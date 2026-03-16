@@ -1,22 +1,39 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
+import { useLogin } from '../../../context/LoginContext';
 import './CardAutenticacion.css';
+import { ShieldAlert } from 'lucide-react';
 
 const CardAutenticacion = ({ children }) => {
+  const navigate = useNavigate();
+  const { validateAll } = useLogin();
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    const esValido = validateAll();
+    if (esValido) {
+      navigate('/dashboard');
+    }
+  };
+
   return (
     <main className="ContenedorPrincipalLogin">
       
-      <section className="TarjetaLogin">
+      <form onSubmit={handleSubmit} className="TarjetaLogin">
         
         {children}
 
         <footer className="PieTarjetaLogin">
           <a href="#" className="EnlaceRecuperacion">Restablecer una contraseña olvidada</a>
-          <p className="TextoRecordatorio">
-            Recuerde: Su acceso está siendo monitoreado por seguridad.
-          </p>
+          
+          <div className="ContenedorRecordatorio">
+            <div className="IconoTooltipSecurity" data-tooltip="Recuerde: Su acceso está siendo monitoreado por seguridad">
+              <ShieldAlert size={18} />
+            </div>
+          </div>
         </footer>
 
-      </section>
+      </form>
 
     </main>
   );

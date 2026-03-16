@@ -49,6 +49,22 @@
   box-shadow: 0 0 0 3px var(--focus-ring);
 }
 
+.CajaEntradaInteractiva:focus-within {
+  border-color: var(--navy-blue);
+  box-shadow: 0 0 0 3px var(--focus-ring);
+  background-color: var(--white);
+}
+
+/* Estado de Error */
+.CajaEntradaInteractiva.CajaError {
+  border-color: #ef4444;
+  background-color: #fef2f2;
+}
+
+.CajaEntradaInteractiva.CajaError:focus-within {
+  box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1);
+}
+
 /* Change icon color smoothly on focus */
 .CajaEntradaInteractiva:focus-within .IconoEntrada {
   color: var(--navy-blue);
@@ -81,7 +97,7 @@
 }
 
 .MensajeErrorValidacion {
-  display: none;
+  display: block;
   color: #ef4444;
   font-size: 0.8rem;
   margin-top: 0.4rem;
