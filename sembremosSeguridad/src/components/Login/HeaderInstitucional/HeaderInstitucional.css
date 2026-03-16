@@ -45,7 +45,7 @@
 
 .SeccionBranding {
   text-align: center;
-  border-bottom: 1px solid var(--gray-border);
+  border-bottom: none;
   padding-bottom: 0.75rem;
   width: 100%;
 }
@@ -60,7 +60,7 @@
 }
 
 .SubtituloGobierno {
-  color: var(--gray-text);
+  color: var(--navy-blue);
   font-size: 0.85rem;
   font-weight: 500;
   margin: 0;
@@ -69,19 +69,28 @@
 }
 
 .SeccionAccesoStatus {
-  margin-top: -12px;
-  background-color: var(--white);
-  padding: 0 12px;
+  margin-top: -10px;
+  display: flex;
+  align-items: center;
+  width: 100%;
+}
+
+.SeccionAccesoStatus::before,
+.SeccionAccesoStatus::after {
+  content: "";
+  flex: 1;
+  height: 1px;
+  background-color: var(--gray-border);
 }
 
 .EtiquetaAcceso {
-  background-color: #f8fafc;
+  background-color: transparent;
   color: var(--navy-blue);
   font-size: 0.7rem;
   font-weight: 700;
-  padding: 0.35rem 1rem;
+  padding: 0 1rem;
   border-radius: 3px;
   text-transform: uppercase;
   letter-spacing: 0.5px;
-  border: 1px solid var(--gray-border);
+  white-space: nowrap;
 }

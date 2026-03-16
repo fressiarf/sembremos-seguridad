@@ -1,36 +1,51 @@
 import React from 'react';
 import './InputValidar.css';
+import { User, Lock, Eye, EyeOff } from 'lucide-react';
 
-import { Eye, EyeOff } from 'lucide-react';
-
-const InputValidar = ({ id, label, type, placeholder, Icon }) => {
+const InputValidar = () => {
   const [showPassword, setShowPassword] = React.useState(false);
 
   const handleTogglePassword = () => {
     setShowPassword(!showPassword);
   };
 
-  const currentType = type === 'password' ? (showPassword ? 'text' : 'password') : type;
-
   return (
-    <div className="ContenedorInputValidar">
+    <div className="SeccionEntradasValidar">
       
-      <label htmlFor={id} className="LabelValidacion">
-        {label}
-      </label>
-      <div className="CajaEntradaInteractiva">
-        <span className="IconoEntrada">
-          {Icon && <Icon size={18} strokeWidth={2.5} />}
-        </span>
-        
-        <input 
-          type={currentType} 
-          id={id} 
-          className="InputCampoValidado" 
-          placeholder={placeholder} 
-        />
+      {/* Entrada de Usuario / Email */}
+      <div className="ContenedorInputValidar">
+        <label htmlFor="EntradaUsuario" className="LabelValidacion">
+          Correo Electrónico o Cédula
+        </label>
+        <div className="CajaEntradaInteractiva">
+          <span className="IconoEntrada">
+            <User size={18} strokeWidth={2.5} />
+          </span>
+          <input 
+            type="text" 
+            id="EntradaUsuario" 
+            className="InputCampoValidado" 
+            placeholder="Ej: usuario@seguridad.go.cr" 
+          />
+        </div>
+        <span className="MensajeErrorValidacion">Dato no reconocido</span>
+      </div>
 
-        {type === 'password' && (
+      {/* Entrada de Contraseña */}
+      <div className="ContenedorInputValidar">
+        <label htmlFor="EntradaPassword" className="LabelValidacion">
+          Contraseña
+        </label>
+        <div className="CajaEntradaInteractiva">
+          <span className="IconoEntrada">
+            <Lock size={18} strokeWidth={2.5} />
+          </span>
+          <input 
+            type={showPassword ? "text" : "password"} 
+            id="EntradaPassword" 
+            className="InputCampoValidado" 
+            placeholder="••••••••" 
+          />
           <button 
             type="button" 
             className="BotonAccionInput"
@@ -38,11 +53,9 @@ const InputValidar = ({ id, label, type, placeholder, Icon }) => {
           >
             {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
           </button>
-        )}
+        </div>
+        <span className="MensajeErrorValidacion">Contraseña incorrecta</span>
       </div>
-      <span className="MensajeErrorValidacion">
-        Dato no reconocido
-      </span>
 
     </div>
   );
