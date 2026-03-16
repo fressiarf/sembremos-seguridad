@@ -1,0 +1,224 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;&display=swap');
+
+/* ══════════════════════════════════════════════
+   Dashboard Global — Estilos Premium con ECharts
+   ══════════════════════════════════════════════ */
+
+.dashboard-global {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  animation: fadeIn 0.4s ease-out;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* ── Header ── */
+.dashboard-global__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 0.5rem;
+}
+
+.dashboard-global__title-block h1 {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #fff;
+  margin: 0;
+}
+
+.dashboard-global__title-block p {
+  color: #7a9cc4;
+  font-size: 0.85rem;
+  margin: 4px 0 0;
+}
+
+.dashboard-global__actions {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.dashboard-global__btn-new {
+  background: #1a1a1a;
+  border: 1px solid #333;
+  color: #fff;
+  padding: 8px 16px;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.dashboard-global__btn-new:hover {
+  background: #252525;
+  border-color: #444;
+}
+
+/* ── Stats Grid ── */
+.dashboard-global__stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1.2rem;
+}
+
+.stat-card {
+  background: #161b22;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  border-radius: 12px;
+  padding: 1.25rem;
+  position: relative;
+  overflow: hidden;
+  height: 140px;
+  display: flex;
+  flex-direction: column;
+}
+
+.stat-card--green { border-bottom: 3px solid #22c55e; }
+.stat-card--blue { border-bottom: 3px solid #3b82f6; }
+.stat-card--orange { border-bottom: 3px solid #f59e0b; }
+.stat-card--red { border-bottom: 3px solid #ef4444; }
+
+.stat-card__icon {
+  margin-bottom: 0.5rem;
+  color: #7a9cc4;
+}
+
+.stat-card__value {
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: #fff;
+  line-height: 1;
+}
+
+.stat-card__label {
+  color: #7a9cc4;
+  font-size: 0.8rem;
+  margin-top: 4px;
+}
+
+.stat-card__sparkline {
+  position: absolute;
+  bottom: 0px;
+  left: 0;
+  right: 0;
+  height: 40px;
+  opacity: 0.4;
+}
+
+/* ── Main Dashboard Layout (Grids) ── */
+.dashboard-global__main-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.5rem;
+}
+
+@media (max-width: 1100px) {
+  .dashboard-global__main-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.dashboard-card {
+  background: #161b22;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  border-radius: 12px;
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+}
+
+.dashboard-card__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+}
+
+.dashboard-card__title {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #fff;
+}
+
+.dashboard-card__chart-container {
+  height: 280px;
+  width: 100%;
+}
+
+/* ── Timeline (Actualizaciones) ── */
+.timeline {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  position: relative;
+  padding-left: 1.5rem;
+  max-height: 280px;
+  overflow-y: auto;
+}
+
+.timeline::-webkit-scrollbar { width: 3px; }
+.timeline::-webkit-scrollbar-thumb { background: #333; border-radius: 4px; }
+
+.timeline::before {
+  content: '';
+  position: absolute;
+  left: 4px;
+  top: 0;
+  bottom: 0;
+  width: 2px;
+  background: #21262d;
+}
+
+.timeline-item { position: relative; }
+.timeline-item__dot {
+  position: absolute;
+  left: -22px;
+  top: 4px;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: #0d1117;
+  border: 2px solid #21262d;
+  z-index: 1;
+}
+
+.timeline-item--green .timeline-item__dot { border-color: #22c55e; }
+.timeline-item--blue .timeline-item__dot { border-color: #3b82f6; }
+.timeline-item--orange .timeline-item__dot { border-color: #f59e0b; }
+
+.timeline-item__content {
+  background: #0d1117;
+  border: 1px solid #21262d;
+  border-radius: 8px;
+  padding: 10px 12px;
+}
+
+.timeline-item__title { color: #fff; font-weight: 600; font-size: 0.85rem; }
+.timeline-item__desc { color: #7a9cc4; font-size: 0.75rem; }
+
+/* ── Bottom Radar/Bar Chart ── */
+.dashboard-global__bottom-card {
+  grid-column: span 2;
+}
+
+@media (max-width: 1100px) {
+  .dashboard-global__bottom-card {
+    grid-column: span 1;
+  }
+}
+
+.dashboard-global__bottom-chart {
+  height: 350px;
+  width: 100%;
+}

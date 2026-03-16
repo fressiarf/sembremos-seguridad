@@ -1,0 +1,6 @@
+.dashboard-wrapper {
+  display: flex;
+  min-height: 100vh;
+  background-color: #0b1e3d;
+  width: 100%;
+}

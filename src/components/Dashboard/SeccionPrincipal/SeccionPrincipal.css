@@ -1,0 +1,11 @@
+.main-content {
+  flex: 1;
+  padding: 2rem;
+  color: #e8eef8;
+  margin-left: 260px;
+  transition: margin-left 0.28s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.main-content--collapsed {
+  margin-left: 68px;
+}
