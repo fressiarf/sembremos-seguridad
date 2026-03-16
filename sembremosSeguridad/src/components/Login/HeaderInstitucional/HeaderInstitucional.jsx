@@ -1,34 +1,35 @@
 import React from 'react';
+import './HeaderInstitucional.css';
+import logoMsp from '../../../assets/Msp_logo-removebg-preview.png';
+import logoInl from '../../../assets/inl-logo-acronym-vertical-navy-removebg-preview.png';
+import logoSembremos from '../../../assets/Captura_de_pantalla_2026-03-15_191337-removebg-preview.png';
 
 const HeaderInstitucional = () => {
   return (
     <header className="HeaderContenedor">
       
-      {/* Sección Izquierda: Logos de la Tríada */}
       <div className="SeccionLogosInstitucionales">
         
         <div className="ContenedorLogoItem">
-          <img src="/logo-msp.png" alt="Logo MSP" className="ImagenLogoMsp" />
+          <img src={logoMsp} alt="Logo MSP" className="ImagenLogoMsp" />
         </div>
 
         <div className="ContenedorLogoItem">
-          <img src="/logo-inl.png" alt="Logo INL" className="ImagenLogoInl" />
+          <img src={logoInl} alt="Logo INL" className="ImagenLogoInl" />
         </div>
 
         <div className="ContenedorLogoItem">
-          <img src="/logo-sembremos.png" alt="Logo Sembremos Seguridad" className="ImagenLogoSembremos" />
+          <img src={logoSembremos} alt="Logo Sembremos Seguridad" className="ImagenLogoSembremos" />
         </div>
 
       </div>
 
-      {/* Sección Central/Derecha: Título del Proyecto */}
       <div className="SeccionBranding">
         <h1 className="TituloProyecto">Sembremos Seguridad</h1>
         <span className="SeparadorVertical"></span>
         <p className="SubtituloGobierno">Gobierno de la República de Costa Rica</p>
       </div>
 
-      {/* Sección de Apoyo (Opcional para el Martes) */}
       <div className="SeccionAccesoStatus">
         <span className="EtiquetaAcceso">Portal Oficial de Gestión</span>
       </div>

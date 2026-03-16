@@ -1,4 +1,7 @@
 import React from 'react';
+import './BtnAcceso.css';
+
+import { LogIn } from 'lucide-react';
 
 const BtnAcceso = () => {
   return (
@@ -6,13 +9,12 @@ const BtnAcceso = () => {
       
       <button type="submit" className="BotonPrincipalAcceso">
         
-        {/* Texto del botón */}
         <span className="TextoBotonAcceso">Ingresar al Sistema</span>
 
-        {/* Espacio para un pequeño icono de flecha o candado */}
-        <span className="IconoBotonAcceso">➡️</span>
+        <span className="IconoBotonAcceso">
+          <LogIn size={18} />
+        </span>
 
-        {/* Este elemento servirá para mostrar un Spinner de carga en el futuro */}
         <div className="IndicadorCargando"></div>
 
       </button>

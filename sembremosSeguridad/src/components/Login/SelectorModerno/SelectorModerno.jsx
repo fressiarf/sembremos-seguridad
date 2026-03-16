@@ -1,4 +1,6 @@
 import React from 'react';
+import './SelectorModerno.css';
+import { Mail, IdCard } from 'lucide-react';
 
 const SelectorMetodoModerno = () => {
   return (
@@ -6,7 +8,9 @@ const SelectorMetodoModerno = () => {
       
       {/* Opción para autenticación por Correo */}
       <div className="OpcionMetodoItem ItemActivo">
-        <span className="IconoMetodo">✉️</span>
+        <span className="IconoMetodo">
+          <Mail size={18} />
+        </span>
         <span className="TextoMetodo">Correo Institucional</span>
       </div>
 
@@ -15,7 +19,9 @@ const SelectorMetodoModerno = () => {
 
       {/* Opción para autenticación por Cédula */}
       <div className="OpcionMetodoItem">
-        <span className="IconoMetodo">🆔</span>
+        <span className="IconoMetodo">
+          <IdCard size={18} />
+        </span>
         <span className="TextoMetodo">Número de Cédula</span>
       </div>
 
