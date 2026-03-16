@@ -1,0 +1,209 @@
+/* CardAutenticacion.css */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+:root {
+  --navy-blue: #0b2240;
+  --navy-blue-light: #163a66;
+  --white: #ffffff;
+  --gray-bg: #f8fafc;
+  --gray-border: #e2e8f0;
+  --gray-text: #64748b;
+  --text-dark: #1e293b;
+  --primary-color: var(--navy-blue);
+  --focus-ring: rgba(11, 34, 64, 0.2);
+  
+  /* Gradiente oficial sutil de la bandera de Costa Rica */
+  --bandera-cr: linear-gradient(
+    to right, 
+    #002b7f 0% 17%, 
+    #ffffff 17% 33%, 
+    #ce1126 33% 67%, 
+    #ffffff 67% 83%, 
+    #002b7f 83% 100%
+  );
+}
+
+body {
+  margin: 0;
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  background-color: var(--navy-blue);
+  /* Fondo institucional con imagen y overlay oscuro */
+  background-image: 
+    linear-gradient(rgba(11, 34, 64, 0.8), rgba(11, 34, 64, 0.8)), 
+    url('/bg-institucional.png');
+  background-size: cover;
+  background-position: center;
+  background-attachment: fixed;
+  min-height: 100vh;
+  backdrop-filter: blur(8px); /* Blur ambiental */
+}
+
+.ContenedorPrincipalLogin {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+  box-sizing: border-box;
+}
+
+.TarjetaLogin {
+  background-color: rgba(255, 255, 255, 0.95); /* Una pizca de transparencia para el efecto glass */
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 4px;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
+  width: 100%;
+  max-width: 700px;
+  padding: 1.25rem 40px;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  max-height: calc(100vh - 4rem);
+  overflow: hidden;
+}
+
+/* Franja superior de la bandera */
+.TarjetaLogin::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 5px;
+  background: var(--bandera-cr);
+}
+
+/* Franja inferior de la bandera */
+.TarjetaLogin::after {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 5px;
+  background: var(--bandera-cr);
+}
+
+.EncabezadoTarjeta {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.TituloBienvenida {
+  color: var(--text-dark);
+  font-size: 1.75rem;
+  font-weight: 700;
+  margin: 0 0 0.5rem 0;
+  letter-spacing: -0.025em;
+}
+
+.InstruccionAcceso {
+  color: var(--gray-text);
+  font-size: 0.95rem;
+  margin: 0;
+  line-height: 1.5;
+}
+
+.PieTarjetaLogin {
+  margin-top: 0.75rem;
+  text-align: center;
+  border-top: 1px solid var(--gray-border);
+  padding-top: 0.75rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.EnlaceRecuperacion {
+  color: var(--primary-color);
+  font-weight: 600;
+  font-size: 0.9rem;
+  text-decoration: none;
+  transition: color 0.2s ease;
+  display: inline-block;
+}
+
+.EnlaceRecuperacion:hover {
+  text-decoration: underline;
+  color: var(--navy-blue-light);
+}
+
+.ContenedorRecordatorio {
+  position: absolute;
+  bottom: 0.75rem;
+  right: 1rem;
+}
+
+.IconoTooltipSecurity {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--gray-text);
+  cursor: help;
+  padding: 8px;
+  border-radius: 50%;
+  transition: all 0.3s ease;
+  background-color: var(--gray-bg);
+  border: 1px solid var(--gray-border);
+}
+
+.IconoTooltipSecurity:hover {
+  color: var(--navy-blue);
+  background-color: var(--white);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+/* Tooltip text - Moved to the left to avoid overlap with buttons */
+.IconoTooltipSecurity::after {
+  content: attr(data-tooltip);
+  position: absolute;
+  bottom: 50%;
+  right: 140%;
+  transform: translateY(50%) translateX(10px);
+  background-color: var(--navy-blue);
+  color: var(--white);
+  padding: 0.6rem 1rem;
+  border-radius: 8px;
+  font-size: 0.75rem;
+  font-weight: 500;
+  width: 220px;
+  text-align: center;
+  opacity: 0;
+  visibility: hidden;
+  transition: all 0.3s cubic-bezier(0.68, -0.55, 0.27, 1.55);
+  pointer-events: none;
+  box-shadow: 0 10px 25px rgba(11, 34, 64, 0.3);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  z-index: 100;
+}
+
+/* Tooltip arrow - pointing right */
+.IconoTooltipSecurity::before {
+  content: "";
+  position: absolute;
+  top: 50%;
+  right: 115%;
+  transform: translateY(-50%) translateX(10px);
+  border-width: 6px;
+  border-style: solid;
+  border-color: transparent transparent transparent var(--navy-blue);
+  opacity: 0;
+  visibility: hidden;
+  transition: all 0.3s ease;
+  z-index: 100;
+}
+
+.IconoTooltipSecurity:hover::after {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(50%) translateX(0);
+}
+
+.IconoTooltipSecurity:hover::before {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(-50%) translateX(0);
+}
