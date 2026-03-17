@@ -1,0 +1,288 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;&display=swap');
+
+/* ══════════════════════════════════════════════
+   Dashboard Global — Estilos Premium con ECharts
+   ══════════════════════════════════════════════ */
+
+.dashboard-global {
+  font-family: 'Inter', system-ui, sans-serif;
+  padding: 2.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+  animation: fadeIn 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+  background: var(--inst-light-bg);
+}
+
+
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* ── Header ── */
+.dashboard-global__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 0.5rem;
+}
+
+.dashboard-global__title-block h1 {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--inst-text-dark);
+  margin: 0;
+}
+
+
+.dashboard-global__title-block p {
+  color: var(--inst-text-muted);
+  font-size: 0.85rem;
+  margin: 4px 0 0;
+}
+
+
+.dashboard-global__actions {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.dashboard-global__btn-new {
+  background: var(--inst-blue);
+  border: 1px solid var(--inst-blue);
+  color: #fff;
+  padding: 10px 20px;
+  border-radius: 10px;
+  font-weight: 600;
+  font-size: 0.95rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  box-shadow: 0 10px 25px rgba(0, 47, 108, 0.2);
+}
+
+.dashboard-global__btn-new:hover {
+  background: var(--inst-dark-blue);
+  transform: translateY(-2px);
+  box-shadow: 0 15px 30px rgba(0, 47, 108, 0.3);
+}
+
+
+
+.dashboard-global__btn-new:hover {
+  background: #252525;
+  border-color: #444;
+}
+
+/* ── Badge de Rol (Modo Claro para Dashboard) ── */
+.role-badge--light {
+  background: #fff !important;
+  border: 1px solid var(--inst-border) !important;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.04) !important;
+}
+
+.role-badge--light .sidebar-admin__role-label {
+  color: var(--inst-text-dark) !important;
+  font-weight: 700 !important;
+}
+
+.role-badge--light .sidebar-admin__role-dot {
+  box-shadow: 0 0 8px rgba(34, 197, 94, 0.4) !important;
+}
+
+
+/* ── Stats Grid ── */
+.dashboard-global__stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1.2rem;
+}
+
+.stat-card {
+  background: var(--inst-white);
+  border: 1px solid var(--inst-border);
+  border-radius: 16px;
+  padding: 1.75rem;
+  position: relative;
+  overflow: hidden;
+  height: auto;
+  min-height: 150px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.02);
+  transition: all 0.3s ease;
+}
+
+.stat-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.05);
+  border-color: rgba(0, 47, 108, 0.1);
+}
+
+
+
+.stat-card--green { border-bottom: 3px solid #22c55e; }
+.stat-card--blue { border-bottom: 3px solid #3b82f6; }
+.stat-card--orange { border-bottom: 3px solid #f59e0b; }
+.stat-card--red { border-bottom: 3px solid #ef4444; }
+
+.stat-card__icon {
+  margin-bottom: 0.5rem;
+  color: var(--inst-blue);
+  background: var(--inst-light-bg);
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px;
+}
+
+
+.stat-card__value {
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: var(--inst-text-dark);
+  line-height: 1;
+}
+
+.stat-card__label {
+  color: var(--inst-text-muted);
+  font-size: 0.8rem;
+  margin-top: 4px;
+}
+
+.stat-card__sparkline {
+  position: absolute;
+  bottom: 0px;
+  left: 0;
+  right: 0;
+  height: 40px;
+  opacity: 0.2;
+}
+
+
+/* ── Main Dashboard Layout (Grids) ── */
+.dashboard-global__main-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.5rem;
+}
+
+@media (max-width: 1100px) {
+  .dashboard-global__main-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.dashboard-card {
+  background: var(--inst-white);
+  border: 1px solid var(--inst-border);
+  border-radius: 20px;
+  padding: 2rem;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 15px 40px rgba(0, 0, 0, 0.02);
+  transition: all 0.4s ease;
+}
+
+.dashboard-card:hover {
+  box-shadow: 0 25px 60px rgba(0, 0, 0, 0.04);
+}
+
+
+
+.dashboard-card__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+}
+
+.dashboard-card__title {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--inst-text-dark);
+}
+
+
+.dashboard-card__chart-container {
+  height: 280px;
+  width: 100%;
+}
+
+/* ── Timeline (Actualizaciones) ── */
+.timeline {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  position: relative;
+  padding-left: 1.5rem;
+  max-height: 280px;
+  overflow-y: auto;
+}
+
+.timeline::-webkit-scrollbar { width: 4px; }
+.timeline::-webkit-scrollbar-thumb { background: var(--inst-border); border-radius: 4px; }
+
+.timeline::before {
+  content: '';
+  position: absolute;
+  left: 4px;
+  top: 0;
+  bottom: 0;
+  width: 2px;
+  background: var(--inst-border);
+}
+
+
+.timeline-item { position: relative; }
+.timeline-item__dot {
+  position: absolute;
+  left: -22px;
+  top: 4px;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--inst-white);
+  border: 2px solid var(--inst-border);
+  z-index: 1;
+}
+
+.timeline-item--green .timeline-item__dot { border-color: #22c55e; }
+.timeline-item--blue .timeline-item__dot { border-color: #3b82f6; }
+.timeline-item--orange .timeline-item__dot { border-color: #f59e0b; }
+
+.timeline-item__content {
+  background: #f8fafc;
+  border: 1px solid var(--inst-border);
+  border-radius: 8px;
+  padding: 10px 12px;
+}
+
+
+.timeline-item__title { color: var(--inst-text-dark); font-weight: 700; font-size: 0.85rem; }
+.timeline-item__desc { color: #475569; font-size: 0.75rem; font-weight: 500; }
+
+
+/* ── Bottom Radar/Bar Chart ── */
+.dashboard-global__bottom-card {
+  grid-column: span 2;
+}
+
+@media (max-width: 1100px) {
+  .dashboard-global__bottom-card {
+    grid-column: span 1;
+  }
+}
+
+.dashboard-global__bottom-chart {
+  height: 350px;
+  width: 100%;
+}
