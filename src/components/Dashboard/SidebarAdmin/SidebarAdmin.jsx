@@ -1,5 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import './SidebarAdmin.css';
+import { dashboardService } from '../../../services/dashboardService';
+
 
 // ──────────────────────────────────────────────
 //  Íconos SVG inline (sin dependencias externas)
@@ -110,40 +112,7 @@ const Icon = {
 // ──────────────────────────────────────────────
 //  Estructura de navegación
 // ──────────────────────────────────────────────
-const NAV_SECTIONS = [
-  {
-    label: 'PRINCIPAL',
-    items: [
-      { id: 'dashboard',   label: 'Dashboard global',      icon: Icon.Dashboard, path: '/dashboard' },
-      { id: 'actividades', label: 'Actividad oficiales',   icon: Icon.Activity,  path: '/actividades', badge: 3 },
-    ],
-  },
-  {
-    label: 'GESTIÓN',
-    items: [
-      { id: 'matrices',    label: 'Todas las matrices',    icon: Icon.Matrix,    path: '/matrices' },
-      { id: 'zonas',       label: 'Zonas críticas',        icon: Icon.Zone,      path: '/zonas',    badge: 2 },
-      { id: 'incidentes',  label: 'Incidentes',            icon: Icon.Incident,  path: '/incidentes' },
-      { id: 'alertas',     label: 'Alertas activas',       icon: Icon.Alert,     path: '/alertas',  badge: 5 },
-    ],
-  },
-  {
-    label: 'ANÁLISIS',
-    items: [
-      { id: 'mapa',        label: 'Mapa de riesgos',       icon: Icon.Map,       path: '/mapa' },
-      { id: 'estadisticas',label: 'Estadísticas',          icon: Icon.Stats,     path: '/estadisticas' },
-      { id: 'calendario',  label: 'Calendario',            icon: Icon.Calendar,  path: '/calendario' },
-    ],
-  },
-  {
-    label: 'ADMINISTRACIÓN',
-    items: [
-      { id: 'usuarios',    label: 'Gestión de usuarios',   icon: Icon.Users,     path: '/usuarios' },
-      { id: 'reportes',    label: 'Reportes INL/MSP',      icon: Icon.Report,    path: '/reportes' },
-      { id: 'configuracion',label: 'Configuración',        icon: Icon.Settings,  path: '/configuracion' },
-    ],
-  },
-];
+
 
 // ──────────────────────────────────────────────
 //  Componente principal
@@ -153,9 +122,64 @@ const SidebarAdmin = ({ collapsed = false, onToggle, activeView, onViewChange })
     PRINCIPAL: true, GESTIÓN: true, ANÁLISIS: true, ADMINISTRACIÓN: true,
   });
 
+  const [stats, setStats] = useState({
+    activitiesCount: 0,
+    zonesCount: 0,
+    alertsCount: 0
+  });
+
+  useEffect(() => {
+    const fetchStats = async () => {
+      const data = await dashboardService.getStats();
+      setStats(data);
+    };
+    fetchStats();
+    
+    // Opcional: Polling cada 30 segundos si se desea tiempo real
+    const interval = setInterval(fetchStats, 30000);
+    return () => clearInterval(interval);
+  }, []);
+
+  // ── Secciones de navegación dinámicas ──
+  const navSections = [
+    {
+      label: 'PRINCIPAL',
+      items: [
+        { id: 'dashboard',   label: 'Dashboard global',      icon: Icon.Dashboard, path: '/dashboard' },
+        { id: 'actividades', label: 'Actividad oficiales',   icon: Icon.Activity,  path: '/actividades', badge: stats.activitiesCount },
+      ],
+    },
+    {
+      label: 'GESTIÓN',
+      items: [
+        { id: 'matrices',    label: 'Todas las matrices',    icon: Icon.Matrix,    path: '/matrices' },
+        { id: 'zonas',       label: 'Zonas críticas',        icon: Icon.Zone,      path: '/zonas',    badge: stats.zonesCount },
+        { id: 'incidentes',  label: 'Incidentes',            icon: Icon.Incident,  path: '/incidentes' },
+        { id: 'alertas',     label: 'Alertas activas',       icon: Icon.Alert,     path: '/alertas',  badge: stats.alertsCount },
+      ],
+    },
+    {
+      label: 'ANÁLISIS',
+      items: [
+        { id: 'mapa',        label: 'Mapa de riesgos',       icon: Icon.Map,       path: '/mapa' },
+        { id: 'estadisticas',label: 'Estadísticas',          icon: Icon.Stats,     path: '/estadisticas' },
+        { id: 'calendario',  label: 'Calendario',            icon: Icon.Calendar,  path: '/calendario' },
+      ],
+    },
+    {
+      label: 'ADMINISTRACIÓN',
+      items: [
+        { id: 'usuarios',    label: 'Gestión de usuarios',   icon: Icon.Users,     path: '/usuarios' },
+        { id: 'reportes',    label: 'Reportes INL/MSP',      icon: Icon.Report,    path: '/reportes' },
+        { id: 'configuracion',label: 'Configuración',        icon: Icon.Settings,  path: '/configuracion' },
+      ],
+    },
+  ];
+
   const toggleSection = (label) => {
     setOpenSections(prev => ({ ...prev, [label]: !prev[label] }));
   };
+
 
   return (
     <aside className={`sidebar-admin ${collapsed ? 'sidebar-admin--collapsed' : ''}`}>
@@ -166,25 +190,24 @@ const SidebarAdmin = ({ collapsed = false, onToggle, activeView, onViewChange })
           <div className="sidebar-admin__logo-icon">
             <Icon.Shield />
           </div>
-          {!collapsed && (
-            <div className="sidebar-admin__logo-text">
-              <span className="sidebar-admin__logo-title">Sembremos</span>
-              <span className="sidebar-admin__logo-subtitle">Seguridad</span>
-              <span className="sidebar-admin__logo-location">Puntarenas · 2025</span>
-            </div>
-          )}
+          <div className="sidebar-admin__logo-text">
+            <span className="sidebar-admin__logo-title">SEMBREMOS</span>
+            <span className="sidebar-admin__logo-subtitle">SEGURIDAD</span>
+          </div>
         </div>
 
-        {/* Botón colapsar */}
         <button className="sidebar-admin__toggle" onClick={onToggle} title={collapsed ? 'Expandir' : 'Colapsar'}>
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"
-            strokeLinecap="round" strokeLinejoin="round"
-            style={{ transform: collapsed ? 'rotate(180deg)' : 'rotate(0)', transition: 'transform 0.3s' }}>
-            <line x1="3" y1="6" x2="21" y2="6" /><line x1="3" y1="12" x2="21" y2="12" />
-            <line x1="3" y1="18" x2="21" y2="18" />
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"
+            style={{ 
+              transform: collapsed ? 'rotate(180deg)' : 'rotate(0deg)', 
+              transition: 'transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275)' 
+            }}>
+            <polyline points="15 18 9 12 15 6" />
           </svg>
         </button>
+
       </div>
+
 
       {/* ── Rol del usuario ── */}
       {!collapsed && (
@@ -196,8 +219,9 @@ const SidebarAdmin = ({ collapsed = false, onToggle, activeView, onViewChange })
 
       {/* ── Navegación ── */}
       <nav className="sidebar-admin__nav">
-        {NAV_SECTIONS.map(section => (
+        {navSections.map(section => (
           <div key={section.label} className="sidebar-admin__section">
+
 
             {/* Título de sección */}
             {!collapsed && (
@@ -225,10 +249,8 @@ const SidebarAdmin = ({ collapsed = false, onToggle, activeView, onViewChange })
                       onClick={() => onViewChange(item.id)}
                       title={collapsed ? item.label : undefined}
                     >
-                      {/* Indicador activo */}
-                      {isActive && <span className="sidebar-admin__item-indicator" />}
-
                       {/* Ícono */}
+
                       <span className="sidebar-admin__item-icon">
                         <IconComp />
                       </span>
@@ -255,8 +277,17 @@ const SidebarAdmin = ({ collapsed = false, onToggle, activeView, onViewChange })
 
       {/* ── Footer: perfil + cerrar sesión ── */}
       <div className="sidebar-admin__footer">
-        <div className="sidebar-admin__profile">
-          <div className="sidebar-admin__avatar">CA</div>
+        <div 
+          className={`sidebar-admin__profile ${activeView === 'perfil' ? 'sidebar-admin__profile--active' : ''}`}
+          onClick={() => onViewChange('perfil')}
+          title="Ver mi perfil"
+        >
+          <div className="sidebar-admin__avatar">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+               <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>
+            </svg>
+          </div>
+
           {!collapsed && (
             <div className="sidebar-admin__profile-info">
               <span className="sidebar-admin__profile-name">C. Araya</span>
@@ -264,6 +295,7 @@ const SidebarAdmin = ({ collapsed = false, onToggle, activeView, onViewChange })
             </div>
           )}
         </div>
+
 
         <a href="/" className="sidebar-admin__logout" title="Cerrar sesión" id="btn-logout" style={{ textDecoration: 'none' }}>
           <Icon.Logout />

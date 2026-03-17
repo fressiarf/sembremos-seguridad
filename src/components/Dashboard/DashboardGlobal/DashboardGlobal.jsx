@@ -1,6 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import ReactECharts from 'echarts-for-react';
 import './DashboardGlobal.css';
+import { useToast } from '../../../context/ToastContext';
+import { dashboardService } from '../../../services/dashboardService';
+
+
 
 // ── Íconos ──
 const Icon = {
@@ -34,16 +38,38 @@ const Icon = {
 
 const DashboardGlobal = () => {
   const [isLoaded, setIsLoaded] = useState(false);
+  const { showToast } = useToast();
+
+  const [dashboardData, setDashboardData] = useState(null);
+  const [stats, setStats] = useState({
+    completadas: 0,
+    activas: 0,
+    pendientes: 0,
+    retrasadas: 0
+  });
 
   useEffect(() => {
-    setIsLoaded(true);
+    const fetchData = async () => {
+      const data = await dashboardService.getFullDashboardData();
+      if (data) {
+        setDashboardData(data);
+        setStats(data.stats);
+        setIsLoaded(true);
+      }
+    };
+    fetchData();
   }, []);
+
+
 
   // ── Configuración ECharts ──
   const globalTextStyle = {
     fontFamily: "'Inter', sans-serif",
-    color: '#7a9cc4'
+    color: '#1e293b',
+    fontWeight: 600
   };
+
+
 
   // 1. Sparkline Opciones
   const getSparklineOption = (color, data) => ({
@@ -85,7 +111,8 @@ const DashboardGlobal = () => {
       left: 'center',
       itemWidth: 12,
       itemHeight: 12,
-      textStyle: { color: '#e8eef8', fontFamily: "'Inter', sans-serif", fontSize: 11 },
+      textStyle: { color: '#1e293b', fontFamily: "'Inter', sans-serif", fontSize: 11, fontWeight: 600 },
+
       itemGap: 20
     },
     series: [
@@ -111,10 +138,12 @@ const DashboardGlobal = () => {
         },
         labelLine: { show: false },
         data: [
-          { value: 45, name: 'L#1: Alcohol/Drogas', itemStyle: { color: '#f59e0b' } },
-          { value: 30, name: 'L#3: Calle', itemStyle: { color: '#3b82f6' } },
-          { value: 68, name: 'L#4: Inversión Social', itemStyle: { color: '#22c55e' } }
+          { value: stats.completadas, name: 'Completadas', itemStyle: { color: '#15803d' } },
+          { value: stats.activas, name: 'En ejecución', itemStyle: { color: '#1d4ed8' } },
+          { value: stats.pendientes, name: 'Pendientes', itemStyle: { color: '#64748b' } },
+          { value: stats.retrasadas, name: 'Retrasadas', itemStyle: { color: '#d97706' } }
         ]
+
       }
     ]
   };
@@ -133,36 +162,38 @@ const DashboardGlobal = () => {
       type: 'value',
       boundaryGap: [0, 0.01],
       splitLine: { lineStyle: { color: 'rgba(255,255,255,0.05)' } },
-      axisLabel: { color: '#7a9cc4', fontFamily: "'Inter', sans-serif" }
+      axisLabel: { color: '#1e293b', fontFamily: "'Inter', sans-serif", fontWeight: 500 }
+
     },
     yAxis: {
       type: 'category',
-      data: ['Prog. Educativos', 'Campañas Pub.', 'Seguimiento Mesas', 'Festivales Juv.'],
-      axisLabel: { color: '#e8eef8', fontSize: 11, fontFamily: "'Inter', sans-serif" },
+      data: dashboardData?.zones.map(z => z.nombre) || [],
+      axisLabel: { color: '#1e293b', fontSize: 11, fontFamily: "'Inter', sans-serif", fontWeight: 600 },
       axisLine: { show: false }
+
     },
+
     series: [
       {
         type: 'bar',
-        data: [
-          { value: 66, itemStyle: { color: '#3b82f6' } },
-          { value: 33, itemStyle: { color: '#f59e0b' } },
-          { value: 50, itemStyle: { color: '#3b82f6' } },
-          { value: 50, itemStyle: { color: '#22c55e' } }
-        ],
+        data: dashboardData?.zones.map(z => ({
+          value: z.incidentes,
+          itemStyle: { color: z.incidentes > 10 ? '#ef4444' : '#1d4ed8' }
+        })) || [],
         showBackground: true,
-        backgroundStyle: { color: 'rgba(255, 255, 255, 0.03)' },
+        backgroundStyle: { color: 'rgba(0, 0, 0, 0.02)' },
         barWidth: '45%',
         itemStyle: { borderRadius: [0, 4, 4, 0] },
         label: { 
           show: true, 
           position: 'right', 
-          formatter: '{c}%', 
-          color: '#fff', 
+          formatter: '{c} inc.', 
+          color: '#1e293b', 
           fontFamily: "'Inter', sans-serif",
-          fontWeight: '600'
+          fontWeight: '700'
         }
       }
+
     ]
   };
 
@@ -176,14 +207,20 @@ const DashboardGlobal = () => {
           <p>Programa Sembremos Seguridad · Cantón Puntarenas (Periodo 2025)</p>
         </div>
         <div className="dashboard-global__actions">
-          <div className="sidebar-admin__role" style={{ margin: 0 }}>
+          <div className="sidebar-admin__role role-badge--light" style={{ margin: 0 }}>
             <span className="sidebar-admin__role-dot" />
             <span className="sidebar-admin__role-label">Administrador</span>
           </div>
-          <button className="dashboard-global__btn-new" id="btn-nueva-accion">
+
+          <button 
+            className="dashboard-global__btn-new" 
+            id="btn-nueva-accion"
+            onClick={() => showToast('Iniciando creación de nueva acción estratégica...', 'info')}
+          >
             <Icon.Plus />
             Nueva acción
           </button>
+
         </div>
       </header>
 
@@ -191,7 +228,7 @@ const DashboardGlobal = () => {
       <section className="dashboard-global__stats-grid">
         <div className="stat-card stat-card--green">
           <div className="stat-card__icon"><Icon.Check /></div>
-          <div className="stat-card__value">02</div>
+          <div className="stat-card__value">{String(stats.completadas).padStart(2, '0')}</div>
           <div className="stat-card__label">Metas Realizadas</div>
           <div className="stat-card__sparkline">
             <ReactECharts option={getSparklineOption('#22c55e', [5, 12, 18, 14, 22, 19, 25])} style={{ height: '40px' }} />
@@ -199,7 +236,7 @@ const DashboardGlobal = () => {
         </div>
         <div className="stat-card stat-card--blue">
           <div className="stat-card__icon"><Icon.Pulse /></div>
-          <div className="stat-card__value">12</div>
+          <div className="stat-card__value">{String(stats.activas).padStart(2, '0')}</div>
           <div className="stat-card__label">Acciones Activas</div>
           <div className="stat-card__sparkline">
             <ReactECharts option={getSparklineOption('#3b82f6', [10, 8, 11, 10, 12, 11, 12])} style={{ height: '40px' }} />
@@ -207,7 +244,7 @@ const DashboardGlobal = () => {
         </div>
         <div className="stat-card stat-card--orange">
           <div className="stat-card__icon"><Icon.Clock /></div>
-          <div className="stat-card__value">14</div>
+          <div className="stat-card__value">{String(stats.pendientes).padStart(2, '0')}</div>
           <div className="stat-card__label">Pendientes</div>
           <div className="stat-card__sparkline">
             <ReactECharts option={getSparklineOption('#f59e0b', [20, 18, 16, 17, 15, 14, 14])} style={{ height: '40px' }} />
@@ -215,12 +252,13 @@ const DashboardGlobal = () => {
         </div>
         <div className="stat-card stat-card--red">
           <div className="stat-card__icon"><Icon.Alert /></div>
-          <div className="stat-card__value">01</div>
+          <div className="stat-card__value">{String(stats.retrasadas).padStart(2, '0')}</div>
           <div className="stat-card__label">Con Retraso</div>
           <div className="stat-card__sparkline">
             <ReactECharts option={getSparklineOption('#ef4444', [2, 1, 3, 2, 1, 2, 1])} style={{ height: '40px' }} />
           </div>
         </div>
+
       </section>
 
       {/* ── Grid Principal de Gráficos ── */}
@@ -229,52 +267,46 @@ const DashboardGlobal = () => {
         {/* Gráfico de Avance por Línea */}
         <section className="dashboard-card">
           <div className="dashboard-card__header">
-            <h2 className="dashboard-card__title">Avance por Línea de Acción</h2>
+            <h2 className="dashboard-card__title">Resumen de Acciones por Estado</h2>
           </div>
           <div className="dashboard-card__chart-container">
             {isLoaded && <ReactECharts option={lineProgressOption} style={{ height: '100%', width: '100%' }} />}
           </div>
         </section>
 
+
         {/* Informes Cualitativos (Timeline) */}
         <section className="dashboard-card">
           <div className="dashboard-card__header">
-            <h2 className="dashboard-card__title">Informes de Avance (Puntarenas)</h2>
+            <h2 className="dashboard-card__title">Últimas Actualizaciones</h2>
           </div>
           <div className="timeline">
-            <div className="timeline-item timeline-item--green">
-              <div className="timeline-item__dot" />
-              <div className="timeline-item__content">
-                <div className="timeline-item__title">Centro Cívico por la Paz</div>
-                <div className="timeline-item__desc">Transformación de espacio y uso regular por jóvenes.</div>
+            {dashboardData?.notifications.map(note => (
+              <div key={note.id} className={`timeline-item timeline-item--${note.tipo === 'success' ? 'green' : 'blue'}`}>
+                <div className="timeline-item__dot" />
+                <div className="timeline-item__content">
+                  <div className="timeline-item__title">{note.mensaje}</div>
+                  <div className="timeline-item__desc">{note.fecha}</div>
+                </div>
               </div>
-            </div>
-            <div className="timeline-item timeline-item--blue">
-              <div className="timeline-item__dot" />
-              <div className="timeline-item__content">
-                <div className="timeline-item__title">Mercadito Navideño</div>
-                <div className="timeline-item__desc">Feria de emprendimiento juvenil con éxito (L#4).</div>
-              </div>
-            </div>
-            <div className="timeline-item timeline-item--orange">
-              <div className="timeline-item__dot" />
-              <div className="timeline-item__content">
-                <div className="timeline-item__title">Campaña de Redes Sociales</div>
-                <div className="timeline-item__desc">Lanzamiento de la 1era campaña de prevención (L#1).</div>
-              </div>
-            </div>
+            ))}
+            {(!dashboardData || dashboardData.notifications.length === 0) && (
+              <p style={{ color: '#64748b', fontSize: '0.85rem' }}>No hay actualizaciones recientes.</p>
+            )}
           </div>
         </section>
+
 
         {/* Gráfico de Cumplimiento Estratégico (Full Width) */}
         <section className="dashboard-card dashboard-global__bottom-card">
           <div className="dashboard-card__header">
-            <h2 className="dashboard-card__title">Cumplimiento de Acciones Estratégicas (Metas 2025)</h2>
+            <h2 className="dashboard-card__title">Distribución de Incidentes por Zonas Críticas</h2>
           </div>
           <div className="dashboard-global__bottom-chart">
             {isLoaded && <ReactECharts option={strategyComplianceOption} style={{ height: '100%', width: '100%' }} />}
           </div>
         </section>
+
 
       </div>
 

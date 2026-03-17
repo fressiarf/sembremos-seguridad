@@ -1,5 +1,7 @@
 import React from 'react';
 import './ActividadOficiales.css';
+import { useToast } from '../../../context/ToastContext';
+
 
 const Icon = {
   Users: () => (
@@ -27,6 +29,8 @@ const Icon = {
 const ActividadOficiales = () => {
   const [selectedOfficer, setSelectedOfficer] = React.useState('Todos los oficiales');
   const [isDropdownOpen, setIsDropdownOpen] = React.useState(false);
+  const { showToast } = useToast();
+
 
   const activities = [
     {
@@ -91,14 +95,11 @@ const ActividadOficiales = () => {
     <div className="actividad-oficiales">
       <header className="actividad-oficiales__header">
         <div className="actividad-oficiales__title-block">
-          <h1>Actividad de oficiales</h1>
-          <p>Historial completo de actualizaciones por oficial</p>
-        </div>
-        <div className="sidebar-admin__role" style={{ margin: 0 }}>
-          <span className="sidebar-admin__role-dot" />
-          <span className="sidebar-admin__role-label">Administrador</span>
+          <h1>Resumen de Actividad</h1>
+          <p>Monitoreo en tiempo real de las actualizaciones del personal en campo</p>
         </div>
       </header>
+
 
       <section className="actividad-oficiales__stats">
         <div className="actividad-stat actividad-stat--green">
@@ -143,7 +144,9 @@ const ActividadOficiales = () => {
                     onClick={() => {
                       setSelectedOfficer(off);
                       setIsDropdownOpen(false);
+                      showToast(`Filtrando actividad por: ${off}`, 'info');
                     }}
+
                   >
                     {off}
                   </div>
