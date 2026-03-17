@@ -4,144 +4,440 @@
 
 /* ─── Stat Card Personal ─── */
 .StatCard {
-  background: var(--white);
-  border: 1px solid var(--gray-border);
-  border-radius: 24px; /* Aumentado para estética premium */
-  padding: 1.5rem;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  background: var(--inst-white);
+  border: 1px solid var(--inst-border);
+  border-radius: 16px;
+  padding: 1.75rem;
   position: relative;
   overflow: hidden;
-  border-bottom-width: 5px; /* Línea de color inferior */
+  height: auto;
+  min-height: 150px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.02);
+  transition: all 0.3s ease;
 }
 
 .StatCard:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 12px 20px -5px rgba(0, 0, 0, 0.1);
-}
-
-.StatCardInfo p {
-  margin: 0;
-  font-size: 0.75rem;
-  color: #94a3b8;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
-}
-
-.StatCardInfo h2 {
-  margin: 0.25rem 0 0;
-  font-size: 2.5rem; /* Números grandes como en mockup */
-  font-weight: 800;
-  color: #0f172a;
-  line-height: 1;
+  transform: translateY(-5px);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.05);
+  border-color: rgba(0, 47, 108, 0.1);
 }
 
 .StatCardIcono {
-  width: 48px;
-  height: 48px;
-  border-radius: 14px;
+  margin-bottom: 0.5rem;
+  color: var(--inst-blue);
+  background: var(--inst-light-bg);
+  width: 40px;
+  height: 40px;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 1.5rem;
-  transition: transform 0.2s ease;
+  border-radius: 8px;
 }
 
-.StatCard:hover .StatCardIcono {
-  transform: scale(1.1);
+.StatCardIcono svg {
+  width: 20px;
+  height: 20px;
 }
 
-/* Colores de estado con base en mockups */
-.StatCardIcono.info, .StatCard[data-tipo="info"] { border-bottom-color: #3b82f6; }
-.StatCardIcono.alerta, .StatCard[data-tipo="alerta"] { border-bottom-color: #f59e0b; }
-.StatCardIcono.exito, .StatCard[data-tipo="exito"] { border-bottom-color: #10b981; }
+.StatCardContenido {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  flex: 1;
+  text-align: left;
+}
 
-.StatCardIcono.info { background: #eff6ff; color: #3b82f6; }
-.StatCardIcono.alerta { background: #fffbeb; color: #f59e0b; }
-.StatCardIcono.exito { background: #f0fdf4; color: #10b981; }
+.StatCardValor {
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: var(--inst-text-dark);
+  line-height: 1;
+}
+
+.StatCardLabel {
+  color: var(--inst-text-muted);
+  font-size: 0.8rem;
+  margin-top: 4px;
+}
+
+/* Colores Dinámicos */
+.StatCard[data-tipo="info"] { border-bottom: 3px solid #3b82f6; }
+.StatCard[data-tipo="alerta"] { border-bottom: 3px solid #f59e0b; }
+.StatCard[data-tipo="exito"] { border-bottom: 3px solid #22c55e; }
+.StatCard[data-tipo="error"] { border-bottom: 3px solid #ef4444; }
 
 /* ─── Info Línea Header ─── */
 .InfoLineaHeader {
-  background: var(--white);
-  border: 1px solid var(--gray-border);
-  border-radius: 20px;
-  padding: 1.5rem;
-  border-left: 6px solid #0d2242;
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+  background: var(--inst-white);
+  border: 1px solid var(--inst-border);
+  border-radius: 16px;
+  padding: 2rem;
+  border-left: 8px solid var(--inst-blue);
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05);
+  margin-bottom: 1.5rem;
 }
 
-/* ... (conservar otros estilos pero con bordes redondeados) */
+.InfoLineaBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: var(--inst-light-bg);
+  padding: 4px 10px;
+  border-radius: 8px;
+  margin-bottom: 10px;
+}
+
+.InfoLineaBadge svg {
+  width: 14px;
+  height: 14px;
+  color: var(--inst-blue);
+}
+
+.InfoLineaBadge span {
+  font-size: 0.7rem;
+  font-weight: 800;
+  color: var(--inst-blue);
+  letter-spacing: 0.05em;
+}
+
+.InfoLineaHeader h4 {
+  margin: 0 0 6px;
+  font-size: 1.2rem;
+  font-weight: 800;
+  color: var(--inst-text-dark);
+}
+
+.InfoLineaMeta {
+  display: flex;
+  gap: 8px;
+  font-size: 0.8rem;
+  color: var(--inst-text-muted);
+  font-weight: 600;
+}
+
+.MetaZona {
+  color: var(--inst-red);
+}
+
+/* ─── Barra de Progreso ─── */
+.BarraProgresoContainer {
+  margin: 1.5rem 0;
+}
+
+.BarraProgresoMeta {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 8px;
+}
+
+.ProgresoLabel {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--inst-text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.ProgresoPorcentaje {
+  font-size: 0.9rem;
+  font-weight: 800;
+  color: var(--inst-text-dark);
+}
+
+.BarraProgresoTrack {
+  width: 100%;
+  height: 8px;
+  background: var(--inst-border);
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.BarraProgresoFill {
+  height: 100%;
+  border-radius: 10px;
+  transition: width 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
 
 .ListaMisTareas {
-  background: var(--white);
-  border: 1px solid var(--gray-border);
-  border-radius: 24px;
+  background: var(--inst-white);
+  border: 1px solid var(--inst-border);
+  border-radius: 20px;
   padding: 2rem;
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+  box-shadow: 0 15px 40px rgba(0, 0, 0, 0.02);
+  transition: all 0.4s ease;
 }
 
-.ListaMisTareas h3 {
-  margin: 0 0 1.5rem;
-  font-size: 1.25rem;
-  font-weight: 800;
-  color: #0d2242;
+.ListaMisTareas:hover {
+  box-shadow: 0 25px 60px rgba(0, 0, 0, 0.04);
 }
 
-/* ─── Tarea Card ─── */
-.TareaCard {
-  background: #f8fafc;
-  border: 1px solid #e2e8f0;
-  border-radius: 16px;
-  padding: 1.25rem;
-  transition: all 0.25s ease;
+.ListaMisTareasHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
 }
 
-.TareaCard:hover {
-  background: white;
-  border-color: #cbd5e1;
-  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+.ListaMisTareasHeader h3 {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--inst-text-dark);
 }
 
-/* ─── Resumen Metas ─── */
-.ResumenMetasContainer {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
+.FiltroBtn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: transparent;
+  border: none;
+  color: var(--text-muted);
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: color 0.2s;
+}
+
+.FiltroBtn:hover {
+  color: var(--msp-blue);
+}
+
+/* ─── Contenedor y Elementos del Timeline ─── */
+.TimelineContenedor {
+  display: flex;
+  flex-direction: column;
   gap: 1.5rem;
-  margin-bottom: 2rem;
+  position: relative;
+  padding-left: 1.5rem;
+}
+
+.TimelineContenedor::before {
+  content: '';
+  position: absolute;
+  left: 4px;
+  top: 0;
+  bottom: 0;
+  width: 2px;
+  background: var(--inst-border);
+}
+
+.TimelineItem {
+  position: relative;
+}
+
+.TimelineDot {
+  position: absolute;
+  left: -22px;
+  top: 4px;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--inst-white);
+  border: 2px solid var(--inst-border);
+  z-index: 1;
+}
+
+.TimelineDot.dot-green { border-color: #22c55e; }
+.TimelineDot.dot-blue { border-color: #3b82f6; }
+.TimelineDot.dot-orange { border-color: #f59e0b; }
+.TimelineDot.dot-yellow { border-color: #eab308; }
+
+.TimelineContent {
+  background: #f8fafc;
+  border: 1px solid var(--inst-border);
+  border-radius: 8px;
+  padding: 10px 12px;
+  flex: 1;
+}
+
+.TimelineMeta {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.5rem;
+}
+
+.TimelineTime {
+  color: var(--inst-text-dark);
+  font-weight: 700;
+  font-size: 0.85rem;
+}
+
+/* ─── Tarea Card (Dentro de Timeline) ─── */
+.TareaCardTimeline {
+  background: var(--inst-white);
+  border: 1px solid var(--inst-border);
+  border-radius: 12px;
+  padding: 1.25rem;
+  transition: all 0.3s ease;
+}
+
+.TareaCardTimeline:hover {
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.04);
+  border-color: var(--inst-blue);
+}
+
+.TareaCardHeaderTimeline {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.TareaCardTitle {
+  font-weight: 700;
+  color: var(--inst-text-dark);
+  font-size: 0.95rem;
+}
+
+.TareaDetailsGrid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+}
+
+.TareaDetailItem strong {
+  font-size: 0.7rem;
+  color: var(--inst-text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.TareaDetailItem p {
+  margin: 2px 0 0;
+  font-size: 0.85rem;
+  color: var(--inst-text-dark);
+  line-height: 1.4;
+}
+
+/* ─── Estado Badge ─── */
+.EstadoBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  border-radius: 20px;
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.EstadoDot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+}
+
+/* Variantes de Estado */
+.EstadoBadge.pendiente {
+  background: #fff7ed;
+  color: #9a3412;
+}
+.EstadoBadge.pendiente .EstadoDot { background: #f97316; }
+
+.EstadoBadge.enproceso {
+  background: #eff6ff;
+  color: #1e40af;
+}
+.EstadoBadge.enproceso .EstadoDot { 
+  background: #3b82f6; 
+  animation: pulse 2s infinite;
+}
+
+.EstadoBadge.completado {
+  background: #f0fdf4;
+  color: #166534;
+}
+.EstadoBadge.completado .EstadoDot { background: #22c55e; }
+
+@keyframes pulse {
+  0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(59, 130, 246, 0.7); }
+  70% { transform: scale(1); box-shadow: 0 0 0 6px rgba(59, 130, 246, 0); }
+  100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(59, 130, 246, 0); }
 }
 
 /* ─── Gráfico Progresión ─── */
 .GraficoProgresionContainer {
-  background: var(--white);
-  border: 1px solid var(--gray-border);
-  border-radius: 24px;
+  background: var(--inst-white);
+  border: 1px solid var(--inst-border);
+  border-radius: 20px;
   padding: 2.5rem;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  min-height: 300px;
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+  min-height: 350px;
+  box-shadow: 0 15px 40px rgba(0, 0, 0, 0.02);
+  position: relative;
+  overflow: hidden;
 }
 
-.GraficoSVG {
-  width: 160px;
-  height: 160px;
+.GraficoProgresionContainer::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; width: 100%; height: 6px;
+  background: linear-gradient(90deg, var(--inst-red), var(--inst-blue));
+}
+
+.GraficoCentro {
+  position: absolute;
+  top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+.GraficoPorcentaje {
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: var(--inst-text-dark);
+  line-height: 1;
+}
+
+.GraficoLabel {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--inst-text-muted);
+  text-transform: uppercase;
+  margin-top: 4px;
 }
 
 /* ─── Próximos Hitos ─── */
 .ProximosHitosCard {
-  background: #0d2242;
-  color: var(--white);
-  border-radius: 24px;
-  padding: 2rem;
+  background: linear-gradient(135deg, var(--inst-dark-blue), #122b5a);
+  color: var(--inst-white);
+  border-radius: 20px;
+  padding: 2.5rem;
   display: flex;
   flex-direction: column;
   justify-content: center;
-  box-shadow: 0 20px 25px -5px rgba(11, 34, 64, 0.2);
+  gap: 1.5rem;
+  box-shadow: 0 25px 50px -12px rgba(7, 19, 36, 0.4);
   height: 100%;
+  position: relative;
+  overflow: hidden;
 }
+
+.HitoIcono {
+  width: 50px;
+  height: 50px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #60a5fa;
+}
+
+.HitoInfo h3 {
+  margin: 0.5rem 0;
+  font-size: 1.5rem;
+  font-weight: 700;
+  line-height: 1.2;
+}
+

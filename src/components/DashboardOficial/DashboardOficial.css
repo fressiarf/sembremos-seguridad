@@ -1,30 +1,66 @@
-/* ═══════════════════════════════════════════════════ */
-/*  DASHBOARD LAYOUT — Sembremos Seguridad            */
-/*  Paleta Institucional MSP / INL                    */
-/* ═══════════════════════════════════════════════════ */
+:root {
+  /* Paleta Institucional (Sincronizada con Admin) */
+  --inst-dark-blue:   #0a1f44;
+  --inst-blue:        #002f6c;
+  --inst-red:         #ce1126;
+  --inst-light-bg:    #f4f7f9;
+  --inst-white:       #ffffff;
+  --inst-border:      #e2e8f0;
+  --inst-text-dark:   #1a2b4b;
+  --inst-text-muted:  #64748b;
+  
+  --sb-width:         260px;
+  --sb-width-collapsed: 68px;
+  --sb-transition:    0.28s cubic-bezier(0.4, 0, 0.2, 1);
+
+  /* Mapping local names to institutional ones for compatibility */
+  --msp-blue: var(--inst-dark-blue);
+  --msp-blue-dark: #051229;
+  --white: var(--inst-white);
+  --gray-light: var(--inst-light-bg);
+  --gray-border: var(--inst-border);
+  --text-dark: var(--inst-text-dark);
+  --text-muted: var(--inst-text-muted);
+}
 
 .LayoutDashboard {
   display: grid;
-  grid-template-columns: 280px 1fr; /* Sidebar un poco más ancho */
+  grid-template-columns: var(--sb-width) 1fr;
   min-height: 100vh;
-  background-color: #f8fafc; /* Fondo claro institucional */
-  font-family: 'Outfit', 'Inter', system-ui, sans-serif;
+  background-color: var(--inst-light-bg);
+  font-family: 'Inter', system-ui, sans-serif;
+  transition: grid-template-columns var(--sb-transition);
 }
 
-/* Override body styles */
+.LayoutDashboard--collapsed {
+  grid-template-columns: var(--sb-width-collapsed) 1fr;
+}
+
+/* Global body override */
 body:has(.LayoutDashboard) {
-  background-color: #f8fafc;
-  background-image: none;
-  backdrop-filter: none;
+  background-color: var(--inst-light-bg) !important;
+  margin: 0;
 }
 
 .ContenedorPrincipalDashboard {
   display: flex;
   flex-direction: column;
-  gap: 2rem;
-  padding: 2.5rem 3rem; /* Más aire en los bordes */
+  padding: 2.5rem; /* Ajustado para coincidir con el Admin */
   overflow-y: auto;
   max-height: 100vh;
+  background: var(--inst-light-bg);
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.ContenidoVistasOficial {
+  display: flex;
+  flex-direction: column;
+  gap: 2.5rem;
+  width: 100%;
 }
 
 /* ─── Sección Hero ─── */
