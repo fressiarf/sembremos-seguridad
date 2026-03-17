@@ -105,6 +105,7 @@ const GestionUsuarios = () => {
             className="search-input"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
+            style={{ paddingLeft: '55px', boxSizing: 'border-box' }}
           />
           {searchQuery && (
             <button 
