@@ -1,13 +1,35 @@
-import React from 'react';
+import React, { useState } from 'react';
+import ContenedorDashboard from '../components/Dashboard/ContenedorDashboard/ContenedorDashboard';
+import SidebarAdmin from '../components/Dashboard/SidebarAdmin/SidebarAdmin';
+import SeccionPrincipal from '../components/Dashboard/SeccionPrincipal/SeccionPrincipal';
 
 const Dashboard = () => {
+  const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
+  const [activeView, setActiveView] = useState('dashboard');
+
+  const toggleSidebar = () => {
+    setIsSidebarCollapsed(!isSidebarCollapsed);
+  };
+
+  const handleViewChange = (viewId) => {
+    setActiveView(viewId);
+  };
+
   return (
-    <div style={{ padding: '2rem', textAlign: 'center' }}>
-      <h1>Dashboard Principal</h1>
-      <p>Bienvenido al Sistema de Gestión - Sembremos Seguridad</p>
-      <a href="/" style={{ color: '#0b2240', fontWeight: 'bold' }}>Cerrar Sesión</a>
-    </div>
+    <ContenedorDashboard collapsed={isSidebarCollapsed}>
+      <SidebarAdmin 
+        collapsed={isSidebarCollapsed} 
+        onToggle={toggleSidebar} 
+        activeView={activeView}
+        onViewChange={handleViewChange}
+      />
+      <SeccionPrincipal 
+        collapsed={isSidebarCollapsed} 
+        activeView={activeView} 
+      />
+    </ContenedorDashboard>
   );
 };
 
 export default Dashboard;
+
