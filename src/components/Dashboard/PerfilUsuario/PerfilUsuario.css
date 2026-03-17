@@ -36,7 +36,9 @@
   margin: 0 auto;
   padding: 0 2.5rem 1.5rem;
   display: flex;
+  flex-direction: row;
   align-items: flex-end;
+  text-align: left;
   gap: 2rem;
   margin-top: -60px;
   position: relative;
@@ -44,8 +46,8 @@
 }
 
 .perfil-avatar {
-  width: 130px;
-  height: 130px;
+  width: 140px;
+  height: 140px;
   background: var(--inst-white);
   border-radius: 24px;
   display: flex;
@@ -54,22 +56,25 @@
   border: 5px solid var(--inst-white);
   box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
   color: var(--inst-dark-blue);
+  flex-shrink: 0;
 }
 
 .perfil-avatar svg {
-  width: 60px;
-  height: 60px;
+  width: 65px;
+  height: 65px;
 }
 
 .perfil-meta {
   flex: 1;
+  padding-top: 60px;
+  padding-bottom: 5px;
 }
 
 .perfil-meta h1 {
-  font-size: 2rem;
+  font-size: 2.2rem;
   font-weight: 800;
   color: var(--inst-text-dark);
-  margin: 0 0 12px 0;
+  margin: 0 0 10px 0;
   letter-spacing: -0.02em;
 }
 
