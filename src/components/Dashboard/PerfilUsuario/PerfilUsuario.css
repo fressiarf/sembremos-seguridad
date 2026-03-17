@@ -34,7 +34,7 @@
 .perfil-header__info {
   max-width: 1200px;
   margin: 0 auto;
-  padding: 0 2.5rem 1.5rem;
+  padding: 0 2.5rem 2.5rem;
   display: flex;
   flex-direction: row;
   align-items: flex-end;
@@ -68,6 +68,7 @@
   flex: 1;
   padding-top: 60px;
   padding-bottom: 5px;
+  margin-bottom: -25px;
 }
 
 .perfil-meta h1 {
