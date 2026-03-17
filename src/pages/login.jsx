@@ -10,7 +10,7 @@ const Login = () => {
     <CardAutenticacion>
       <HeaderInstitucional />
       <SelectorMetodoModerno />
-      <InputValidar />
+      <InputValidar/>
       <BtnAcceso />
     </CardAutenticacion>
   );

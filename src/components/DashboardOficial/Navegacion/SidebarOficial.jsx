@@ -1,19 +1,22 @@
+import './Navegacion.css';
 import UserBrand from "./UserBrand";
+import MenuLinkItem from "./MenuLinkItem";
 
 const SidebarOficial = () => {
   return (
-    <aside>
-      <UserBrand />
-      <nav>
-        <ul>
-          {/* Aquí irán los MenuLinkItem */}
-          <li>Inicio / Dashboard</li>
-          <li>Mis Líneas de Acción</li>
-          <li>Historial de Reportes</li>
-        </ul>
-      </nav>
+    <aside className="SidebarOficial">
       <div>
-        <button>Cerrar Sesión</button>
+        <UserBrand />
+        <nav>
+          <ul className="NavMenuLista">
+            <li><MenuLinkItem label="Dashboard" isActive={true} /></li>
+            <li><MenuLinkItem label="Mis Líneas de Acción" badgeCount={2} /></li>
+            <li><MenuLinkItem label="Historial de Reportes" /></li>
+          </ul>
+        </nav>
+      </div>
+      <div>
+        <button className="BtnCerrarSesion">Cerrar Sesión</button>
       </div>
     </aside>
   );

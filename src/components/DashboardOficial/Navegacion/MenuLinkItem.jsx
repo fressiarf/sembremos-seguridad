@@ -1,9 +1,10 @@
+import './Navegacion.css';
+
 const MenuLinkItem = ({ label, iconName, isActive, badgeCount }) => {
   return (
-    <a href="#">
-      <i>{/* Icono placeholder */}</i>
+    <a href="#" className={`MenuLinkItem ${isActive ? 'Activo' : ''}`}>
       <span>{label}</span>
-      {badgeCount > 0 && <span>{badgeCount}</span>}
+      {badgeCount > 0 && <span className="MenuLinkBadge">{badgeCount}</span>}
     </a>
   );
 };

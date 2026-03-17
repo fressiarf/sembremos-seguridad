@@ -1,0 +1,188 @@
+/* ═══════════════════════════════════════════════════ */
+/*  SIDEBAR OFICIAL — Navegación Lateral              */
+/* ═══════════════════════════════════════════════════ */
+
+.SidebarOficial {
+  background-color: #071324;
+  color: var(--white);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 1.5rem 0;
+  height: 100vh;
+  position: sticky;
+  top: 0;
+  box-shadow: 4px 0 20px rgba(0, 0, 0, 0.15);
+  border-right: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+/* ─── User Brand ─── */
+.UserBrandContainer {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0 1.25rem 2rem;
+  margin-bottom: 1rem;
+}
+
+.UserBrandLogo {
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  object-fit: contain;
+  background: white;
+  padding: 6px;
+}
+
+.UserBrandTexto h3 {
+  margin: 0;
+  font-size: 0.9rem;
+  font-weight: 800;
+  letter-spacing: 0.02em;
+  color: white;
+  text-transform: uppercase;
+}
+
+.UserBrandTexto p {
+  margin: 0;
+  font-size: 0.7rem;
+  color: #ef4444; /* Color rojo institucional de "SEGURIDAD" */
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+/* ─── Menu Links ─── */
+.NavMenuLista {
+  list-style: none;
+  padding: 0 0.75rem;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.MenuLinkItem {
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+  padding: 0.85rem 1rem;
+  color: rgba(255, 255, 255, 0.5);
+  text-decoration: none;
+  font-size: 0.9rem;
+  font-weight: 500;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  border-left: 3px solid transparent;
+  border-radius: 12px;
+  cursor: pointer;
+}
+
+.MenuLinkItem:hover {
+  background-color: rgba(255, 255, 255, 0.03);
+  color: var(--white);
+}
+
+.MenuLinkItem.Activo {
+  background-color: rgba(255, 255, 255, 0.07);
+  color: var(--white);
+  border-left: 4px solid #ef4444; /* Rojo institucional para el activo */
+  font-weight: 600;
+}
+
+.MenuLinkBadge {
+  margin-left: auto;
+  background-color: #ef4444;
+  color: white;
+  font-size: 0.7rem;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(239, 68, 68, 0.3);
+}
+
+/* ─── Botón Cerrar Sesión ─── */
+.BtnCerrarSesion {
+  margin: 1rem 1.25rem 2rem;
+  padding: 0.75rem 1rem;
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: rgba(255, 255, 255, 0.5);
+  border-radius: 10px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.BtnCerrarSesion:hover {
+  background: rgba(239, 68, 68, 0.1);
+  border-color: rgba(239, 68, 68, 0.4);
+  color: #fca5a5;
+}
+
+/* ─── Role Pill ─── */
+.RolePill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  background: rgba(59, 130, 246, 0.2);
+  border-radius: 12px;
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: #93c5fd;
+  margin: 0.5rem 1.25rem 0;
+}
+
+.RolePillDot {
+  width: 6px;
+  height: 6px;
+  background: #3b82f6;
+  border-radius: 50%;
+}
+
+/* ─── Topbar ─── */
+.TopbarOficial {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: var(--white);
+  padding: 1rem 1.5rem;
+  border-radius: 8px;
+  border: 1px solid var(--gray-border);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+}
+
+.TopbarSeccion h1 {
+  margin: 0;
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--text-dark);
+}
+
+.TopbarSeccion span {
+  font-size: 0.8rem;
+  color: var(--gray-text);
+}
+
+.TopbarUsuario {
+  text-align: right;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.TopbarUsuario span:first-child {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text-dark);
+}
+
+.TopbarUsuario span:last-child {
+  font-size: 0.75rem;
+  color: var(--gray-text);
+}
