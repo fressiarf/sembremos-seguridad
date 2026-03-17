@@ -1,10 +1,20 @@
-const MenuLinkItem = ({ label, iconName, isActive, badgeCount }) => {
+import './Navegacion.css';
+
+const MenuLinkItem = ({ label, icon, isActive, badgeCount, onClick, collapsed }) => {
   return (
-    <a href="#">
-      <i>{/* Icono placeholder */}</i>
-      <span>{label}</span>
-      {badgeCount > 0 && <span>{badgeCount}</span>}
-    </a>
+    <button 
+      className={`MenuLinkItem ${isActive ? 'Activo' : ''} ${collapsed ? 'MenuLinkItem--collapsed' : ''}`}
+      onClick={onClick}
+      title={collapsed ? label : ''}
+    >
+      <div className="MenuLinkIconArea">
+        <span className="MenuLinkIcon">
+          {icon}
+        </span>
+        {badgeCount !== undefined && <span className="MenuLinkBadge">{badgeCount}</span>}
+      </div>
+      <span className="MenuLinkText">{label}</span>
+    </button>
   );
 };
 

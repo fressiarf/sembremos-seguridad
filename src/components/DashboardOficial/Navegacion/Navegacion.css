@@ -1,0 +1,484 @@
+/* ═══════════════════════════════════════════════════ */
+/*  SIDEBAR OFICIAL — Navegación Lateral              */
+/* ═══════════════════════════════════════════════════ */
+
+.SidebarOficial {
+  background: linear-gradient(180deg, #0a1f44 0%, #051229 100%);
+  color: var(--white);
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  position: sticky;
+  top: 0;
+  box-shadow: 12px 0 50px rgba(0, 0, 0, 0.4);
+  border-right: 1px solid rgba(255, 255, 255, 0.03);
+  transition: width var(--sb-transition);
+  width: var(--sb-width);
+  overflow: hidden;
+  z-index: 1000;
+}
+
+/* Patrón de puntos decorativos */
+.SidebarOficial::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image: radial-gradient(rgba(255,255,255,0.025) 1px, transparent 1px);
+  background-size: 20px 20px;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.SidebarOficial > * {
+  position: relative;
+  z-index: 1;
+}
+
+.SidebarOficial--collapsed {
+  width: var(--sb-width-collapsed);
+}
+
+/* ─── Main Content Scrollable ─── */
+.SidebarMainContent {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  display: flex;
+  flex-direction: column;
+  padding: 8px 0 12px;
+}
+
+/* ─── Header: Brand & Toggle ─── */
+.SidebarHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20px 18px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  min-height: 80px;
+  flex-shrink: 0;
+}
+
+.SidebarOficial--collapsed .SidebarHeader {
+  flex-direction: column;
+  padding: 20px 0;
+  gap: 12px;
+}
+
+.UserBrandContainer {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.UserBrandLogo {
+  width: 42px;
+  height: 42px;
+  min-width: 42px;
+  background: white;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+}
+
+.UserBrandTexto h3 {
+  margin: 0;
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: white;
+  line-height: 1.2;
+  letter-spacing: -0.01em;
+}
+
+.BrandSubtitle {
+  margin: 0;
+  font-size: 0.95rem;
+  color: var(--inst-red) !important;
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+/* ─── Top Toggle Button ─── */
+.SidebarTopToggleBtn {
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  color: white;
+  width: 28px;
+  height: 28px;
+  min-width: 28px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.SidebarTopToggleBtn:hover {
+  background: var(--inst-red);
+  transform: scale(1.05);
+}
+
+/* ─── Role Pill ─── */
+.RolePill {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 16px;
+  padding: 10px 14px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+}
+
+.RolePillDot {
+  width: 8px;
+  height: 8px;
+  background: #22c55e;
+  border-radius: 50%;
+  box-shadow: 0 0 10px rgba(34, 197, 94, 0.4);
+}
+
+.RolePillLabel {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: white;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+/* ─── Sidebar Sections ─── */
+.SidebarSection {
+  margin-bottom: 1.5rem;
+}
+
+.SidebarSectionHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 1.25rem 0.5rem;
+  color: rgba(255, 255, 255, 0.3);
+  font-size: 0.65rem;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: color 0.2s ease;
+}
+
+.SidebarSectionHeader:hover {
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.SectionChevron {
+  color: rgba(255, 255, 255, 0.3);
+  transition: transform 0.3s ease, color 0.2s ease;
+}
+
+.SidebarSectionHeader:hover .SectionChevron {
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.SectionChevron--collapsed {
+  transform: rotate(-90deg);
+}
+
+/* ─── Menu Links ─── */
+.SidebarNav {
+  padding: 0;
+}
+
+/* ─── Menu Links ─── */
+.SidebarNav {
+  padding: 0;
+}
+
+.NavMenuLista {
+  list-style: none;
+  margin: 0;
+  padding: 2px 10px;
+}
+
+.MenuLinkItem {
+  position: relative;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 14px;
+  margin: 4px 0;
+  border: none;
+  background: transparent;
+  border-radius: 12px;
+  cursor: pointer;
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 0.88rem;
+  font-weight: 500;
+  transition: all 0.3s ease;
+  white-space: nowrap;
+}
+
+.SidebarOficial--collapsed .MenuLinkItem {
+  justify-content: center;
+  padding: 12px 0;
+  gap: 0;
+}
+
+.MenuLinkItem:hover {
+  background: rgba(255, 255, 255, 0.04);
+  color: #fff;
+}
+
+.SidebarOficial:not(.SidebarOficial--collapsed) .MenuLinkItem:hover {
+  padding-left: 18px;
+}
+
+.MenuLinkItem.Activo {
+  background: linear-gradient(90deg, rgba(255,255,255,0.08) 0%, rgba(255,255,255,0.02) 100%) !important;
+  color: #fff !important;
+  font-weight: 600;
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.05);
+}
+
+/* Red active bar */
+.MenuLinkItem.Activo::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 8px;
+  bottom: 8px;
+  width: 3px;
+  background: var(--inst-red);
+  border-radius: 0 4px 4px 0;
+  box-shadow: 2px 0 10px rgba(206, 17, 38, 0.8);
+}
+
+.MenuLinkIconArea {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  min-width: 20px;
+  opacity: 0.85;
+  transition: all 0.3s ease;
+}
+
+.MenuLinkIconArea svg {
+  width: 17px;
+  height: 17px;
+}
+
+.MenuLinkItem.Activo .MenuLinkIconArea {
+  color: #60a5fa;
+  opacity: 1;
+}
+
+.MenuLinkText {
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  transition: opacity var(--sb-transition);
+}
+
+.SidebarOficial--collapsed .MenuLinkText {
+  display: none;
+}
+
+.MenuLinkBadge {
+  min-width: 20px;
+  height: 20px;
+  padding: 0 6px;
+  background: var(--inst-red);
+  color: #fff;
+  border-radius: 10px;
+  font-size: 0.68rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 8px rgba(239, 68, 68, 0.45);
+}
+
+
+/* ─── Footer & Logout Fixed ─── */
+.SidebarOficialFooter {
+  flex-shrink: 0;
+  padding: 1.25rem 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.ProfileCard {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.75rem;
+  background: rgba(255, 255, 255, 0.04);
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.ProfileCard:hover {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.ProfileAvatar {
+  width: 40px;
+  height: 40px;
+  min-width: 40px;
+  background: white;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.ProfileInfo {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  white-space: nowrap;
+}
+
+.ProfileName {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: white;
+}
+
+.ProfileRole {
+  font-size: 0.7rem;
+  color: #94a3b8;
+}
+
+.SidebarOficial--collapsed .ProfileInfo {
+  display: none;
+}
+
+.BtnLogoutLink {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.5rem;
+  background: transparent;
+  border: 1px solid transparent;
+  color: #94a3b8;
+  font-size: 0.9rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  width: 100%;
+}
+
+.BtnLogoutLink:hover {
+  background: rgba(239, 68, 68, 0.1);
+  color: #ef4444;
+  border-radius: 8px;
+}
+
+.LogoutIconWrapper {
+  width: 20px;
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.SidebarOficial--collapsed .BtnLogoutLink span {
+  display: none;
+}
+
+.SidebarOficial--collapsed .BtnLogoutLink {
+  justify-content: center;
+}
+
+/* ─── Topbar Refinement ─── */
+.TopbarOficial {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  background: transparent;
+  padding: 0;
+  margin-bottom: 2.5rem;
+}
+
+.TopbarSeccionInfo h1 {
+  margin: 0;
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--inst-text-dark);
+}
+
+.TopbarSubtitulo {
+  margin: 4px 0 0;
+  font-size: 0.85rem;
+  color: var(--inst-text-muted);
+}
+
+.TopbarAcciones {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+}
+
+.StatusPill {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 16px;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+  border: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+.StatusDot {
+  width: 8px;
+  height: 8px;
+  background: #22c55e;
+  border-radius: 50%;
+  animation: pulse-green 2s infinite;
+}
+
+.StatusLabel {
+  font-size: 0.7rem;
+  font-weight: 800;
+  color: #1e293b;
+  letter-spacing: 0.05em;
+}
+
+.BtnNuevaAccion {
+  background: var(--msp-blue-dark);
+  color: white;
+  border: none;
+  padding: 10px 24px;
+  border-radius: 12px;
+  font-weight: 700;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 15px rgba(13, 34, 66, 0.2);
+}
+
+.BtnNuevaAccion:hover {
+  background: var(--msp-blue);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(13, 34, 66, 0.3);
+}
+
+@keyframes pulse-green {
+  0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.7); }
+  70% { transform: scale(1); box-shadow: 0 0 0 6px rgba(34, 197, 94, 0); }
+  100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(34, 197, 94, 0); }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}

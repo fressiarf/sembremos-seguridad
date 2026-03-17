@@ -62,6 +62,21 @@ export const dashboardService = {
       console.error('Error fetching full dashboard data:', error);
       return null;
     }
+  },
+
+  createActivity: async (activityData) => {
+    try {
+      const response = await fetch(`${BASE_URL}/actividades`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(activityData)
+      });
+      if (!response.ok) throw new Error('Error creating activity');
+      return await response.json();
+    } catch (error) {
+      console.error('Error in createActivity:', error);
+      throw error;
+    }
   }
 };
 

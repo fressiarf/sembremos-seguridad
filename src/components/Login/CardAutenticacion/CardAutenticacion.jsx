@@ -10,9 +10,16 @@ const CardAutenticacion = ({ children }) => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    const esValido = validateAll();
-    if (esValido) {
-      navigate('/dashboard');
+    const user = validateAll();
+    if (user) {
+      if (user.rol === 'admin') {
+        navigate('/dashboard');
+      } else if (user.rol === 'oficial') {
+        navigate('/dashboardOficial');
+      } else {
+        // Por defecto si no tiene rol claro (aunque en db.json debería tenerlo)
+        navigate('/dashboardOficial');
+      }
     }
   };
 

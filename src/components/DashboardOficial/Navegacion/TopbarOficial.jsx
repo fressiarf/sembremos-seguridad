@@ -1,15 +1,22 @@
-const TopbarOficial = () => {
+import './Navegacion.css';
+
+const TopbarOficial = ({ usuario, seccion, subtitulo }) => {
   return (
-    <header>
-      <div>
-        <h1>Título de Sección (Ej: Mis Tareas)</h1>
-        <span>Subtítulo o Breadcrumb</span>
+    <header className="TopbarOficial">
+      <div className="TopbarIzquierda">
+        <div className="TopbarSeccionInfo">
+          <h1>{seccion || 'Dashboard'}</h1>
+          <p className="TopbarSubtitulo">{subtitulo || 'Panel del Oficial'}</p>
+        </div>
       </div>
       
-      <div>
-        <span>Oficial: Nombre Apellido</span>
-        <span>Sector: Nombre de Zona</span>
-        {/* Espacio para Avatar o Status */}
+      <div className="TopbarDerecha">
+        <div className="TopbarAcciones">
+          <div className="StatusPill">
+            <span className="StatusDot" />
+            <span className="StatusLabel">OFICIAL</span>
+          </div>
+        </div>
       </div>
     </header>
   );

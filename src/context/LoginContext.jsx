@@ -70,7 +70,7 @@ export const LoginProvider = ({ children }) => {
     }
 
     setErrors(newErrors);
-    return true;
+    return usuarioEncontrado;
   };
 
   const value = {

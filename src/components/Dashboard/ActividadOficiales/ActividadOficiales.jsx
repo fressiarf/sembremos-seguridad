@@ -1,6 +1,7 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import './ActividadOficiales.css';
 import { useToast } from '../../../context/ToastContext';
+import { dashboardService } from '../../../services/dashboardService';
 
 
 const Icon = {
@@ -27,61 +28,85 @@ const Icon = {
 };
 
 const ActividadOficiales = () => {
-  const [selectedOfficer, setSelectedOfficer] = React.useState('Todos los oficiales');
-  const [isDropdownOpen, setIsDropdownOpen] = React.useState(false);
+  const [selectedOfficer, setSelectedOfficer] = useState('Todos los oficiales');
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const [activities, setActivities] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [showAssignForm, setShowAssignForm] = useState(false);
+  const [newActivity, setNewActivity] = useState({
+    titulo: '',
+    problematica: '',
+    lineaAccion: '',
+    propuestaMeta: '',
+    responsables: '',
+    descripcion: '',
+    oficialId: '2',
+    oficialNombre: 'Juan Vargas',
+    zona: 'Barranca',
+    status: 'Pendiente'
+  });
   const { showToast } = useToast();
 
-
-  const activities = [
-    {
-      id: 1,
-      date: 'Hoy 10:32',
-      officer: 'Of. J. Rodríguez',
-      zone: 'Barranca',
-      action: 'LA-2025-07',
-      title: 'Liga deportiva juvenil',
-      status: 'En ejecución',
-      statusClass: 'ejecucion',
-      desc: 'Avance a 90%. Taller completado, 45 jóvenes. Próxima sesión: 22 mar.',
-      color: '#22c55e'
-    },
-    {
-      id: 2,
-      date: 'Ayer 3:15',
-      officer: 'Of. M. Campos',
-      zone: 'Chacarita',
-      action: 'LA-2025-12',
-      title: 'Capacitación anti-droga',
-      status: 'Pendiente',
-      statusClass: 'pendiente',
-      desc: 'Nueva línea registrada. Inicio previsto: 20/03/2025.',
-      color: '#3b82f6'
-    },
-    {
-      id: 3,
-      date: '13 mar 9:00',
-      officer: 'Of. J. Martínez',
-      zone: 'Barranca',
-      action: 'LA-2025-03',
-      title: 'Jornada Plaza Fantasma',
-      status: 'Retrasada',
-      statusClass: 'retrasada',
-      desc: 'Jornada pospuesta por lluvia. Nueva fecha: 25/03/2025.',
-      color: '#f59e0b'
-    },
-    {
-      id: 4,
-      date: '12 mar 2:40',
-      officer: 'Of. A. López',
-      zone: 'Cantonal',
-      action: 'LA-2025-01',
-      title: 'Taller educativo',
-      status: 'Completada',
-      statusClass: 'completada',
-      desc: 'Acción cerrada. 120 beneficiarios. Informe enviado a INL y MSP.',
-      color: '#22c55e'
+  const loadActivities = async () => {
+    try {
+      const data = await dashboardService.getFullDashboardData();
+      if (data && data.activities) {
+        const mapped = data.activities.map(act => ({
+          id: act.id,
+          date: act.fecha || 'Reciente',
+          officer: act.oficialNombre || 'Sin asignar',
+          zone: act.zona || 'N/A',
+          action: act.lineaAccion || `LA-2024-${act.id.toString().padStart(2, '0')}`,
+          title: act.titulo || act.problematica || 'Sin título',
+          status: act.status,
+          statusClass: act.status.toLowerCase().replace(' ', '').replace('ó', 'o'),
+          desc: act.descripcion || act.propuestaMeta,
+          color: act.status === 'Completada' ? '#22c55e' : (act.status.toLowerCase().includes('ejecución') ? '#3b82f6' : '#f59e0b')
+        }));
+        setActivities(mapped);
+      }
+    } catch (error) {
+      showToast('Error al cargar actividades en tiempo real', 'error');
+    } finally {
+      setLoading(false);
     }
-  ];
+  };
+
+  useEffect(() => {
+    loadActivities();
+  }, [showToast]);
+
+  const handleCreateActivity = async (e) => {
+    e.preventDefault();
+    if (!newActivity.titulo || !newActivity.problematica || !newActivity.lineaAccion) {
+      showToast('Por favor completa los campos obligatorios (*)', 'warning');
+      return;
+    }
+
+    try {
+      await dashboardService.createActivity({
+        ...newActivity,
+        fecha: new Date().toISOString().split('T')[0]
+      });
+      showToast('Tarea estratégica asignada exitosamente', 'success');
+      setShowAssignForm(false);
+      setNewActivity({
+        titulo: '',
+        problematica: '',
+        lineaAccion: '',
+        propuestaMeta: '',
+        responsables: '',
+        descripcion: '',
+        oficialId: '2',
+        oficialNombre: 'Juan Vargas',
+        zona: 'Barranca',
+        status: 'Pendiente'
+      });
+      loadActivities();
+    } catch (error) {
+      showToast('Error al asignar la tarea', 'error');
+    }
+  };
 
   // Extraer oficiales únicos
   const officerList = ['Todos los oficiales', ...new Set(activities.map(a => a.officer))];
@@ -91,6 +116,8 @@ const ActividadOficiales = () => {
     ? activities 
     : activities.filter(a => a.officer === selectedOfficer);
 
+  if (loading) return <div style={{ padding: '3rem', color: '#7a9cc4' }}>Cargando actividad operativa...</div>;
+
   return (
     <div className="actividad-oficiales">
       <header className="actividad-oficiales__header">
@@ -98,7 +125,92 @@ const ActividadOficiales = () => {
           <h1>Resumen de Actividad</h1>
           <p>Monitoreo en tiempo real de las actualizaciones del personal en campo</p>
         </div>
+        <button 
+          className="btn-primary-assign" 
+          onClick={() => setShowAssignForm(true)}
+        >
+          Asignar Acción Estratégica
+        </button>
       </header>
+
+      {showAssignForm && (
+        <div className="assign-modal-overlay">
+          <div className="assign-modal" style={{ maxWidth: '600px' }}>
+            <h3>Asignar Tarea Operativa</h3>
+            <form onSubmit={handleCreateActivity}>
+              <div className="form-row-grid">
+                <div className="form-group">
+                  <label>Título / Problemática *</label>
+                  <input 
+                    type="text" 
+                    placeholder="Ej: Consumo de licor en vía pública" 
+                    value={newActivity.titulo}
+                    onChange={e => setNewActivity({...newActivity, titulo: e.target.value, problematica: e.target.value})}
+                  />
+                </div>
+                <div className="form-group">
+                  <label>Línea de Acción *</label>
+                  <input 
+                    type="text" 
+                    placeholder="Ej: LA-2025-001" 
+                    value={newActivity.lineaAccion}
+                    onChange={e => setNewActivity({...newActivity, lineaAccion: e.target.value})}
+                  />
+                </div>
+              </div>
+
+              <div className="form-row-grid">
+                <div className="form-group">
+                  <label>Oficial Responsable</label>
+                  <select 
+                    value={newActivity.oficialId}
+                    onChange={e => {
+                      const opt = e.target.options[e.target.selectedIndex];
+                      setNewActivity({...newActivity, oficialId: e.target.value, oficialNombre: opt.text});
+                    }}
+                  >
+                    <option value="2">Juan Vargas</option>
+                    <option value="3">Maria Rojas</option>
+                  </select>
+                </div>
+                <div className="form-group">
+                  <label>Otros Responsables</label>
+                  <input 
+                    type="text" 
+                    placeholder="Ej: Fuerza Pública, Municipalidad" 
+                    value={newActivity.responsables}
+                    onChange={e => setNewActivity({...newActivity, responsables: e.target.value})}
+                  />
+                </div>
+              </div>
+
+              <div className="form-group">
+                <label>Propuesta / Meta</label>
+                <input 
+                  type="text" 
+                  placeholder="Ej: Reducir reportes en un 20%" 
+                  value={newActivity.propuestaMeta}
+                  onChange={e => setNewActivity({...newActivity, propuestaMeta: e.target.value})}
+                />
+              </div>
+
+              <div className="form-group">
+                <label>Descripción Adicional</label>
+                <textarea 
+                  placeholder="Instrucciones específicas..."
+                  value={newActivity.descripcion}
+                  onChange={e => setNewActivity({...newActivity, descripcion: e.target.value})}
+                ></textarea>
+              </div>
+
+              <div className="modal-actions">
+                <button type="button" onClick={() => setShowAssignForm(false)} className="btn-cancel">Cancelar</button>
+                <button type="submit" className="btn-assign-submit">Confirmar Asignación</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
 
 
       <section className="actividad-oficiales__stats">
