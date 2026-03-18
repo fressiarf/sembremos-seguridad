@@ -255,7 +255,7 @@ const GestionUsuarios = () => {
                     title={`Cambiar a ${user.rol === 'admin' ? 'Oficial' : 'Administrador'}`}
                   >
                     <UserCog size={16} />
-                    {updatingId === user.id ? 'Actualizando...' : (user.rol === 'admin' ? 'Degradar a Oficial' : 'Hacer Admin')}
+                    {updatingId === user.id ? 'Actualizando...' : (user.rol === 'admin' ? 'Cambio a Oficial' : 'Hacer Admin')}
                   </button>
                 </td>
 

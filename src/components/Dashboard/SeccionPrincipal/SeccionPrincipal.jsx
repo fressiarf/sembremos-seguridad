@@ -7,6 +7,7 @@ import GestionUsuarios from '../GestionUsuarios/GestionUsuarios';
 import PerfilUsuario from '../PerfilUsuario/PerfilUsuario';
 import MatrizSeguimiento from '../MatrizSeguimiento/MatrizSeguimiento';
 import MapaRiesgos from '../MapaRiesgos/MapaRiesgos';
+import ZonasCriticas from '../ZonasCriticas/ZonasCriticas';
 import { useLogin } from '../../../context/LoginContext';
 
 // Mapeo de vistas a nombres de sección para el TopbarOficial
@@ -44,9 +45,10 @@ const SeccionPrincipal = ({ collapsed, activeView }) => {
       {activeView === 'perfil' && <PerfilUsuario />}
       {activeView === 'matrices' && <MatrizSeguimiento />}
       {activeView === 'mapa' && <MapaRiesgos />}
+      {activeView === 'zonas' && <ZonasCriticas />}
 
       {/* Placeholder para otras vistas */}
-      {activeView !== 'dashboard' && activeView !== 'actividades' && activeView !== 'usuarios' && activeView !== 'perfil' && activeView !== 'matrices' && activeView !== 'mapa' && (
+      {activeView !== 'dashboard' && activeView !== 'actividades' && activeView !== 'usuarios' && activeView !== 'perfil' && activeView !== 'matrices' && activeView !== 'mapa' && activeView !== 'zonas' && (
         <div style={{ padding: '2rem', color: '#7a9cc4' }}>
           <h2>Vista en desarrollo: {activeView}</h2>
           <p>Esta sección se implementará próximamente.</p>

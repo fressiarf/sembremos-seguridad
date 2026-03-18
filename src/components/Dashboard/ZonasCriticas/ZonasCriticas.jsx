@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { dashboardService } from '../../../services/dashboardService';
+import { Users, ClipboardList, Clock } from 'lucide-react';
 import './zonas.css';
 
 const PinIcon = () => (
@@ -55,6 +56,15 @@ function ZonasCriticas() {
       retrasadas: 1,
       beneficiarios: 260,
       iconType: "pin"
+    },
+    "Cantonal": {
+      classNameModifier: "cantonal",
+      percentageText: "71%",
+      lineas: 6,
+      completadas: 1,
+      retrasadas: 0,
+      beneficiarios: 180,
+      iconType: "globe"
     }
   };
 
@@ -67,6 +77,63 @@ function ZonasCriticas() {
     beneficiarios: 180,
     iconType: "globe"
   };
+
+  const renderZonaCard = (zona) => {
+    const conf = visualConfig[zona.nombre] || defaultConf;
+    return (
+      <div key={zona.id} className={`zona-card ${zona.nombre === 'Cantonal' ? 'zona-card-cantonal' : ''}`}>
+        
+        {zona.nombre !== 'Cantonal' && (
+          <div className={`zona-card-image zona-img-${conf.classNameModifier}`}>
+            <div className="zona-card-overlay"></div>
+          </div>
+        )}
+        
+        <div className="zona-card-content">
+          <div className="zona-title-row">
+              <div className="zona-title">
+                {conf.iconType === 'globe' ? <GlobeIcon /> : <PinIcon />}
+                <h3>{zona.nombre}</h3>
+              </div>
+              <span className={`zona-percentage zona-color-${conf.classNameModifier}`}>{conf.percentageText}</span>
+          </div>
+          
+          <div className="zona-progress-bg">
+              <div className={`zona-progress-fill zona-fill-${conf.classNameModifier}`}></div>
+          </div>
+
+          <div className="zona-stats">
+              <div className="zona-stat-row">
+                <span className="stat-label">Nivel</span>
+                <span className="stat-value">{zona.nivel}</span>
+              </div>
+              <div className="zona-stat-row">
+                <span className="stat-label">Incidentes</span>
+                <span className="stat-value">{zona.incidentes}</span>
+              </div>
+              <div className="zona-stat-row">
+                <span className="stat-label">Líneas activas</span>
+                <span className="stat-value">{conf.lineas}</span>
+              </div>
+              <div className="zona-stat-row">
+                <span className="stat-label">Completadas</span>
+                <span className="stat-value completadas-value">{conf.completadas}</span>
+              </div>
+              
+              <hr className="zona-divider" />
+              
+              <div className="zona-stat-row">
+                <span className="stat-label">Beneficiarios</span>
+                <span className="stat-value beneficiarios-value">{conf.beneficiarios}</span>
+              </div>
+          </div>
+        </div>
+      </div>
+    );
+  };
+
+  const localZonas = zonas.filter(z => z.nombre !== 'Cantonal');
+  const cantonalZona = zonas.filter(z => z.nombre === 'Cantonal');
 
   return (
     <div className="zonas-criticas-container">
@@ -87,57 +154,49 @@ function ZonasCriticas() {
       </div>
       
       <div className="zonas-grid">
-        {zonas.map(zona => {
-           const conf = visualConfig[zona.nombre] || defaultConf;
-           return (
-             <div key={zona.id} className="zona-card">
-               <div className={`zona-card-image zona-img-${conf.classNameModifier}`}>
-                 <div className="zona-card-overlay"></div>
-               </div>
-               
-               <div className="zona-card-content">
-                  <div className="zona-title-row">
-                     <div className="zona-title">
-                        {conf.iconType === 'globe' ? <GlobeIcon /> : <PinIcon />}
-                        <h3>{zona.nombre}</h3>
-                     </div>
-                     <span className={`zona-percentage zona-color-${conf.classNameModifier}`}>{conf.percentageText}</span>
-                  </div>
-                  
-                  <div className="zona-progress-bg">
-                     <div className={`zona-progress-fill zona-fill-${conf.classNameModifier}`}></div>
-                  </div>
-
-                  <div className="zona-stats">
-                     <div className="zona-stat-row">
-                        <span className="stat-label">Nivel</span>
-                        <span className="stat-value">{zona.nivel}</span>
-                     </div>
-                     <div className="zona-stat-row">
-                        <span className="stat-label">Incidentes</span>
-                        <span className="stat-value">{zona.incidentes}</span>
-                     </div>
-                     <div className="zona-stat-row">
-                        <span className="stat-label">Líneas activas</span>
-                        <span className="stat-value">{conf.lineas}</span>
-                     </div>
-                     <div className="zona-stat-row">
-                        <span className="stat-label">Completadas</span>
-                        <span className="stat-value completadas-value">{conf.completadas}</span>
-                     </div>
-                     
-                     <hr className="zona-divider" />
-                     
-                     <div className="zona-stat-row">
-                        <span className="stat-label">Beneficiarios</span>
-                        <span className="stat-value beneficiarios-value">{conf.beneficiarios}</span>
-                     </div>
-                  </div>
-               </div>
-             </div>
-           );
-        })}
+        {localZonas.map(renderZonaCard)}
       </div>
+
+      {cantonalZona.length > 0 && (
+        <div className="cantonal-section">
+          <div className="cantonal-separator">
+            <span className="cantonal-label">Resumen Cantonal</span>
+            <hr className="cantonal-line" />
+          </div>
+          
+          <div className="cantonal-metrics-grid">
+            <div className="cantonal-metric-card green">
+              <div className="metric-icon-box">
+                <Users size={20} />
+              </div>
+              <div className="metric-info">
+                <span className="metric-number">02</span>
+                <span className="metric-label">Oficiales registrados</span>
+              </div>
+            </div>
+
+            <div className="cantonal-metric-card blue">
+              <div className="metric-icon-box">
+                <ClipboardList size={20} />
+              </div>
+              <div className="metric-info">
+                <span className="metric-number">04</span>
+                <span className="metric-label">Tareas estratégicas</span>
+              </div>
+            </div>
+
+            <div className="cantonal-metric-card orange">
+              <div className="metric-icon-box">
+                <Clock size={20} />
+              </div>
+              <div className="metric-info">
+                <span className="metric-number">02</span>
+                <span className="metric-label">Sin actividad 7d</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
