@@ -3,8 +3,8 @@ const BASE_URL = 'http://localhost:5000';
 export const oficialService = {
   getLineasAccion: async (oficialId) => {
     try {
-      // In a real application we would filter by userId, here we fetch all for demonstration
-      const response = await fetch(`${BASE_URL}/actividades`);
+      // Filtrar por oficialId en la petición al JSON server
+      const response = await fetch(`${BASE_URL}/actividades?oficialId=${oficialId}`);
       if (!response.ok) throw new Error('Error fetching actividades');
       const actos = await response.json();
       
@@ -29,14 +29,14 @@ export const oficialService = {
     }
   },
 
-  getEstadisticas: async () => {
+  getEstadisticas: async (oficialId) => {
     try {
-      const response = await fetch(`${BASE_URL}/actividades`);
+      const response = await fetch(`${BASE_URL}/actividades?oficialId=${oficialId}`);
       if (!response.ok) throw new Error('Error fetching stats');
       const actividades = await response.json();
       
       const completadas = actividades.filter(a => a.status === 'Completada').length;
-      const enProceso = actividades.filter(a => a.status.toLowerCase().includes('ejecución')).length;
+      const enProceso = actividades.filter(a => (a.status || '').toLowerCase().includes('ejecución')).length;
       const total = actividades.length;
       const progresoGeneral = total > 0 ? Math.round((completadas / total) * 100) : 0;
 
@@ -80,7 +80,7 @@ export const oficialService = {
     try {
       const [lineas, estadisticas, hitos] = await Promise.all([
         oficialService.getLineasAccion(oficialId),
-        oficialService.getEstadisticas(),
+        oficialService.getEstadisticas(oficialId),
         oficialService.getHitos(oficialId)
       ]);
 

@@ -6,12 +6,16 @@ import GraficoProgresion from './MainDashboardOficial/GraficoProgresion';
 import ProximosHitos from './MainDashboardOficial/ProximosHitos';
 import ListaMisTareas from './MainDashboardOficial/ListaMisTareas';
 import { oficialService } from '../../services/oficialService';
+import { useLogin } from '../../context/LoginContext';
 
 const SeccionPrincipalOficial = ({ activeView, collapsed }) => {
+  const { user } = useLogin();
   const [tareas, setTareas] = useState([]);
   const [estadisticas, setEstadisticas] = useState(null);
   const [hitos, setHitos] = useState([]);
-  const oficialId = 2; // Hardcodeado a Brandon por ahora
+  
+  // Usar el ID del usuario logueado o el ID 2 (Juan Vargas) por defecto para desarrollo
+  const oficialId = user?.id || 2;
 
   const fetchData = async () => {
     const data = await oficialService.getFullDashboardData(oficialId);
@@ -31,7 +35,10 @@ const SeccionPrincipalOficial = ({ activeView, collapsed }) => {
       <TopbarOficial 
         seccion={activeView === 'dashboard' ? 'Dashboard Oficial' : activeView === 'lineas' ? 'Mis Líneas' : 'Historial'} 
         subtitulo="Programa Sembremos Seguridad · Cantón Puntarenas (Periodo 2025)"
-        usuario={{ nombre: "Brandon Mora", zona: "Barranca" }}
+        usuario={{ 
+          nombre: user?.nombre || "Juan Vargas", 
+          zona: user?.zona || "Barranca" 
+        }}
       />
 
       {activeView === 'dashboard' && (

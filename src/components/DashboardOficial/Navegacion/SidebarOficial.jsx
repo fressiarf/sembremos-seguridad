@@ -1,106 +1,142 @@
-import React from 'react';
-import { useState } from 'react';
-import { ChevronLeft, ChevronRight, LayoutGrid, Activity, Clock, LogOut, ChevronDown, User, MapPin } from 'lucide-react';
+import React, { useState } from 'react';
+import '../../Dashboard/SidebarAdmin/SidebarAdmin.css';
+import { useLogin } from "../../../context/LoginContext";
 import UserBrand from "./UserBrand";
-import MenuLinkItem from "./MenuLinkItem";
+import { ChevronLeft, ChevronDown, LayoutDashboard, Activity, Clock, LogOut, User, MapPin } from "lucide-react";
 
 const SidebarOficial = ({ collapsed = false, onToggle, activeView, onViewChange }) => {
-  const [operativoExpanded, setOperativoExpanded] = useState(true);
-  const [gestionExpanded, setGestionExpanded] = useState(true);
+  const { logout } = useLogin();
+  const [openSections, setOpenSections] = useState({
+    OPERATIVO: true, GESTIÓN: true,
+  });
+
+  // ── Secciones de navegación para el Oficial ──
+  const navSections = [
+    {
+      label: 'OPERATIVO',
+      items: [
+        { id: 'dashboard',   label: 'Dashboard',              icon: LayoutDashboard },
+        { id: 'lineas',      label: 'Mis Líneas de Acción',   icon: Activity },
+      ],
+    },
+    {
+      label: 'GESTIÓN',
+      items: [
+        { id: 'historial',   label: 'Historial de Reportes',  icon: Clock },
+      ],
+    },
+  ];
+
+  const toggleSection = (label) => {
+    setOpenSections(prev => ({ ...prev, [label]: !prev[label] }));
+  };
 
   return (
-    <aside className={`SidebarOficial ${collapsed ? 'SidebarOficial--collapsed' : ''}`}>
-      <div className="SidebarMainContent">
-        <div className="SidebarHeader">
-           <UserBrand collapsed={collapsed} />
-           <button className="SidebarTopToggleBtn" onClick={onToggle}>
-             {collapsed ? <ChevronRight size={16} strokeWidth={2.5} /> : <ChevronLeft size={16} strokeWidth={2.5} />}
-           </button>
-        </div>
-        
-        {!collapsed && (
-          <div className="RolePill">
-            <span className="RolePillDot" />
-            <span className="RolePillLabel">OFICIAL</span>
-          </div>
-        )}
+    <aside className={`sidebar-admin ${collapsed ? 'sidebar-admin--collapsed' : ''}`}>
 
-        <nav className="SidebarNav">
-          <div className="SidebarSection">
-            {!collapsed && (
-              <div className="SidebarSectionHeader" onClick={() => setOperativoExpanded(!operativoExpanded)}>
-                <span>OPERATIVO</span>
-                <ChevronDown size={14} className={`SectionChevron ${!operativoExpanded ? 'SectionChevron--collapsed' : ''}`} />
-              </div>
-            )}
-            {(collapsed || operativoExpanded) && (
-              <ul className="NavMenuLista">
-                <li>
-                  <MenuLinkItem 
-                    label="Dashboard" 
-                    icon={<LayoutGrid size={20} />}
-                    isActive={activeView === 'dashboard'} 
-                    onClick={() => onViewChange('dashboard')}
-                    collapsed={collapsed}
-                  />
-                </li>
-                <li>
-                  <MenuLinkItem 
-                    label="Mis Líneas de Acción" 
-                    icon={activeView === 'lineas' ? <MapPin size={20} /> : <Activity size={20} />}
-                    isActive={activeView === 'lineas'}
-                    onClick={() => onViewChange('lineas')}
-                    badgeCount={0} 
-                    collapsed={collapsed}
-                  />
-                </li>
-              </ul>
-            )}
-          </div>
+      {/* ── Encabezado institucional ── */}
+      <div className="sidebar-admin__header">
+        <UserBrand collapsed={collapsed} />
 
-          <div className="SidebarSection">
-            {!collapsed && (
-              <div className="SidebarSectionHeader" onClick={() => setGestionExpanded(!gestionExpanded)}>
-                <span>GESTIÓN</span>
-                <ChevronDown size={14} className={`SectionChevron ${!gestionExpanded ? 'SectionChevron--collapsed' : ''}`} />
-              </div>
-            )}
-            {(collapsed || gestionExpanded) && (
-              <ul className="NavMenuLista">
-                <li>
-                  <MenuLinkItem 
-                    label="Historial de Reportes" 
-                    icon={<Clock size={20} />}
-                    isActive={activeView === 'historial'}
-                    onClick={() => onViewChange('historial')}
-                    badgeCount={0}
-                    collapsed={collapsed}
-                  />
-                </li>
-              </ul>
-            )}
-          </div>
-        </nav>
+        <button className="sidebar-admin__toggle" onClick={onToggle} title={collapsed ? 'Expandir' : 'Colapsar'}>
+          <ChevronLeft 
+            size={18} 
+            strokeWidth={2.5}
+            style={{ 
+              transform: collapsed ? 'rotate(180deg)' : 'rotate(0deg)', 
+              transition: 'transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275)' 
+            }}
+          />
+        </button>
       </div>
 
-      <footer className="SidebarOficialFooter">
-        <div className="ProfileCard">
-          <div className="ProfileAvatar"><User size={20} color="#0f172a" strokeWidth={2.5} /></div>
+      {/* ── Rol del usuario ── */}
+      {!collapsed && (
+        <div className="sidebar-admin__role">
+          <span className="sidebar-admin__role-dot" />
+          <span className="sidebar-admin__role-label">Oficial</span>
+        </div>
+      )}
+
+      {/* ── Navegación ── */}
+      <nav className="sidebar-admin__nav">
+        {navSections.map(section => (
+          <div key={section.label} className="sidebar-admin__section">
+
+            {/* Título de sección */}
+            {!collapsed && (
+              <button
+                className="sidebar-admin__section-title"
+                onClick={() => toggleSection(section.label)}
+              >
+                <span>{section.label}</span>
+                <span className="sidebar-admin__section-chevron">
+                   <ChevronDown size={14} style={{ transform: openSections[section.label] ? 'rotate(0deg)' : 'rotate(-90deg)', transition: 'transform 0.25s ease' }} />
+                </span>
+              </button>
+            )}
+
+            {/* Ítems */}
+            <ul className={`sidebar-admin__list ${!collapsed && !openSections[section.label] ? 'sidebar-admin__list--hidden' : ''}`}>
+              {section.items.map(item => {
+                const IconComp = item.icon;
+                const isActive = activeView === item.id;
+                return (
+                  <li key={item.id}>
+                    <button
+                      id={`nav-${item.id}`}
+                      className={`sidebar-admin__item ${isActive ? 'sidebar-admin__item--active' : ''}`}
+                      onClick={() => onViewChange(item.id)}
+                      title={collapsed ? item.label : undefined}
+                    >
+                      <span className="sidebar-admin__item-icon">
+                        <IconComp />
+                      </span>
+
+                      {!collapsed && (
+                        <span className="sidebar-admin__item-label">{item.label}</span>
+                      )}
+
+                      {item.badge && (
+                        <span className={`sidebar-admin__badge ${collapsed ? 'sidebar-admin__badge--dot' : ''}`}>
+                          {!collapsed && item.badge}
+                        </span>
+                      )}
+                    </button>
+                  </li>
+                );
+              })}
+            </ul>
+          </div>
+        ))}
+      </nav>
+
+      {/* ── Footer: perfil + cerrar sesión ── */}
+      <div className="sidebar-admin__footer">
+        <div 
+          className={`sidebar-admin__profile ${activeView === 'perfil' ? 'sidebar-admin__profile--active' : ''}`}
+          onClick={() => onViewChange('perfil')}
+          title="Ver mi perfil"
+        >
+          <div className="sidebar-admin__avatar">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+               <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>
+            </svg>
+          </div>
+
           {!collapsed && (
-            <div className="ProfileInfo">
-              <span className="ProfileName">C. Araya</span>
-              <span className="ProfileRole">Administrador</span>
+            <div className="sidebar-admin__profile-info">
+              <span className="sidebar-admin__profile-name">Juan Vargas</span>
+              <span className="sidebar-admin__profile-role">Oficial</span>
             </div>
           )}
         </div>
 
-        <button className="BtnLogoutLink" onClick={() => console.log('Logout')}>
-          <div className="LogoutIconWrapper">
-             <LogOut size={18} />
-          </div>
+        <button className="sidebar-admin__logout" onClick={logout} title="Cerrar sesión" id="btn-logout">
+          <LogOut size={18} />
           {!collapsed && <span>Cerrar sesión</span>}
         </button>
-      </footer>
+      </div>
     </aside>
   );
 };

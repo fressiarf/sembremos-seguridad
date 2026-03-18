@@ -3,10 +3,12 @@ import './MainDashboard.css';
 import EstadoBadge from "./EstadoBadge";
 import { oficialService } from '../../../services/oficialService';
 import { useToast } from '../../../context/ToastContext';
-import { RefreshCw } from 'lucide-react';
+import { RefreshCw, ClipboardEdit, ChevronUp, ChevronDown } from 'lucide-react';
+import FormOficial from './FormOficial';
 
 const TareaCard = ({ tarea, isLast, onUpdate }) => {
   const [isUpdating, setIsUpdating] = useState(false);
+  const [showForm, setShowForm] = useState(false);
   const { showToast } = useToast();
 
   const getStatusColorClass = (estado) => {
@@ -41,61 +43,79 @@ const TareaCard = ({ tarea, isLast, onUpdate }) => {
 
   return (
     <div className="TimelineItem">
-      <div className={`TimelineDot ${dotClass}`}></div>
-      
-      <div className="TimelineContent">
-        <div className="TimelineMeta">
-          <span className="TimelineTime">{tarea?.fecha || 'Hoy'}</span>
-          <span className="TimelineSeparator">·</span>
-          <span className="TimelineUser">Responsable Asignado</span>
-          <span className="TimelineSeparator">·</span>
-          <span className="TimelineZone">{tarea?.zona || 'Cantón'}</span>
+      <article className="TareaCardTimeline">
+        {/* Header Institucional (Verde como en el PDF) */}
+        <div className="TareaCardHeaderInstitucional">
+          <span>Línea de Acción: {tarea?.lineaAccion || tarea?.codigo || 'S/L'}</span>
+          <EstadoBadge status={tarea?.estado || 'PENDIENTE'} />
         </div>
-        
-        <article className="TareaCardTimeline">
-          <div className="TareaCardHeaderTimeline">
-             <div className="TareaCardTitle">
-                <span className="TareaCode">{tarea?.lineaAccion || tarea?.codigo || 'S/L'}</span>
-                <span className="TareaTitleSep">·</span>
-                <span className="TareaName">{tarea?.problematica || tarea?.titulo || 'Sin título'}</span>
-             </div>
-             <EstadoBadge status={tarea?.estado || 'PENDIENTE'} />
+
+        {/* Columna Principal - Descripción y Acciones */}
+        <div className="TareaCardColPrincipal">
+          <div className="CeldaHeader">Descripción de la Línea de Trabajo</div>
+          <div className="CeldaTabla">
+            <h4 className="TareaNameLabel">{tarea?.problematica || tarea?.titulo || 'Sin título'}</h4>
+            <p className="TareaDescripcionText">
+              {tarea?.propuestaMeta || tarea?.descripcion || 'No hay descripción disponible para esta línea de acción.'}
+            </p>
           </div>
-          <div className="TareaCardBodyTimeline">
-             <div className="TareaDetailsGrid">
-                {tarea?.propuestaMeta && (
-                  <div className="TareaDetailItem">
-                    <strong>Propuesta / Meta:</strong>
-                    <p>{tarea.propuestaMeta}</p>
-                  </div>
-                )}
-                {tarea?.responsables && (
-                  <div className="TareaDetailItem">
-                    <strong>Corresponsables:</strong>
-                    <p>{tarea.responsables}</p>
-                  </div>
-                )}
-                {tarea?.descripcion && (
-                  <div className="TareaDetailItem">
-                    <strong>Instrucciones:</strong>
-                    <p>{tarea.descripcion}</p>
-                  </div>
-                )}
-             </div>
-             
-             <div className="TareaCardFooter">
-                <button 
-                    className="BtnUpdateStatus" 
-                    onClick={handleNextStatus}
-                    disabled={isUpdating}
-                >
-                  <RefreshCw size={14} className={isUpdating ? 'spin' : ''} />
-                  {isUpdating ? 'Actualizando...' : 'Avanzar Estado'}
-                </button>
-             </div>
+
+          <div className="CeldaHeader">Acciones Estratégicas / Bitácora</div>
+          <div className="CeldaTabla">
+            <ul className="AccionesEstrategicasList">
+              {tarea?.descripcion ? (
+                <li>{tarea.descripcion}</li>
+              ) : (
+                <li>Pendiente de asignación de acciones detalladas.</li>
+              )}
+              {tarea?.zona && <li>Zona de operación: {tarea.zona}</li>}
+            </ul>
           </div>
-        </article>
-      </div>
+        </div>
+
+        {/* Columna Lateral - Coordinador y Detalles */}
+        <div className="TareaCardColLateral">
+          <div className="CeldaHeader">Coordinador</div>
+          <div className="CeldaTabla">
+            <strong className="CoordinadorLabel">Fuerza Pública</strong>
+            <p className="CoordinadorValue">{tarea?.responsables || 'Sembremos Seguridad'}</p>
+          </div>
+
+          <div className="CeldaHeader">Estado</div>
+          <div className="CeldaTabla" style={{ flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center', gap: '10px' }}>
+            <button 
+                className="BtnUpdateStatus" 
+                onClick={handleNextStatus}
+                disabled={isUpdating}
+                style={{ width: '100%', justifyContent: 'center' }}
+            >
+              <RefreshCw size={14} className={isUpdating ? 'spin' : ''} />
+              {isUpdating ? 'Avanzar' : 'Siguiente'}
+            </button>
+
+            <button 
+                className={`BtnToggleForm ${showForm ? 'active' : ''}`}
+                onClick={() => setShowForm(!showForm)}
+                style={{ width: '100%', justifyContent: 'center' }}
+            >
+              <ClipboardEdit size={14} />
+              {showForm ? 'Cerrar' : 'Reportar'}
+            </button>
+          </div>
+        </div>
+
+        {showForm && (
+          <div className="TareaCardFormExpander" style={{ gridColumn: '1 / -1', padding: '1.5rem', borderTop: '1px solid #000' }}>
+            <FormOficial 
+              actividad={tarea} 
+              onSuccess={() => {
+                setShowForm(false);
+                if (onUpdate) onUpdate();
+              }} 
+            />
+          </div>
+        )}
+      </article>
     </div>
   );
 };

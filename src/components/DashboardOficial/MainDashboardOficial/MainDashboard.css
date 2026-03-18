@@ -4,70 +4,73 @@
 
 /* ─── Stat Card Personal ─── */
 .StatCard {
-  background: var(--inst-white);
-  border: 1px solid var(--inst-border);
-  border-radius: 16px;
-  padding: 1.75rem;
+  background: var(--white);
+  border: 1px solid var(--gray-border);
+  border-radius: 4px; /* Estilo de documento oficial */
+  padding: 1.5rem;
   position: relative;
   overflow: hidden;
   height: auto;
-  min-height: 150px;
+  min-height: 110px;
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.02);
-  transition: all 0.3s ease;
+  justify-content: center;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
+  transition: all 0.2s ease;
+  border-top: 6px solid var(--navy-blue); /* Borde superior grueso por defecto */
 }
 
 .StatCard:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.05);
-  border-color: rgba(0, 47, 108, 0.1);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
 }
 
 .StatCardIcono {
-  margin-bottom: 0.5rem;
-  color: var(--inst-blue);
-  background: var(--inst-light-bg);
-  width: 40px;
-  height: 40px;
+  margin-bottom: 0.75rem;
+  color: var(--navy-blue);
+  background: var(--gray-bg);
+  width: 36px;
+  height: 36px;
   display: flex;
   align-items: center;
   justify-content: center;
-  border-radius: 8px;
+  border-radius: 6px;
+  opacity: 0.9;
 }
 
 .StatCardIcono svg {
-  width: 20px;
-  height: 20px;
+  width: 18px;
+  height: 18px;
 }
 
 .StatCardContenido {
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  flex: 1;
-  text-align: left;
 }
 
 .StatCardValor {
-  font-size: 1.75rem;
-  font-weight: 700;
-  color: var(--inst-text-dark);
-  line-height: 1;
+  font-size: 1.8rem;
+  font-weight: 800;
+  color: var(--navy-blue);
+  line-height: 1.1;
+  margin: 0;
 }
 
 .StatCardLabel {
-  color: var(--inst-text-muted);
-  font-size: 0.8rem;
+  color: var(--gray-text);
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
   margin-top: 4px;
 }
 
-/* Colores Dinámicos */
-.StatCard[data-tipo="info"] { border-bottom: 3px solid #3b82f6; }
-.StatCard[data-tipo="alerta"] { border-bottom: 3px solid #f59e0b; }
-.StatCard[data-tipo="exito"] { border-bottom: 3px solid #22c55e; }
-.StatCard[data-tipo="error"] { border-bottom: 3px solid #ef4444; }
+/* Colores Dinámicos (Borde Superior) */
+.StatCard[data-tipo="info"] { border-top-color: var(--inst-blue); }
+.StatCard[data-tipo="alerta"] { border-top-color: var(--inst-red); }
+.StatCard[data-tipo="exito"] { border-top-color: var(--inst-green); }
+.StatCard[data-tipo="error"] { border-top-color: var(--inst-red); }
 
 /* ─── Info Línea Header ─── */
 .InfoLineaHeader {
@@ -161,156 +164,200 @@
   transition: width 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275);
 }
 
+/* ─── Lista de Tareas Estilo 'Líneas de Acción' (Tablas PDF) ─── */
 .ListaMisTareas {
-  background: var(--inst-white);
-  border: 1px solid var(--inst-border);
-  border-radius: 20px;
-  padding: 2rem;
-  box-shadow: 0 15px 40px rgba(0, 0, 0, 0.02);
-  transition: all 0.4s ease;
-}
-
-.ListaMisTareas:hover {
-  box-shadow: 0 25px 60px rgba(0, 0, 0, 0.04);
+  background: transparent;
+  padding: 0;
+  box-shadow: none;
 }
 
 .ListaMisTareasHeader {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 1.5rem;
+  margin-bottom: 2rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid var(--gray-border);
 }
 
 .ListaMisTareasHeader h3 {
-  font-size: 1rem;
-  font-weight: 600;
-  color: var(--inst-text-dark);
+  font-size: 1.25rem;
+  font-weight: 800;
+  color: var(--navy-blue);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
 }
 
-.FiltroBtn {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  background: transparent;
-  border: none;
-  color: var(--text-muted);
-  font-size: 0.9rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: color 0.2s;
-}
-
-.FiltroBtn:hover {
-  color: var(--msp-blue);
-}
-
-/* ─── Contenedor y Elementos del Timeline ─── */
 .TimelineContenedor {
   display: flex;
   flex-direction: column;
-  gap: 1.5rem;
-  position: relative;
-  padding-left: 1.5rem;
+  gap: 2.5rem;
 }
 
-.TimelineContenedor::before {
-  content: '';
-  position: absolute;
-  left: 4px;
-  top: 0;
-  bottom: 0;
-  width: 2px;
-  background: var(--inst-border);
+/* El 'Card' ahora es una Tabla Institucional */
+.TareaCardTimeline {
+  background: var(--white);
+  border: 1px solid #000; /* Bordes negros finos como en el PDF */
+  border-radius: 0;
+  display: grid;
+  grid-template-columns: 3fr 1fr; /* Relación de aspecto del PDF */
+  transition: all 0.3s ease;
+  overflow: hidden;
 }
 
-.TimelineItem {
-  position: relative;
-}
-
-.TimelineDot {
-  position: absolute;
-  left: -22px;
-  top: 4px;
-  width: 10px;
-  height: 10px;
-  border-radius: 50%;
-  background: var(--inst-white);
-  border: 2px solid var(--inst-border);
-  z-index: 1;
-}
-
-.TimelineDot.dot-green { border-color: #22c55e; }
-.TimelineDot.dot-blue { border-color: #3b82f6; }
-.TimelineDot.dot-orange { border-color: #f59e0b; }
-.TimelineDot.dot-yellow { border-color: #eab308; }
-
-.TimelineContent {
-  background: #f8fafc;
-  border: 1px solid var(--inst-border);
-  border-radius: 8px;
-  padding: 10px 12px;
-  flex: 1;
-}
-
-.TimelineMeta {
+.TareaCardHeaderInstitucional {
+  grid-column: 1 / -1;
+  background: var(--inst-green);
+  color: white;
+  padding: 8px 16px;
+  font-size: 0.85rem;
+  font-weight: 800;
+  text-transform: uppercase;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 0.5rem;
 }
 
-.TimelineTime {
-  color: var(--inst-text-dark);
+.TareaCardColPrincipal {
+  padding: 0;
+  border-right: 1px solid #000;
+}
+
+.TareaCardColLateral {
+  background: #f1f5f9;
+  display: flex;
+  flex-direction: column;
+}
+
+.CeldaTabla {
+  border-bottom: 1px solid #000;
+  padding: 12px 16px;
+}
+
+.CeldaTabla:last-child {
+  border-bottom: none;
+}
+
+.CeldaHeader {
+  background: #e2e8f0;
+  font-size: 0.7rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  color: var(--navy-blue);
+  padding: 4px 16px;
+  border-bottom: 1px solid #000;
+}
+
+.TareaNameLabel {
+  display: block;
+  font-size: 1rem;
   font-weight: 700;
+  color: var(--navy-blue);
+  margin-bottom: 8px;
+}
+
+.TareaDescripcionText {
   font-size: 0.85rem;
+  line-height: 1.5;
+  color: #334155;
+  margin: 0;
 }
 
-/* ─── Tarea Card (Dentro de Timeline) ─── */
-.TareaCardTimeline {
+.AccionesEstrategicasList {
+  margin: 0;
+  padding-left: 1.25rem;
+  font-size: 0.8rem;
+  color: #1e293b;
+}
+
+.AccionesEstrategicasList li {
+  margin-bottom: 6px;
+}
+
+/* Columna Lateral (Coordinadores / Info) */
+.CoordinadorLabel {
+  font-size: 0.8rem;
+  font-weight: 800;
+  color: var(--navy-blue);
+  text-align: center;
+  display: block;
+  margin-bottom: 8px;
+}
+
+.CoordinadorValue {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: #475569;
+  text-align: center;
+}
+
+/* ─── Botones de Acción en Card ─── */
+.TareaCardFooter {
+  display: flex;
+  gap: 12px;
+  margin-top: 1.5rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--inst-border);
+}
+
+.BtnUpdateStatus, .BtnToggleForm {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  border-radius: 8px;
+  font-size: 0.8rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border: 1px solid transparent;
+}
+
+.BtnUpdateStatus {
+  background: var(--inst-blue);
+  color: white;
+}
+
+.BtnUpdateStatus:hover {
+  background: var(--inst-dark-blue);
+  transform: translateY(-1px);
+}
+
+.BtnToggleForm {
+  background: var(--inst-light-bg);
+  color: var(--inst-blue);
+  border-color: var(--inst-border);
+}
+
+.BtnToggleForm:hover {
   background: var(--inst-white);
-  border: 1px solid var(--inst-border);
-  border-radius: 12px;
-  padding: 1.25rem;
-  transition: all 0.3s ease;
+  border-color: var(--inst-blue);
+  color: var(--inst-blue);
 }
 
-.TareaCardTimeline:hover {
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.04);
+.BtnToggleForm.active {
+  background: var(--inst-blue);
+  color: white;
   border-color: var(--inst-blue);
 }
 
-.TareaCardHeaderTimeline {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 1rem;
+.TareaCardFormExpander {
+  margin-top: 1rem;
+  animation: slideDown 0.3s ease-out;
 }
 
-.TareaCardTitle {
-  font-weight: 700;
-  color: var(--inst-text-dark);
-  font-size: 0.95rem;
+@keyframes slideDown {
+  from { opacity: 0; transform: translateY(-10px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
-.TareaDetailsGrid {
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: 0.75rem;
-  margin-bottom: 1rem;
+.spin {
+  animation: spin 1s linear infinite;
 }
 
-.TareaDetailItem strong {
-  font-size: 0.7rem;
-  color: var(--inst-text-muted);
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-}
-
-.TareaDetailItem p {
-  margin: 2px 0 0;
-  font-size: 0.85rem;
-  color: var(--inst-text-dark);
-  line-height: 1.4;
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
 }
 
 /* ─── Estado Badge ─── */
