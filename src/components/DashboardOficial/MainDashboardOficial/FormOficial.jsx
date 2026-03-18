@@ -39,7 +39,7 @@ const FormOficial = ({ actividad, onSuccess }) => {
     setMensaje({ tipo: '', texto: '' });
 
     try {
-      const response = await fetch(`http://localhost:5000/actividades/${actividad.id}`, {
+      const response = await fetch(`http://localhost:3001/actividades/${actividad.id}`, {
         method: 'PATCH',
         headers: {
           'Content-Type': 'application/json',
