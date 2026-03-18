@@ -40,7 +40,8 @@
 .LayoutDashboard {
   display: grid;
   grid-template-columns: var(--sb-width) 1fr;
-  min-height: 100vh;
+  height: 100vh;
+  overflow: hidden;
   background-color: var(--navy-blue);
   background-image: 
     linear-gradient(rgba(11, 34, 64, 0.85), rgba(11, 34, 64, 0.85)),
