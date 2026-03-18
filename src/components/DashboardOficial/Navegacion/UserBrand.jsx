@@ -1,16 +1,18 @@
-import { Shield } from 'lucide-react';
+import logoMsp from '../../../assets/Msp_logo-removebg-preview.png';
 import './Navegacion.css';
 
 const UserBrand = ({ collapsed }) => {
   return (
-    <div className="UserBrandContainer">
+    <div className={`UserBrandContainer ${collapsed ? 'collapsed' : ''}`}>
       <div className="UserBrandLogo">
-        <Shield size={24} color="#0f172a" fill="#0f172a" />
+        <img src={logoMsp} alt="MSP" className="BrandLogoImg" />
       </div>
-      <div className="UserBrandTexto">
-        <h3>SEMBREMOS</h3>
-        <p className="BrandSubtitle">SEGURIDAD</p>
-      </div>
+      {!collapsed && (
+        <div className="UserBrandTexto">
+          <h3>SEMBREMOS</h3>
+          <p className="BrandSubtitle">SEGURIDAD</p>
+        </div>
+      )}
     </div>
   );
 };

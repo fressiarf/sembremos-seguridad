@@ -1,33 +1,53 @@
 :root {
-  /* Paleta Institucional (Sincronizada con Admin) */
-  --inst-dark-blue:   #0a1f44;
-  --inst-blue:        #002f6c;
+  /* Paleta Institucional (MSP / Sembremos Seguridad) - Sincronizada con Login */
+  --navy-blue:        #0b2240;
+  --navy-blue-light:  #163a66;
   --inst-red:         #ce1126;
-  --inst-light-bg:    #f4f7f9;
-  --inst-white:       #ffffff;
-  --inst-border:      #e2e8f0;
-  --inst-text-dark:   #1a2b4b;
-  --inst-text-muted:  #64748b;
-  
-  --sb-width:         260px;
-  --sb-width-collapsed: 68px;
-  --sb-transition:    0.28s cubic-bezier(0.4, 0, 0.2, 1);
+  --white:            #ffffff;
+  --gray-bg:          #f8fafc;
+  --gray-border:      #e2e8f0;
+  --gray-text:        #64748b;
+  --text-dark:        #1e293b;
 
-  /* Mapping local names to institutional ones for compatibility */
-  --msp-blue: var(--inst-dark-blue);
-  --msp-blue-dark: #051229;
-  --white: var(--inst-white);
-  --gray-light: var(--inst-light-bg);
-  --gray-border: var(--inst-border);
-  --text-dark: var(--inst-text-dark);
-  --text-muted: var(--inst-text-muted);
+  /* Colores adicionales para estados */
+  --inst-green:       #008d45;
+  --inst-light-blue:  #00a9e0;
+
+  /* Gradiente oficial sutil de la bandera de Costa Rica */
+  --bandera-cr: linear-gradient(
+    to right, 
+    #002b7f 0% 17%, 
+    #ffffff 17% 33%, 
+    #ce1126 33% 67%, 
+    #ffffff 67% 83%, 
+    #002b7f 83% 100%
+  );
+  
+  --sb-width:         280px;
+  --sb-width-collapsed: 80px;
+  --sb-transition:    0.3s cubic-bezier(0.4, 0, 0.2, 1);
+
+  /* Mapping local names to institutional ones */
+  --inst-dark-blue: var(--navy-blue);
+  --inst-blue: var(--navy-blue-light);
+  --inst-light-bg: var(--gray-bg);
+  --inst-white: var(--white);
+  --inst-border: var(--gray-border);
+  --inst-text-dark: var(--text-dark);
+  --inst-text-muted: var(--gray-text);
 }
 
 .LayoutDashboard {
   display: grid;
   grid-template-columns: var(--sb-width) 1fr;
   min-height: 100vh;
-  background-color: var(--inst-light-bg);
+  background-color: var(--navy-blue);
+  background-image: 
+    linear-gradient(rgba(11, 34, 64, 0.85), rgba(11, 34, 64, 0.85)),
+    url('/bg-institucional.png');
+  background-size: cover;
+  background-position: center;
+  background-attachment: fixed;
   font-family: 'Inter', system-ui, sans-serif;
   transition: grid-template-columns var(--sb-transition);
 }
@@ -38,17 +58,17 @@
 
 /* Global body override */
 body:has(.LayoutDashboard) {
-  background-color: var(--inst-light-bg) !important;
+  background-color: var(--navy-blue) !important;
   margin: 0;
 }
 
 .ContenedorPrincipalDashboard {
   display: flex;
   flex-direction: column;
-  padding: 2.5rem; /* Ajustado para coincidir con el Admin */
+  padding: 2.5rem;
   overflow-y: auto;
   max-height: 100vh;
-  background: var(--inst-light-bg);
+  background: transparent;
 }
 
 @keyframes fadeIn {

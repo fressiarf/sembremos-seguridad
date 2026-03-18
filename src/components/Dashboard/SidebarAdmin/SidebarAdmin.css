@@ -15,42 +15,39 @@ html, body, #root {
 }
 
 :root {
-  /* Paleta Institucional (Inspirada en el Login) */
-  --inst-dark-blue:   #0a1f44;
-  --inst-blue:        #002f6c;
-  --inst-red:         #ce1126;
-  --inst-light-bg:    #f4f7f9;
+  /* Paleta Institucional Refinada (MSP/Sembremos) */
+  --inst-dark-blue:   #0b2240; /* Navy Blue Principal */
+  --inst-blue:        #163a66; /* Navy Light */
+  --inst-red:         #ce1126; /* Rojo Institucional */
+  --inst-green:       #008d45; /* Verde Sembremos */
+  --inst-light-bg:    #f8fafc;
   --inst-white:       #ffffff;
-  --inst-border:      #e2e8f0;
-  --inst-text-dark:   #1a2b4b;
-  --inst-text-muted:  #64748b;
+  --inst-border:      rgba(255, 255, 255, 0.08);
   
   --sb-bg:            var(--inst-dark-blue);
-  --sb-bg-hover:      #122b5a;
-  --sb-bg-active:     #162d5a;
-  --sb-border:        rgba(255,255,255,0.08);
+  --sb-bg-hover:      rgba(255, 255, 255, 0.05);
+  --sb-bg-active:     rgba(255, 255, 255, 0.08);
   --sb-text-primary:  #ffffff;
-  --sb-text-secondary:#b0c4de;
-  --sb-text-muted:    #7a9cc4;
-  --sb-accent:        #3b82f6;
-  --sb-success:       #22c55e;
+  --sb-text-secondary:rgba(255, 255, 255, 0.7);
+  --sb-text-muted:    rgba(255, 255, 255, 0.4);
+  --sb-accent:        var(--inst-green);
+  --sb-success:       var(--inst-green);
+  --sb-badge-red:     var(--inst-red);
 
-  --sb-width:         260px;
-  --sb-width-collapsed: 68px;
-  --sb-radius:        12px;
-  --sb-transition:    0.28s cubic-bezier(0.4, 0, 0.2, 1);
+  --sb-width:         280px;
+  --sb-width-collapsed: 80px;
+  --sb-radius:        0px; /* Bordes rectos institucionales */
+  --sb-transition:    0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 
 
 /* ── Contenedor principal ── */
 .sidebar-admin {
-  position: fixed;
+  position: sticky;
   top: 0;
-  left: 0;
-  bottom: 0;
-  height: 100%;
-  width: var(--sb-width);
+  height: 100vh;
+  width: var(--sb-width); /* Mantener para colapsar en el grid */
   background: linear-gradient(180deg, #0a1f44 0%, #051229 100%);
   display: flex;
   flex-direction: column;
@@ -493,6 +490,11 @@ html, body, #root {
   background: rgba(0,0,0,0.15);
 }
 
+.sidebar-admin--collapsed .sidebar-admin__footer {
+  padding: 10px 0 16px;
+  align-items: center;
+}
+
 
 /* Perfil de usuario */
 .sidebar-admin__profile {
@@ -508,7 +510,9 @@ html, body, #root {
 
 .sidebar-admin--collapsed .sidebar-admin__profile {
   justify-content: center;
-  padding: 8px 0;
+  padding: 6px;
+  width: auto;
+  background: transparent;
 }
 
 
@@ -539,6 +543,15 @@ html, body, #root {
   align-items: center;
   justify-content: center;
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+  transition: all var(--sb-transition);
+}
+
+.sidebar-admin--collapsed .sidebar-admin__avatar {
+  width: 32px;
+  height: 32px;
+  min-width: 32px;
+  border-radius: 8px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.25);
 }
 
 
@@ -594,10 +607,6 @@ html, body, #root {
 }
 
 
-.sidebar-admin--collapsed .sidebar-admin__logout {
-  padding: 9px;
-}
-
 .sidebar-admin__logout:hover {
   background: rgba(239, 68, 68, 0.1);
   color: #ef4444;
@@ -605,8 +614,13 @@ html, body, #root {
 }
 
 .sidebar-admin--collapsed .sidebar-admin__logout {
-  padding: 12px 0;
+  padding: 8px;
   justify-content: center;
+  gap: 0;
+  width: auto;
+  min-width: 0;
+  border: none;
+  background: transparent;
 }
 
 

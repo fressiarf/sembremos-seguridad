@@ -1,13 +1,12 @@
 import React from 'react';
-import ContenedorDashboard from '../components/Dashboard/ContenedorDashboard/ContenedorDashboard';
+import LayoutDashboard from '../components/DashboardOficial/Navegacion/LayoutDashboard';
 import SidebarAdmin from '../components/Dashboard/SidebarAdmin/SidebarAdmin';
 import SeccionPrincipal from '../components/Dashboard/SeccionPrincipal/SeccionPrincipal';
 
 const Dashboard = () => (
-  <ContenedorDashboard>
-    <SidebarAdmin />
+  <LayoutDashboard sidebar={<SidebarAdmin />}>
     <SeccionPrincipal />
-  </ContenedorDashboard>
+  </LayoutDashboard>
 );
 
 export default Dashboard;

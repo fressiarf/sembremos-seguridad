@@ -2,35 +2,21 @@ import React, { useState, useEffect } from 'react';
 import './GestionUsuarios.css';
 import { userService } from '../../../services/userService';
 import { useToast } from '../../../context/ToastContext';
-
-
-// Íconos simplificados
-const Icon = {
-  Search: () => (
-    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-      <circle cx="11" cy="11" r="8" /><line x1="21" y1="21" x2="16.65" y2="16.65" />
-    </svg>
-  ),
-  UserCog: () => (
-    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
-      <circle cx="9" cy="7" r="4" />
-      <circle cx="19" cy="11" r="3" />
-      <path d="M19 8v1" /><path d="M19 13v1" /><path d="M21.5 9.5l-.5.5" /><path d="M17 12l-.5.5" />
-    </svg>
-  ),
-  Shield: () => (
-    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
-    </svg>
-  )
-};
+import { Search, UserCog, Shield, UserPlus, X, Key, Mail, Fingerprint, User as UserIcon } from 'lucide-react';
 
 const GestionUsuarios = () => {
   const [users, setUsers] = useState([]);
   const [searchQuery, setSearchQuery] = useState('');
   const [loading, setLoading] = useState(true);
   const [updatingId, setUpdatingId] = useState(null);
+  const [showCreateModal, setShowCreateModal] = useState(false);
+  const [newUser, setNewUser] = useState({
+    nombre: '',
+    cedula: '',
+    usuario: '',
+    password: '',
+    rol: 'oficial'
+  });
   const { showToast } = useToast();
 
   
@@ -70,8 +56,31 @@ const GestionUsuarios = () => {
     } catch (error) {
       showToast('Error crítico al actualizar el rol en la base de datos', 'error');
     } finally {
-
       setUpdatingId(null);
+    }
+  };
+
+  const handleCreateUser = async (e) => {
+    e.preventDefault();
+    if (!newUser.nombre || !newUser.cedula || !newUser.usuario || !newUser.password) {
+      showToast('Por favor completa todos los campos', 'warning');
+      return;
+    }
+
+    try {
+      await userService.createUser(newUser);
+      showToast('Usuario creado exitosamente', 'success');
+      setShowCreateModal(false);
+      setNewUser({
+        nombre: '',
+        cedula: '',
+        usuario: '',
+        password: '',
+        rol: 'oficial'
+      });
+      fetchUsers();
+    } catch (error) {
+      showToast('Error al crear el usuario', 'error');
     }
   };
 
@@ -97,7 +106,7 @@ const GestionUsuarios = () => {
       <section className="gestion-usuarios__filters">
         <div className="search-wrapper">
           <div className="search-icon">
-            <Icon.Search />
+            <Search size={18} />
           </div>
           <input 
             type="text" 
@@ -113,11 +122,96 @@ const GestionUsuarios = () => {
               onClick={() => setSearchQuery('')}
               title="Limpiar búsqueda"
             >
-              ✕
+              <X size={14} />
             </button>
           )}
         </div>
+        <button className="btn-create-user" onClick={() => setShowCreateModal(true)}>
+            <UserPlus size={18} />
+            <span>Nuevo Usuario</span>
+        </button>
       </section>
+
+      {showCreateModal && (
+        <div className="modal-overlay">
+          <div className="user-modal">
+            <div className="user-modal__header">
+              <h3>Registrar Personal</h3>
+              <button className="btn-close-modal" onClick={() => setShowCreateModal(false)}>
+                <X size={20} />
+              </button>
+            </div>
+            <form onSubmit={handleCreateUser} className="user-modal__form">
+              <div className="form-grid">
+                <div className="form-group">
+                  <label>Nombre Completo</label>
+                  <div className="input-with-icon">
+                    <UserIcon size={16} />
+                    <input 
+                      type="text" 
+                      placeholder="Ej: Juan Pérez" 
+                      value={newUser.nombre}
+                      onChange={e => setNewUser({...newUser, nombre: e.target.value})}
+                    />
+                  </div>
+                </div>
+                <div className="form-group">
+                  <label>Número de Cédula</label>
+                  <div className="input-with-icon">
+                    <Fingerprint size={16} />
+                    <input 
+                      type="text" 
+                      placeholder="Ej: 102340567" 
+                      value={newUser.cedula}
+                      onChange={e => setNewUser({...newUser, cedula: e.target.value})}
+                    />
+                  </div>
+                </div>
+                <div className="form-group">
+                  <label>Correo Electrónico (Gmail)</label>
+                  <div className="input-with-icon">
+                    <Mail size={16} />
+                    <input 
+                      type="email" 
+                      placeholder="usuario@gmail.com" 
+                      value={newUser.usuario}
+                      onChange={e => setNewUser({...newUser, usuario: e.target.value})}
+                    />
+                  </div>
+                </div>
+                <div className="form-group">
+                  <label>Contraseña Temporal</label>
+                  <div className="input-with-icon">
+                    <Key size={16} />
+                    <input 
+                      type="password" 
+                      placeholder="********" 
+                      value={newUser.password}
+                      onChange={e => setNewUser({...newUser, password: e.target.value})}
+                    />
+                  </div>
+                </div>
+                <div className="form-group full-width">
+                  <label>Rol asignado</label>
+                  <select 
+                    value={newUser.rol}
+                    onChange={e => setNewUser({...newUser, rol: e.target.value})}
+                    className="modal-select"
+                  >
+                    <option value="oficial">Oficial de campo</option>
+                    <option value="admin">Administrador del sistema</option>
+                    <option value="analista">Analista de datos</option>
+                  </select>
+                </div>
+              </div>
+              <div className="user-modal__footer">
+                <button type="button" className="btn-cancel-modal" onClick={() => setShowCreateModal(false)}>Cancelar</button>
+                <button type="submit" className="btn-submit-modal">Guardar Usuario</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
 
 
       <div className="usuarios-table-container">
@@ -148,7 +242,7 @@ const GestionUsuarios = () => {
                 <td>{user.cedula}</td>
                 <td>
                   <span className={`role-badge role-badge--${user.rol}`}>
-                    <Icon.Shield /> 
+                    <Shield size={14} style={{ marginRight: '6px' }} /> 
                     {user.rol === 'admin' ? 'Administrador' : 'Oficial'}
                   </span>
                 </td>
@@ -160,7 +254,7 @@ const GestionUsuarios = () => {
                     disabled={updatingId === user.id}
                     title={`Cambiar a ${user.rol === 'admin' ? 'Oficial' : 'Administrador'}`}
                   >
-                    <Icon.UserCog />
+                    <UserCog size={16} />
                     {updatingId === user.id ? 'Actualizando...' : (user.rol === 'admin' ? 'Degradar a Oficial' : 'Hacer Admin')}
                   </button>
                 </td>

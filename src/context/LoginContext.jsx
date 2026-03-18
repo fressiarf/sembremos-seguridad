@@ -1,10 +1,17 @@
-import React, { createContext, useContext, useState } from 'react';
+import React, { createContext, useContext, useState, useEffect } from 'react';
 import mockData from '../../db.json';
 
 const LoginContext = createContext();
 
 export const LoginProvider = ({ children }) => {
   const [metodo, setMetodo] = useState('email'); // 'email' o 'cedula'
+
+  useEffect(() => {
+    const savedUser = localStorage.getItem('currentUser');
+    if (savedUser) {
+      setUser(JSON.parse(savedUser));
+    }
+  }, []);
 
   const cambiarMetodo = (nuevoMetodo) => {
     setMetodo(nuevoMetodo);
@@ -20,6 +27,8 @@ export const LoginProvider = ({ children }) => {
     usuario: '',
     password: ''
   });
+
+  const [user, setUser] = useState(null); // Estado para el usuario logueado
 
   const validateAll = () => {
     const newErrors = {
@@ -69,8 +78,22 @@ export const LoginProvider = ({ children }) => {
       return false;
     }
 
+    if (usuarioEncontrado) {
+      setUser(usuarioEncontrado);
+      localStorage.setItem('currentUser', JSON.stringify(usuarioEncontrado));
+    }
+
     setErrors(newErrors);
     return usuarioEncontrado;
+  };
+
+  const logout = () => {
+    setFormData({ usuario: '', password: '' });
+    setErrors({ usuario: '', password: '' });
+    setUser(null);
+    localStorage.removeItem('currentUser');
+    // Redirigir al login
+    window.location.href = '/';
   };
 
   const value = {
@@ -80,7 +103,9 @@ export const LoginProvider = ({ children }) => {
     setFormData,
     errors,
     setErrors,
-    validateAll
+    validateAll,
+    logout,
+    user
   };
 
   return (

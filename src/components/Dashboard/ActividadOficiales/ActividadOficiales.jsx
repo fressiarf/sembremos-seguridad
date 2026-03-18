@@ -2,30 +2,8 @@ import React, { useState, useEffect } from 'react';
 import './ActividadOficiales.css';
 import { useToast } from '../../../context/ToastContext';
 import { dashboardService } from '../../../services/dashboardService';
-
-
-const Icon = {
-  Users: () => (
-    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
-      <circle cx="9" cy="7" r="4" />
-      <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
-      <path d="M16 3.13a4 4 0 0 1 0 7.75" />
-    </svg>
-  ),
-  Edit: () => (
-    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
-      <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
-    </svg>
-  ),
-  Clock: () => (
-    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-      <circle cx="12" cy="12" r="10" />
-      <polyline points="12 6 12 12 16 14" />
-    </svg>
-  ),
-};
+import { userService } from '../../../services/userService';
+import { Users, Edit, Clock, Plus, X, ListTodo, MapPin, User as UserIcon, Calendar, FileText } from 'lucide-react';
 
 const ActividadOficiales = () => {
   const [selectedOfficer, setSelectedOfficer] = useState('Todos los oficiales');
@@ -33,6 +11,7 @@ const ActividadOficiales = () => {
   const [activities, setActivities] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showAssignForm, setShowAssignForm] = useState(false);
+  const [officers, setOfficers] = useState([]); // Lista de oficiales reales
   const [newActivity, setNewActivity] = useState({
     titulo: '',
     problematica: '',
@@ -47,11 +26,13 @@ const ActividadOficiales = () => {
   });
   const { showToast } = useToast();
 
-  const loadActivities = async () => {
+  const loadData = async () => {
     try {
-      const data = await dashboardService.getFullDashboardData();
-      if (data && data.activities) {
-        const mapped = data.activities.map(act => ({
+      setLoading(true);
+      // Cargar actividades
+      const dashData = await dashboardService.getFullDashboardData();
+      if (dashData && dashData.activities) {
+        const mapped = dashData.activities.map(act => ({
           id: act.id,
           date: act.fecha || 'Reciente',
           officer: act.oficialNombre || 'Sin asignar',
@@ -65,16 +46,31 @@ const ActividadOficiales = () => {
         }));
         setActivities(mapped);
       }
+
+      // Cargar oficiales reales para el select
+      const allUsers = await userService.getUsers();
+      const onlyOfficers = allUsers.filter(u => u.rol === 'oficial');
+      setOfficers(onlyOfficers);
+
+      // Si hay oficiales, establecer el primero por defecto en el form
+      if (onlyOfficers.length > 0) {
+        setNewActivity(prev => ({
+          ...prev,
+          oficialId: onlyOfficers[0].id.toString(),
+          oficialNombre: onlyOfficers[0].nombre
+        }));
+      }
+
     } catch (error) {
-      showToast('Error al cargar actividades en tiempo real', 'error');
+      showToast('Error al sincronizar datos operativos', 'error');
     } finally {
       setLoading(false);
     }
   };
 
   useEffect(() => {
-    loadActivities();
-  }, [showToast]);
+    loadData();
+  }, []);
 
   const handleCreateActivity = async (e) => {
     e.preventDefault();
@@ -97,12 +93,12 @@ const ActividadOficiales = () => {
         propuestaMeta: '',
         responsables: '',
         descripcion: '',
-        oficialId: '2',
-        oficialNombre: 'Juan Vargas',
+        oficialId: officers.length > 0 ? officers[0].id.toString() : '2',
+        oficialNombre: officers.length > 0 ? officers[0].nombre : 'Juan Vargas',
         zona: 'Barranca',
         status: 'Pendiente'
       });
-      loadActivities();
+      loadData();
     } catch (error) {
       showToast('Error al asignar la tarea', 'error');
     }
@@ -162,16 +158,21 @@ const ActividadOficiales = () => {
               <div className="form-row-grid">
                 <div className="form-group">
                   <label>Oficial Responsable</label>
-                  <select 
-                    value={newActivity.oficialId}
-                    onChange={e => {
-                      const opt = e.target.options[e.target.selectedIndex];
-                      setNewActivity({...newActivity, oficialId: e.target.value, oficialNombre: opt.text});
-                    }}
-                  >
-                    <option value="2">Juan Vargas</option>
-                    <option value="3">Maria Rojas</option>
-                  </select>
+                    <select 
+                      value={newActivity.oficialId}
+                      onChange={e => {
+                        const opt = e.target.options[e.target.selectedIndex];
+                        setNewActivity({...newActivity, oficialId: e.target.value, oficialNombre: opt.text});
+                      }}
+                    >
+                      {officers.length > 0 ? (
+                        officers.map(off => (
+                          <option key={off.id} value={off.id}>{off.nombre}</option>
+                        ))
+                      ) : (
+                        <option value="">Cargando oficiales...</option>
+                      )}
+                    </select>
                 </div>
                 <div className="form-group">
                   <label>Otros Responsables</label>
@@ -215,21 +216,21 @@ const ActividadOficiales = () => {
 
       <section className="actividad-oficiales__stats">
         <div className="actividad-stat actividad-stat--green">
-          <div className="actividad-stat__icon"><Icon.Users /></div>
+          <div className="actividad-stat__icon"><Users size={24} /></div>
           <div className="actividad-stat__info">
-            <span className="actividad-stat__value">05</span>
-            <span className="actividad-stat__label">Oficiales activos</span>
+            <span className="actividad-stat__value">{officers.length.toString().padStart(2, '0')}</span>
+            <span className="actividad-stat__label">Oficiales registrados</span>
           </div>
         </div>
         <div className="actividad-stat actividad-stat--blue">
-          <div className="actividad-stat__icon"><Icon.Edit /></div>
+          <div className="actividad-stat__icon"><Edit size={24} /></div>
           <div className="actividad-stat__info">
-            <span className="actividad-stat__value">18</span>
-            <span className="actividad-stat__label">Updates esta semana</span>
+            <span className="actividad-stat__value">{activities.length.toString().padStart(2, '0')}</span>
+            <span className="actividad-stat__label">Tareas estratégicas</span>
           </div>
         </div>
         <div className="actividad-stat actividad-stat--orange">
-          <div className="actividad-stat__icon"><Icon.Clock /></div>
+          <div className="actividad-stat__icon"><Clock size={24} /></div>
           <div className="actividad-stat__info">
             <span className="actividad-stat__value">02</span>
             <span className="actividad-stat__label">Sin actividad 7d</span>

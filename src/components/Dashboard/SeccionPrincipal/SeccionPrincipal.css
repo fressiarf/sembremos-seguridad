@@ -1,17 +1,8 @@
 .main-content {
   flex: 1;
-  height: 100vh;
-  overflow-y: auto;
-  padding: 0; /* Padding will be handled by internal modules for better control */
+  width: 100%;
+  padding: 0;
   color: var(--inst-text-dark);
-  margin-left: var(--sb-width);
-  transition: margin-left var(--sb-transition);
-  background: var(--inst-light-bg);
-  position: relative;
-}
-
-.main-content--collapsed {
-  margin-left: var(--sb-width-collapsed);
 }
 
 

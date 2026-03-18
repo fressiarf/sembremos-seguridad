@@ -3,6 +3,7 @@ import ReactECharts from 'echarts-for-react';
 import './DashboardGlobal.css';
 import { useToast } from '../../../context/ToastContext';
 import { dashboardService } from '../../../services/dashboardService';
+import TopbarOficial from '../../DashboardOficial/Navegacion/TopbarOficial';
 
 
 
@@ -36,6 +37,10 @@ const Icon = {
   ),
 };
 
+import logoMsp from '../../../assets/Msp_logo-removebg-preview.png';
+import logoInl from '../../../assets/inl-logo-acronym-vertical-navy-removebg-preview.png';
+import logoSembremos from '../../../assets/Captura_de_pantalla_2026-03-15_191337-removebg-preview.png';
+
 const DashboardGlobal = () => {
   const [isLoaded, setIsLoaded] = useState(false);
   const { showToast } = useToast();
@@ -60,16 +65,12 @@ const DashboardGlobal = () => {
     fetchData();
   }, []);
 
-
-
   // ── Configuración ECharts ──
   const globalTextStyle = {
     fontFamily: "'Inter', sans-serif",
-    color: '#1e293b',
-    fontWeight: 600
+    color: '#0b2240', // Navy Blue
+    fontWeight: 700
   };
-
-
 
   // 1. Sparkline Opciones
   const getSparklineOption = (color, data) => ({
@@ -87,7 +88,7 @@ const DashboardGlobal = () => {
         color: {
           type: 'linear', x: 0, y: 0, x2: 0, y2: 1,
           colorStops: [
-            { offset: 0, color: `${color}44` },
+            { offset: 0, color: `${color}33` },
             { offset: 1, color: `${color}00` }
           ]
         }
@@ -102,48 +103,43 @@ const DashboardGlobal = () => {
     tooltip: { 
       trigger: 'item', 
       padding: 10, 
-      backgroundColor: '#161b22', 
+      backgroundColor: '#0b2240', 
       borderColor: '#333', 
       textStyle: { color: '#fff', fontFamily: "'Inter', sans-serif" } 
     },
     legend: { 
-      bottom: '2%', 
+      bottom: '0%', 
       left: 'center',
-      itemWidth: 12,
-      itemHeight: 12,
-      textStyle: { color: '#1e293b', fontFamily: "'Inter', sans-serif", fontSize: 11, fontWeight: 600 },
-
-      itemGap: 20
+      itemWidth: 10,
+      itemHeight: 10,
+      textStyle: { color: '#0b2240', fontFamily: "'Inter', sans-serif", fontSize: 10, fontWeight: 700 },
+      itemGap: 15
     },
     series: [
       {
         name: 'Avance %',
         type: 'pie',
-        radius: ['45%', '65%'],
-        center: ['50%', '42%'],
+        radius: ['50%', '75%'],
+        center: ['50%', '40%'],
         avoidLabelOverlap: false,
-        itemStyle: { borderRadius: 6, borderColor: '#161b22', borderWidth: 2 },
-        label: {
-          show: false,
-          position: 'center'
-        },
+        itemStyle: { borderRadius: 4, borderColor: '#fff', borderWidth: 2 },
+        label: { show: false, position: 'center' },
         emphasis: {
           label: {
             show: true,
-            fontSize: 18,
+            fontSize: 16,
             fontWeight: 'bold',
-            color: '#fff',
+            color: '#0b2240',
             fontFamily: "'Inter', sans-serif"
           }
         },
         labelLine: { show: false },
         data: [
-          { value: stats.completadas, name: 'Completadas', itemStyle: { color: '#15803d' } },
-          { value: stats.activas, name: 'En ejecución', itemStyle: { color: '#1d4ed8' } },
+          { value: stats.completadas, name: 'Completadas', itemStyle: { color: '#008d45' } }, // Inst Green
+          { value: stats.activas, name: 'En ejecución', itemStyle: { color: '#163a66' } }, // Navy Light
           { value: stats.pendientes, name: 'Pendientes', itemStyle: { color: '#64748b' } },
-          { value: stats.retrasadas, name: 'Retrasadas', itemStyle: { color: '#d97706' } }
+          { value: stats.retrasadas, name: 'Retrasadas', itemStyle: { color: '#ce1126' } } // Inst Red
         ]
-
       }
     ]
   };
@@ -157,81 +153,50 @@ const DashboardGlobal = () => {
       axisPointer: { type: 'shadow' },
       textStyle: { fontFamily: "'Inter', sans-serif" }
     },
-    grid: { left: '3%', right: '8%', bottom: '5%', containLabel: true },
+    grid: { left: '2%', right: '10%', bottom: '5%', containLabel: true },
     xAxis: {
       type: 'value',
-      boundaryGap: [0, 0.01],
-      splitLine: { lineStyle: { color: 'rgba(255,255,255,0.05)' } },
-      axisLabel: { color: '#1e293b', fontFamily: "'Inter', sans-serif", fontWeight: 500 }
-
+      splitLine: { lineStyle: { color: '#e2e8f0', type: 'dashed' } },
+      axisLabel: { color: '#64748b', fontFamily: "'Inter', sans-serif", fontWeight: 600 }
     },
     yAxis: {
       type: 'category',
       data: dashboardData?.zones.map(z => z.nombre) || [],
-      axisLabel: { color: '#1e293b', fontSize: 11, fontFamily: "'Inter', sans-serif", fontWeight: 600 },
-      axisLine: { show: false }
-
+      axisLabel: { color: '#0b2240', fontSize: 10, fontFamily: "'Inter', sans-serif", fontWeight: 700 },
+      axisLine: { show: true, lineStyle: { color: '#e2e8f0' } }
     },
-
     series: [
       {
         type: 'bar',
         data: dashboardData?.zones.map(z => ({
           value: z.incidentes,
-          itemStyle: { color: z.incidentes > 10 ? '#ef4444' : '#1d4ed8' }
+          itemStyle: { color: z.incidentes > 10 ? '#ce1126' : '#0b2240' }
         })) || [],
-        showBackground: true,
-        backgroundStyle: { color: 'rgba(0, 0, 0, 0.02)' },
-        barWidth: '45%',
-        itemStyle: { borderRadius: [0, 4, 4, 0] },
+        barWidth: '50%',
+        itemStyle: { borderRadius: [0, 2, 2, 0] },
         label: { 
           show: true, 
           position: 'right', 
-          formatter: '{c} inc.', 
-          color: '#1e293b', 
+          formatter: '{c}', 
+          color: '#0b2240', 
           fontFamily: "'Inter', sans-serif",
-          fontWeight: '700'
+          fontWeight: '800'
         }
       }
-
     ]
   };
 
-  return (
+   return (
     <div className="dashboard-global">
-      
-      {/* ── Encabezado ── */}
-      <header className="dashboard-global__header">
-        <div className="dashboard-global__title-block">
-          <h1>Dashboard global</h1>
-          <p>Programa Sembremos Seguridad · Cantón Puntarenas (Periodo 2025)</p>
-        </div>
-        <div className="dashboard-global__actions">
-          <div className="sidebar-admin__role role-badge--light" style={{ margin: 0 }}>
-            <span className="sidebar-admin__role-dot" />
-            <span className="sidebar-admin__role-label">Administrador</span>
-          </div>
 
-          <button 
-            className="dashboard-global__btn-new" 
-            id="btn-nueva-accion"
-            onClick={() => showToast('Iniciando creación de nueva acción estratégica...', 'info')}
-          >
-            <Icon.Plus />
-            Nueva acción
-          </button>
-
-        </div>
-      </header>
-
-      {/* ── Tarjetas con Sparklines ── */}
+      {/* ── Tarjetas con Sparklines (Estilo Ficha Técnica) ── */}
       <section className="dashboard-global__stats-grid">
         <div className="stat-card stat-card--green">
           <div className="stat-card__icon"><Icon.Check /></div>
           <div className="stat-card__value">{String(stats.completadas).padStart(2, '0')}</div>
           <div className="stat-card__label">Metas Realizadas</div>
           <div className="stat-card__sparkline">
-            <ReactECharts option={getSparklineOption('#22c55e', [5, 12, 18, 14, 22, 19, 25])} style={{ height: '40px' }} />
+            <ReactECharts option={getSparklineOption('#008d45', [5, 12, 18, 14, 22, 19, 25])} style={{ height: '40px' }} />
           </div>
         </div>
         <div className="stat-card stat-card--blue">
@@ -239,7 +204,7 @@ const DashboardGlobal = () => {
           <div className="stat-card__value">{String(stats.activas).padStart(2, '0')}</div>
           <div className="stat-card__label">Acciones Activas</div>
           <div className="stat-card__sparkline">
-            <ReactECharts option={getSparklineOption('#3b82f6', [10, 8, 11, 10, 12, 11, 12])} style={{ height: '40px' }} />
+            <ReactECharts option={getSparklineOption('#163a66', [10, 8, 11, 10, 12, 11, 12])} style={{ height: '40px' }} />
           </div>
         </div>
         <div className="stat-card stat-card--orange">
@@ -247,7 +212,7 @@ const DashboardGlobal = () => {
           <div className="stat-card__value">{String(stats.pendientes).padStart(2, '0')}</div>
           <div className="stat-card__label">Pendientes</div>
           <div className="stat-card__sparkline">
-            <ReactECharts option={getSparklineOption('#f59e0b', [20, 18, 16, 17, 15, 14, 14])} style={{ height: '40px' }} />
+            <ReactECharts option={getSparklineOption('#ce1126', [20, 18, 16, 17, 15, 14, 14])} style={{ height: '40px' }} />
           </div>
         </div>
         <div className="stat-card stat-card--red">
@@ -255,10 +220,9 @@ const DashboardGlobal = () => {
           <div className="stat-card__value">{String(stats.retrasadas).padStart(2, '0')}</div>
           <div className="stat-card__label">Con Retraso</div>
           <div className="stat-card__sparkline">
-            <ReactECharts option={getSparklineOption('#ef4444', [2, 1, 3, 2, 1, 2, 1])} style={{ height: '40px' }} />
+            <ReactECharts option={getSparklineOption('#ce1126', [2, 1, 3, 2, 1, 2, 1])} style={{ height: '40px' }} />
           </div>
         </div>
-
       </section>
 
       {/* ── Grid Principal de Gráficos ── */}
