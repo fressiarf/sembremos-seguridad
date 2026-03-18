@@ -504,12 +504,14 @@
 
 /* ── Detalle seleccionado (DEBAJO DEL MAPA) ── */
 .panel-detalle {
+  position: relative;
+  z-index: 10;
   margin-top: 1.5rem;
   border: 2px solid;
   border-radius: var(--mr-radius-sm);
-  padding: 1.25rem;
+  padding: 1.5rem;
   background: var(--mr-white);
-  box-shadow: 0 10px 30px rgba(0, 47, 108, 0.05);
+  box-shadow: 0 15px 40px rgba(0, 47, 108, 0.1);
   animation: detailIn 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
