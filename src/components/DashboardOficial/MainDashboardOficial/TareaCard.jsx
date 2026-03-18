@@ -1,121 +1,120 @@
 import React, { useState } from 'react';
-import './MainDashboard.css';
-import EstadoBadge from "./EstadoBadge";
-import { oficialService } from '../../../services/oficialService';
-import { useToast } from '../../../context/ToastContext';
-import { RefreshCw, ClipboardEdit, ChevronUp, ChevronDown } from 'lucide-react';
+import { CheckCircle, Clock, DollarSign, Camera, Activity } from 'lucide-react';
 import FormOficial from './FormOficial';
 
-const TareaCard = ({ tarea, isLast, onUpdate }) => {
-  const [isUpdating, setIsUpdating] = useState(false);
-  const [showForm, setShowForm] = useState(false);
-  const { showToast } = useToast();
+const TareaCard = ({ tarea, onUpdate }) => {
+  const [isReporting, setIsReporting] = useState(false);
 
-  const getStatusColorClass = (estado) => {
-    const s = estado?.toLowerCase() || '';
-    if (s.includes('proceso') || s.includes('ejec')) return 'dot-blue';
-    if (s.includes('completado') || s.includes('listo')) return 'dot-green';
-    if (s.includes('retrasada') || s.includes('alerta')) return 'dot-orange';
-    return 'dot-yellow';
+  const formatColones = (amount) => {
+    if (!amount || amount === 0) return '₡0';
+    return '₡' + amount.toLocaleString('es-CR');
   };
-
-  const handleNextStatus = async () => {
-    const statuses = ['Pendiente', 'En ejecución', 'Completada'];
-    const currentIndex = statuses.indexOf(tarea?.estado || 'Pendiente');
-    const nextStatus = statuses[(currentIndex + 1) % statuses.length];
-    
-    setIsUpdating(true);
-    try {
-      await oficialService.updateActividad(tarea.id, { 
-        status: nextStatus,
-        ...(nextStatus === 'Completada' ? { porcentaje: 100 } : {})
-      });
-      showToast(`Tarea actualizada a ${nextStatus}`, 'success');
-      if (onUpdate) onUpdate();
-    } catch (error) {
-      showToast('Error al actualizar la tarea', 'error');
-    } finally {
-      setIsUpdating(false);
-    }
-  };
-
-  const dotClass = getStatusColorClass(tarea?.estado);
 
   return (
-    <div className="TimelineItem">
-      <article className="TareaCardTimeline">
-        {/* Header Institucional (Verde como en el PDF) */}
-        <div className="TareaCardHeaderInstitucional">
-          <span>Línea de Acción: {tarea?.lineaAccion || tarea?.codigo || 'S/L'}</span>
-          <EstadoBadge status={tarea?.estado || 'PENDIENTE'} />
-        </div>
+    <div style={{
+      background: '#fff',
+      border: `1px solid ${tarea.completada ? '#bbf7d0' : '#e2e8f0'}`,
+      borderRadius: '12px',
+      overflow: 'hidden',
+      marginBottom: '12px',
+      boxShadow: '0 4px 12px rgba(0,0,0,0.02)'
+    }}>
+      {/* Información de la Línea a la que pertenece */}
+      <div style={{
+        padding: '10px 16px',
+        background: '#f8fafc',
+        borderBottom: '1px solid #e2e8f0',
+        display: 'flex',
+        alignItems: 'center',
+        gap: '8px'
+      }}>
+        <Activity size={14} color="#64748b" />
+        <span style={{ fontSize: '0.7rem', fontWeight: 700, color: '#64748b', textTransform: 'uppercase' }}>
+          {tarea.lineaAccionId} · {tarea.lineaNombre} 
+        </span>
+      </div>
 
-        {/* Columna Principal - Descripción y Acciones */}
-        <div className="TareaCardColPrincipal">
-          <div className="CeldaHeader">Descripción de la Línea de Trabajo</div>
-          <div className="CeldaTabla">
-            <h4 className="TareaNameLabel">{tarea?.problematica || tarea?.titulo || 'Sin título'}</h4>
-            <p className="TareaDescripcionText">
-              {tarea?.propuestaMeta || tarea?.descripcion || 'No hay descripción disponible para esta línea de acción.'}
-            </p>
-          </div>
-
-          <div className="CeldaHeader">Acciones Estratégicas / Bitácora</div>
-          <div className="CeldaTabla">
-            <ul className="AccionesEstrategicasList">
-              {tarea?.descripcion ? (
-                <li>{tarea.descripcion}</li>
-              ) : (
-                <li>Pendiente de asignación de acciones detalladas.</li>
+      <div style={{ padding: '16px' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+          
+          {/* Detalles de la tarea */}
+          <div style={{ display: 'flex', gap: '14px', flex: 1 }}>
+            <div style={{ marginTop: '2px' }}>
+              {tarea.completada ? <CheckCircle size={22} color="#22c55e" /> : <Clock size={22} color="#94a3b8" />}
+            </div>
+            <div>
+              <h3 style={{ margin: '0 0 4px', fontSize: '1.05rem', fontWeight: 700, color: '#0b2240' }}>
+                {tarea.titulo}
+              </h3>
+              {tarea.descripcion && (
+                <p style={{ margin: '0 0 10px', fontSize: '0.85rem', color: '#64748b' }}>
+                  {tarea.descripcion}
+                </p>
               )}
-              {tarea?.zona && <li>Zona de operación: {tarea.zona}</li>}
-            </ul>
+              
+              {/* Información si está completada */}
+              {tarea.completada && (
+                <div style={{ background: '#f0fdf4', padding: '10px 12px', borderRadius: '8px', border: '1px solid #bbf7d0', marginTop: '10px' }}>
+                  {tarea.reporteOficial && (
+                    <div style={{ fontSize: '0.85rem', color: '#166534', fontStyle: 'italic', marginBottom: '8px' }}>
+                      "{tarea.reporteOficial}"
+                    </div>
+                  )}
+                  <div style={{ display: 'flex', gap: '16px', fontSize: '0.75rem', color: '#166534', fontWeight: 600 }}>
+                    <span style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                      <Clock size={12} /> {tarea.fechaCompletada}
+                    </span>
+                    {tarea.inversionColones > 0 && (
+                      <span style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                        <DollarSign size={12} /> {formatColones(tarea.inversionColones)}
+                      </span>
+                    )}
+                    {tarea.fotos?.length > 0 && (
+                      <span style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                        <Camera size={12} /> {tarea.fotos.length} foto(s)
+                      </span>
+                    )}
+                  </div>
+                </div>
+              )}
+            </div>
           </div>
-        </div>
 
-        {/* Columna Lateral - Coordinador y Detalles */}
-        <div className="TareaCardColLateral">
-          <div className="CeldaHeader">Coordinador</div>
-          <div className="CeldaTabla">
-            <strong className="CoordinadorLabel">Fuerza Pública</strong>
-            <p className="CoordinadorValue">{tarea?.responsables || 'Sembremos Seguridad'}</p>
-          </div>
-
-          <div className="CeldaHeader">Estado</div>
-          <div className="CeldaTabla" style={{ flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center', gap: '10px' }}>
-            <button 
-                className="BtnUpdateStatus" 
-                onClick={handleNextStatus}
-                disabled={isUpdating}
-                style={{ width: '100%', justifyContent: 'center' }}
+          {/* Botón de acción */}
+          {!tarea.completada && (
+            <button
+              onClick={() => setIsReporting(!isReporting)}
+              style={{
+                background: isReporting ? '#ef4444' : '#0b2240',
+                color: '#fff',
+                border: 'none',
+                padding: '8px 16px',
+                borderRadius: '8px',
+                fontSize: '0.85rem',
+                fontWeight: 700,
+                cursor: 'pointer',
+                transition: 'all 0.2s',
+                whiteSpace: 'nowrap'
+              }}
             >
-              <RefreshCw size={14} className={isUpdating ? 'spin' : ''} />
-              {isUpdating ? 'Avanzar' : 'Siguiente'}
+              {isReporting ? 'Cancelar' : '✓ Completar Tarea'}
             </button>
-
-            <button 
-                className={`BtnToggleForm ${showForm ? 'active' : ''}`}
-                onClick={() => setShowForm(!showForm)}
-                style={{ width: '100%', justifyContent: 'center' }}
-            >
-              <ClipboardEdit size={14} />
-              {showForm ? 'Cerrar' : 'Reportar'}
-            </button>
-          </div>
+          )}
         </div>
+      </div>
 
-        {showForm && (
-          <div className="TareaCardFormExpander" style={{ gridColumn: '1 / -1', padding: '1.5rem', borderTop: '1px solid #000' }}>
-            <FormOficial 
-              actividad={tarea} 
-              onSuccess={() => {
-                setShowForm(false);
-                if (onUpdate) onUpdate();
-              }} 
-            />
-          </div>
-        )}
-      </article>
+      {/* Formulario de reporte */}
+      {isReporting && !tarea.completada && (
+        <div style={{ borderTop: '1px solid #e2e8f0', background: '#f8fafc' }}>
+          <FormOficial
+            tarea={tarea}
+            onComplete={() => {
+              setIsReporting(false);
+              onUpdate();
+            }}
+          />
+        </div>
+      )}
     </div>
   );
 };

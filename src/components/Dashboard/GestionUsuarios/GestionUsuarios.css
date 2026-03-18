@@ -38,18 +38,20 @@
 .gestion-usuarios__title h1 {
   font-size: 1.25rem;
   font-weight: 800;
-  color: var(--navy-blue);
+  color: #fff;
   text-transform: uppercase;
   letter-spacing: 1px;
   margin: 0;
+  text-shadow: 0 2px 8px rgba(0,0,0,0.3);
 }
 
 .gestion-usuarios__title p {
-  color: var(--gray-text);
+  color: rgba(255,255,255,0.75);
   font-size: 0.75rem;
   font-weight: 600;
   margin: 2px 0 0;
   text-transform: uppercase;
+  text-shadow: 0 1px 4px rgba(0,0,0,0.2);
 }
 
 /* ── Filtros y Búsqueda ── */
@@ -63,6 +65,27 @@
   align-items: center;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
 }
+
+.search-wrapper {
+  flex: 1;
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.search-wrapper .search-icon {
+  position: absolute;
+  left: 16px;
+  top: 50%;
+  transform: translateY(-50%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #64748b;
+  z-index: 1;
+  pointer-events: none;
+}
+
 
 .search-input {
   width: 100%;
@@ -136,7 +159,29 @@
   border-radius: 4px;
   color: white;
   font-weight: 800;
+  font-size: 0.7rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  line-height: 1;
+}
+
+.user-info-cell {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.user-details {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.user-email {
   font-size: 0.75rem;
+  color: #64748b;
 }
 
 .user-name {
@@ -165,14 +210,20 @@
 }
 
 .btn-change-role {
-  background: var(--gray-bg);
-  border: 1px solid var(--gray-border);
-  color: var(--navy-blue);
-  padding: 6px 12px;
-  border-radius: 4px;
-  font-size: 0.75rem;
+  background: var(--gray-bg, #f8fafc);
+  border: 1px solid var(--gray-border, #e2e8f0);
+  color: var(--navy-blue, #0b2240);
+  padding: 8px 14px;
+  border-radius: 6px;
+  font-size: 0.72rem;
   font-weight: 700;
   text-transform: uppercase;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  white-space: nowrap;
 }
 
 

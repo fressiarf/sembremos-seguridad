@@ -16,7 +16,7 @@ const SidebarOficial = ({ collapsed = false, onToggle, activeView, onViewChange 
       label: 'OPERATIVO',
       items: [
         { id: 'dashboard',   label: 'Dashboard',              icon: LayoutDashboard },
-        { id: 'lineas',      label: 'Mis Líneas de Acción',   icon: Activity },
+        { id: 'lineas',      label: 'Mis Tareas',             icon: Activity },
       ],
     },
     {

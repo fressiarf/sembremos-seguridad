@@ -3,300 +3,308 @@ import './ActividadOficiales.css';
 import { useToast } from '../../../context/ToastContext';
 import { dashboardService } from '../../../services/dashboardService';
 import { userService } from '../../../services/userService';
-import { Users, Edit, Clock, Plus, X, ListTodo, MapPin, User as UserIcon, Calendar, FileText } from 'lucide-react';
+import { Users, Edit, Plus, X, ListTodo, MapPin, DollarSign, CheckCircle, Clock, ChevronDown, ChevronUp } from 'lucide-react';
 
 const ActividadOficiales = () => {
-  const [selectedOfficer, setSelectedOfficer] = useState('Todos los oficiales');
-  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-  const [activities, setActivities] = useState([]);
+  const [officers, setOfficers] = useState([]);
+  const [lineas, setLineas] = useState([]);
+  const [tareas, setTareas] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [showAssignForm, setShowAssignForm] = useState(false);
-  const [officers, setOfficers] = useState([]); // Lista de oficiales reales
-  const [newActivity, setNewActivity] = useState({
-    titulo: '',
-    problematica: '',
-    lineaAccion: '',
-    propuestaMeta: '',
-    responsables: '',
-    descripcion: '',
-    oficialId: '2',
-    oficialNombre: 'Juan Vargas',
-    zona: 'Barranca',
-    status: 'Pendiente'
-  });
+  const [showLineaForm, setShowLineaForm] = useState(false);
+  const [showTareaForm, setShowTareaForm] = useState(false);
+  const [expandedLinea, setExpandedLinea] = useState(null);
+  const [stats, setStats] = useState({ totalTareas: 0, tareasCompletadas: 0, inversionTotal: 0 });
   const { showToast } = useToast();
+
+  const [newLinea, setNewLinea] = useState({
+    problematica: '', lineaAccion: '', objetivo: '',
+    indicador: '', meta: '', responsable: 'Municipalidad',
+    corresponsable: '', zona: 'Barranca'
+  });
+
+  const [newTarea, setNewTarea] = useState({
+    lineaAccionId: '', titulo: '', descripcion: '', oficialId: ''
+  });
+
+  const formatColones = (amount) => {
+    if (!amount || amount === 0) return '₡0';
+    return '₡' + amount.toLocaleString('es-CR');
+  };
 
   const loadData = async () => {
     try {
       setLoading(true);
-      // Cargar actividades
       const dashData = await dashboardService.getFullDashboardData();
-      if (dashData && dashData.activities) {
-        const mapped = dashData.activities.map(act => ({
-          id: act.id,
-          date: act.fecha || 'Reciente',
-          officer: act.oficialNombre || 'Sin asignar',
-          zone: act.zona || 'N/A',
-          action: act.lineaAccion || `LA-2024-${act.id.toString().padStart(2, '0')}`,
-          title: act.titulo || act.problematica || 'Sin título',
-          status: act.status,
-          statusClass: act.status.toLowerCase().replace(' ', '').replace('ó', 'o'),
-          desc: act.descripcion || act.propuestaMeta,
-          color: act.status === 'Completada' ? '#22c55e' : (act.status.toLowerCase().includes('ejecución') ? '#3b82f6' : '#f59e0b')
-        }));
-        setActivities(mapped);
-      }
-
-      // Cargar oficiales reales para el select
       const allUsers = await userService.getUsers();
       const onlyOfficers = allUsers.filter(u => u.rol === 'oficial');
       setOfficers(onlyOfficers);
 
-      // Si hay oficiales, establecer el primero por defecto en el form
-      if (onlyOfficers.length > 0) {
-        setNewActivity(prev => ({
-          ...prev,
-          oficialId: onlyOfficers[0].id.toString(),
-          oficialNombre: onlyOfficers[0].nombre
-        }));
+      if (dashData) {
+        setLineas(dashData.lineas);
+        setTareas(dashData.tareas);
+        setStats(dashData.stats);
       }
-
     } catch (error) {
-      showToast('Error al sincronizar datos operativos', 'error');
+      showToast('Error al cargar datos', 'error');
     } finally {
       setLoading(false);
     }
   };
 
-  useEffect(() => {
-    loadData();
-  }, []);
+  useEffect(() => { loadData(); }, []);
 
-  const handleCreateActivity = async (e) => {
+  // ── Crear Línea de Acción ──
+  const handleCreateLinea = async (e) => {
     e.preventDefault();
-    if (!newActivity.titulo || !newActivity.problematica || !newActivity.lineaAccion) {
-      showToast('Por favor completa los campos obligatorios (*)', 'warning');
+    if (!newLinea.problematica || !newLinea.lineaAccion) {
+      showToast('Completa los campos obligatorios (*)', 'warning');
       return;
     }
-
     try {
-      await dashboardService.createActivity({
-        ...newActivity,
-        fecha: new Date().toISOString().split('T')[0]
-      });
-      showToast('Tarea estratégica asignada exitosamente', 'success');
-      setShowAssignForm(false);
-      setNewActivity({
-        titulo: '',
-        problematica: '',
-        lineaAccion: '',
-        propuestaMeta: '',
-        responsables: '',
-        descripcion: '',
-        oficialId: officers.length > 0 ? officers[0].id.toString() : '2',
-        oficialNombre: officers.length > 0 ? officers[0].nombre : 'Juan Vargas',
-        zona: 'Barranca',
-        status: 'Pendiente'
-      });
+      const lineaId = `LA-${Date.now().toString().slice(-4)}`;
+      await dashboardService.createLineaAccion({ ...newLinea, id: lineaId, no: lineas.length + 1 });
+      showToast('Línea de acción creada ✓', 'success');
+      setShowLineaForm(false);
+      setNewLinea({ problematica: '', lineaAccion: '', objetivo: '', indicador: '', meta: '', responsable: 'Municipalidad', corresponsable: '', zona: 'Barranca' });
       loadData();
     } catch (error) {
-      showToast('Error al asignar la tarea', 'error');
+      showToast('Error al crear la línea', 'error');
     }
   };
 
-  // Extraer oficiales únicos
-  const officerList = ['Todos los oficiales', ...new Set(activities.map(a => a.officer))];
+  // ── Crear Tarea ──
+  const handleCreateTarea = async (e) => {
+    e.preventDefault();
+    if (!newTarea.lineaAccionId || !newTarea.titulo || !newTarea.oficialId) {
+      showToast('Seleccioná línea, título y oficial (*)', 'warning');
+      return;
+    }
+    try {
+      const oficial = officers.find(o => o.id === newTarea.oficialId);
+      await dashboardService.createTarea({
+        ...newTarea,
+        oficialNombre: oficial?.nombre || 'Sin nombre'
+      });
+      showToast('Tarea creada y asignada ✓', 'success');
+      setShowTareaForm(false);
+      setNewTarea({ lineaAccionId: '', titulo: '', descripcion: '', oficialId: '' });
+      loadData();
+    } catch (error) {
+      showToast('Error al crear la tarea', 'error');
+    }
+  };
 
-  // Filtrar actividades
-  const filteredActivities = selectedOfficer === 'Todos los oficiales' 
-    ? activities 
-    : activities.filter(a => a.officer === selectedOfficer);
-
-  if (loading) return <div style={{ padding: '3rem', color: '#7a9cc4' }}>Cargando actividad operativa...</div>;
+  if (loading) return <div style={{ padding: '3rem', color: '#7a9cc4' }}>Cargando...</div>;
 
   return (
     <div className="actividad-oficiales">
       <header className="actividad-oficiales__header">
         <div className="actividad-oficiales__title-block">
-          <h1>Resumen de Actividad</h1>
-          <p>Monitoreo en tiempo real de las actualizaciones del personal en campo</p>
+          <h1>Gestión de Líneas y Tareas</h1>
+          <p>Crea líneas de acción y asigna tareas a los oficiales</p>
         </div>
-        <button 
-          className="btn-primary-assign" 
-          onClick={() => setShowAssignForm(true)}
-        >
-          Asignar Acción Estratégica
-        </button>
+        <div style={{ display: 'flex', gap: '10px' }}>
+          <button className="btn-primary-assign" onClick={() => setShowLineaForm(true)}>
+            <Plus size={16} /> Crear Línea
+          </button>
+          <button className="btn-primary-assign" onClick={() => {
+            if (lineas.length === 0) { showToast('Primero crea una Línea de Acción', 'warning'); return; }
+            if (officers.length === 0) { showToast('Primero crea un Oficial en Gestión de Usuarios', 'warning'); return; }
+            setShowTareaForm(true);
+          }}>
+            <Plus size={16} /> Asignar Tarea
+          </button>
+        </div>
       </header>
 
-      {showAssignForm && (
+      {/* ── Modal Crear Línea ── */}
+      {showLineaForm && (
         <div className="assign-modal-overlay">
           <div className="assign-modal" style={{ maxWidth: '600px' }}>
-            <h3>Asignar Tarea Operativa</h3>
-            <form onSubmit={handleCreateActivity}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '1.5rem' }}>
+              <h3 style={{ margin: 0, color: '#0b2240' }}>Nueva Línea de Acción</h3>
+              <button onClick={() => setShowLineaForm(false)} style={{ background: 'none', border: 'none', cursor: 'pointer' }}><X size={20} /></button>
+            </div>
+            <form onSubmit={handleCreateLinea}>
               <div className="form-row-grid">
                 <div className="form-group">
-                  <label>Título / Problemática *</label>
-                  <input 
-                    type="text" 
-                    placeholder="Ej: Consumo de licor en vía pública" 
-                    value={newActivity.titulo}
-                    onChange={e => setNewActivity({...newActivity, titulo: e.target.value, problematica: e.target.value})}
-                  />
+                  <label>Problemática *</label>
+                  <input type="text" placeholder="Ej: CONSUMO DE DROGA" value={newLinea.problematica} onChange={e => setNewLinea({...newLinea, problematica: e.target.value})} />
                 </div>
                 <div className="form-group">
-                  <label>Línea de Acción *</label>
-                  <input 
-                    type="text" 
-                    placeholder="Ej: LA-2025-001" 
-                    value={newActivity.lineaAccion}
-                    onChange={e => setNewActivity({...newActivity, lineaAccion: e.target.value})}
-                  />
+                  <label>Zona</label>
+                  <select value={newLinea.zona} onChange={e => setNewLinea({...newLinea, zona: e.target.value})}>
+                    <option value="Barranca">Barranca</option>
+                    <option value="Chacarita">Chacarita</option>
+                    <option value="El Roble">El Roble</option>
+                    <option value="Puntarenas">Puntarenas</option>
+                  </select>
                 </div>
               </div>
-
+              <div className="form-group">
+                <label>Línea de Acción *</label>
+                <textarea placeholder="Descripción de la línea estratégica..." value={newLinea.lineaAccion} onChange={e => setNewLinea({...newLinea, lineaAccion: e.target.value})} />
+              </div>
               <div className="form-row-grid">
                 <div className="form-group">
-                  <label>Oficial Responsable</label>
-                    <select 
-                      value={newActivity.oficialId}
-                      onChange={e => {
-                        const opt = e.target.options[e.target.selectedIndex];
-                        setNewActivity({...newActivity, oficialId: e.target.value, oficialNombre: opt.text});
-                      }}
-                    >
-                      {officers.length > 0 ? (
-                        officers.map(off => (
-                          <option key={off.id} value={off.id}>{off.nombre}</option>
-                        ))
-                      ) : (
-                        <option value="">Cargando oficiales...</option>
-                      )}
-                    </select>
+                  <label>Indicador</label>
+                  <input type="text" placeholder="Ej: Festivales realizados" value={newLinea.indicador} onChange={e => setNewLinea({...newLinea, indicador: e.target.value})} />
                 </div>
                 <div className="form-group">
-                  <label>Otros Responsables</label>
-                  <input 
-                    type="text" 
-                    placeholder="Ej: Fuerza Pública, Municipalidad" 
-                    value={newActivity.responsables}
-                    onChange={e => setNewActivity({...newActivity, responsables: e.target.value})}
-                  />
+                  <label>Meta</label>
+                  <input type="text" placeholder="Ej: Red conformada" value={newLinea.meta} onChange={e => setNewLinea({...newLinea, meta: e.target.value})} />
                 </div>
               </div>
-
-              <div className="form-group">
-                <label>Propuesta / Meta</label>
-                <input 
-                  type="text" 
-                  placeholder="Ej: Reducir reportes en un 20%" 
-                  value={newActivity.propuestaMeta}
-                  onChange={e => setNewActivity({...newActivity, propuestaMeta: e.target.value})}
-                />
-              </div>
-
-              <div className="form-group">
-                <label>Descripción Adicional</label>
-                <textarea 
-                  placeholder="Instrucciones específicas..."
-                  value={newActivity.descripcion}
-                  onChange={e => setNewActivity({...newActivity, descripcion: e.target.value})}
-                ></textarea>
-              </div>
-
               <div className="modal-actions">
-                <button type="button" onClick={() => setShowAssignForm(false)} className="btn-cancel">Cancelar</button>
-                <button type="submit" className="btn-assign-submit">Confirmar Asignación</button>
+                <button type="button" onClick={() => setShowLineaForm(false)} className="btn-cancel">Cancelar</button>
+                <button type="submit" className="btn-assign-submit">Crear Línea</button>
               </div>
             </form>
           </div>
         </div>
       )}
 
+      {/* ── Modal Crear Tarea ── */}
+      {showTareaForm && (
+        <div className="assign-modal-overlay">
+          <div className="assign-modal" style={{ maxWidth: '550px' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '1.5rem' }}>
+              <h3 style={{ margin: 0, color: '#0b2240' }}>Asignar Tarea a Oficial</h3>
+              <button onClick={() => setShowTareaForm(false)} style={{ background: 'none', border: 'none', cursor: 'pointer' }}><X size={20} /></button>
+            </div>
+            <form onSubmit={handleCreateTarea}>
+              <div className="form-row-grid">
+                <div className="form-group">
+                  <label>Línea de Acción *</label>
+                  <select value={newTarea.lineaAccionId} onChange={e => setNewTarea({...newTarea, lineaAccionId: e.target.value})}>
+                    <option value="">-- Seleccionar --</option>
+                    {lineas.map(l => (
+                      <option key={l.id} value={l.id}>{l.id} · {l.problematica}</option>
+                    ))}
+                  </select>
+                </div>
+                <div className="form-group">
+                  <label>Oficial Asignado *</label>
+                  <select value={newTarea.oficialId} onChange={e => setNewTarea({...newTarea, oficialId: e.target.value})}>
+                    <option value="">-- Seleccionar --</option>
+                    {officers.map(o => (
+                      <option key={o.id} value={o.id}>{o.nombre}</option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+              <div className="form-group">
+                <label>Título de la tarea *</label>
+                <input type="text" placeholder="Ej: Firmar convenio con MEP" value={newTarea.titulo} onChange={e => setNewTarea({...newTarea, titulo: e.target.value})} />
+              </div>
+              <div className="form-group">
+                <label>Descripción (opcional)</label>
+                <textarea placeholder="Detalle de lo que debe hacer el oficial..." value={newTarea.descripcion} onChange={e => setNewTarea({...newTarea, descripcion: e.target.value})} />
+              </div>
+              <div className="modal-actions">
+                <button type="button" onClick={() => setShowTareaForm(false)} className="btn-cancel">Cancelar</button>
+                <button type="submit" className="btn-assign-submit">Asignar Tarea</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
 
+      {/* ── Stats ── */}
       <section className="actividad-oficiales__stats">
         <div className="actividad-stat actividad-stat--green">
-          <div className="actividad-stat__icon"><Users size={24} /></div>
+          <div className="actividad-stat__icon"><CheckCircle size={24} /></div>
           <div className="actividad-stat__info">
-            <span className="actividad-stat__value">{officers.length.toString().padStart(2, '0')}</span>
-            <span className="actividad-stat__label">Oficiales registrados</span>
+            <span className="actividad-stat__value">{String(stats.tareasCompletadas).padStart(2,'0')}</span>
+            <span className="actividad-stat__label">Tareas completadas</span>
           </div>
         </div>
         <div className="actividad-stat actividad-stat--blue">
-          <div className="actividad-stat__icon"><Edit size={24} /></div>
+          <div className="actividad-stat__icon"><Clock size={24} /></div>
           <div className="actividad-stat__info">
-            <span className="actividad-stat__value">{activities.length.toString().padStart(2, '0')}</span>
-            <span className="actividad-stat__label">Tareas estratégicas</span>
+            <span className="actividad-stat__value">{String(stats.tareasPendientes).padStart(2,'0')}</span>
+            <span className="actividad-stat__label">Tareas pendientes</span>
           </div>
         </div>
         <div className="actividad-stat actividad-stat--orange">
-          <div className="actividad-stat__icon"><Clock size={24} /></div>
+          <div className="actividad-stat__icon"><DollarSign size={24} /></div>
           <div className="actividad-stat__info">
-            <span className="actividad-stat__value">02</span>
-            <span className="actividad-stat__label">Sin actividad 7d</span>
+            <span className="actividad-stat__value">{formatColones(stats.inversionTotal)}</span>
+            <span className="actividad-stat__label">Inversión total</span>
           </div>
         </div>
       </section>
 
+      {/* ── Líneas con Tareas ── */}
       <section className="actividad-history">
         <div className="actividad-history__header">
-          <h2 className="actividad-history__title">Historial completo de actualizaciones</h2>
-          <div className="actividad-history__filter-container">
-            <div 
-              className="actividad-history__filter" 
-              onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-            >
-              {selectedOfficer} ▾
-            </div>
-            {isDropdownOpen && (
-              <div className="actividad-dropdown">
-                {officerList.map(off => (
-                  <div 
-                    key={off} 
-                    className={`actividad-dropdown__item ${selectedOfficer === off ? 'actividad-dropdown__item--active' : ''}`}
-                    onClick={() => {
-                      setSelectedOfficer(off);
-                      setIsDropdownOpen(false);
-                      showToast(`Filtrando actividad por: ${off}`, 'info');
-                    }}
-
-                  >
-                    {off}
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
+          <h2 className="actividad-history__title">Líneas de Acción y Tareas Asignadas</h2>
         </div>
 
-        <div className="actividad-timeline">
-          {filteredActivities.length > 0 ? (
-            filteredActivities.map((act) => (
-              <div key={act.id} className="actividad-item">
-                <div className="actividad-item__indicator" style={{ backgroundColor: act.color, color: act.color }} />
-                <div className="actividad-item__line" />
-                <div className="actividad-item__content">
-                  <div className="actividad-item__meta">
-                    <strong>{act.date}</strong> · {act.officer} · {act.zone}
-                  </div>
-                  <div className="actividad-item__card">
-                    <div className="actividad-item__card-header">
-                      <div className="actividad-item__main-info">
-                        <h4>{act.action} · {act.title}</h4>
-                      </div>
-                      <span className={`badge badge--${act.statusClass}`}>{act.status}</span>
+        {lineas.length > 0 ? (
+          lineas.map(linea => (
+            <div key={linea.id} style={{ marginBottom: '16px', background: '#fff', border: '1px solid #e2e8f0', borderRadius: '12px', overflow: 'hidden' }}>
+              {/* Línea Header */}
+              <div
+                onClick={() => setExpandedLinea(expandedLinea === linea.id ? null : linea.id)}
+                style={{ padding: '16px 20px', cursor: 'pointer', display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: '#f8fafc' }}
+              >
+                <div>
+                  <div style={{ fontSize: '0.7rem', fontWeight: 700, color: '#64748b', textTransform: 'uppercase', letterSpacing: '0.05em' }}>{linea.id} · {linea.problematica}</div>
+                  <div style={{ fontWeight: 700, color: '#0b2240', fontSize: '0.9rem', marginTop: '2px' }}>{linea.lineaAccion}</div>
+                </div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+                  {/* Progress bar */}
+                  <div style={{ width: '120px' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.7rem', fontWeight: 700, color: '#0b2240', marginBottom: '4px' }}>
+                      <span>{linea.tareasCompletadas}/{linea.totalTareas}</span>
+                      <span>{linea.progreso}%</span>
                     </div>
-                    <p className="actividad-item__desc">{act.desc}</p>
+                    <div style={{ height: '6px', background: '#e2e8f0', borderRadius: '10px' }}>
+                      <div style={{ height: '100%', width: `${linea.progreso}%`, background: linea.progreso === 100 ? '#22c55e' : '#3b82f6', borderRadius: '10px', transition: 'width 0.3s' }} />
+                    </div>
                   </div>
+                  {expandedLinea === linea.id ? <ChevronUp size={18} color="#64748b" /> : <ChevronDown size={18} color="#64748b" />}
                 </div>
               </div>
-            ))
-          ) : (
-            <div style={{ textAlign: 'center', padding: '3rem', color: '#7a9cc4' }}>
-              No hay actividades registradas para este oficial.
+
+              {/* Tareas expandidas */}
+              {expandedLinea === linea.id && (
+                <div style={{ padding: '16px 20px', borderTop: '1px solid #e2e8f0' }}>
+                  {linea.tareas && linea.tareas.length > 0 ? (
+                    linea.tareas.map(tarea => (
+                      <div key={tarea.id} style={{ padding: '12px 14px', marginBottom: '8px', background: tarea.completada ? '#f0fdf4' : '#fff', borderRadius: '8px', border: `1px solid ${tarea.completada ? '#bbf7d0' : '#e2e8f0'}`, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                          {tarea.completada ? <CheckCircle size={18} color="#22c55e" /> : <Clock size={18} color="#94a3b8" />}
+                          <div>
+                            <div style={{ fontWeight: 700, color: '#0b2240', fontSize: '0.85rem' }}>{tarea.titulo}</div>
+                            <div style={{ fontSize: '0.75rem', color: '#64748b' }}>
+                              {tarea.oficialNombre} {tarea.completada && `· Completada ${tarea.fechaCompletada}`}
+                            </div>
+                            {tarea.completada && tarea.reporteOficial && (
+                              <div style={{ fontSize: '0.78rem', color: '#334155', marginTop: '4px', fontStyle: 'italic' }}>"{tarea.reporteOficial}"</div>
+                            )}
+                          </div>
+                        </div>
+                        <div style={{ display: 'flex', gap: '8px', alignItems: 'center', fontSize: '0.75rem', color: '#64748b' }}>
+                          {tarea.inversionColones > 0 && <span>{formatColones(tarea.inversionColones)}</span>}
+                          <span className={`badge badge--${tarea.completada ? 'completada' : 'pendiente'}`}>{tarea.completada ? 'Completada' : 'Pendiente'}</span>
+                        </div>
+                      </div>
+                    ))
+                  ) : (
+                    <p style={{ color: '#94a3b8', fontSize: '0.85rem', textAlign: 'center', padding: '1rem' }}>No hay tareas asignadas a esta línea todavía.</p>
+                  )}
+                </div>
+              )}
             </div>
-          )}
-        </div>
+          ))
+        ) : (
+          <div style={{ textAlign: 'center', padding: '3rem', color: '#94a3b8' }}>
+            <ListTodo size={40} style={{ marginBottom: '12px', opacity: 0.5 }} />
+            <p>No hay líneas de acción creadas. Usá el botón <strong>"Crear Línea"</strong> para empezar.</p>
+          </div>
+        )}
       </section>
     </div>
   );
