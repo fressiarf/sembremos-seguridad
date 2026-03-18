@@ -1,4 +1,4 @@
-const API_URL = 'http://localhost:5000/usuarios';
+const API_URL = 'http://localhost:3001/usuarios';
 
 export const userService = {
   // Obtener todos los usuarios
