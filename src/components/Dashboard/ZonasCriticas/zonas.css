@@ -1,0 +1,213 @@
+.zonas-criticas-container {
+    padding: 30px;
+    color: #fff;
+    font-family: inherit;
+    height: 100%;
+}
+
+.zonas-criticas-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 30px;
+}
+
+.zonas-page-title {
+    font-size: 24px;
+    font-weight: 700;
+    margin: 0 0 8px 0;
+}
+
+.zonas-page-subtitle {
+    font-size: 14px;
+    color: #9ca3af;
+    margin: 0;
+}
+
+.zonas-header-actions {
+    display: flex;
+    gap: 16px;
+    align-items: center;
+}
+
+.admin-badge {
+    background-color: transparent;
+    border: 1px solid #3f3f46;
+    border-radius: 20px;
+    padding: 6px 16px;
+    font-size: 13px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: #e4e4e7;
+}
+
+.admin-badge-dot {
+    width: 6px;
+    height: 6px;
+    background-color: #3b82f6;
+    border-radius: 50%;
+}
+
+.btn-nueva {
+    background-color: transparent;
+    border: 1px solid #3f3f46;
+    color: #fff;
+    padding: 8px 16px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: background 0.2s;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.btn-nueva:hover {
+    background-color: #27272a;
+}
+
+.zonas-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 24px;
+}
+
+@media (max-width: 1024px) {
+    .zonas-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+.zona-card {
+    background-color: #262626;
+    border-radius: 12px;
+    overflow: hidden;
+    position: relative;
+    border: 1px solid #3f3f46;
+}
+
+.zona-card-image {
+    height: 140px;
+    background-size: cover;
+    background-position: center;
+    position: relative;
+}
+
+.zona-card-overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to bottom, rgba(38, 38, 38, 0) 30%, rgba(38, 38, 38, 1) 100%);
+}
+
+.zona-card-content {
+    padding: 0 24px 24px 24px;
+    position: relative;
+    z-index: 2;
+    margin-top: -20px;
+}
+
+.zona-title-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.zona-title {
+    display: flex;
+    align-items: center;
+}
+
+.zona-title h3 {
+    margin: 0;
+    font-size: 18px;
+    font-weight: 600;
+}
+
+.zona-percentage {
+    font-weight: 700;
+    font-size: 14px;
+}
+
+.zona-progress-bg {
+    background-color: #3f3f46;
+    height: 6px;
+    border-radius: 3px;
+    margin-bottom: 24px;
+    overflow: hidden;
+}
+
+.zona-progress-fill {
+    height: 100%;
+    border-radius: 3px;
+}
+
+.zona-stats {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.zona-stat-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.stat-label {
+    color: #9ca3af;
+    font-size: 14px;
+}
+
+.stat-value {
+    font-size: 14px;
+    font-weight: 600;
+    color: #e4e4e7;
+}
+
+.zona-divider {
+    border: none;
+    border-top: 1px solid #3f3f46;
+    margin: 8px 0;
+}
+
+.beneficiarios-value {
+    font-size: 18px;
+    font-weight: 700 !important;
+}
+
+.zona-icon {
+    flex-shrink: 0;
+    margin-right: 8px;
+}
+
+.zona-icon-pin {
+    stroke: #ef4444;
+}
+
+.zona-icon-globe {
+    stroke: #0ea5e9;
+}
+
+.completadas-value {
+    color: #22c55e !important;
+}
+
+/* Configuracion Dinamica Extraida del JSX */
+
+.zona-img-barranca { background-image: url('https://upload.wikimedia.org/wikipedia/commons/thumb/e/ea/Rio_Barranca%2C_Puntarenas.jpg/640px-Rio_Barranca%2C_Puntarenas.jpg'); }
+.zona-color-barranca { color: #22c55e; }
+.zona-fill-barranca { width: 78%; background-color: #22c55e; }
+
+.zona-img-chacarita { background-image: url('https://upload.wikimedia.org/wikipedia/commons/thumb/1/1a/Puntarenas_Costa_Rica.jpg/640px-Puntarenas_Costa_Rica.jpg'); }
+.zona-color-chacarita { color: #f59e0b; }
+.zona-fill-chacarita { width: 62%; background-color: #f59e0b; }
+
+.zona-img-el-roble { background-image: url('https://upload.wikimedia.org/wikipedia/commons/thumb/c/c2/Costa_Rica_-_Puntarenas_-_Beach_03.jpg/640px-Costa_Rica_-_Puntarenas_-_Beach_03.jpg'); }
+.zona-color-el-roble { color: #3b82f6; }
+.zona-fill-el-roble { width: 55%; background-color: #3b82f6; }
+
+.zona-img-default { background-image: url('https://upload.wikimedia.org/wikipedia/commons/thumb/7/77/Capitan%C3%ADa_de_Puntarenas._Costa_Rica.JPG/640px-Capitan%C3%ADa_de_Puntarenas._Costa_Rica.JPG'); }
+.zona-color-default { color: #22c55e; }
+.zona-fill-default { width: 71%; background-color: #22c55e; }
