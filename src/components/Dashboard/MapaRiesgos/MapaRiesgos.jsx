@@ -4,6 +4,9 @@ import './MapaRiesgos.css';
 // ─────────────────────────────────────────────────────────
 //  DATOS DE CANTONES — Provincia de Puntarenas (11 cantones)
 // ─────────────────────────────────────────────────────────
+// ─────────────────────────────────────────────────────────
+//  DATOS DE CANTONES — Provincia de Puntarenas (12 cantones)
+// ─────────────────────────────────────────────────────────
 const CANTONES_DATA = [
   {
     id: 'puntarenas',
@@ -13,10 +16,10 @@ const CANTONES_DATA = [
     alertas: 14,
     oficiales: 32,
     tendencia: 'up',
-    descripcion: 'Zona costera principal · Puerto Central',
-    // SVG path relativo al viewBox 0 0 800 700
-    path: 'M 180,200 L 310,185 L 340,220 L 320,270 L 290,300 L 240,310 L 200,290 L 175,255 Z',
-    cx: 258, cy: 248,
+    descripcion: 'Puerto Central · Archipiélago del Golfo',
+    // Mainland + Peninsula parts
+    path: 'M 100,140 L 160,120 L 190,150 L 170,180 L 110,170 Z M 30,160 L 70,140 L 90,190 L 50,220 Z',
+    cx: 145, cy: 155,
   },
   {
     id: 'esparza',
@@ -27,8 +30,8 @@ const CANTONES_DATA = [
     oficiales: 18,
     tendencia: 'up',
     descripcion: 'Acceso vía Ruta 1 · Zona industrial',
-    path: 'M 310,185 L 390,160 L 420,195 L 410,240 L 380,260 L 340,250 L 320,220 Z',
-    cx: 375, cy: 215,
+    path: 'M 190,150 L 250,130 L 270,160 L 230,190 L 190,180 Z',
+    cx: 230, cy: 165,
   },
   {
     id: 'montes-oro',
@@ -38,9 +41,9 @@ const CANTONES_DATA = [
     alertas: 5,
     oficiales: 12,
     tendencia: 'stable',
-    descripcion: 'Zona montañosa · Miramar cabecera',
-    path: 'M 390,160 L 460,140 L 490,175 L 475,215 L 445,230 L 420,210 Z',
-    cx: 440, cy: 185,
+    descripcion: 'Zona montañosa · Miramar',
+    path: 'M 210,100 L 260,90 L 280,120 L 230,135 Z',
+    cx: 245, cy: 110,
   },
   {
     id: 'aguirre',
@@ -50,9 +53,9 @@ const CANTONES_DATA = [
     alertas: 11,
     oficiales: 20,
     tendencia: 'up',
-    descripcion: 'Zona turística · Quepos cabecera',
-    path: 'M 175,310 L 240,300 L 260,340 L 240,380 L 205,395 L 170,370 L 160,340 Z',
-    cx: 210, cy: 350,
+    descripcion: 'Turismo · Parque Manuel Antonio',
+    path: 'M 320,290 L 370,270 L 410,330 L 350,370 Z',
+    cx: 375, cy: 320,
   },
   {
     id: 'parrita',
@@ -62,9 +65,9 @@ const CANTONES_DATA = [
     alertas: 4,
     oficiales: 10,
     tendencia: 'down',
-    descripcion: 'Planicie costera · Zona palmera',
-    path: 'M 160,380 L 205,385 L 220,420 L 200,455 L 165,465 L 145,435 L 148,400 Z',
-    cx: 183, cy: 425,
+    descripcion: 'Planicie costera · Zona agrícola',
+    path: 'M 280,240 L 330,220 L 360,260 L 310,290 Z',
+    cx: 325, cy: 260,
   },
   {
     id: 'corredores',
@@ -74,9 +77,9 @@ const CANTONES_DATA = [
     alertas: 10,
     oficiales: 22,
     tendencia: 'stable',
-    descripcion: 'Zona sur · Frontera Panamá',
-    path: 'M 300,480 L 380,465 L 410,495 L 400,535 L 360,555 L 315,545 L 295,515 Z',
-    cx: 355, cy: 510,
+    descripcion: 'Frontera sur · Paso Canoas',
+    path: 'M 650,580 L 720,540 L 760,630 L 680,680 Z',
+    cx: 710, cy: 620,
   },
   {
     id: 'osa',
@@ -86,9 +89,21 @@ const CANTONES_DATA = [
     alertas: 6,
     oficiales: 14,
     tendencia: 'down',
-    descripcion: 'Península de Osa · Zona natural',
-    path: 'M 220,455 L 260,440 L 300,460 L 295,510 L 260,535 L 225,520 L 205,490 Z',
-    cx: 255, cy: 490,
+    descripcion: 'Península de Osa · Biodiversidad',
+    path: 'M 410,380 L 530,340 L 580,450 L 530,580 L 420,620 L 360,450 Z',
+    cx: 470, cy: 490,
+  },
+  {
+    id: 'golfito',
+    nombre: 'Golfito',
+    nivel: 'critico',
+    incidentes: 45,
+    alertas: 8,
+    oficiales: 16,
+    tendencia: 'up',
+    descripcion: 'Depósito Libre · Zona portuaria sur',
+    path: 'M 530,580 L 580,450 L 650,480 L 690,640 L 600,690 Z',
+    cx: 610, cy: 580,
   },
   {
     id: 'buenos-aires',
@@ -98,9 +113,9 @@ const CANTONES_DATA = [
     alertas: 2,
     oficiales: 8,
     tendencia: 'down',
-    descripcion: 'Zona alta · Limítrofe con San José',
-    path: 'M 480,330 L 560,310 L 590,345 L 580,395 L 545,415 L 500,405 L 475,370 Z',
-    cx: 532, cy: 365,
+    descripcion: 'Zona indígena · Valle del General',
+    path: 'M 530,340 L 660,310 L 700,420 L 580,450 Z',
+    cx: 620, cy: 380,
   },
   {
     id: 'coto-brus',
@@ -110,9 +125,9 @@ const CANTONES_DATA = [
     alertas: 3,
     oficiales: 9,
     tendencia: 'stable',
-    descripcion: 'Zona cafetalera · San Vito cabecera',
-    path: 'M 500,415 L 570,400 L 610,435 L 600,475 L 560,490 L 515,478 L 495,450 Z',
-    cx: 552, cy: 445,
+    descripcion: 'Zona cafetalera · Limítrofe',
+    path: 'M 660,420 L 750,390 L 780,490 L 690,520 Z',
+    cx: 730, cy: 450,
   },
   {
     id: 'garabito',
@@ -122,9 +137,9 @@ const CANTONES_DATA = [
     alertas: 7,
     oficiales: 15,
     tendencia: 'up',
-    descripcion: 'Jacó · Turismo de playa',
-    path: 'M 310,295 L 380,280 L 400,315 L 385,355 L 350,370 L 315,355 L 300,325 Z',
-    cx: 352, cy: 325,
+    descripcion: 'Jacó · Polo turístico',
+    path: 'M 240,195 L 300,180 L 330,225 L 270,250 Z',
+    cx: 290, cy: 220,
   },
   {
     id: 'monteverde',
@@ -134,9 +149,9 @@ const CANTONES_DATA = [
     alertas: 1,
     oficiales: 6,
     tendencia: 'down',
-    descripcion: 'Zona de reserva · Ecoturismo',
-    path: 'M 460,175 L 530,155 L 560,185 L 550,225 L 515,240 L 480,225 L 460,200 Z',
-    cx: 508, cy: 198,
+    descripcion: 'Reserva forestal · Ecoturismo',
+    path: 'M 160,80 L 220,70 L 240,105 L 180,115 Z',
+    cx: 205, cy: 95,
   },
 ];
 
@@ -248,7 +263,7 @@ const MapaRiesgos = () => {
           <div className="mapa-riesgos__title-icon"><Icon.Map /></div>
           <div>
             <h1>Mapa de Riesgos</h1>
-            <p>Provincia de Puntarenas · 11 Cantones · Tiempo real</p>
+            <p>Provincia de Puntarenas · 12 Cantones · Tiempo real</p>
           </div>
         </div>
         <div className="mapa-riesgos__kpis">
@@ -502,39 +517,39 @@ const MapaRiesgos = () => {
               ))}
             </div>
 
-            {/* Detalle del cantón seleccionado — Mover aquí debajo del mapa */}
-            {selectedCanton && (
-              <div className="panel-detalle"
-                style={{ borderColor: NIVEL_CONFIG[selectedCanton.nivel].color }}>
-                <div className="panel-detalle__title"
-                  style={{ color: NIVEL_CONFIG[selectedCanton.nivel].dark }}>
-                  {selectedCanton.nombre}
-                </div>
-                <p className="panel-detalle__desc">{selectedCanton.descripcion}</p>
-                <div className="panel-detalle__grid">
-                  <div className="panel-detalle__cell">
-                    <span className="panel-detalle__val" style={{ color: NIVEL_CONFIG[selectedCanton.nivel].color }}>
-                      {selectedCanton.incidentes}
-                    </span>
-                    <span className="panel-detalle__key">Incidentes</span>
-                  </div>
-                  <div className="panel-detalle__cell">
-                    <span className="panel-detalle__val">{selectedCanton.alertas}</span>
-                    <span className="panel-detalle__key">Alertas</span>
-                  </div>
-                  <div className="panel-detalle__cell">
-                    <span className="panel-detalle__val">{selectedCanton.oficiales}</span>
-                    <span className="panel-detalle__key">Oficiales</span>
-                  </div>
-                </div>
-                <button className="panel-detalle__close"
-                  onClick={() => setSelectedCanton(null)}>
-                  Cerrar detalle ×
-                </button>
-              </div>
-            )}
-
           </div>
+
+          {/* ── Detalle del cantón seleccionado — FUERA del wrapper 3D para evitar recortes ── */}
+          {selectedCanton && (
+            <div className="panel-detalle"
+              style={{ borderColor: NIVEL_CONFIG[selectedCanton.nivel].color }}>
+              <div className="panel-detalle__title"
+                style={{ color: NIVEL_CONFIG[selectedCanton.nivel].dark }}>
+                {selectedCanton.nombre}
+              </div>
+              <p className="panel-detalle__desc">{selectedCanton.descripcion}</p>
+              <div className="panel-detalle__grid">
+                <div className="panel-detalle__cell">
+                  <span className="panel-detalle__val" style={{ color: NIVEL_CONFIG[selectedCanton.nivel].color }}>
+                    {selectedCanton.incidentes}
+                  </span>
+                  <span className="panel-detalle__key">Incidentes</span>
+                </div>
+                <div className="panel-detalle__cell">
+                  <span className="panel-detalle__val">{selectedCanton.alertas}</span>
+                  <span className="panel-detalle__key">Alertas</span>
+                </div>
+                <div className="panel-detalle__cell">
+                  <span className="panel-detalle__val">{selectedCanton.oficiales}</span>
+                  <span className="panel-detalle__key">Oficiales</span>
+                </div>
+              </div>
+              <button className="panel-detalle__close"
+                onClick={() => setSelectedCanton(null)}>
+                Cerrar detalle ×
+              </button>
+            </div>
+          )}
         </div>
 
         {/* ── Panel lateral ── */}
