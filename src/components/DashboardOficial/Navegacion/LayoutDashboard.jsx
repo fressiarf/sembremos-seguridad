@@ -5,7 +5,6 @@ const LayoutDashboard = ({ sidebar, children }) => {
   const [activeView, setActiveView] = useState('dashboard');
   const [collapsed, setCollapsed] = useState(false);
 
-  // Inyectamos estados al sidebar y contenido dinámicamente
   const renderSidebar = () => {
     if (React.isValidElement(sidebar)) {
       return React.cloneElement(sidebar, { 
@@ -38,3 +37,5 @@ const LayoutDashboard = ({ sidebar, children }) => {
 };
 
 export default LayoutDashboard;
+
+

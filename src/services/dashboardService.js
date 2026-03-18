@@ -1,61 +1,79 @@
 const BASE_URL = 'http://localhost:3001';
 
 export const dashboardService = {
-  getStats: async () => {
+  /**
+   * Obtiene todas las líneas de acción
+   */
+  getLineasAccion: async () => {
     try {
-      const [activities, zones, alerts] = await Promise.all([
-        fetch(`${BASE_URL}/actividades`).then(r => r.json()),
-        fetch(`${BASE_URL}/zonas`).then(r => r.json()),
-        fetch(`${BASE_URL}/alertas`).then(r => r.json())
-      ]);
-
-      return {
-        activitiesCount: activities.length,
-        zonesCount: zones.length,
-        alertsCount: alerts.length
-      };
+      const response = await fetch(`${BASE_URL}/lineasAccion`);
+      if (!response.ok) throw new Error('Error fetching líneas');
+      return await response.json();
     } catch (error) {
-      console.error('Error fetching dashboard stats:', error);
-      return { activitiesCount: 0, zonesCount: 0, alertsCount: 0 };
+      console.error('Error fetching líneas:', error);
+      return [];
     }
   },
 
-  getDetailedStats: async () => {
+  /**
+   * Obtiene todas las tareas
+   */
+  getTareas: async () => {
     try {
-      const response = await fetch(`${BASE_URL}/actividades`);
-      const activities = await response.json();
-
-      return {
-        completadas: activities.filter(a => a.status === 'Completada').length,
-        activas: activities.filter(a => a.status === 'En ejecución').length,
-        pendientes: activities.filter(a => a.status === 'Pendiente').length,
-        retrasadas: activities.filter(a => a.status === 'Retrasada').length
-      };
+      const response = await fetch(`${BASE_URL}/tareas`);
+      if (!response.ok) throw new Error('Error fetching tareas');
+      return await response.json();
     } catch (error) {
-      console.error('Error fetching detailed stats:', error);
-      return { completadas: 0, activas: 0, pendientes: 0, retrasadas: 0 };
+      console.error('Error fetching tareas:', error);
+      return [];
     }
   },
 
+  /**
+   * Obtiene TODOS los datos del dashboard global de una sola vez
+   */
   getFullDashboardData: async () => {
     try {
-      const [activities, zones, alerts, notifications] = await Promise.all([
-        fetch(`${BASE_URL}/actividades`).then(r => r.json()),
+      const [lineas, tareas, zonas, alertas, notificaciones] = await Promise.all([
+        fetch(`${BASE_URL}/lineasAccion`).then(r => r.json()),
+        fetch(`${BASE_URL}/tareas`).then(r => r.json()),
         fetch(`${BASE_URL}/zonas`).then(r => r.json()),
         fetch(`${BASE_URL}/alertas`).then(r => r.json()),
         fetch(`${BASE_URL}/notificaciones`).then(r => r.json())
       ]);
 
+      // Enriquecer líneas con tareas y progreso
+      const lineasEnriquecidas = lineas.map(linea => {
+        const tareasLinea = tareas.filter(t => t.lineaAccionId === linea.id);
+        const completadas = tareasLinea.filter(t => t.completada);
+        return {
+          ...linea,
+          tareas: tareasLinea,
+          totalTareas: tareasLinea.length,
+          tareasCompletadas: completadas.length,
+          progreso: tareasLinea.length > 0 ? Math.round((completadas.length / tareasLinea.length) * 100) : 0,
+          inversionLinea: completadas.reduce((sum, t) => sum + (t.inversionColones || 0), 0)
+        };
+      });
+
+      // Stats globales
+      const totalTareas = tareas.length;
+      const tareasCompletadas = tareas.filter(t => t.completada).length;
+      const inversionTotal = tareas.filter(t => t.completada).reduce((sum, t) => sum + (t.inversionColones || 0), 0);
+
       return {
-        activities,
-        zones,
-        alerts,
-        notifications,
+        lineas: lineasEnriquecidas,
+        tareas,
+        zones: zonas,
+        alerts: alertas,
+        notifications: notificaciones,
         stats: {
-          completadas: activities.filter(a => a.status === 'Completada').length,
-          activas: activities.filter(a => a.status === 'En ejecución').length,
-          pendientes: activities.filter(a => a.status === 'Pendiente').length,
-          retrasadas: activities.filter(a => a.status === 'Retrasada').length
+          totalLineas: lineas.length,
+          totalTareas,
+          tareasCompletadas,
+          tareasPendientes: totalTareas - tareasCompletadas,
+          inversionTotal,
+          cumplimiento: totalTareas > 0 ? Math.round((tareasCompletadas / totalTareas) * 100) : 0
         }
       };
     } catch (error) {
@@ -64,6 +82,52 @@ export const dashboardService = {
     }
   },
 
+  /**
+   * Crea una nueva línea de acción (Admin)
+   */
+  createLineaAccion: async (lineaData) => {
+    try {
+      const response = await fetch(`${BASE_URL}/lineasAccion`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(lineaData)
+      });
+      if (!response.ok) throw new Error('Error creating línea de acción');
+      return await response.json();
+    } catch (error) {
+      console.error('Error in createLineaAccion:', error);
+      throw error;
+    }
+  },
+
+  /**
+   * Crea una nueva tarea bajo una línea de acción (Admin)
+   */
+  createTarea: async (tareaData) => {
+    try {
+      const response = await fetch(`${BASE_URL}/tareas`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          ...tareaData,
+          completada: false,
+          fechaCompletada: null,
+          reporteOficial: '',
+          fotos: [],
+          inversionColones: 0
+        })
+      });
+      if (!response.ok) throw new Error('Error creating tarea');
+      return await response.json();
+    } catch (error) {
+      console.error('Error in createTarea:', error);
+      throw error;
+    }
+  },
+
+  /**
+   * Obtiene las zonas del programa
+   */
   getZonas: async () => {
     try {
       const response = await fetch(`${BASE_URL}/zonas`);
@@ -73,21 +137,5 @@ export const dashboardService = {
       console.error('Error in getZonas:', error);
       throw error;
     }
-  },
-
-  createActivity: async (activityData) => {
-    try {
-      const response = await fetch(`${BASE_URL}/actividades`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(activityData)
-      });
-      if (!response.ok) throw new Error('Error creating activity');
-      return await response.json();
-    } catch (error) {
-      console.error('Error in createActivity:', error);
-      throw error;
-    }
   }
 };
-

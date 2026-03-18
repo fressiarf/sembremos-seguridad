@@ -15,14 +15,16 @@
 .matriz-title-block h1 {
   font-size: 1.5rem;
   font-weight: 700;
-  color: var(--inst-text-dark);
+  color: #fff;
   margin: 0;
+  text-shadow: 0 2px 8px rgba(0,0,0,0.3);
 }
 
 .matriz-title-block p {
-  color: var(--inst-text-muted);
+  color: rgba(255,255,255,0.75);
   font-size: 0.85rem;
   margin: 4px 0 0;
+  text-shadow: 0 1px 4px rgba(0,0,0,0.2);
 }
 
 .btn-export {
@@ -120,11 +122,13 @@
   border-radius: 20px;
   border: 1px solid var(--inst-border);
   box-shadow: 0 10px 30px rgba(0,0,0,0.03);
-  overflow: hidden;
+  overflow-x: auto;
+  overflow-y: hidden;
 }
 
 .matriz-table {
   width: 100%;
+  min-width: 950px;
   border-collapse: collapse;
   font-size: 0.9rem;
 }

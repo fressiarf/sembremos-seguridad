@@ -131,6 +131,23 @@
   gap: 2rem;
 }
 
+.perfil-card {
+  background: #fff;
+  border: 1px solid var(--inst-border, #e2e8f0);
+  border-radius: 16px;
+  padding: 2rem;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.04);
+}
+
+.perfil-card__subtitle {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--inst-text-dark, #0b2240);
+  margin: 0 0 1rem;
+  padding-bottom: 0.75rem;
+  border-bottom: 2px solid var(--inst-light-bg, #f8fafc);
+}
+
 
 .perfil-card__title {
   font-size: 1.1rem;
