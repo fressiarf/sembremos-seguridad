@@ -69,26 +69,24 @@
 
 .zonas-grid {
     display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 24px;
-}
-
-@media (max-width: 1024px) {
-    .zonas-grid {
-        grid-template-columns: 1fr;
-    }
+    grid-template-columns: 1fr;
+    gap: 16px;
 }
 
 .zona-card {
-    background-color: #262626;
+    background-color: #ffffff;  /* Antes: #262626 */
     border-radius: 12px;
     overflow: hidden;
     position: relative;
-    border: 1px solid #3f3f46;
+    border: 1px solid #e5e7eb;  /* Antes: #3f3f46 */
+    display: flex;
+    flex-direction: row;
 }
 
 .zona-card-image {
-    height: 140px;
+    width: 30%;
+    height: auto;
+    min-height: 100%;
     background-size: cover;
     background-position: center;
     position: relative;
@@ -97,21 +95,103 @@
 .zona-card-overlay {
     position: absolute;
     inset: 0;
-    background: linear-gradient(to bottom, rgba(38, 38, 38, 0) 30%, rgba(38, 38, 38, 1) 100%);
+    background: linear-gradient(to right, rgba(255, 255, 255, 0) 20%, rgba(255, 255, 255, 1) 90%);
 }
 
 .zona-card-content {
-    padding: 0 24px 24px 24px;
+    width: 70%;
+    margin-top: 0;
+    padding: 20px 24px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
     position: relative;
     z-index: 2;
-    margin-top: -20px;
+}
+
+/* --- Separador Cantonal --- */
+.cantonal-section {
+    margin-top: 40px;
+}
+
+.cantonal-separator {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 24px;
+}
+
+.cantonal-label {
+    text-transform: uppercase;
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    color: #9ca3af;
+    white-space: nowrap;
+}
+
+.cantonal-line {
+    flex-grow: 1;
+    border: none;
+    border-top: 1px solid #3f3f46;
+    margin: 0;
+}
+
+/* Cantonal - Sin imagen, centrada y con borde sutil */
+.zona-card-cantonal {
+    background-color: #f8fafc; /* Fondo ligeramente azulado claro, para diferenciar */
+    border: 1px solid #3b82f6;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+}
+
+.zona-card-cantonal .zona-card-content {
+    width: 100%;
+    text-align: center;
+    align-items: center;
+    padding: 24px 32px;
+}
+
+.zona-card-cantonal .zona-title-row {
+    justify-content: center;
+    gap: 16px;
+    width: 100%;
+}
+
+.zona-card-cantonal .zona-progress-bg {
+    max-width: 400px;
+    margin: 0 auto 16px auto;
+}
+
+.zona-card-cantonal .zona-stats {
+    width: 100%;
+    max-width: 400px;
+    margin: 0 auto;
+}
+
+@media (max-width: 768px) {
+    .zona-card {
+        flex-direction: column;
+    }
+    .zona-card-image {
+        width: 100%;
+        height: 180px;
+        min-height: 180px;
+    }
+    .zona-card-overlay {
+        background: linear-gradient(to bottom, rgba(255, 255, 255, 0) 30%, rgba(255, 255, 255, 1) 100%);
+    }
+    .zona-card-content {
+        width: 100%;
+        margin-top: -20px;
+        padding: 0 24px 24px 24px;
+    }
 }
 
 .zona-title-row {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 20px;
+    margin-bottom: 12px;
 }
 
 .zona-title {
@@ -121,8 +201,9 @@
 
 .zona-title h3 {
     margin: 0;
-    font-size: 18px;
+    font-size: 16px;
     font-weight: 600;
+    color: #111827; /* Texto negro/oscuro */
 }
 
 .zona-percentage {
@@ -131,11 +212,12 @@
 }
 
 .zona-progress-bg {
-    background-color: #3f3f46;
+    background-color: #e5e7eb; /* Fondo de la barra cambiado a gris claro */
     height: 6px;
     border-radius: 3px;
-    margin-bottom: 24px;
+    margin-bottom: 16px;
     overflow: hidden;
+    width: 100%;
 }
 
 .zona-progress-fill {
@@ -146,7 +228,8 @@
 .zona-stats {
     display: flex;
     flex-direction: column;
-    gap: 16px;
+    gap: 12px;
+    width: 100%;
 }
 
 .zona-stat-row {
@@ -156,20 +239,20 @@
 }
 
 .stat-label {
-    color: #9ca3af;
-    font-size: 14px;
+    color: #6b7280; /* Texto de etiquetas gris medio/oscuro */
+    font-size: 13px;
 }
 
 .stat-value {
-    font-size: 14px;
+    font-size: 13px;
     font-weight: 600;
-    color: #e4e4e7;
+    color: #111827; /* Valor en texto oscuro */
 }
 
 .zona-divider {
     border: none;
-    border-top: 1px solid #3f3f46;
-    margin: 8px 0;
+    border-top: 1px solid #e5e7eb; /* Línea separadora clara */
+    margin: 4px 0;
 }
 
 .beneficiarios-value {
@@ -196,18 +279,78 @@
 
 /* Configuracion Dinamica Extraida del JSX */
 
-.zona-img-barranca { background-image: url('https://upload.wikimedia.org/wikipedia/commons/thumb/e/ea/Rio_Barranca%2C_Puntarenas.jpg/640px-Rio_Barranca%2C_Puntarenas.jpg'); }
-.zona-color-barranca { color: #22c55e; }
-.zona-fill-barranca { width: 78%; background-color: #22c55e; }
+/* Barranca – Río Barranca, zona verde a orillas del río */
+.zona-img-barranca {
+    background-image: url('/zona-barranca.jpg');
+    background-position: center 40%;
+}
 
-.zona-img-chacarita { background-image: url('https://upload.wikimedia.org/wikipedia/commons/thumb/1/1a/Puntarenas_Costa_Rica.jpg/640px-Puntarenas_Costa_Rica.jpg'); }
-.zona-color-chacarita { color: #f59e0b; }
-.zona-fill-chacarita { width: 62%; background-color: #f59e0b; }
+.zona-color-barranca {
+    color: #22c55e;
+}
 
-.zona-img-el-roble { background-image: url('https://upload.wikimedia.org/wikipedia/commons/thumb/c/c2/Costa_Rica_-_Puntarenas_-_Beach_03.jpg/640px-Costa_Rica_-_Puntarenas_-_Beach_03.jpg'); }
-.zona-color-el-roble { color: #3b82f6; }
-.zona-fill-el-roble { width: 55%; background-color: #3b82f6; }
+.zona-fill-barranca {
+    width: 78%;
+    background-color: #22c55e;
+}
 
-.zona-img-default { background-image: url('https://upload.wikimedia.org/wikipedia/commons/thumb/7/77/Capitan%C3%ADa_de_Puntarenas._Costa_Rica.JPG/640px-Capitan%C3%ADa_de_Puntarenas._Costa_Rica.JPG'); }
-.zona-color-default { color: #22c55e; }
-.zona-fill-default { width: 71%; background-color: #22c55e; }
+/* Chacarita – Vista costera de Puntarenas */
+.zona-img-chacarita {
+    background-image: url('/zona-chacarita.jpg');
+    background-position: center 30%;
+}
+
+.zona-color-chacarita {
+    color: #f59e0b;
+}
+
+.zona-fill-chacarita {
+    width: 62%;
+    background-color: #f59e0b;
+}
+
+/* El Roble – Zona comercial, avenida principal */
+.zona-img-el-roble {
+    background-image: url('/zona-el-roble.jpg');
+    background-position: center 50%;
+}
+
+.zona-color-el-roble {
+    color: #3b82f6;
+}
+
+.zona-fill-el-roble {
+    width: 55%;
+    background-color: #3b82f6;
+}
+
+/* Cantonal – Bandera de Puntarenas */
+.zona-img-cantonal {
+    background-image: url('/zona-cantonal.jpg');
+    background-position: center center;
+    background-size: cover;
+}
+
+.zona-color-cantonal {
+    color: #22c55e;
+}
+
+.zona-fill-cantonal {
+    width: 71%;
+    background-color: #22c55e;
+}
+
+/* Fallback genérico */
+.zona-img-default {
+    background-image: url('/zona-cantonal.jpg');
+    background-position: center 50%;
+}
+
+.zona-color-default {
+    color: #22c55e;
+}
+
+.zona-fill-default {
+    width: 71%;
+    background-color: #22c55e;
+}
