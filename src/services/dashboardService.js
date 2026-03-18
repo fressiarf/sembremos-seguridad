@@ -64,6 +64,17 @@ export const dashboardService = {
     }
   },
 
+  getZonas: async () => {
+    try {
+      const response = await fetch(`${BASE_URL}/zonas`);
+      if (!response.ok) throw new Error('Error fetching zonas');
+      return await response.json();
+    } catch (error) {
+      console.error('Error in getZonas:', error);
+      throw error;
+    }
+  },
+
   createActivity: async (activityData) => {
     try {
       const response = await fetch(`${BASE_URL}/actividades`, {
@@ -79,5 +90,4 @@ export const dashboardService = {
     }
   }
 };
-
 
