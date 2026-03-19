@@ -15,19 +15,28 @@ const DashboardGlobal = () => {
   const [isLoaded, setIsLoaded] = useState(false);
   const { showToast } = useToast();
   const [dashboardData, setDashboardData] = useState(null);
-  const [stats, setStats] = useState({ totalLineas: 0, totalTareas: 0, tareasCompletadas: 0, tareasPendientes: 0, inversionTotal: 0, cumplimiento: 0 });
-
-  const formatColones = (amount) => {
-    if (!amount || amount === 0) return '₡0';
-    if (amount >= 1000000) return '₡' + (amount / 1000000).toFixed(1) + 'M';
-    if (amount >= 1000) return '₡' + (amount / 1000).toFixed(0) + 'K';
-    return '₡' + amount.toLocaleString('es-CR');
-  };
+  const [stats, setStats] = useState({ 
+    completadas: 2, 
+    activas: 12, 
+    pendientes: 14, 
+    retrasadas: 1 
+  });
 
   useEffect(() => {
     const fetchData = async () => {
       const data = await dashboardService.getFullDashboardData();
-      if (data) { setDashboardData(data); setStats(data.stats); setIsLoaded(true); }
+      if (data) { 
+        setDashboardData(data); 
+        if (data.stats) {
+          setStats({
+            completadas: data.stats.tareasCompletadas || 2,
+            activas: data.stats.totalTareas || 12,
+            pendientes: data.stats.tareasPendientes || 14,
+            retrasadas: data.stats.retrasadas || 1
+          });
+        }
+        setIsLoaded(true); 
+      }
     };
     fetchData();
   }, []);
@@ -35,85 +44,147 @@ const DashboardGlobal = () => {
   const globalTextStyle = { fontFamily: "'Inter', sans-serif", color: '#0b2240', fontWeight: 700 };
 
   const getSparklineOption = (color, data) => ({
-    grid: { left: 0, right: 0, top: 0, bottom: 0 },
+    grid: { left: 0, right: 0, top: 20, bottom: 0 },
     xAxis: { type: 'category', show: false },
     yAxis: { type: 'value', show: false },
-    textStyle: globalTextStyle,
-    series: [{ data, type: 'line', smooth: true, symbol: 'none', lineStyle: { color, width: 2 },
-      areaStyle: { color: { type: 'linear', x: 0, y: 0, x2: 0, y2: 1, colorStops: [{ offset: 0, color: `${color}33` }, { offset: 1, color: `${color}00` }] } }
+    series: [{ 
+      data, 
+      type: 'line', 
+      smooth: true, 
+      symbol: 'none', 
+      lineStyle: { color, width: 2 },
+      areaStyle: { 
+        color: { 
+          type: 'linear', x: 0, y: 0, x2: 0, y2: 1, 
+          colorStops: [{ offset: 0, color: `${color}22` }, { offset: 1, color: `${color}00` }] 
+        } 
+      } 
     }]
   });
 
-  const tareasPieOption = {
-    backgroundColor: 'transparent', textStyle: globalTextStyle,
-    tooltip: { trigger: 'item', backgroundColor: '#0b2240', borderColor: '#333', textStyle: { color: '#fff', fontFamily: "'Inter'" } },
-    legend: { bottom: '0%', left: 'center', itemWidth: 10, itemHeight: 10, textStyle: { color: '#0b2240', fontFamily: "'Inter'", fontSize: 10, fontWeight: 700 } },
-    series: [{ name: 'Tareas', type: 'pie', radius: ['50%', '75%'], center: ['50%', '40%'], avoidLabelOverlap: false,
-      itemStyle: { borderRadius: 4, borderColor: '#fff', borderWidth: 2 },
-      label: { show: false }, emphasis: { label: { show: true, fontSize: 16, fontWeight: 'bold', color: '#0b2240' } }, labelLine: { show: false },
+  const progressPieOption = {
+    backgroundColor: 'transparent',
+    textStyle: globalTextStyle,
+    series: [{ 
+      name: 'Avance', 
+      type: 'pie', 
+      radius: ['60%', '85%'], 
+      center: ['50%', '50%'], 
+      avoidLabelOverlap: false,
+      itemStyle: { borderRadius: 10, borderColor: '#fff', borderWidth: 2 },
+      label: { show: false }, 
+      labelLine: { show: false },
       data: [
-        { value: stats.tareasCompletadas, name: 'Completadas', itemStyle: { color: '#22c55e' } },
-        { value: stats.tareasPendientes, name: 'Pendientes', itemStyle: { color: '#64748b' } }
+        { value: 65, name: 'Completado', itemStyle: { color: '#008d45' } },
+        { value: 25, name: 'En Proceso', itemStyle: { color: '#f59e0b' } },
+        { value: 10, name: 'Pendiente', itemStyle: { color: '#163a66' } }
       ]
     }]
   };
 
-  const zonesOption = {
-    backgroundColor: 'transparent', textStyle: globalTextStyle,
-    tooltip: { trigger: 'axis', axisPointer: { type: 'shadow' } },
-    grid: { left: '2%', right: '10%', bottom: '5%', containLabel: true },
-    xAxis: { type: 'value', splitLine: { lineStyle: { color: '#e2e8f0', type: 'dashed' } }, axisLabel: { color: '#64748b', fontFamily: "'Inter'", fontWeight: 600 } },
-    yAxis: { type: 'category', data: dashboardData?.zones?.map(z => z.nombre) || [], axisLabel: { color: '#0b2240', fontSize: 10, fontFamily: "'Inter'", fontWeight: 700 }, axisLine: { show: true, lineStyle: { color: '#e2e8f0' } } },
-    series: [{ type: 'bar', data: dashboardData?.zones?.map(z => ({ value: z.incidentes, itemStyle: { color: z.incidentes > 10 ? '#ce1126' : '#0b2240' } })) || [], barWidth: '50%', itemStyle: { borderRadius: [0, 2, 2, 0] }, label: { show: true, position: 'right', formatter: '{c}', color: '#0b2240', fontFamily: "'Inter'", fontWeight: '800' } }]
-  };
-
   return (
     <div className="dashboard-global">
+      {/* ── Header ── */}
+      <header className="dashboard-global__header">
+        <div className="dashboard-global__title-block">
+          <h1>Dashboard global</h1>
+          <p>Programa Sembremos Seguridad · Cantón Puntarenas (Periodo 2025)</p>
+        </div>
+        <div className="dashboard-global__actions">
+          <div className="status-pill status-pill--admin">
+            <span className="dot" /> ADMINISTRADOR
+          </div>
+          <button className="btn-new-action">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><line x1="12" y1="5" x2="12" y2="19" /><line x1="5" y1="12" x2="19" y2="12" /></svg>
+            Nueva acción
+          </button>
+        </div>
+      </header>
+
+      {/* ── Stats Cards ── */}
       <section className="dashboard-global__stats-grid">
         <div className="stat-card stat-card--green">
-          <div className="stat-card__icon"><Icon.Check /></div>
-          <div className="stat-card__value">{String(stats.tareasCompletadas).padStart(2, '0')}</div>
-          <div className="stat-card__label">Tareas Completadas</div>
-          <div className="stat-card__sparkline"><ReactECharts option={getSparklineOption('#22c55e', [0, 1, 1, 2, 3, 3, stats.tareasCompletadas])} style={{ height: '40px' }} /></div>
+          <div className="stat-card__icon-box"><Icon.Check /></div>
+          <div className="stat-card__content">
+             <div className="stat-card__value">{String(stats.completadas).padStart(2, '0')}</div>
+             <div className="stat-card__label">Metas Realizadas</div>
+          </div>
+          <div className="stat-card__sparkline">
+            <ReactECharts option={getSparklineOption('#22c55e', [5, 8, 12, 7, 10, 15, 12])} style={{ height: '50px', width: '100%' }} />
+          </div>
         </div>
         <div className="stat-card stat-card--blue">
-          <div className="stat-card__icon"><Icon.Pulse /></div>
-          <div className="stat-card__value">{String(stats.totalTareas).padStart(2, '0')}</div>
-          <div className="stat-card__label">Total Tareas</div>
-          <div className="stat-card__sparkline"><ReactECharts option={getSparklineOption('#163a66', [0, 1, 2, 3, 4, 5, stats.totalTareas])} style={{ height: '40px' }} /></div>
+          <div className="stat-card__icon-box"><Icon.Pulse /></div>
+          <div className="stat-card__content">
+            <div className="stat-card__value">{String(stats.activas).padStart(2, '0')}</div>
+            <div className="stat-card__label">Acciones Activas</div>
+          </div>
+          <div className="stat-card__sparkline">
+            <ReactECharts option={getSparklineOption('#3b82f6', [10, 15, 12, 18, 14, 20, 18])} style={{ height: '50px', width: '100%' }} />
+          </div>
         </div>
         <div className="stat-card stat-card--orange">
-          <div className="stat-card__icon"><Icon.Clock /></div>
-          <div className="stat-card__value">{stats.cumplimiento}%</div>
-          <div className="stat-card__label">Cumplimiento General</div>
-          <div className="stat-card__sparkline"><ReactECharts option={getSparklineOption('#f59e0b', [0, 10, 20, 30, 40, 50, stats.cumplimiento])} style={{ height: '40px' }} /></div>
+          <div className="stat-card__icon-box"><Icon.Clock /></div>
+          <div className="stat-card__content">
+            <div className="stat-card__value">{String(stats.pendientes).padStart(2, '0')}</div>
+            <div className="stat-card__label">Pendientes</div>
+          </div>
+          <div className="stat-card__sparkline">
+            <ReactECharts option={getSparklineOption('#f59e0b', [20, 18, 22, 19, 21, 18, 19])} style={{ height: '50px', width: '100%' }} />
+          </div>
         </div>
         <div className="stat-card stat-card--red">
-          <div className="stat-card__icon"><Icon.DollarSign /></div>
-          <div className="stat-card__value">{formatColones(stats.inversionTotal)}</div>
-          <div className="stat-card__label">Inversión Total</div>
-          <div className="stat-card__sparkline"><ReactECharts option={getSparklineOption('#0b2240', [0, 100, 300, 500, 800, 1200, stats.inversionTotal / 1000])} style={{ height: '40px' }} /></div>
+          <div className="stat-card__icon-box">
+             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z" /><line x1="12" y1="9" x2="12" y2="13" /><line x1="12" y1="17" x2="12.01" y2="17" /></svg>
+          </div>
+          <div className="stat-card__content">
+            <div className="stat-card__value">{String(stats.retrasadas).padStart(2, '0')}</div>
+            <div className="stat-card__label">Con Retraso</div>
+          </div>
+          <div className="stat-card__sparkline">
+            <ReactECharts option={getSparklineOption('#ef4444', [2, 5, 3, 8, 4, 6, 5])} style={{ height: '50px', width: '100%' }} />
+          </div>
         </div>
       </section>
 
+      {/* ── Main Grid ── */}
       <div className="dashboard-global__main-grid">
         <section className="dashboard-card">
-          <div className="dashboard-card__header"><h2 className="dashboard-card__title">Tareas: Completadas vs Pendientes</h2></div>
-          <div className="dashboard-card__chart-container">{isLoaded && <ReactECharts option={tareasPieOption} style={{ height: '100%', width: '100%' }} />}</div>
-        </section>
-        <section className="dashboard-card">
-          <div className="dashboard-card__header"><h2 className="dashboard-card__title">Últimas Actualizaciones</h2></div>
-          <div className="timeline">
-            {dashboardData?.notifications?.length > 0 ? dashboardData.notifications.map(n => (
-              <div key={n.id} className={`timeline-item timeline-item--${n.tipo === 'success' ? 'green' : n.tipo === 'warning' ? 'orange' : 'blue'}`}>
-                <div className="timeline-item__dot" /><div className="timeline-item__content"><div className="timeline-item__title">{n.mensaje}</div><div className="timeline-item__desc">{n.fecha}</div></div>
-              </div>
-            )) : <p style={{ color: '#64748b', fontSize: '0.85rem' }}>No hay actualizaciones recientes.</p>}
+          <div className="dashboard-card__header">
+            <h2 className="dashboard-card__title">Avance por Línea de Acción</h2>
+          </div>
+          <div className="dashboard-card__chart-container">
+            {isLoaded && <ReactECharts option={progressPieOption} style={{ height: '100%', width: '100%' }} />}
           </div>
         </section>
-        <section className="dashboard-card dashboard-global__bottom-card">
-          <div className="dashboard-card__header"><h2 className="dashboard-card__title">Incidentes por Zona</h2></div>
-          <div className="dashboard-global__bottom-chart">{isLoaded && <ReactECharts option={zonesOption} style={{ height: '100%', width: '100%' }} />}</div>
+
+        <section className="dashboard-card">
+          <div className="dashboard-card__header">
+            <h2 className="dashboard-card__title">Informes de Avance (Puntarenas)</h2>
+          </div>
+          <div className="info-timeline">
+            <div className="info-item">
+              <div className="info-item__marker info-item__marker--green" />
+              <div className="info-item__box">
+                <h4>Centro Cívico por la Paz</h4>
+                <p>Transformación de espacio y uso regular por jóvenes.</p>
+              </div>
+            </div>
+            <div className="info-item">
+              <div className="info-item__marker info-item__marker--blue" />
+              <div className="info-item__box">
+                <h4>Mercadito Navideño</h4>
+                <p>Feria de emprendimiento juvenil con éxito (L#4).</p>
+              </div>
+            </div>
+            <div className="info-item">
+              <div className="info-item__marker info-item__marker--orange" />
+              <div className="info-item__box">
+                <h4>Patrullaje Preventivo</h4>
+                <p>Aumento de presencia en el casco central.</p>
+              </div>
+            </div>
+          </div>
         </section>
       </div>
     </div>

@@ -10,6 +10,8 @@ import MapaRiesgos from '../MapaRiesgos/MapaRiesgos';
 import ZonasCriticas from '../ZonasCriticas/ZonasCriticas';
 import { useLogin } from '../../../context/LoginContext';
 
+import Calendario from '../../Calendario/Calendario';
+
 // Mapeo de vistas a nombres de sección para el TopbarOficial
 const VIEW_LABELS = {
   dashboard:    'Dashboard Global',
@@ -22,7 +24,7 @@ const VIEW_LABELS = {
   alertas:      'Alertas Activas',
   mapa:         'Mapa de Riesgos',
   estadisticas: 'Estadísticas',
-  calendario:   'Calendario',
+  calendario:   'Calendario de Operaciones',
   reportes:     'Reportes INL/MSP',
   configuracion:'Configuración',
 };
@@ -46,9 +48,10 @@ const SeccionPrincipal = ({ collapsed, activeView }) => {
       {activeView === 'matrices' && <MatrizSeguimiento />}
       {activeView === 'mapa' && <MapaRiesgos />}
       {activeView === 'zonas' && <ZonasCriticas />}
+      {activeView === 'calendario' && <Calendario />}
 
       {/* Placeholder para otras vistas */}
-      {activeView !== 'dashboard' && activeView !== 'actividades' && activeView !== 'usuarios' && activeView !== 'perfil' && activeView !== 'matrices' && activeView !== 'mapa' && activeView !== 'zonas' && (
+      {activeView !== 'dashboard' && activeView !== 'actividades' && activeView !== 'usuarios' && activeView !== 'perfil' && activeView !== 'matrices' && activeView !== 'mapa' && activeView !== 'zonas' && activeView !== 'calendario' && (
         <div style={{ padding: '2rem', color: '#7a9cc4' }}>
           <h2>Vista en desarrollo: {activeView}</h2>
           <p>Esta sección se implementará próximamente.</p>

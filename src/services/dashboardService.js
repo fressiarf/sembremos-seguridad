@@ -1,4 +1,4 @@
-const BASE_URL = 'http://localhost:3001';
+const BASE_URL = 'http://localhost:5000';
 
 export const dashboardService = {
   /**
@@ -64,6 +64,7 @@ export const dashboardService = {
       return {
         lineas: lineasEnriquecidas,
         tareas,
+        activities: tareas,
         zones: zonas,
         alerts: alertas,
         notifications: notificaciones,

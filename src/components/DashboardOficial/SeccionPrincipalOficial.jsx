@@ -3,9 +3,11 @@ import ListaMisTareas from './MainDashboardOficial/ListaMisTareas';
 import HistorialContainer from './Historial/HistorialContainer';
 import { oficialService } from '../../services/oficialService';
 import { useToast } from '../../context/ToastContext';
+import { useLogin } from '../../context/LoginContext';
 import { CheckCircle, Clock, Activity, DollarSign } from 'lucide-react';
 
 const SeccionPrincipalOficial = ({ activeView = 'dashboard' }) => {
+  const { user } = useLogin();
   const [tareas, setTareas] = useState([]);
   const [estadisticas, setEstadisticas] = useState({
     totalTareas: 0, completadas: 0, pendientes: 0,
@@ -15,12 +17,11 @@ const SeccionPrincipalOficial = ({ activeView = 'dashboard' }) => {
   const [filter, setFilter] = useState('Todas');
   const { showToast } = useToast();
 
-  const OFICIAL_ID = '2'; // hardcodeado temporalmente
-
   const loadData = async () => {
+    if (!user?.id) return;
     try {
       setLoading(true);
-      const data = await oficialService.getFullDashboardData(OFICIAL_ID);
+      const data = await oficialService.getFullDashboardData(user.id);
       if (data) {
         setTareas(data.tareas);
         setEstadisticas(data.estadisticas);
@@ -32,7 +33,7 @@ const SeccionPrincipalOficial = ({ activeView = 'dashboard' }) => {
     }
   };
 
-  useEffect(() => { loadData(); }, []);
+  useEffect(() => { loadData(); }, [user?.id]);
 
   const formatColones = (amount) => {
     if (!amount || amount === 0) return '₡0';
