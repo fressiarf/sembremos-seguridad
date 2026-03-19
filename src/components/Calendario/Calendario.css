@@ -1,0 +1,649 @@
+.calendario-container {
+    padding: 2rem 2.5rem;
+    background: #fff;
+    border-radius: 16px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.05);
+    font-family: 'Inter', sans-serif;
+    color: #1e293b;
+    max-width: 1100px;
+    margin: 1.5rem auto;
+    border: 1px solid #e2e8f0;
+    box-sizing: border-box;
+}
+
+/* Header */
+.calendario-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+    padding-bottom: 1.5rem;
+    border-bottom: 1px solid #f1f5f9;
+}
+
+.calendario-info h1 {
+    font-size: 1.75rem;
+    font-weight: 800;
+    color: #0b2240;
+    margin: 0;
+}
+
+.calendario-info h1 span {
+    color: #64748b;
+    font-weight: 400;
+}
+
+.calendario-info p {
+    color: #64748b;
+    font-size: 0.9rem;
+    margin: 4px 0 0;
+}
+
+.calendario-nav {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+}
+
+.nav-btn {
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    width: 40px;
+    height: 40px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    color: #64748b;
+    transition: all 0.2s ease;
+}
+
+.nav-btn:hover {
+    background: #0b2240;
+    color: #fff;
+    border-color: #0b2240;
+    transform: translateY(-2px);
+}
+
+.today-btn {
+    padding: 0 1rem;
+    height: 40px;
+    background: #fff;
+    border: 1px solid #e2e8f0;
+    border-radius: 10px;
+    font-weight: 600;
+    color: #0b2240;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.today-btn:hover {
+    background: #f1f5f9;
+}
+
+/* Grid */
+.calendario-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 1px;
+    background: #e2e8f0;
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    overflow: hidden;
+}
+
+.grid-weekday {
+    background: #f8fafc;
+    padding: 12px;
+    text-align: center;
+    font-weight: 700;
+    color: #64748b;
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.grid-day {
+    background: #fff;
+    height: 120px;
+    padding: 8px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    cursor: pointer;
+    transition: background 0.2s ease;
+    position: relative;
+}
+
+.grid-day:hover {
+    background: #f1f5f9;
+}
+
+.grid-day.fuera-mes {
+    background: #f8fafc;
+    color: #cbd5e1;
+    cursor: default;
+}
+
+.day-number {
+    font-weight: 600;
+    font-size: 0.9rem;
+    margin-bottom: 4px;
+}
+
+.day-events {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    overflow-y: auto;
+    overflow-x: hidden;
+    max-height: 80px;
+}
+
+/* Event Pill */
+.event-pill {
+    padding: 4px 8px;
+    border-radius: 6px;
+    color: #fff;
+    font-size: 0.75rem;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    transition: transform 0.2s;
+}
+
+.event-pill:hover {
+    transform: scale(1.02);
+    filter: brightness(1.1);
+}
+
+.event-time {
+    opacity: 0.8;
+    font-size: 0.65rem;
+}
+
+/* Modal */
+.calendar-modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(11, 34, 64, 0.4);
+    backdrop-filter: blur(4px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    animation: fadeIn 0.3s ease;
+}
+
+.calendar-modal {
+    background: #fff;
+    width: 90%;
+    max-width: 460px;
+    border-radius: 20px;
+    padding: 2.5rem;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+    animation: slideUp 0.3s ease;
+    box-sizing: border-box;
+}
+
+.modal-header {
+    margin-bottom: 1.5rem;
+}
+
+.modal-header h2 {
+    color: #0b2240;
+    margin: 0;
+    font-size: 1.5rem;
+}
+
+.modal-header p {
+    color: #64748b;
+    margin: 4px 0 0;
+    font-size: 0.9rem;
+}
+
+.form-group {
+    margin-bottom: 1.25rem;
+}
+
+.form-group label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: #475569;
+    margin-bottom: 6px;
+}
+
+.form-group input, 
+.form-group select {
+    width: 100%;
+    padding: 12px 14px;
+    border: 1px solid #e2e8f0;
+    border-radius: 10px;
+    font-size: 0.95rem;
+    transition: all 0.2s;
+    box-sizing: border-box;
+}
+
+.form-group input:focus,
+.form-group select:focus {
+    outline: none;
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+}
+
+.modal-actions {
+    display: flex;
+    gap: 12px;
+    margin-top: 2rem;
+}
+
+.btn-cancel {
+    flex: 1;
+    padding: 12px;
+    background: #f1f5f9;
+    border: none;
+    border-radius: 12px;
+    color: #475569;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.btn-cancel:hover {
+    background: #e2e8f0;
+}
+
+.btn-save {
+    flex: 2;
+    padding: 12px;
+    background: #0b2240;
+    border: none;
+    border-radius: 12px;
+    color: #fff;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.btn-save:hover {
+    background: #1e3a5f;
+    box-shadow: 0 4px 12px rgba(11, 34, 64, 0.2);
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+@keyframes slideUp {
+    from { transform: translateY(20px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+}
+
+/* Responsiveness */
+@media (max-width: 1024px) {
+    .grid-day {
+        height: 100px;
+    }
+}
+
+@media (max-width: 768px) {
+    .calendario-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 1rem;
+    }
+    .grid-day {
+        height: 80px;
+    }
+    .day-number {
+        font-size: 0.8rem;
+    }
+    .event-title {
+        display: none;
+    }
+    .event-pill {
+        justify-content: center;
+        padding: 2px;
+    }
+    .notif-panel {
+        margin: 0 -1rem;
+        border-radius: 12px;
+    }
+}
+
+/* ══════════════════════════════════════════════
+   NOTIFICACIONES
+   ══════════════════════════════════════════════ */
+
+/* Botón campana */
+.notif-btn {
+    position: relative;
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    width: 40px;
+    height: 40px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    color: #64748b;
+    transition: all 0.2s ease;
+}
+
+.notif-btn:hover {
+    background: #0b2240;
+    color: #fff;
+    border-color: #0b2240;
+    transform: translateY(-2px);
+}
+
+.notif-btn--active {
+    color: #0b2240;
+    border-color: #3b82f6;
+    background: #eff6ff;
+}
+
+.notif-btn--active:hover {
+    background: #0b2240;
+    color: #fff;
+}
+
+/* Badge numérico */
+.notif-badge {
+    position: absolute;
+    top: -4px;
+    right: -4px;
+    background: #ef4444;
+    color: #fff;
+    font-size: 0.6rem;
+    font-weight: 800;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 2px 6px rgba(239, 68, 68, 0.4);
+    animation: badge-pulse 2s ease-in-out infinite;
+}
+
+@keyframes badge-pulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.15); }
+}
+
+/* Panel de Agenda */
+.notif-panel {
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 14px;
+    margin-bottom: 1.5rem;
+    overflow: hidden;
+    animation: slideDown 0.3s ease;
+}
+
+@keyframes slideDown {
+    from { opacity: 0; transform: translateY(-10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.notif-panel__header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 14px 18px;
+    background: #0b2240;
+    color: #fff;
+}
+
+.notif-panel__title {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: 700;
+    font-size: 0.9rem;
+}
+
+.notif-panel__close {
+    background: rgba(255,255,255,0.1);
+    border: none;
+    color: #fff;
+    width: 28px;
+    height: 28px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.notif-panel__close:hover {
+    background: rgba(255,255,255,0.2);
+}
+
+/* Estado vacío */
+.notif-empty {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    padding: 2rem;
+    color: #94a3b8;
+}
+
+.notif-empty p {
+    margin: 0;
+    font-size: 0.85rem;
+}
+
+/* Lista de eventos */
+.notif-list {
+    padding: 8px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    max-height: 280px;
+    overflow-y: auto;
+}
+
+.notif-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 14px;
+    background: #fff;
+    border-radius: 10px;
+    border: 1px solid #e2e8f0;
+    transition: all 0.2s;
+}
+
+.notif-item:hover {
+    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+    transform: translateX(2px);
+}
+
+.notif-item__color {
+    width: 4px;
+    height: 36px;
+    border-radius: 4px;
+    flex-shrink: 0;
+}
+
+.notif-item__info {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    min-width: 0;
+}
+
+.notif-item__title {
+    font-weight: 600;
+    font-size: 0.88rem;
+    color: #0b2240;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.notif-item__time {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 0.75rem;
+    color: #64748b;
+}
+
+.notif-item__cat {
+    font-size: 0.7rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+}
+
+.notif-item__actions {
+    display: flex;
+    gap: 4px;
+}
+
+.notif-item__action {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 6px;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+    color: #cbd5e1;
+}
+
+.notif-item__edit:hover {
+    color: #3b82f6;
+    background: #eff6ff;
+}
+
+.notif-item__delete:hover {
+    color: #ef4444;
+    background: #fef2f2;
+}
+
+.btn-delete {
+    padding: 12px;
+    background: #fef2f2;
+    border: 1px solid #fee2e2;
+    border-radius: 12px;
+    color: #ef4444;
+    font-weight: 600;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    transition: all 0.2s;
+}
+
+.btn-delete:hover {
+    background: #ef4444;
+    color: #fff;
+    border-color: #ef4444;
+}
+
+/* ══════════════════════════════════════════════
+   BANNER DE ALERTA PERSISTENTE
+   ══════════════════════════════════════════════ */
+
+.alerta-banner {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 14px 20px;
+    background: linear-gradient(135deg, #1e3a5f 0%, #0b2240 100%);
+    border-radius: 12px;
+    margin-bottom: 1.25rem;
+    color: #fff;
+    animation: banner-pulse 2s ease-in-out infinite;
+    border: 1px solid rgba(59, 130, 246, 0.3);
+    box-shadow: 0 4px 15px rgba(11, 34, 64, 0.3);
+}
+
+.alerta-banner--urgente {
+    background: linear-gradient(135deg, #dc2626 0%, #991b1b 100%);
+    border-color: rgba(239, 68, 68, 0.5);
+    box-shadow: 0 4px 20px rgba(220, 38, 38, 0.35);
+    animation: banner-shake 0.6s ease-in-out infinite;
+}
+
+@keyframes banner-pulse {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.92; transform: scale(1.005); }
+}
+
+@keyframes banner-shake {
+    0%, 100% { transform: translateX(0); }
+    15% { transform: translateX(-3px); }
+    30% { transform: translateX(3px); }
+    45% { transform: translateX(-2px); }
+    60% { transform: translateX(2px); }
+    75% { transform: translateX(-1px); }
+    90% { transform: translateX(1px); }
+}
+
+.alerta-banner__icon {
+    font-size: 1.5rem;
+    flex-shrink: 0;
+}
+
+.alerta-banner__content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.alerta-banner__content strong {
+    font-size: 0.95rem;
+    font-weight: 700;
+}
+
+.alerta-banner__content span {
+    font-size: 0.8rem;
+    opacity: 0.85;
+}
+
+.alerta-banner__content span b {
+    opacity: 1;
+    font-weight: 800;
+}
+
+.alerta-banner__categoria {
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 0.7rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    white-space: nowrap;
+    flex-shrink: 0;
+}

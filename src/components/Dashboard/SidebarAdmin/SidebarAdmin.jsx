@@ -31,8 +31,14 @@ const SidebarAdmin = ({ collapsed = false, onToggle, activeView, onViewChange })
 
   useEffect(() => {
     const fetchStats = async () => {
-      const data = await dashboardService.getStats();
-      setStats(data);
+      const data = await dashboardService.getFullDashboardData();
+      if (data) {
+        setStats({
+          activitiesCount: data.stats?.totalTareas || 0,
+          zonesCount: data.zones?.length || 0,
+          alertsCount: data.alerts?.length || 0
+        });
+      }
     };
     fetchStats();
     
