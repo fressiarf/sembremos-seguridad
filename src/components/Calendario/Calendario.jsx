@@ -200,6 +200,23 @@ const Calendario = () => {
         e.preventDefault();
         if (!nuevoEvento.titulo || !nuevoEvento.inicio || !nuevoEvento.fin) return;
         
+        // Validar duración máxima de 60 minutos
+        const [hIni, mIni] = nuevoEvento.inicio.split(':').map(Number);
+        const [hFin, mFin] = nuevoEvento.fin.split(':').map(Number);
+        const totalMinsIni = hIni * 60 + mIni;
+        const totalMinsFin = hFin * 60 + mFin;
+        const duracion = totalMinsFin - totalMinsIni;
+
+        if (duracion < 0) {
+            showToast('La hora de fin debe ser posterior a la de inicio', 'warning');
+            return;
+        }
+
+        if (duracion > 60) {
+            showToast('⚠️ La duración máxima permitida es de 60 min', 'error');
+            return;
+        }
+        
         if (editandoId) {
             setEventos(prev => prev.map(ev => 
                 ev.id === editandoId 
