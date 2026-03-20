@@ -1,4 +1,8 @@
 import React, { useState } from 'react';
+<<<<<<< HEAD:src/components/DashboardOficial/Navegacion/LayoutDashboard.jsx
+=======
+import '../DashboardInstitucion.css';
+>>>>>>> 9eef092f52afe0a93f7ac738b33a0de493f0cd1f:src/components/DashboardInstitucion/Navegacion/LayoutDashboard.jsx
 
 const LayoutDashboard = ({ sidebar, children }) => {
   const [collapsed, setCollapsed] = useState(false);

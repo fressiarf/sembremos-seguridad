@@ -13,7 +13,7 @@ import { useLogin } from '../../../context/LoginContext';
 
 import Calendario from '../../Calendario/Calendario';
 
-// Mapeo de vistas a nombres de sección para el TopbarOficial
+// Mapeo de vistas a nombres de sección para el TopbarInstitucion
 const VIEW_LABELS = {
   dashboard:    'Dashboard Global',
   actividades:  'Actividad Oficiales',

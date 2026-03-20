@@ -20,7 +20,7 @@ const CardAutenticacion = ({ children }) => {
         navigate('/dashboardInstitucion');
       } else {
         // Por defecto si no tiene rol claro (aunque en db.json debería tenerlo)
-        navigate('/dashboardOficial');
+        navigate('/dashboardInstitucion');
       }
     }
   };

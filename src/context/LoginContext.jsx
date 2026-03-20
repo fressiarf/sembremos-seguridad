@@ -7,7 +7,7 @@ export const LoginProvider = ({ children }) => {
   const [metodo, setMetodo] = useState('email'); // 'email' o 'cedula'
 
   useEffect(() => {
-    const savedUser = localStorage.getItem('currentUser');
+    const savedUser = sessionStorage.getItem('currentUser');
     if (savedUser) {
       setUser(JSON.parse(savedUser));
     }
@@ -80,7 +80,7 @@ export const LoginProvider = ({ children }) => {
 
     if (usuarioEncontrado) {
       setUser(usuarioEncontrado);
-      localStorage.setItem('currentUser', JSON.stringify(usuarioEncontrado));
+      sessionStorage.setItem('currentUser', JSON.stringify(usuarioEncontrado));
     }
 
     setErrors(newErrors);
@@ -91,9 +91,14 @@ export const LoginProvider = ({ children }) => {
     setFormData({ usuario: '', password: '' });
     setErrors({ usuario: '', password: '' });
     setUser(null);
-    localStorage.removeItem('currentUser');
-    // Redirigir al login
-    window.location.href = '/';
+    
+    // Eliminación agresiva de llaves de sesión
+    sessionStorage.removeItem('currentUser');
+    localStorage.removeItem('currentUser'); 
+    sessionStorage.clear();
+
+    // Redirigir pisando el historial para que no puedan usar el botón de "Atrás"
+    window.location.replace('/');
   };
 
   const value = {
