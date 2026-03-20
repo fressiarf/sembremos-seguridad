@@ -138,5 +138,27 @@ export const dashboardService = {
       console.error('Error in getZonas:', error);
       throw error;
     }
+  },
+
+  /**
+   * Envía un reporte de avance de una institución corresponsable
+   */
+  postReporte: async (reporteData) => {
+    try {
+      const response = await fetch(`${BASE_URL}/reportes`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          ...reporteData,
+          fechaCreacion: new Date().toISOString(),
+          estado: 'pendiente'
+        })
+      });
+      if (!response.ok) throw new Error('Error enviando reporte');
+      return await response.json();
+    } catch (error) {
+      console.error('Error in postReporte:', error);
+      throw error;
+    }
   }
 };

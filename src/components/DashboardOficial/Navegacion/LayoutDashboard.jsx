@@ -1,41 +1,24 @@
 import React, { useState } from 'react';
-import '../DashboardOficial.css';
 
 const LayoutDashboard = ({ sidebar, children }) => {
-  const [activeView, setActiveView] = useState('dashboard');
   const [collapsed, setCollapsed] = useState(false);
-
-  const renderSidebar = () => {
-    if (React.isValidElement(sidebar)) {
-      return React.cloneElement(sidebar, { 
-        activeView, 
-        onViewChange: setActiveView,
-        collapsed,
-        onToggle: () => setCollapsed(!collapsed)
-      });
-    }
-    return sidebar;
-  };
-
-  const renderContent = () => {
-    return React.Children.map(children, child => {
-      if (React.isValidElement(child)) {
-        return React.cloneElement(child, { activeView, collapsed });
-      }
-      return child;
-    });
-  };
+  const [activeView, setActiveView] = useState('dashboard');
 
   return (
-    <div className={`LayoutDashboard ${collapsed ? 'LayoutDashboard--collapsed' : ''}`}>
-      {renderSidebar()}
-      <div className="ContenedorPrincipalDashboard">
-        {renderContent()}
+    <div style={{ display: 'flex', minHeight: '100vh', background: '#f1f5f9' }}>
+      {sidebar && React.cloneElement(sidebar, {
+        collapsed,
+        onToggle: () => setCollapsed(!collapsed),
+        activeView,
+        onViewChange: setActiveView,
+      })}
+      <div style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
+        {React.Children.map(children, child =>
+          child ? React.cloneElement(child, { collapsed, activeView }) : null
+        )}
       </div>
     </div>
   );
 };
 
 export default LayoutDashboard;
-
-

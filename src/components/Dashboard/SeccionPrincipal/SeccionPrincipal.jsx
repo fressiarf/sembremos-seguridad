@@ -1,11 +1,12 @@
 import React from 'react';
 import './SeccionPrincipal.css';
-import TopbarOficial from '../../DashboardOficial/Navegacion/TopbarOficial';
+import TopbarInstitucion from '../../DashboardInstitucion/TopbarInstitucion';
 import DashboardGlobal from '../DashboardGlobal/DashboardGlobal';
 import ActividadOficiales from '../ActividadOficiales/ActividadOficiales';
 import GestionUsuarios from '../GestionUsuarios/GestionUsuarios';
 import PerfilUsuario from '../PerfilUsuario/PerfilUsuario';
 import MatrizSeguimiento from '../MatrizSeguimiento/MatrizSeguimiento';
+import DashboardInstitucion from '../../DashboardInstitucion/DashboardInstitucion';
 import MapaRiesgos from '../MapaRiesgos/MapaRiesgos';
 import ZonasCriticas from '../ZonasCriticas/ZonasCriticas';
 import { useLogin } from '../../../context/LoginContext';
@@ -34,18 +35,18 @@ const SeccionPrincipal = ({ collapsed, activeView }) => {
 
   return (
     <main className={`main-content ${collapsed ? 'main-content--collapsed' : ''}`}>
-      <TopbarOficial 
-        seccion={VIEW_LABELS[activeView] || activeView}
-        subtitulo="Programa Sembremos Seguridad · Portal Oficial de Gestión"
-        usuario={{ nombre: user?.nombre || 'C. Araya', zona: user?.rol || 'Administrador' }}
-        rol="ADMINISTRADOR"
+      <TopbarInstitucion 
+        portalTitle={VIEW_LABELS[activeView] || activeView}
+        badgeText={user?.rol === 'institucion' ? 'INSTITUCIÓN' : 'ADMINISTRADOR'}
       />
 
       {activeView === 'dashboard' && <DashboardGlobal />}
       {activeView === 'actividades' && <ActividadOficiales />}
       {activeView === 'usuarios' && <GestionUsuarios />}
       {activeView === 'perfil' && <PerfilUsuario />}
-      {activeView === 'matrices' && <MatrizSeguimiento />}
+      {activeView === 'matrices' && (
+        user?.rol === 'institucion' ? <DashboardInstitucion /> : <MatrizSeguimiento />
+      )}
       {activeView === 'mapa' && <MapaRiesgos />}
       {activeView === 'zonas' && <ZonasCriticas />}
       {activeView === 'calendario' && <Calendario />}
