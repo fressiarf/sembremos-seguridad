@@ -91,9 +91,14 @@ export const LoginProvider = ({ children }) => {
     setFormData({ usuario: '', password: '' });
     setErrors({ usuario: '', password: '' });
     setUser(null);
+    
+    // Eliminación agresiva de llaves de sesión
     sessionStorage.removeItem('currentUser');
-    // Redirigir al login
-    window.location.href = '/';
+    localStorage.removeItem('currentUser'); 
+    sessionStorage.clear();
+
+    // Redirigir pisando el historial para que no puedan usar el botón de "Atrás"
+    window.location.replace('/');
   };
 
   const value = {

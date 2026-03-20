@@ -45,6 +45,7 @@ const Icon = {
 const PerfilUsuario = () => {
   const [user, setUser] = useState(null);
   const [isEditing, setIsEditing] = useState(false);
+  const [showPolicy, setShowPolicy] = useState(false);
   const [formData, setFormData] = useState({
     nombre: '',
     usuario: '',
@@ -106,77 +107,34 @@ const PerfilUsuario = () => {
 
   return (
     <div className="perfil-usuario">
-      <header className="perfil-header">
-        <div className="perfil-header__banner"></div>
-        <div className="perfil-header__info">
-          <div className="perfil-avatar">
-            <Icon.User />
-          </div>
-          <div className="perfil-meta">
-            <h1>{user.nombre}</h1>
-            <div className="perfil-actions-header">
-              <span className={`badge-rol badge-rol--${user.rol}`}>
-                {user.rol === 'admin' ? 'Administrador del Sistema' : 'Oficial de Seguridad'}
-              </span>
-              {!isEditing && (
-                <button className="btn-edit-profile" onClick={() => setIsEditing(true)}>
-                  <Icon.Edit /> Editar Perfil
-                </button>
-              )}
+      <div className="perfil-content" style={{ display: 'block' }}>
+        <div className="perfil-card" style={{ padding: 0, overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
+          
+          {/* HEADER EMBEBIDO EN LA TARJETA */}
+          <header className="perfil-header" style={{ marginBottom: 0, borderBottom: '1px solid #e2e8f0', background: 'transparent' }}>
+            <div className="perfil-header__banner"></div>
+            <div className="perfil-header__info" style={{ maxWidth: 'none', padding: '0 3rem 2.5rem' }}>
+              <div className="perfil-avatar">
+                <Icon.User />
+              </div>
+              <div className="perfil-meta">
+                <h1>{user.nombre}</h1>
+                <div className="perfil-actions-header">
+                  <span className={`badge-rol badge-rol--${user.rol}`}>
+                    {user.rol === 'admin' ? 'Administrador del Sistema' : 'Oficial de Seguridad'}
+                  </span>
+                  <button className="btn-edit-profile" onClick={() => setIsEditing(true)}>
+                    <Icon.Edit /> Editar Perfil
+                  </button>
+                </div>
+              </div>
             </div>
-          </div>
-        </div>
-      </header>
-
-      <div className="perfil-content">
-        <section className="perfil-section">
-          <div className="perfil-card">
+          </header>          {/* CONTENIDO PRINCIPAL */}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '2.5rem', padding: '3rem' }}>
+            <section className="perfil-main" style={{ width: '100%' }}>
             <h3 className="perfil-card__title">Información del Funcionario</h3>
             
-            {isEditing ? (
-              <form onSubmit={handleUpdate} className="perfil-form">
-                <div className="form-grid">
-                  <div className="form-group">
-                    <label>Nombre Completo</label>
-                    <input 
-                      type="text" 
-                      name="nombre"
-                      value={formData.nombre}
-                      onChange={handleChange}
-                      required
-                    />
-                  </div>
-                  <div className="form-group">
-                    <label>Correo Institucional</label>
-                    <input 
-                      type="email" 
-                      name="usuario"
-                      value={formData.usuario}
-                      onChange={handleChange}
-                      required
-                    />
-                  </div>
-                  <div className="form-group">
-                    <label>Cédula de Identidad</label>
-                    <input 
-                      type="text" 
-                      name="cedula"
-                      value={formData.cedula}
-                      onChange={handleChange}
-                      required
-                    />
-                  </div>
-                </div>
-                <div className="form-actions">
-                  <button type="button" className="btn-cancel" onClick={() => setIsEditing(false)}>
-                    Cancelar
-                  </button>
-                  <button type="submit" className="btn-save" disabled={saving}>
-                    {saving ? 'Guardando...' : <><Icon.Save /> Guardar Cambios</>}
-                  </button>
-                </div>
-              </form>
-            ) : (
+            {/* Vista Siempre Visible */}
               <div className="perfil-grid">
                 <div className="perfil-field">
                   <div className="field-icon"><Icon.Mail /></div>
@@ -207,30 +165,103 @@ const PerfilUsuario = () => {
                   </div>
                 </div>
               </div>
-            )}
-          </div>
-        </section>
+            </section>
 
-        <aside className="perfil-sidebar">
-          <div className="perfil-card stat-perfil">
-            <h4 className="perfil-card__subtitle">Actividad Reciente</h4>
-            <div className="perfil-mini-stat">
-              <span className="stat-label">Último Acceso</span>
-              <span className="stat-val">Hoy, 21:15</span>
-            </div>
-            <div className="perfil-mini-stat">
-              <span className="stat-label">Estado de Cuenta</span>
-              <span className="stat-val active-status">Activa</span>
-            </div>
-          </div>
+            <hr style={{ border: 'none', borderTop: '1px solid #e2e8f0', margin: 0 }} />
 
-          <div className="perfil-card help-card">
-            <h4>Seguridad Institucional</h4>
-            <p>Sus datos están protegidos bajo protocolos de seguridad gubernamental.</p>
-            <button className="btn-secondary-inst">Política de Privacidad</button>
+            {/* ACTIVIDAD RECIENTE & SEGURIDAD - EN HORIZONTAL */}
+            <section style={{ width: '100%' }}>
+              <h3 className="perfil-card__title">Actividad y Seguridad de Cuenta</h3>
+              <div style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'center', gap: '1.5rem' }}>
+                
+                <div style={{ flex: '1 1 300px', maxWidth: '450px', padding: '1.5rem', background: '#f8fafc', borderRadius: '14px', border: '1px solid #e2e8f0', display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                  <span style={{ fontSize: '0.85rem', color: '#64748b', fontWeight: 600, textTransform: 'uppercase' }}>Último Acceso</span>
+                  <span style={{ fontSize: '1.2rem', fontWeight: 800, color: '#0b2240' }}>Hoy, 21:15</span>
+                  <span style={{ fontSize: '0.75rem', color: '#64748b' }}>Desde dirección IP Segura</span>
+                </div>
+
+                <div style={{ flex: '1 1 300px', maxWidth: '450px', padding: '1.5rem', background: '#f0fdf4', borderRadius: '14px', border: '1px solid #bbf7d0', display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                  <span style={{ fontSize: '0.85rem', color: '#166534', fontWeight: 600, textTransform: 'uppercase' }}>Estado de Cuenta</span>
+                  <span style={{ fontSize: '1.2rem', fontWeight: 800, color: '#22c55e' }}>Activa</span>
+                  <span style={{ fontSize: '0.75rem', color: '#166534' }}>Verificada y asegurada</span>
+                </div>
+
+                <div style={{ flex: '1 1 300px', maxWidth: '450px', padding: '1.5rem', background: '#fff', borderRadius: '14px', border: '1px solid #e2e8f0', display: 'flex', flexDirection: 'column', gap: '8px', alignItems: 'center', textAlign: 'center' }}>
+                  <span style={{ fontSize: '0.85rem', color: '#64748b', fontWeight: 600, textTransform: 'uppercase' }}>Seguridad de Datos</span>
+                  <span style={{ fontSize: '0.85rem', color: '#0b2240', marginBottom: '8px', lineHeight: 1.4 }}>Tus datos operan bajo protocolos gubernamentales.</span>
+                  <button className="btn-secondary-inst" onClick={() => setShowPolicy(true)} style={{ margin: 0, width: 'auto', padding: '6px 16px', fontSize: '0.8rem', cursor: 'pointer' }}>Política de Privacidad</button>
+                </div>
+
+              </div>
+            </section>
+
           </div>
-        </aside>
+        </div>
       </div>
+
+      {/* OVERLAY MODAL FORM */}
+      {isEditing && (
+        <div style={{ position: 'fixed', inset: 0, backgroundColor: 'rgba(0, 0, 0, 0.65)', zIndex: 9999, display: 'flex', justifyContent: 'center', alignItems: 'center', backdropFilter: 'blur(3px)' }}>
+          <div style={{ background: '#fff', borderRadius: '20px', padding: '3rem', width: '90%', maxWidth: '600px', boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.4)', animation: 'fadeIn 0.3s ease' }}>
+            <h3 className="perfil-card__title" style={{ marginBottom: '1.5rem', borderBottom: '1px solid #e2e8f0', paddingBottom: '1rem' }}>Actualización de Perfil</h3>
+            <form onSubmit={handleUpdate} className="perfil-form">
+              <div className="form-grid">
+                <div className="form-group">
+                  <label>Nombre Completo</label>
+                  <input type="text" name="nombre" value={formData.nombre} onChange={handleChange} required />
+                </div>
+                <div className="form-group">
+                  <label>Correo Institucional</label>
+                  <input type="email" name="usuario" value={formData.usuario} onChange={handleChange} required />
+                </div>
+                <div className="form-group">
+                  <label>Cédula de Identidad</label>
+                  <input type="text" name="cedula" value={formData.cedula} onChange={handleChange} required />
+                </div>
+              </div>
+              <div className="form-actions" style={{ marginTop: '2rem', display: 'flex', gap: '1rem', justifyContent: 'flex-end' }}>
+                <button type="button" className="btn-cancel" onClick={() => setIsEditing(false)} style={{ background: '#f1f5f9', color: '#475569', border: 'none', padding: '10px 20px', borderRadius: '12px', fontWeight: 'bold' }}>
+                  Cancelar
+                </button>
+                <button type="submit" className="btn-save" disabled={saving} style={{ background: '#0b2240', color: '#fff', border: 'none', padding: '10px 24px', borderRadius: '12px', fontWeight: 'bold', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  {saving ? 'Guardando...' : <><Icon.Save size={18} /> Guardar Cambios</>}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+    {/* OVERLAY MODAL POLITICA DE PRIVACIDAD */}
+      {showPolicy && (
+        <div style={{ position: 'fixed', inset: 0, backgroundColor: 'rgba(0, 0, 0, 0.65)', zIndex: 9999, display: 'flex', justifyContent: 'center', alignItems: 'center', backdropFilter: 'blur(3px)' }}>
+          <div style={{ background: '#fff', borderRadius: '20px', padding: '3rem', width: '90%', maxWidth: '700px', maxHeight: '90vh', overflowY: 'auto', boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.4)', animation: 'fadeIn 0.3s ease' }}>
+            <h3 className="perfil-card__title" style={{ marginBottom: '1.5rem', borderBottom: '1px solid #e2e8f0', paddingBottom: '1rem', color: '#0b2240' }}>Protocolo de Seguridad de Datos</h3>
+            <div style={{ fontSize: '0.95rem', color: '#334155', lineHeight: '1.7' }}>
+              <p style={{ marginBottom: '1.2rem' }}>
+                El protocolo de seguridad de la estrategia Sembremos Seguridad en Costa Rica, liderada por el Ministerio de Seguridad Pública (MSP), se fundamenta en la Ley 8968 de Protección de la Persona frente al Tratamiento de sus Datos Personales. Busca proteger la confidencialidad, integridad y uso lícito de la información recopilada en los 84 cantones para prevenir delitos, garantizando la anonimización de datos sensibles y restringiendo el acceso a personal autorizado.
+              </p>
+              <h4 style={{ color: '#0b2240', marginBottom: '0.8rem', marginTop: '1.5rem', fontSize: '1rem' }}>Los componentes clave de seguridad incluyen:</h4>
+              <ul style={{ paddingLeft: '1.5rem', marginBottom: '1.5rem', display: 'flex', flexDirection: 'column', gap: '0.8rem' }}>
+                <li><strong>Fundamento Legal:</strong> Cumplimiento con la Ley 8968 del Sistema Costarricense de Información Jurídica.</li>
+                <li><strong>Gestión de Datos:</strong> Obligación de manejar datos veraces, actuales y pertinentes, con eliminación de datos innecesarios.</li>
+                <li><strong>Confidencialidad:</strong> Protección estricta contra el acceso, copia, difusión o tratamiento no autorizado de datos, especialmente los que afecten la intimidad.</li>
+                <li><strong>Cooperación Institucional:</strong> Articulación con municipalidades y otras entidades bajo normas de seguridad de la información.</li>
+                <li><strong>Transparencia y Rendición de Cuentas:</strong> Publicación de información anonimizada para control ciudadano.</li>
+              </ul>
+              <div style={{ background: '#f8fafc', padding: '1.2rem', borderRadius: '8px', borderLeft: '4px solid #3b82f6', marginTop: '1.5rem' }}>
+                <strong>Nota:</strong> La estrategia se enfoca en el uso de estadísticas y percepciones de seguridad, garantizando que el tratamiento de datos personales no revele información sensible como origen racial, político o salud.
+              </div>
+            </div>
+            <div style={{ marginTop: '2.5rem', display: 'flex', justifyContent: 'flex-end' }}>
+              <button type="button" onClick={() => setShowPolicy(false)} style={{ background: '#0b2240', color: '#fff', border: 'none', padding: '10px 24px', borderRadius: '12px', fontWeight: 'bold', cursor: 'pointer' }}>
+                Entendido
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
     </div>
   );
 };

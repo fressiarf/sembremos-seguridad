@@ -64,7 +64,7 @@ const SeccionPrincipalInstitucion = ({ activeView = 'dashboard' }) => {
   // ── Vista Calendario ──
   if (activeView === 'calendario') {
     return (
-      <div style={{ padding: '1rem', height: '100%', overflow: 'hidden' }}>
+      <div style={{ padding: '2rem 2.5rem' }}>
         <Calendario />
       </div>
     );

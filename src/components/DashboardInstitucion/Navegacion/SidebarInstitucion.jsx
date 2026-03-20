@@ -55,7 +55,7 @@ const SidebarInstitucion = ({ collapsed = false, onToggle, activeView, onViewCha
       {!collapsed && (
         <div className="sidebar-admin__role">
           <span className="sidebar-admin__role-dot" />
-          <span className="sidebar-admin__role-label">Oficial</span>
+          <span className="sidebar-admin__role-label">Institución</span>
         </div>
       )}
 
