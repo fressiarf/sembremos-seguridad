@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { CheckCircle, Clock, DollarSign, Camera, Activity } from 'lucide-react';
-import FormOficial from './FormOficial';
+import FormInstitucion from './FormInstitucion';
 
 const TareaCard = ({ tarea, onUpdate }) => {
   const [isReporting, setIsReporting] = useState(false);
@@ -106,7 +106,7 @@ const TareaCard = ({ tarea, onUpdate }) => {
       {/* Formulario de reporte */}
       {isReporting && !tarea.completada && (
         <div style={{ borderTop: '1px solid #e2e8f0', background: '#f8fafc' }}>
-          <FormOficial
+          <FormInstitucion
             tarea={tarea}
             onComplete={() => {
               setIsReporting(false);

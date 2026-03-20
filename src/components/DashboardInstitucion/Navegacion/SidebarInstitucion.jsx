@@ -2,9 +2,9 @@ import React, { useState } from 'react';
 import '../../Dashboard/SidebarAdmin/SidebarAdmin.css';
 import { useLogin } from "../../../context/LoginContext";
 import UserBrand from "./UserBrand";
-import { ChevronLeft, ChevronDown, LayoutDashboard, Activity, Clock, LogOut, User, MapPin } from "lucide-react";
+import { ChevronLeft, ChevronDown, LayoutDashboard, Activity, Clock, LogOut, User, MapPin, Calendar } from "lucide-react";
 
-const SidebarOficial = ({ collapsed = false, onToggle, activeView, onViewChange }) => {
+const SidebarInstitucion = ({ collapsed = false, onToggle, activeView, onViewChange }) => {
   const { logout } = useLogin();
   const [openSections, setOpenSections] = useState({
     OPERATIVO: true, GESTIÓN: true,
@@ -23,6 +23,7 @@ const SidebarOficial = ({ collapsed = false, onToggle, activeView, onViewChange 
       label: 'GESTIÓN',
       items: [
         { id: 'historial',   label: 'Historial de Reportes',  icon: Clock },
+        { id: 'calendario',  label: 'Calendario de Tareas',   icon: Calendar },
       ],
     },
   ];
@@ -141,4 +142,4 @@ const SidebarOficial = ({ collapsed = false, onToggle, activeView, onViewChange 
   );
 };
 
-export default SidebarOficial;
+export default SidebarInstitucion;

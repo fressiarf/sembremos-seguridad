@@ -1,4 +1,4 @@
-export const RolePillOficial = ({ nombreRol }) => {
+export const RolePillInstitucion = ({ nombreRol }) => {
   return (
     <div>
       <span>•</span>
@@ -6,4 +6,4 @@ export const RolePillOficial = ({ nombreRol }) => {
     </div>
   );
 };
-export default RolePillOficial;
+export default RolePillInstitucion;

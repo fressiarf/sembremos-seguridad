@@ -1,6 +1,6 @@
 import React from 'react';
 import './SeccionPrincipal.css';
-import TopbarOficial from '../../DashboardOficial/Navegacion/TopbarOficial';
+import TopbarInstitucion from '../../DashboardInstitucion/Navegacion/TopbarInstitucion';
 import DashboardGlobal from '../DashboardGlobal/DashboardGlobal';
 import ActividadOficiales from '../ActividadOficiales/ActividadOficiales';
 import GestionUsuarios from '../GestionUsuarios/GestionUsuarios';
@@ -12,7 +12,7 @@ import { useLogin } from '../../../context/LoginContext';
 
 import Calendario from '../../Calendario/Calendario';
 
-// Mapeo de vistas a nombres de sección para el TopbarOficial
+// Mapeo de vistas a nombres de sección para el TopbarInstitucion
 const VIEW_LABELS = {
   dashboard:    'Dashboard Global',
   actividades:  'Actividad Oficiales',
@@ -34,9 +34,9 @@ const SeccionPrincipal = ({ collapsed, activeView }) => {
 
   return (
     <main className={`main-content ${collapsed ? 'main-content--collapsed' : ''}`}>
-      <TopbarOficial 
+      <TopbarInstitucion 
         seccion={VIEW_LABELS[activeView] || activeView}
-        subtitulo="Programa Sembremos Seguridad · Portal Oficial de Gestión"
+        subtitulo="Programa Sembremos Seguridad · Portal Institucional de Gestión"
         usuario={{ nombre: user?.nombre || 'C. Araya', zona: user?.rol || 'Administrador' }}
         rol="ADMINISTRADOR"
       />

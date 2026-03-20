@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
-import './FormOficial.css';
+import './FormInstitucion.css';
 import { oficialService } from '../../../services/oficialService';
 import { useToast } from '../../../context/ToastContext';
 
-const FormOficial = ({ tarea, onComplete }) => {
+const FormInstitucion = ({ tarea, onComplete }) => {
   const [formData, setFormData] = useState({
     reporteOficial: '',
     inversionColones: '',
@@ -41,8 +41,8 @@ const FormOficial = ({ tarea, onComplete }) => {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="form-oficial" style={{ borderRadius: 0, boxShadow: 'none', border: 'none', margin: 0 }}>
-      <div className="form-oficial__body">
+    <form onSubmit={handleSubmit} className="form-institucion" style={{ borderRadius: 0, boxShadow: 'none', border: 'none', margin: 0 }}>
+      <div className="form-institucion__body">
         <div className="form-group" style={{ marginBottom: '12px' }}>
           <label>¿Qué hiciste para completar esta tarea? *</label>
           <textarea
@@ -88,4 +88,4 @@ const FormOficial = ({ tarea, onComplete }) => {
   );
 };
 
-export default FormOficial;
+export default FormInstitucion;

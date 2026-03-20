@@ -1,16 +1,19 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Login from '../pages/login';
-import DashboardOficial from '../pages/DashboardOficial';
+import DashboardInstitucion from '../pages/DashboardInstitucion';
 import Dashboard from '../pages/Dashboard';
+import PrivateRoutes from './PrivateRoutes';
 
 const Routing = () => {
     return (
         <Router>
             <Routes>
                 <Route path="/" element={<Login />} />
-                <Route path="/dashboardOficial" element={<DashboardOficial />} />
-                <Route path="/dashboard" element={<Dashboard />} />
+
+                {/*  Rutras Privadas */}
+                <Route path="/dashboardInstitucion" element={<PrivateRoutes><DashboardInstitucion /></PrivateRoutes>} />
+                <Route path="/dashboard" element={<PrivateRoutes><Dashboard /></PrivateRoutes>} />
             </Routes>
         </Router>
     );

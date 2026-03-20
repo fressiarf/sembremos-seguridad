@@ -1,12 +1,14 @@
 import React, { useState, useEffect } from 'react';
-import ListaMisTareas from './MainDashboardOficial/ListaMisTareas';
+import ListaMisTareas from './MainDashboardInstitucion/ListaMisTareas';
 import HistorialContainer from './Historial/HistorialContainer';
+import PerfilUsuario from '../Dashboard/PerfilUsuario/PerfilUsuario';
+import Calendario from '../Calendario/Calendario';
 import { oficialService } from '../../services/oficialService';
 import { useToast } from '../../context/ToastContext';
 import { useLogin } from '../../context/LoginContext';
 import { CheckCircle, Clock, Activity, DollarSign } from 'lucide-react';
 
-const SeccionPrincipalOficial = ({ activeView = 'dashboard' }) => {
+const SeccionPrincipalInstitucion = ({ activeView = 'dashboard' }) => {
   const { user } = useLogin();
   const [tareas, setTareas] = useState([]);
   const [estadisticas, setEstadisticas] = useState({
@@ -59,6 +61,15 @@ const SeccionPrincipalOficial = ({ activeView = 'dashboard' }) => {
     );
   }
 
+  // ── Vista Calendario ──
+  if (activeView === 'calendario') {
+    return (
+      <div style={{ padding: '1rem', height: '100%', overflow: 'hidden' }}>
+        <Calendario />
+      </div>
+    );
+  }
+
   // ── Vista Dashboard (Solo Resumen / Estadísticas) ──
   if (activeView === 'dashboard') {
     return (
@@ -98,6 +109,15 @@ const SeccionPrincipalOficial = ({ activeView = 'dashboard' }) => {
             <span style={{ fontSize: '1.4rem', fontWeight: 800, color: '#0b2240' }}>{formatColones(estadisticas.inversionTotal)}</span>
           </div>
         </div>
+      </div>
+    );
+  }
+
+  // ── Vista Perfil ──
+  if (activeView === 'perfil') {
+    return (
+      <div style={{ padding: '2rem 2.5rem' }}>
+        <PerfilUsuario />
       </div>
     );
   }
@@ -149,4 +169,4 @@ const SeccionPrincipalOficial = ({ activeView = 'dashboard' }) => {
   );
 };
 
-export default SeccionPrincipalOficial;
+export default SeccionPrincipalInstitucion;
