@@ -7,6 +7,7 @@
   animation: fadeIn 0.5s ease;
   min-height: 100vh;
   background: transparent;
+  margin: 0;
 }
 
 .perfil-header {
@@ -123,19 +124,18 @@
 }
 
 .perfil-content {
+  width: 100%;
   max-width: 1200px;
   margin: 0 auto;
-  padding: 0 2.5rem 3rem;
-  display: grid;
-  grid-template-columns: 1fr 340px;
-  gap: 2rem;
+  padding: 0 0 3rem 0;
+  box-sizing: border-box;
 }
 
 .perfil-card {
   background: #fff;
-  border: 1px solid var(--inst-border, #e2e8f0);
+  border: none;
   border-radius: 16px;
-  padding: 2rem;
+  overflow: hidden;
   box-shadow: 0 4px 16px rgba(0,0,0,0.04);
 }
 

@@ -41,45 +41,45 @@ const FormInstitucion = ({ tarea, onComplete }) => {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="form-institucion" style={{ borderRadius: 0, boxShadow: 'none', border: 'none', margin: 0 }}>
-      <div className="form-institucion__body">
-        <div className="form-group" style={{ marginBottom: '12px' }}>
-          <label>¿Qué hiciste para completar esta tarea? *</label>
-          <textarea
-            className="form-textarea"
-            placeholder="Describí las acciones realizadas..."
-            value={formData.reporteOficial}
-            onChange={e => setFormData({...formData, reporteOficial: e.target.value})}
-            style={{ height: '80px' }}
+    <form onSubmit={handleSubmit} className="FormOficialContainer" style={{ border: 'none', background: 'transparent', boxShadow: 'none', padding: '1.5rem' }}>
+      <div className="FormGroup">
+        <label>¿Qué hiciste para completar esta tarea? *</label>
+        <textarea
+          className="FormControl FormTextarea"
+          placeholder="Describí las acciones realizadas..."
+          value={formData.reporteOficial}
+          onChange={e => setFormData({...formData, reporteOficial: e.target.value})}
+          style={{ minHeight: '100px' }}
+        />
+      </div>
+      <div className="FormRowGrid">
+        <div className="FormGroup">
+          <label>Inversión realizada (₡)</label>
+          <input
+            type="number"
+            className="FormControl"
+            placeholder="0"
+            value={formData.inversionColones}
+            onChange={e => setFormData({...formData, inversionColones: e.target.value})}
           />
         </div>
-        <div className="form-row" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
-          <div className="form-group">
-            <label>Inversión realizada (₡)</label>
-            <input
-              type="number"
-              className="form-input"
-              placeholder="0"
-              value={formData.inversionColones}
-              onChange={e => setFormData({...formData, inversionColones: e.target.value})}
-            />
-          </div>
-          <div className="form-group">
-            <label>Fotos de evidencia (URLs)</label>
-            <input
-              type="text"
-              className="form-input"
-              placeholder="url1, url2, ..."
-              value={formData.fotos}
-              onChange={e => setFormData({...formData, fotos: e.target.value})}
-            />
-          </div>
+        <div className="FormGroup">
+          <label>Fotos de evidencia (URLs)</label>
+          <input
+            type="text"
+            className="FormControl"
+            placeholder="url1, url2, ..."
+            value={formData.fotos}
+            onChange={e => setFormData({...formData, fotos: e.target.value})}
+          />
         </div>
+      </div>
+      <div className="FormActions">
         <button
           type="submit"
           disabled={loading}
-          className="form-submit-btn"
-          style={{ marginTop: '12px', width: '100%' }}
+          className="BtnSubmit"
+          style={{ width: '100%', justifyContent: 'center', marginTop: '10px' }}
         >
           {loading ? 'Guardando...' : '✓ Marcar como Completada'}
         </button>

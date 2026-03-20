@@ -207,13 +207,13 @@ const Calendario = () => {
         const totalMinsFin = hFin * 60 + mFin;
         const duracion = totalMinsFin - totalMinsIni;
 
-        if (duracion < 0) {
-            showToast('La hora de fin debe ser posterior a la de inicio', 'warning');
+        if (hIni > 23 || hFin > 23 || mIni > 59 || mFin > 59) {
+            showToast('Formato de hora inválido (Minutos máximos: 59)', 'error');
             return;
         }
 
-        if (duracion > 60) {
-            showToast('⚠️ La duración máxima permitida es de 60 min', 'error');
+        if (duracion < 0) {
+            showToast('La hora de fin debe ser posterior a la de inicio', 'warning');
             return;
         }
         
@@ -357,11 +357,17 @@ const Calendario = () => {
                 ))}
                 {todosLosDias.map((item, idx) => {
                     const eventosDia = getEventosDia(item.dia, item.fueraMes);
+                    
+                    const hoy = new Date();
+                    hoy.setHours(0, 0, 0, 0);
+                    const fechaEvaluada = new Date(anio, mes, item.dia);
+                    const esPasado = !item.fueraMes && fechaEvaluada < hoy;
+                    
                     return (
                         <div 
                             key={idx} 
-                            className={`grid-day ${item.fueraMes ? 'fuera-mes' : ''}`}
-                            onClick={() => abrirModal(item.dia, item.fueraMes)}
+                            className={`grid-day ${item.fueraMes || esPasado ? 'fuera-mes' : ''}`}
+                            onClick={() => abrirModal(item.dia, item.fueraMes || esPasado)}
                         >
                             <span className="day-number">{item.dia}</span>
                             <div className="day-events">
