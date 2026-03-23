@@ -15,7 +15,7 @@ const GestionUsuarios = () => {
     cedula: '',
     usuario: '',
     password: '',
-    rol: 'oficial'
+    rol: 'institución'
   });
   const { showToast } = useToast();
 
@@ -45,7 +45,7 @@ const GestionUsuarios = () => {
     }
 
     
-    const newRol = currentRol === 'admin' ? 'oficial' : 'admin';
+    const newRol = currentRol === 'admin' ? 'institución' : 'admin';
     setUpdatingId(userId);
 
     try {
@@ -76,7 +76,7 @@ const GestionUsuarios = () => {
         cedula: '',
         usuario: '',
         password: '',
-        rol: 'oficial'
+        rol: 'institución'
       });
       fetchUsers();
     } catch (error) {
@@ -99,7 +99,7 @@ const GestionUsuarios = () => {
       <header className="gestion-usuarios__header">
         <div className="gestion-usuarios__title">
           <h1>Gestión de Usuarios</h1>
-          <p>Control de acceso y roles para personal administrativo y oficiales</p>
+          <p>Control de acceso y roles para personal administrativo e instituciones</p>
         </div>
       </header>
 
@@ -198,9 +198,8 @@ const GestionUsuarios = () => {
                     onChange={e => setNewUser({...newUser, rol: e.target.value})}
                     className="modal-select"
                   >
-                    <option value="oficial">Oficial de campo</option>
+                    <option value="institución">Institución</option>
                     <option value="admin">Administrador del sistema</option>
-                    <option value="analista">Analista de datos</option>
                   </select>
                 </div>
               </div>
@@ -243,7 +242,7 @@ const GestionUsuarios = () => {
                 <td>
                   <span className={`role-badge role-badge--${user.rol}`}>
                     <Shield size={14} style={{ marginRight: '6px' }} /> 
-                    {user.rol === 'admin' ? 'Administrador' : 'Oficial'}
+                    {user.rol === 'admin' ? 'Administrador' : 'Institución'}
                   </span>
                 </td>
                 <td style={{ color: '#7a9cc4', fontSize: '0.8rem' }}>14 Mar, 2025</td>
@@ -252,10 +251,10 @@ const GestionUsuarios = () => {
                     className="btn-change-role"
                     onClick={() => handleToggleRole(user.id, user.rol)}
                     disabled={updatingId === user.id}
-                    title={`Cambiar a ${user.rol === 'admin' ? 'Oficial' : 'Administrador'}`}
+                    title={`Cambiar a ${user.rol === 'admin' ? 'Institución' : 'Administrador'}`}
                   >
                     <UserCog size={16} />
-                    {updatingId === user.id ? 'Actualizando...' : (user.rol === 'admin' ? 'Cambio a Oficial' : 'Hacer Admin')}
+                    {updatingId === user.id ? 'Actualizando...' : (user.rol === 'admin' ? 'Cambio a Institución' : 'Hacer Admin')}
                   </button>
                 </td>
 
