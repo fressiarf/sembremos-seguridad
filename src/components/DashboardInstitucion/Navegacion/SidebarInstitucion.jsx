@@ -5,7 +5,7 @@ import UserBrand from "./UserBrand";
 import { ChevronLeft, ChevronDown, LayoutDashboard, Activity, Clock, LogOut, User, MapPin, Calendar } from "lucide-react";
 
 const SidebarInstitucion = ({ collapsed = false, onToggle, activeView, onViewChange }) => {
-  const { logout } = useLogin();
+  const { user, logout } = useLogin();
   const [openSections, setOpenSections] = useState({
     OPERATIVO: true, GESTIÓN: true,
   });
@@ -55,7 +55,9 @@ const SidebarInstitucion = ({ collapsed = false, onToggle, activeView, onViewCha
       {!collapsed && (
         <div className="sidebar-admin__role">
           <span className="sidebar-admin__role-dot" />
-          <span className="sidebar-admin__role-label">Institución</span>
+          <span className="sidebar-admin__role-label">
+            {user?.rol === 'admin' ? 'Administrador' : 'Institución'}
+          </span>
         </div>
       )}
 
@@ -127,8 +129,10 @@ const SidebarInstitucion = ({ collapsed = false, onToggle, activeView, onViewCha
 
           {!collapsed && (
             <div className="sidebar-admin__profile-info">
-              <span className="sidebar-admin__profile-name">Juan Vargas</span>
-              <span className="sidebar-admin__profile-role">Oficial</span>
+              <span className="sidebar-admin__profile-name">{user?.nombre || "Juan Vargas"}</span>
+              <span className="sidebar-admin__profile-role">
+                {user?.rol === 'oficial' ? 'Oficial' : 'Administrador'}
+              </span>
             </div>
           )}
         </div>

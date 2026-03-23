@@ -18,7 +18,7 @@ import { ChevronLeft, ChevronDown, LayoutGrid, Activity, Clock, LogOut, User, Ma
 //  Componente principal
 // ──────────────────────────────────────────────
 const SidebarAdmin = ({ collapsed = false, onToggle, activeView, onViewChange }) => {
-  const { logout } = useLogin();
+  const { user, logout } = useLogin();
   const [openSections, setOpenSections] = useState({
     PRINCIPAL: true, GESTIÓN: true, ANÁLISIS: true, ADMINISTRACIÓN: true,
   });
@@ -112,7 +112,9 @@ const SidebarAdmin = ({ collapsed = false, onToggle, activeView, onViewChange })
       {!collapsed && (
         <div className="sidebar-admin__role">
           <span className="sidebar-admin__role-dot" />
-          <span className="sidebar-admin__role-label">Administrador</span>
+          <span className="sidebar-admin__role-label">
+            {user?.rol === 'admin' ? 'Administrador' : 'Oficial'}
+          </span>
         </div>
       )}
 
@@ -189,8 +191,10 @@ const SidebarAdmin = ({ collapsed = false, onToggle, activeView, onViewChange })
 
           {!collapsed && (
             <div className="sidebar-admin__profile-info">
-              <span className="sidebar-admin__profile-name">C. Araya</span>
-              <span className="sidebar-admin__profile-role">Administrador</span>
+              <span className="sidebar-admin__profile-name">{user?.nombre || "C. Araya"}</span>
+              <span className="sidebar-admin__profile-role">
+                {user?.rol === 'admin' ? 'Administrador' : 'Oficial'}
+              </span>
             </div>
           )}
         </div>
