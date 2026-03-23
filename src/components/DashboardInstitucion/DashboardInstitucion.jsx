@@ -64,8 +64,8 @@ const DashboardInstitucion = () => {
   }
 
   return (
-    <div className="dashboard-institucion-wrapper" style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh', background: '#f8fafc' }}>
-      {/* Topbar Adaptado al diseño de la Institución */}
+    <div className="dashboard-institucion-wrapper" style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh', width: '100%' }}>
+      {/* Topbar Adaptado al diseño de la Institución - Pegado arriba (flush) */}
       <TopbarInstitucion>
         <button className="btn-report-pdf" onClick={handlePrintPDF} title="Generar reporte visual para impresión">
           <Download size={18} />
@@ -73,45 +73,53 @@ const DashboardInstitucion = () => {
         </button>
       </TopbarInstitucion>
 
-      <div className="dashboard-institucion-container" style={{ flex: 1 }}>
+      {/* Contenido Principal con fondo transparente para dejar ver el fondo global (navy azul) */}
+      <div className="dashboard-institucion-content" style={{ 
+        flex: 1, 
+        padding: '2.5rem', 
+        backgroundColor: 'transparent',
+        display: 'flex',
+        flexDirection: 'column',
+        gap: '2rem'
+      }}>
+        
+        {/* Filters */}
+        <div className="dashboard-inst-filters">
+          <input 
+            type="text" 
+            placeholder="Buscar línea de acción..." 
+            className="inst-search"
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+          />
+          <select 
+            className="inst-select"
+            value={filterStatus}
+            onChange={(e) => setFilterStatus(e.target.value)}
+          >
+            <option value="Todos">Todas las líneas</option>
+            <option value="Completada">Completadas</option>
+            <option value="En ejecución">En proceso</option>
+            <option value="Pendiente">Retrasadas / Pendientes</option>
+          </select>
+        </div>
 
-      {/* Filters */}
-      <div className="dashboard-inst-filters">
-        <input 
-          type="text" 
-          placeholder="Buscar línea de acción..." 
-          className="inst-search"
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-        />
-        <select 
-          className="inst-select"
-          value={filterStatus}
-          onChange={(e) => setFilterStatus(e.target.value)}
-        >
-          <option value="Todos">Todas las líneas</option>
-          <option value="Completada">Completadas</option>
-          <option value="En ejecución">En proceso</option>
-          <option value="Pendiente">Retrasadas / Pendientes</option>
-        </select>
-      </div>
-
-      {/* Cards Grid */}
-      <div className="cards-grid">
-        {filteredData.length === 0 ? (
-          <div style={{ textAlign: 'center', padding: '4rem', color: '#94a3b8' }}>
-            <FileText size={48} style={{ margin: '0 auto 1rem auto', opacity: 0.5 }} />
-            <h3>No hay líneas de acción que coincidan con los filtros</h3>
-          </div>
-        ) : (
-          filteredData.map(linea => (
-            <CardLineaAccion key={linea.id} linea={linea}>
-              <ModuloDelegacion lineaId={linea.id} tareasIniciales={linea.tareas || []} />
-              <CargaEvidencia lineaId={linea.id} />
-            </CardLineaAccion>
-          ))
-        )}
-      </div>
+        {/* Cards Grid */}
+        <div className="cards-grid">
+          {filteredData.length === 0 ? (
+            <div style={{ textAlign: 'center', padding: '4rem', color: '#94a3b8' }}>
+              <FileText size={48} style={{ margin: '0 auto 1rem auto', opacity: 0.5 }} />
+              <h3>No hay líneas de acción que coincidan con los filtros</h3>
+            </div>
+          ) : (
+            filteredData.map(linea => (
+              <CardLineaAccion key={linea.id} linea={linea}>
+                <ModuloDelegacion lineaId={linea.id} tareasIniciales={linea.tareas || []} />
+                <CargaEvidencia lineaId={linea.id} />
+              </CardLineaAccion>
+            ))
+          )}
+        </div>
       </div>
     </div>
   );

@@ -38,20 +38,18 @@
 .gestion-usuarios__title h1 {
   font-size: 1.25rem;
   font-weight: 800;
-  color: #fff;
+  color: var(--navy-blue);
   text-transform: uppercase;
   letter-spacing: 1px;
   margin: 0;
-  text-shadow: 0 2px 8px rgba(0,0,0,0.3);
 }
 
 .gestion-usuarios__title p {
-  color: rgba(255,255,255,0.75);
+  color: var(--gray-text);
   font-size: 0.75rem;
   font-weight: 600;
   margin: 2px 0 0;
   text-transform: uppercase;
-  text-shadow: 0 1px 4px rgba(0,0,0,0.2);
 }
 
 /* ── Filtros y Búsqueda ── */
@@ -102,17 +100,24 @@
   background: var(--navy-blue);
   color: #fff;
   border: none;
-  padding: 10px 20px;
-  border-radius: 4px;
+  padding: 12px 24px;
+  border-radius: 12px;
   font-weight: 700;
   text-transform: uppercase;
   font-size: 0.8rem;
   letter-spacing: 0.5px;
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 10px;
   cursor: pointer;
-  box-shadow: 0 4px 10px rgba(11, 34, 64, 0.2);
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 15px rgba(11, 34, 64, 0.2);
+}
+
+.btn-create-user:hover {
+  background: var(--navy-blue-light);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(11, 34, 64, 0.3);
 }
 
 /* ── Tabla de Usuarios (Estilo 'Línea de Acción') ── */
@@ -252,28 +257,7 @@
   to { opacity: 1; transform: translateY(0); }
 }
 
-/* ── Botón Crear Usuario ── */
-.btn-create-user {
-  background: var(--msp-blue-dark);
-  color: #fff;
-  border: none;
-  padding: 12px 24px;
-  border-radius: 12px;
-  font-weight: 700;
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  box-shadow: 0 4px 15px rgba(13, 34, 66, 0.2);
-}
-
-.btn-create-user:hover {
-  background: var(--msp-blue);
-  transform: translateY(-2px);
-  box-shadow: 0 8px 25px rgba(13, 34, 66, 0.3);
-}
-
+/* Definition consolidated above */
 /* ── Modal de Usuario ── */
 .modal-overlay {
   position: fixed;

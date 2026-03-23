@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import './SidebarAdmin.css';
 import { dashboardService } from '../../../services/dashboardService';
 import { useLogin } from "../../../context/LoginContext";
-import UserBrand from "../../DashboardInstitucion/Navegacion/UserBrand";
+import UserBrand from "../../Shared/Navegacion/UserBrand";
 import { ChevronLeft, ChevronDown, LayoutGrid, Activity, Clock, LogOut, User, MapPin, Shield, Bell, TriangleAlert, FileText, Settings, Calendar, LayoutDashboard } from "lucide-react";
 
 
@@ -18,7 +18,7 @@ import { ChevronLeft, ChevronDown, LayoutGrid, Activity, Clock, LogOut, User, Ma
 //  Componente principal
 // ──────────────────────────────────────────────
 const SidebarAdmin = ({ collapsed = false, onToggle, activeView, onViewChange }) => {
-  const { logout } = useLogin();
+  const { user, logout } = useLogin();
   const [openSections, setOpenSections] = useState({
     PRINCIPAL: true, GESTIÓN: true, ANÁLISIS: true, ADMINISTRACIÓN: true,
   });
@@ -31,14 +31,8 @@ const SidebarAdmin = ({ collapsed = false, onToggle, activeView, onViewChange })
 
   useEffect(() => {
     const fetchStats = async () => {
-      const data = await dashboardService.getFullDashboardData();
-      if (data) {
-        setStats({
-          activitiesCount: data.stats?.totalTareas || 0,
-          zonesCount: data.zones?.length || 0,
-          alertsCount: data.alerts?.length || 0
-        });
-      }
+      const data = await dashboardService.getStats();
+      setStats(data);
     };
     fetchStats();
     
@@ -112,7 +106,9 @@ const SidebarAdmin = ({ collapsed = false, onToggle, activeView, onViewChange })
       {!collapsed && (
         <div className="sidebar-admin__role">
           <span className="sidebar-admin__role-dot" />
-          <span className="sidebar-admin__role-label">Administrador</span>
+          <span className="sidebar-admin__role-label">
+            {user?.rol === 'admin' ? 'Administrador' : 'Oficial'}
+          </span>
         </div>
       )}
 
@@ -189,8 +185,10 @@ const SidebarAdmin = ({ collapsed = false, onToggle, activeView, onViewChange })
 
           {!collapsed && (
             <div className="sidebar-admin__profile-info">
-              <span className="sidebar-admin__profile-name">C. Araya</span>
-              <span className="sidebar-admin__profile-role">Administrador</span>
+              <span className="sidebar-admin__profile-name">{user?.nombre || "C. Araya"}</span>
+              <span className="sidebar-admin__profile-role">
+                {user?.rol === 'admin' ? 'Administrador' : 'Oficial'}
+              </span>
             </div>
           )}
         </div>

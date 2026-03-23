@@ -1,7 +1,7 @@
 import React from 'react';
 import '../Dashboard/SidebarAdmin/SidebarAdmin.css';
 import { useLogin } from '../../context/LoginContext';
-import UserBrand from './Navegacion/UserBrand';
+import UserBrand from '../Shared/Navegacion/UserBrand';
 import { ChevronLeft, LayoutDashboard, FileText, Send, LogOut, Building2 } from 'lucide-react';
 
 const SidebarInstitucion = ({ collapsed = false, onToggle, activeView, onViewChange }) => {

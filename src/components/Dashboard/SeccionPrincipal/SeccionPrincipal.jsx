@@ -52,7 +52,7 @@ const SeccionPrincipal = ({ collapsed, activeView }) => {
       {activeView === 'calendario' && <Calendario />}
 
       {/* Placeholder para otras vistas */}
-      {activeView !== 'dashboard' && activeView !== 'actividades' && activeView !== 'usuarios' && activeView !== 'perfil' && activeView !== 'matrices' && activeView !== 'mapa' && activeView !== 'zonas' && activeView !== 'calendario' && (
+      {activeView !== 'dashboard' && activeView !== 'actividades' && activeView !== 'usuarios' && activeView !== 'perfil' && activeView !== 'matrices' && activeView !== 'mapa' && activeView !== 'zonas' && (
         <div style={{ padding: '2rem', color: '#7a9cc4' }}>
           <h2>Vista en desarrollo: {activeView}</h2>
           <p>Esta sección se implementará próximamente.</p>
