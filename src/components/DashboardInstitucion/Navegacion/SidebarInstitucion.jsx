@@ -1,78 +1,29 @@
-import React, { useState, useEffect } from 'react';
-import './SidebarAdmin.css';
-import { dashboardService } from '../../../services/dashboardService';
+import React, { useState } from 'react';
+import '../../Dashboard/SidebarAdmin/SidebarAdmin.css';
 import { useLogin } from "../../../context/LoginContext";
-import UserBrand from "../../Shared/Navegacion/UserBrand";
-import { ChevronLeft, ChevronDown, LayoutGrid, Activity, Clock, LogOut, User, MapPin, Shield, Bell, TriangleAlert, FileText, Settings, Calendar, LayoutDashboard } from "lucide-react";
+import UserBrand from "./UserBrand";
+import { ChevronLeft, ChevronDown, LayoutDashboard, Activity, Clock, LogOut, User, MapPin, Calendar } from "lucide-react";
 
-
-// Navigation link items should be consistent, but for now we'll keep the admin structure
-// and just update the visuals.
-
-// ──────────────────────────────────────────────
-//  Estructura de navegación
-// ──────────────────────────────────────────────
-
-
-// ──────────────────────────────────────────────
-//  Componente principal
-// ──────────────────────────────────────────────
-const SidebarAdmin = ({ collapsed = false, onToggle, activeView, onViewChange }) => {
+const SidebarInstitucion = ({ collapsed = false, onToggle, activeView, onViewChange }) => {
   const { user, logout } = useLogin();
   const [openSections, setOpenSections] = useState({
-    PRINCIPAL: true, GESTIÓN: true, ANÁLISIS: true, ADMINISTRACIÓN: true,
+    OPERATIVO: true, GESTIÓN: true,
   });
 
-  const [stats, setStats] = useState({
-    activitiesCount: 0,
-    zonesCount: 0,
-    alertsCount: 0
-  });
-
-  useEffect(() => {
-    const fetchStats = async () => {
-      const data = await dashboardService.getStats();
-      setStats(data);
-    };
-    fetchStats();
-    
-    // Opcional: Polling cada 30 segundos si se desea tiempo real
-    const interval = setInterval(fetchStats, 30000);
-    return () => clearInterval(interval);
-  }, []);
-
-  // ── Secciones de navegación dinámicas ──
+  // ── Secciones de navegación para el Oficial ──
   const navSections = [
     {
-      label: 'PRINCIPAL',
+      label: 'OPERATIVO',
       items: [
-        { id: 'dashboard',   label: 'Dashboard global',      icon: LayoutDashboard, path: '/dashboard' },
-        { id: 'actividades', label: 'Actividad oficiales',   icon: Activity,  path: '/actividades', badge: stats.activitiesCount },
+        { id: 'dashboard',   label: 'Dashboard',              icon: LayoutDashboard },
+        { id: 'lineas',      label: 'Mis Tareas',             icon: Activity },
       ],
     },
     {
       label: 'GESTIÓN',
       items: [
-        { id: 'matrices',    label: 'Todas las matrices',    icon: FileText,    path: '/matrices' },
-        { id: 'zonas',       label: 'Zonas críticas',        icon: MapPin,      path: '/zonas',    badge: stats.zonesCount },
-        { id: 'incidentes',  label: 'Incidentes',            icon: TriangleAlert,  path: '/incidentes' },
-        { id: 'alertas',     label: 'Alertas activas',       icon: Bell,     path: '/alertas',  badge: stats.alertsCount },
-      ],
-    },
-    {
-      label: 'ANÁLISIS',
-      items: [
-        { id: 'mapa',        label: 'Mapa de riesgos',       icon: MapPin,       path: '/mapa' },
-        { id: 'estadisticas',label: 'Estadísticas',          icon: Activity,     path: '/estadisticas' },
-        { id: 'calendario',  label: 'Calendario',            icon: Calendar,  path: '/calendario' },
-      ],
-    },
-    {
-      label: 'ADMINISTRACIÓN',
-      items: [
-        { id: 'usuarios',    label: 'Gestión de usuarios',   icon: User,     path: '/usuarios' },
-        { id: 'reportes',    label: 'Reportes INL/MSP',      icon: FileText,    path: '/reportes' },
-        { id: 'configuracion',label: 'Configuración',        icon: Settings,  path: '/configuracion' },
+        { id: 'historial',   label: 'Historial de Reportes',  icon: Clock },
+        { id: 'calendario',  label: 'Calendario de Tareas',   icon: Calendar },
       ],
     },
   ];
@@ -80,7 +31,6 @@ const SidebarAdmin = ({ collapsed = false, onToggle, activeView, onViewChange })
   const toggleSection = (label) => {
     setOpenSections(prev => ({ ...prev, [label]: !prev[label] }));
   };
-
 
   return (
     <aside className={`sidebar-admin ${collapsed ? 'sidebar-admin--collapsed' : ''}`}>
@@ -101,13 +51,12 @@ const SidebarAdmin = ({ collapsed = false, onToggle, activeView, onViewChange })
         </button>
       </div>
 
-
       {/* ── Rol del usuario ── */}
       {!collapsed && (
         <div className="sidebar-admin__role">
           <span className="sidebar-admin__role-dot" />
           <span className="sidebar-admin__role-label">
-            {user?.rol === 'admin' ? 'Administrador' : 'Oficial'}
+            {user?.rol === 'admin' ? 'Administrador' : 'Institución'}
           </span>
         </div>
       )}
@@ -116,7 +65,6 @@ const SidebarAdmin = ({ collapsed = false, onToggle, activeView, onViewChange })
       <nav className="sidebar-admin__nav">
         {navSections.map(section => (
           <div key={section.label} className="sidebar-admin__section">
-
 
             {/* Título de sección */}
             {!collapsed && (
@@ -144,18 +92,14 @@ const SidebarAdmin = ({ collapsed = false, onToggle, activeView, onViewChange })
                       onClick={() => onViewChange(item.id)}
                       title={collapsed ? item.label : undefined}
                     >
-                      {/* Ícono */}
-
                       <span className="sidebar-admin__item-icon">
                         <IconComp />
                       </span>
 
-                      {/* Etiqueta */}
                       {!collapsed && (
                         <span className="sidebar-admin__item-label">{item.label}</span>
                       )}
 
-                      {/* Badge */}
                       {item.badge && (
                         <span className={`sidebar-admin__badge ${collapsed ? 'sidebar-admin__badge--dot' : ''}`}>
                           {!collapsed && item.badge}
@@ -185,14 +129,13 @@ const SidebarAdmin = ({ collapsed = false, onToggle, activeView, onViewChange })
 
           {!collapsed && (
             <div className="sidebar-admin__profile-info">
-              <span className="sidebar-admin__profile-name">{user?.nombre || "C. Araya"}</span>
+              <span className="sidebar-admin__profile-name">{user?.nombre || "Juan Vargas"}</span>
               <span className="sidebar-admin__profile-role">
-                {user?.rol === 'admin' ? 'Administrador' : 'Oficial'}
+                {user?.rol === 'oficial' ? 'Oficial' : 'Administrador'}
               </span>
             </div>
           )}
         </div>
-
 
         <button className="sidebar-admin__logout" onClick={logout} title="Cerrar sesión" id="btn-logout">
           <LogOut size={18} />
@@ -203,4 +146,4 @@ const SidebarAdmin = ({ collapsed = false, onToggle, activeView, onViewChange })
   );
 };
 
-export default SidebarAdmin;
+export default SidebarInstitucion;
