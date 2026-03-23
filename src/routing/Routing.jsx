@@ -10,10 +10,10 @@ const Routing = () => {
         <Router>
             <Routes>
                 <Route path="/" element={<Login />} />
+                {/*  Rutas Privadas */}
 
-                {/*  Rutras Privadas */}
-                <Route path="/dashboardInstitucion" element={<PrivateRoutes><DashboardInstitucion /></PrivateRoutes>} />
                 <Route path="/dashboard" element={<PrivateRoutes><Dashboard /></PrivateRoutes>} />
+                <Route path="/dashboardInstitucion" element={<PrivateRoutes><DashboardInstitucion /></PrivateRoutes>} />
             </Routes>
         </Router>
     );

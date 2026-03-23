@@ -14,7 +14,7 @@ const CardAutenticacion = ({ children }) => {
     if (user) {
       if (user.rol === 'admin') {
         navigate('/dashboard');
-      } else if (user.rol === 'institución') {
+      } else if (user.rol === 'oficial' || user.rol === 'institucion') {
         navigate('/dashboardInstitucion');
       } else {
         navigate('/dashboardInstitucion');

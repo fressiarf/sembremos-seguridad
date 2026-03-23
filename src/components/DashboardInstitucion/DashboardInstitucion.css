@@ -1,146 +1,473 @@
-:root {
-  /* Paleta Institucional (MSP / Sembremos Seguridad) - Sincronizada con Login */
-  --navy-blue:        #0b2240;
-  --navy-blue-light:  #163a66;
-  --inst-red:         #ce1126;
-  --white:            #ffffff;
-  --gray-bg:          #f8fafc;
-  --gray-border:      #e2e8f0;
-  --gray-text:        #64748b;
-  --text-dark:        #1e293b;
+/* Tailwind-like utilities for clean UI */
+.flex { display: flex; }
+.flex-col { flex-direction: column; }
+.items-center { align-items: center; }
+.justify-between { justify-content: space-between; }
+.gap-2 { gap: 0.5rem; }
+.gap-4 { gap: 1rem; }
+.grid { display: grid; }
+.grid-cols-2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.grid-cols-3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.w-full { width: 100%; }
+.h-full { height: 100%; }
 
-  /* Colores adicionales para estados */
-  --inst-green:       #008d45;
-  --inst-light-blue:  #00a9e0;
+/* Colors */
+.text-gray-500 { color: #6b7280; }
+.text-gray-700 { color: #374151; }
+.text-gray-900 { color: #111827; }
+.text-blue-600 { color: #2563eb; }
 
-  /* Gradiente institucional sutil de la bandera de Costa Rica */
-  --bandera-cr: linear-gradient(
-    to right, 
-    #002b7f 0% 17%, 
-    #ffffff 17% 33%, 
-    #ce1126 33% 67%, 
-    #ffffff 67% 83%, 
-    #002b7f 83% 100%
-  );
-  
-  --sb-width:         280px;
-  --sb-width-collapsed: 80px;
-  --sb-transition:    0.3s cubic-bezier(0.4, 0, 0.2, 1);
+/* Backgrounds for semáforo */
+.bg-green-500 { background-color: #22c55e; color: white; }
+.bg-yellow-400 { background-color: #facc15; color: #451a03; }
+.bg-red-500 { background-color: #ef4444; color: white; }
+.bg-blue-600 { background-color: #2563eb; color: white; }
 
-  /* Mapping local names to institutional ones */
-  --inst-dark-blue: var(--navy-blue);
-  --inst-blue: var(--navy-blue-light);
-  --inst-light-bg: var(--gray-bg);
-  --inst-white: var(--white);
-  --inst-border: var(--gray-border);
-  --inst-text-dark: var(--text-dark);
-  --inst-text-muted: var(--gray-text);
+/* Dashboard Container */
+.dashboard-institucion-container {
+  padding: 2rem;
+  background-color: #f8fafc;
+  min-height: 100vh;
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
 }
 
-.LayoutDashboard {
-  display: grid;
-  grid-template-columns: var(--sb-width) 1fr;
-  height: 100vh;
-  overflow: hidden;
-  background-color: var(--navy-blue);
-  background-image: 
-    linear-gradient(rgba(11, 34, 64, 0.85), rgba(11, 34, 64, 0.85)),
-    url('/bg-institucional.png');
-  background-size: cover;
-  background-position: center;
-  background-attachment: fixed;
-  font-family: 'Inter', system-ui, sans-serif;
-  transition: grid-template-columns var(--sb-transition);
+/* Header */
+.dashboard-inst-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
 }
 
-.LayoutDashboard--collapsed {
-  grid-template-columns: var(--sb-width-collapsed) 1fr;
-}
-
-/* Global body override */
-body:has(.LayoutDashboard) {
-  background-color: var(--navy-blue) !important;
+.dashboard-inst-title h1 {
+  font-size: 1.875rem;
+  font-weight: 700;
+  color: #1e293b;
   margin: 0;
 }
 
-.ContenedorPrincipalDashboard {
-  display: flex;
-  flex-direction: column;
-  padding: 2.5rem;
-  overflow-y: auto;
-  max-height: 100vh;
-  background: transparent;
-}
-
-@keyframes fadeIn {
-  from { opacity: 0; transform: translateY(10px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-
-.ContenidoVistasInstitucion {
-  display: flex;
-  flex-direction: column;
-  gap: 2.5rem;
-  width: 100%;
-}
-
-/* ─── Sección Hero ─── */
-.SeccionHeroDashboard {
-  display: flex;
-  flex-direction: column;
-  gap: 1.5rem;
-}
-
-/* Banner de bienvenida o texto flotante */
-.HeaderFlotanteDashboard {
-  margin-bottom: 1rem;
-}
-
-.HeaderFlotanteDashboard h1 {
-  font-size: 2rem;
-  font-weight: 800;
-  color: #0d2242;
-  letter-spacing: -0.02em;
-}
-
-.HeaderFlotanteDashboard p {
-  font-size: 0.95rem;
+.dashboard-inst-title p {
   color: #64748b;
-  margin-top: 4px;
+  margin: 0.25rem 0 0 0;
+  font-size: 0.875rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
 }
 
-.GrillaEstadisticas {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
+.btn-report-pdf {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background-color: #0b2240;
+  color: white;
+  padding: 0.75rem 1.25rem;
+  border-radius: 0.5rem;
+  font-weight: 600;
+  font-size: 0.875rem;
+  border: none;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+}
+.btn-report-pdf:hover { background-color: #1a365d; }
+
+/* Filters */
+.dashboard-inst-filters {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+
+.inst-search, .inst-select {
+  padding: 0.75rem 1rem;
+  border: 1px solid #e2e8f0;
+  border-radius: 0.5rem;
+  background: white;
+  width: 100%;
+  max-width: 300px;
+  font-size: 0.875rem;
+  color: #334155;
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+.inst-search:focus, .inst-select:focus {
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+/* Cards Grid */
+.cards-grid {
+  display: flex;
+  flex-direction: column;
   gap: 1.5rem;
 }
 
-/* ─── Grilla Principal ─── */
-.GrillaPrincipalDosColumnas {
-  display: grid;
-  grid-template-columns: 1.8fr 1fr; /* Gráfico más dominante */
-  gap: 2rem;
-  align-items: stretch;
+/* Card Linea Accion */
+.card-inst {
+  background: white;
+  border-radius: 1rem;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+  border: 1px solid #f1f5f9;
+  overflow: hidden;
+  transition: box-shadow 0.2s;
+}
+.card-inst:hover {
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
 }
 
-.ColumnaOperativa,
-.ColumnaInformativa {
+.card-inst-header {
+  padding: 1.5rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 2rem;
+}
+
+.card-inst-title-area {
+  flex: 1;
+}
+
+.card-inst-badges {
+  display: flex;
+  gap: 0.75rem;
+  margin-bottom: 0.75rem;
+}
+
+.badge-traffic-light {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  padding: 0.25rem 0.75rem;
+  border-radius: 9999px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.025em;
+}
+
+.badge-id {
+  background-color: #f1f5f9;
+  color: #475569;
+  padding: 0.25rem 0.75rem;
+  border-radius: 9999px;
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.card-inst-title {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #0f172a;
+  margin: 0 0 0.5rem 0;
+  line-height: 1.4;
+}
+
+.card-inst-subtitle {
+  color: #64748b;
+  font-size: 0.875rem;
+  margin: 0;
+  line-height: 1.5;
+}
+
+.card-inst-progress-area {
+  width: 200px;
+  text-align: right;
+}
+
+.progress-info {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-bottom: 0.5rem;
+}
+
+.progress-value {
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: #0f172a;
+}
+
+.progress-label {
+  font-size: 0.75rem;
+  color: #64748b;
+  font-weight: 500;
+  text-transform: uppercase;
+}
+
+.progress-bar-bg {
+  height: 0.5rem;
+  background-color: #e2e8f0;
+  border-radius: 9999px;
+  overflow: hidden;
+}
+
+.progress-bar-fill {
+  height: 100%;
+  border-radius: 9999px;
+  transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.card-inst-actions {
+  display: flex;
+  align-items: center;
+}
+
+.btn-expand {
+  background: #f1f5f9;
+  border: none;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #64748b;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.btn-expand:hover { background: #e2e8f0; color: #0f172a; }
+
+.card-inst-body {
+  border-top: 1px solid #f1f5f9;
+  padding: 1.5rem;
+  background-color: #f8fafc;
+}
+
+.card-inst-body-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2rem;
+}
+
+/* Modulo Delegacion */
+.delegation-module {
+  background: white;
+  border-radius: 0.75rem;
+  padding: 1.25rem;
+  border: 1px solid #e2e8f0;
+}
+
+.delegation-header {
+  font-size: 1rem;
+  font-weight: 700;
+  color: #1e293b;
+  margin: 0 0 1rem 0;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.task-input-group {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 1.25rem;
+}
+
+.task-input {
+  flex: 1;
+  padding: 0.625rem 1rem;
+  border: 1px solid #cbd5e1;
+  border-radius: 0.5rem;
+  font-size: 0.875rem;
+}
+.task-input:focus { outline: none; border-color: #3b82f6; }
+
+.avatar-select {
+  padding: 0.625rem;
+  border: 1px solid #cbd5e1;
+  border-radius: 0.5rem;
+  background: white;
+  font-size: 0.875rem;
+  color: #334155;
+}
+
+.btn-add-task {
+  background: #3b82f6;
+  color: white;
+  border: none;
+  border-radius: 0.5rem;
+  padding: 0 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+.btn-add-task:hover { background: #2563eb; }
+
+.subtask-list {
   display: flex;
   flex-direction: column;
+  gap: 0.75rem;
+}
+
+.subtask-item {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.75rem;
+  border-radius: 0.5rem;
+  border: 1px solid #e2e8f0;
+  background: #f8fafc;
+  transition: all 0.2s;
+}
+.subtask-item.completed {
+  background: #ecfdf5;
+  border-color: #a7f3d0;
+}
+
+.subtask-checkbox {
+  width: 1.25rem;
+  height: 1.25rem;
+  cursor: pointer;
+  accent-color: #10b981;
+}
+
+.subtask-content {
+  flex: 1;
+}
+.subtask-title {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #1e293b;
+  margin: 0 0 0.25rem 0;
+}
+.subtask-item.completed .subtask-title {
+  text-decoration: line-through;
+  color: #64748b;
+}
+
+.avatar-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  background: #e2e8f0;
+  padding: 0.25rem 0.5rem;
+  border-radius: 9999px;
+  font-size: 0.7rem;
+  color: #475569;
+  font-weight: 500;
+}
+
+/* Evidencia Module */
+.evidencia-module {
+  background: white;
+  border-radius: 0.75rem;
+  padding: 1.25rem;
+  border: 1px solid #e2e8f0;
+}
+
+.dropzone {
+  border: 2px dashed #cbd5e1;
+  border-radius: 0.75rem;
+  padding: 2rem 1rem;
+  text-align: center;
+  background: #f8fafc;
+  cursor: pointer;
+  transition: all 0.2s;
+  margin-bottom: 1.25rem;
+}
+.dropzone:hover, .dropzone.active {
+  border-color: #3b82f6;
+  background: #eff6ff;
+}
+
+.dropzone-icon {
+  margin: 0 auto 0.75rem auto;
+  color: #3b82f6;
+}
+
+.dropzone-text {
+  font-size: 0.875rem;
+  color: #475569;
+  margin: 0;
+  font-weight: 500;
+}
+
+.dropzone-subtext {
+  font-size: 0.75rem;
+  color: #94a3b8;
+  margin: 0.25rem 0 0 0;
+}
+
+.kpi-inputs {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
   gap: 1rem;
 }
 
-/* ─── Sección Formulario ─── */
-.SeccionFormularioActualizacion {
-  margin-top: 0.5rem;
+.kpi-group label {
+  display: block;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #475569;
+  margin-bottom: 0.375rem;
+  text-transform: uppercase;
 }
 
-/* ─── Responsive ─── */
-@media (max-width: 1024px) {
-  .LayoutDashboard {
-    grid-template-columns: 1fr;
+.kpi-input-wrapper {
+  position: relative;
+}
+
+.kpi-icon {
+  position: absolute;
+  left: 0.75rem;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #94a3b8;
+}
+
+.kpi-input-wrapper input {
+  width: 100%;
+  padding: 0.625rem 0.75rem 0.625rem 2.25rem;
+  border: 1px solid #cbd5e1;
+  border-radius: 0.5rem;
+  font-size: 0.875rem;
+  transition: all 0.2s;
+}
+.kpi-input-wrapper input:focus {
+  outline: none;
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.uploaded-files-list {
+  margin-top: 1rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.file-tag {
+  background: #e2e8f0;
+  border-radius: 0.375rem;
+  padding: 0.25rem 0.5rem;
+  font-size: 0.75rem;
+  color: #334155;
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+}
+
+/* Ocultar elementos auxiliares en impresión */
+@media print {
+  body {
+    background: white;
   }
-  .GrillaPrincipalDosColumnas {
-    grid-template-columns: 1fr;
+  .sidebar-admin, .dashboard-inst-filters, .btn-report-pdf, .btn-expand, .card-inst-body {
+    display: none !important;
+  }
+  .dashboard-institucion-container {
+    padding: 0;
+  }
+  .card-inst {
+    break-inside: avoid;
+    border: 1px solid #000;
+    box-shadow: none;
+    margin-bottom: 1rem;
+  }
+  .bg-green-500, .bg-yellow-400, .bg-red-500 {
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
   }
 }
