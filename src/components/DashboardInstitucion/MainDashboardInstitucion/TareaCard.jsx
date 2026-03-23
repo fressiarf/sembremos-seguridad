@@ -55,9 +55,9 @@ const TareaCard = ({ tarea, onUpdate }) => {
               {/* Información si está completada */}
               {tarea.completada && (
                 <div style={{ background: '#f0fdf4', padding: '10px 12px', borderRadius: '8px', border: '1px solid #bbf7d0', marginTop: '10px' }}>
-                  {tarea.reporteOficial && (
+                  {tarea.reporteInstitucion && (
                     <div style={{ fontSize: '0.85rem', color: '#166534', fontStyle: 'italic', marginBottom: '8px' }}>
-                      "{tarea.reporteOficial}"
+                      "{tarea.reporteInstitucion}"
                     </div>
                   )}
                   <div style={{ display: 'flex', gap: '16px', fontSize: '0.75rem', color: '#166534', fontWeight: 600 }}>

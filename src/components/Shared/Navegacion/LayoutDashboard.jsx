@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import '../DashboardInstitucion.css';
+import './LayoutDashboard.css';
 
 const LayoutDashboard = ({ sidebar, children }) => {
   const [activeView, setActiveView] = useState('dashboard');

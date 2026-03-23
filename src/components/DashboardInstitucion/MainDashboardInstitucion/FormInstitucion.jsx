@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
 import './FormInstitucion.css';
-import { oficialService } from '../../../services/oficialService';
+import { institucionService } from '../../../services/oficialService';
 import { useToast } from '../../../context/ToastContext';
 
 const FormInstitucion = ({ tarea, onComplete }) => {
   const [formData, setFormData] = useState({
-    reporteOficial: '',
+    reporteInstitucion: '',
     inversionColones: '',
     fotos: ''
   });
@@ -14,7 +14,7 @@ const FormInstitucion = ({ tarea, onComplete }) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!formData.reporteOficial.trim()) {
+    if (!formData.reporteInstitucion.trim()) {
       showToast('Describí lo que hiciste para completar la tarea', 'warning');
       return;
     }
@@ -25,8 +25,8 @@ const FormInstitucion = ({ tarea, onComplete }) => {
         ? formData.fotos.split(',').map(f => f.trim()).filter(f => f)
         : [];
 
-      await oficialService.completarTarea(tarea.id, {
-        reporteOficial: formData.reporteOficial,
+      await institucionService.completarTarea(tarea.id, {
+        reporteInstitucion: formData.reporteInstitucion,
         inversionColones: parseFloat(formData.inversionColones) || 0,
         fotos: fotosArray
       });
@@ -47,8 +47,8 @@ const FormInstitucion = ({ tarea, onComplete }) => {
         <textarea
           className="FormControl FormTextarea"
           placeholder="Describí las acciones realizadas..."
-          value={formData.reporteOficial}
-          onChange={e => setFormData({...formData, reporteOficial: e.target.value})}
+          value={formData.reporteInstitucion}
+          onChange={e => setFormData({...formData, reporteInstitucion: e.target.value})}
           style={{ minHeight: '100px' }}
         />
       </div>

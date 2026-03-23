@@ -23,7 +23,7 @@ const ActividadOficiales = () => {
   });
 
   const [newTarea, setNewTarea] = useState({
-    lineaAccionId: '', titulo: '', descripcion: '', oficialId: ''
+    lineaAccionId: '', titulo: '', descripcion: '', institucionId: ''
   });
 
   const formatColones = (amount) => {
@@ -36,7 +36,7 @@ const ActividadOficiales = () => {
       setLoading(true);
       const dashData = await dashboardService.getFullDashboardData();
       const allUsers = await userService.getUsers();
-      const onlyOfficers = allUsers.filter(u => u.rol === 'oficial');
+      const onlyOfficers = allUsers.filter(u => u.rol === 'institución');
       setOfficers(onlyOfficers);
 
       if (dashData) {
@@ -75,19 +75,19 @@ const ActividadOficiales = () => {
   // ── Crear Tarea ──
   const handleCreateTarea = async (e) => {
     e.preventDefault();
-    if (!newTarea.lineaAccionId || !newTarea.titulo || !newTarea.oficialId) {
-      showToast('Seleccioná línea, título y oficial (*)', 'warning');
+    if (!newTarea.lineaAccionId || !newTarea.titulo || !newTarea.institucionId) {
+      showToast('Seleccioná línea, título e institución (*)', 'warning');
       return;
     }
     try {
-      const oficial = officers.find(o => o.id === newTarea.oficialId);
+      const institucion = officers.find(o => o.id === newTarea.institucionId);
       await dashboardService.createTarea({
         ...newTarea,
-        oficialNombre: oficial?.nombre || 'Sin nombre'
+        institucionNombre: institucion?.nombre || 'Sin nombre'
       });
       showToast('Tarea creada y asignada ✓', 'success');
       setShowTareaForm(false);
-      setNewTarea({ lineaAccionId: '', titulo: '', descripcion: '', oficialId: '' });
+      setNewTarea({ lineaAccionId: '', titulo: '', descripcion: '', institucionId: '' });
       loadData();
     } catch (error) {
       showToast('Error al crear la tarea', 'error');
@@ -101,7 +101,7 @@ const ActividadOficiales = () => {
       <header className="actividad-oficiales__header">
         <div className="actividad-oficiales__title-block">
           <h1>Gestión de Líneas y Tareas</h1>
-          <p>Crea líneas de acción y asigna tareas a los oficiales</p>
+          <p>Crea líneas de acción y asigna tareas a las instituciones</p>
         </div>
         <div style={{ display: 'flex', gap: '10px' }}>
           <button className="btn-primary-assign" onClick={() => setShowLineaForm(true)}>
@@ -109,7 +109,7 @@ const ActividadOficiales = () => {
           </button>
           <button className="btn-primary-assign" onClick={() => {
             if (lineas.length === 0) { showToast('Primero crea una Línea de Acción', 'warning'); return; }
-            if (officers.length === 0) { showToast('Primero crea un Oficial en Gestión de Usuarios', 'warning'); return; }
+            if (officers.length === 0) { showToast('Primero crea una Institución en Gestión de Usuarios', 'warning'); return; }
             setShowTareaForm(true);
           }}>
             <Plus size={16} /> Asignar Tarea
@@ -169,7 +169,7 @@ const ActividadOficiales = () => {
         <div className="assign-modal-overlay">
           <div className="assign-modal" style={{ maxWidth: '550px' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '1.5rem' }}>
-              <h3 style={{ margin: 0, color: '#0b2240' }}>Asignar Tarea a Oficial</h3>
+              <h3 style={{ margin: 0, color: '#0b2240' }}>Asignar Tarea a Institución</h3>
               <button onClick={() => setShowTareaForm(false)} style={{ background: 'none', border: 'none', cursor: 'pointer' }}><X size={20} /></button>
             </div>
             <form onSubmit={handleCreateTarea}>
@@ -184,8 +184,8 @@ const ActividadOficiales = () => {
                   </select>
                 </div>
                 <div className="form-group">
-                  <label>Oficial Asignado *</label>
-                  <select value={newTarea.oficialId} onChange={e => setNewTarea({...newTarea, oficialId: e.target.value})}>
+                  <label>Institución Asignada *</label>
+                  <select value={newTarea.institucionId} onChange={e => setNewTarea({...newTarea, institucionId: e.target.value})}>
                     <option value="">-- Seleccionar --</option>
                     {officers.map(o => (
                       <option key={o.id} value={o.id}>{o.nombre}</option>
@@ -199,7 +199,7 @@ const ActividadOficiales = () => {
               </div>
               <div className="form-group">
                 <label>Descripción (opcional)</label>
-                <textarea placeholder="Detalle de lo que debe hacer el oficial..." value={newTarea.descripcion} onChange={e => setNewTarea({...newTarea, descripcion: e.target.value})} />
+                <textarea placeholder="Detalle de lo que debe hacer la institución..." value={newTarea.descripcion} onChange={e => setNewTarea({...newTarea, descripcion: e.target.value})} />
               </div>
               <div className="modal-actions">
                 <button type="button" onClick={() => setShowTareaForm(false)} className="btn-cancel">Cancelar</button>
@@ -279,10 +279,10 @@ const ActividadOficiales = () => {
                           <div>
                             <div style={{ fontWeight: 700, color: '#0b2240', fontSize: '0.85rem' }}>{tarea.titulo}</div>
                             <div style={{ fontSize: '0.75rem', color: '#64748b' }}>
-                              {tarea.oficialNombre} {tarea.completada && `· Completada ${tarea.fechaCompletada}`}
+                              {tarea.institucionNombre} {tarea.completada && `· Completada ${tarea.fechaCompletada}`}
                             </div>
-                            {tarea.completada && tarea.reporteOficial && (
-                              <div style={{ fontSize: '0.78rem', color: '#334155', marginTop: '4px', fontStyle: 'italic' }}>"{tarea.reporteOficial}"</div>
+                            {tarea.completada && tarea.reporteInstitucion && (
+                              <div style={{ fontSize: '0.78rem', color: '#334155', marginTop: '4px', fontStyle: 'italic' }}>"{tarea.reporteInstitucion}"</div>
                             )}
                           </div>
                         </div>

@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import './SidebarAdmin.css';
 import { dashboardService } from '../../../services/dashboardService';
 import { useLogin } from "../../../context/LoginContext";
-import UserBrand from "../../DashboardInstitucion/Navegacion/UserBrand";
+import UserBrand from "../../Shared/Navegacion/UserBrand";
 import { ChevronLeft, ChevronDown, LayoutGrid, Activity, Clock, LogOut, User, MapPin, Shield, Bell, TriangleAlert, FileText, Settings, Calendar, LayoutDashboard } from "lucide-react";
 
 
@@ -31,14 +31,8 @@ const SidebarAdmin = ({ collapsed = false, onToggle, activeView, onViewChange })
 
   useEffect(() => {
     const fetchStats = async () => {
-      const data = await dashboardService.getFullDashboardData();
-      if (data) {
-        setStats({
-          activitiesCount: data.stats?.totalTareas || 0,
-          zonesCount: data.zones?.length || 0,
-          alertsCount: data.alerts?.length || 0
-        });
-      }
+      const data = await dashboardService.getStats();
+      setStats(data);
     };
     fetchStats();
     
