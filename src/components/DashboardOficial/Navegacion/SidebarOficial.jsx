@@ -127,7 +127,7 @@ const SidebarOficial = ({ collapsed = false, onToggle, activeView, onViewChange 
           {!collapsed && (
             <div className="sidebar-admin__profile-info">
               <span className="sidebar-admin__profile-name">Juan Vargas</span>
-              <span className="sidebar-admin__profile-role">Oficial</span>
+              <span className="sidebar-admin__profile-role">Institución</span>
             </div>
           )}
         </div>

@@ -46,10 +46,10 @@ const SeccionPrincipalOficial = ({ activeView = 'dashboard' }) => {
     const tareasCompletadas = tareas.filter(t => t.completada);
     const registros = tareasCompletadas.map(t => ({
       fecha: t.fechaCompletada,
-      oficial: t.oficialNombre,
-      zona: t.zona || 'Asignada', // Idealmente vendría de la línea
+      oficial: t.institucionNombre,
+      zona: t.zona || 'Asignada',
       lineaAccion: `${t.lineaNombre} - ${t.titulo}`,
-      comentario: t.reporteOficial || 'Sin reporte detallado'
+      comentario: t.reporteInstitucion || 'Sin reporte detallado'
     }));
     return (
       <div style={{ padding: '2rem 2.5rem' }}>

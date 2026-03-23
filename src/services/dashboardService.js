@@ -113,7 +113,7 @@ export const dashboardService = {
           ...tareaData,
           completada: false,
           fechaCompletada: null,
-          reporteOficial: '',
+          reporteInstitucion: '',
           fotos: [],
           inversionColones: 0
         })

@@ -19,7 +19,6 @@ const CardAutenticacion = ({ children }) => {
       } else if (user.rol === 'institucion') {
         navigate('/dashboardInstitucion');
       } else {
-        // Por defecto si no tiene rol claro (aunque en db.json debería tenerlo)
         navigate('/dashboardInstitucion');
       }
     }
