@@ -3,7 +3,6 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Login from '../pages/login';
 import DashboardInstitucion from '../pages/DashboardInstitucion';
 import Dashboard from '../pages/Dashboard';
-import DashboardInstitucion from '../pages/DashboardInstitucion';
 import DashboardOficial from '../pages/DashboardOficial';
 import PrivateRoutes from './PrivateRoutes';
 

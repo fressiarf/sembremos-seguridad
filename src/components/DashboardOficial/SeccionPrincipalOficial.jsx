@@ -1,18 +1,11 @@
-<<<<<<< HEAD:src/components/DashboardOficial/SeccionPrincipalOficial.jsx
-import React from 'react';
-=======
 import React, { useState, useEffect } from 'react';
-import ListaMisTareas from './MainDashboardInstitucion/ListaMisTareas';
+import ListaMisTareas from './MainDashboardOficial/ListaMisTareas';
 import HistorialContainer from './Historial/HistorialContainer';
-import PerfilUsuario from '../Dashboard/PerfilUsuario/PerfilUsuario';
-import Calendario from '../Calendario/Calendario';
 import { oficialService } from '../../services/oficialService';
 import { useToast } from '../../context/ToastContext';
-import { useLogin } from '../../context/LoginContext';
 import { CheckCircle, Clock, Activity, DollarSign } from 'lucide-react';
 
-const SeccionPrincipalInstitucion = ({ activeView = 'dashboard' }) => {
-  const { user } = useLogin();
+const SeccionPrincipalOficial = ({ activeView = 'dashboard' }) => {
   const [tareas, setTareas] = useState([]);
   const [estadisticas, setEstadisticas] = useState({
     totalTareas: 0, completadas: 0, pendientes: 0,
@@ -22,11 +15,12 @@ const SeccionPrincipalInstitucion = ({ activeView = 'dashboard' }) => {
   const [filter, setFilter] = useState('Todas');
   const { showToast } = useToast();
 
+  const OFICIAL_ID = '2'; // hardcodeado temporalmente
+
   const loadData = async () => {
-    if (!user?.id) return;
     try {
       setLoading(true);
-      const data = await oficialService.getFullDashboardData(user.id);
+      const data = await oficialService.getFullDashboardData(OFICIAL_ID);
       if (data) {
         setTareas(data.tareas);
         setEstadisticas(data.estadisticas);
@@ -38,7 +32,7 @@ const SeccionPrincipalInstitucion = ({ activeView = 'dashboard' }) => {
     }
   };
 
-  useEffect(() => { loadData(); }, [user?.id]);
+  useEffect(() => { loadData(); }, []);
 
   const formatColones = (amount) => {
     if (!amount || amount === 0) return '₡0';
@@ -60,15 +54,6 @@ const SeccionPrincipalInstitucion = ({ activeView = 'dashboard' }) => {
     return (
       <div style={{ padding: '2rem 2.5rem' }}>
         <HistorialContainer registros={registros} />
-      </div>
-    );
-  }
-
-  // ── Vista Calendario ──
-  if (activeView === 'calendario') {
-    return (
-      <div style={{ padding: '2rem 2.5rem' }}>
-        <Calendario />
       </div>
     );
   }
@@ -116,29 +101,51 @@ const SeccionPrincipalInstitucion = ({ activeView = 'dashboard' }) => {
     );
   }
 
-  // ── Vista Perfil ──
-  if (activeView === 'perfil') {
-    return (
-      <div style={{ padding: '2rem 2.5rem' }}>
-        <PerfilUsuario />
-      </div>
-    );
-  }
-
   // ── Vista Mis Tareas (Solo Lista de Tareas y Filtros) ──
   const tareasFiltradas = tareas.filter(t => {
     if (filter === 'Completadas') return t.completada;
     if (filter === 'Pendientes') return !t.completada;
     return true; // 'Todas'
   });
->>>>>>> 9eef092f52afe0a93f7ac738b33a0de493f0cd1f:src/components/DashboardInstitucion/SeccionPrincipalInstitucion.jsx
 
-const SeccionPrincipalOficial = ({ collapsed, activeView }) => {
   return (
-    <main style={{ flex: 1, padding: '2rem', color: '#0b2240' }}>
-      <p>Sección del oficial — vista: {activeView}</p>
-    </main>
+    <div style={{ padding: '2rem 2.5rem', fontFamily: 'Inter, sans-serif' }}>
+      <div style={{ marginBottom: '2rem' }}>
+        <h1 style={{ fontSize: '1.5rem', fontWeight: 700, color: '#fff', margin: '0 0 4px', textShadow: '0 2px 8px rgba(0,0,0,0.3)' }}>Mis Tareas Asignadas</h1>
+        <p style={{ color: 'rgba(255,255,255,0.75)', fontSize: '0.85rem', margin: 0, textShadow: '0 1px 4px rgba(0,0,0,0.2)' }}>Gestioná tus actividades y reportá tus avances diariamente.</p>
+      </div>
+
+      {/* Filtros */}
+      <div style={{ display: 'flex', gap: '10px', marginBottom: '1.5rem', flexWrap: 'wrap' }}>
+        {['Todas', 'Pendientes', 'Completadas'].map(f => (
+          <button
+            key={f}
+            onClick={() => setFilter(f)}
+            style={{
+              padding: '8px 18px',
+              borderRadius: '20px',
+              border: 'none',
+              background: filter === f ? '#0b2240' : '#fff',
+              color: filter === f ? '#fff' : '#0b2240',
+              fontSize: '0.85rem',
+              fontWeight: 700,
+              cursor: 'pointer',
+              transition: 'all 0.2s',
+              boxShadow: '0 2px 6px rgba(0,0,0,0.05)'
+            }}
+          >
+            {f}
+          </button>
+        ))}
+      </div>
+
+      {/* Lista de Tareas Flat */}
+      <ListaMisTareas
+        tareas={tareasFiltradas}
+        onUpdate={loadData}
+      />
+    </div>
   );
 };
 
-export default SeccionPrincipalInstitucion;
+export default SeccionPrincipalOficial;

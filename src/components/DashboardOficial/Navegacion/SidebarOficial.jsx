@@ -1,13 +1,10 @@
-<<<<<<< HEAD:src/components/DashboardOficial/Navegacion/SidebarOficial.jsx
-import React from 'react';
-=======
 import React, { useState } from 'react';
 import '../../Dashboard/SidebarAdmin/SidebarAdmin.css';
 import { useLogin } from "../../../context/LoginContext";
 import UserBrand from "./UserBrand";
-import { ChevronLeft, ChevronDown, LayoutDashboard, Activity, Clock, LogOut, User, MapPin, Calendar } from "lucide-react";
+import { ChevronLeft, ChevronDown, LayoutDashboard, Activity, Clock, LogOut, User, MapPin } from "lucide-react";
 
-const SidebarInstitucion = ({ collapsed = false, onToggle, activeView, onViewChange }) => {
+const SidebarOficial = ({ collapsed = false, onToggle, activeView, onViewChange }) => {
   const { logout } = useLogin();
   const [openSections, setOpenSections] = useState({
     OPERATIVO: true, GESTIÓN: true,
@@ -26,7 +23,6 @@ const SidebarInstitucion = ({ collapsed = false, onToggle, activeView, onViewCha
       label: 'GESTIÓN',
       items: [
         { id: 'historial',   label: 'Historial de Reportes',  icon: Clock },
-        { id: 'calendario',  label: 'Calendario de Tareas',   icon: Calendar },
       ],
     },
   ];
@@ -34,21 +30,8 @@ const SidebarInstitucion = ({ collapsed = false, onToggle, activeView, onViewCha
   const toggleSection = (label) => {
     setOpenSections(prev => ({ ...prev, [label]: !prev[label] }));
   };
->>>>>>> 9eef092f52afe0a93f7ac738b33a0de493f0cd1f:src/components/DashboardInstitucion/Navegacion/SidebarInstitucion.jsx
 
-const SidebarOficial = ({ collapsed, onToggle, activeView, onViewChange }) => {
   return (
-<<<<<<< HEAD:src/components/DashboardOficial/Navegacion/SidebarOficial.jsx
-    <aside style={{
-      width: collapsed ? '70px' : '260px',
-      background: '#0b2240',
-      minHeight: '100vh',
-      transition: 'width 0.3s ease',
-      padding: '1rem 0',
-    }}>
-      <div style={{ color: '#fff', textAlign: 'center', padding: '1rem', fontSize: '0.8rem' }}>
-        {!collapsed && 'Oficial'}
-=======
     <aside className={`sidebar-admin ${collapsed ? 'sidebar-admin--collapsed' : ''}`}>
 
       {/* ── Encabezado institucional ── */}
@@ -71,7 +54,7 @@ const SidebarOficial = ({ collapsed, onToggle, activeView, onViewChange }) => {
       {!collapsed && (
         <div className="sidebar-admin__role">
           <span className="sidebar-admin__role-dot" />
-          <span className="sidebar-admin__role-label">Institución</span>
+          <span className="sidebar-admin__role-label">Oficial</span>
         </div>
       )}
 
@@ -153,10 +136,9 @@ const SidebarOficial = ({ collapsed, onToggle, activeView, onViewChange }) => {
           <LogOut size={18} />
           {!collapsed && <span>Cerrar sesión</span>}
         </button>
->>>>>>> 9eef092f52afe0a93f7ac738b33a0de493f0cd1f:src/components/DashboardInstitucion/Navegacion/SidebarInstitucion.jsx
       </div>
     </aside>
   );
 };
 
-export default SidebarInstitucion;
+export default SidebarOficial;
