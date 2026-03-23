@@ -3,7 +3,7 @@ import ListaMisTareas from './MainDashboardInstitucion/ListaMisTareas';
 import HistorialContainer from './Historial/HistorialContainer';
 import PerfilUsuario from '../Dashboard/PerfilUsuario/PerfilUsuario';
 import Calendario from '../Calendario/Calendario';
-import { oficialService } from '../../services/oficialService';
+import { institucionService } from '../../services/oficialService';
 import { useToast } from '../../context/ToastContext';
 import { useLogin } from '../../context/LoginContext';
 import { CheckCircle, Clock, Activity, DollarSign } from 'lucide-react';
@@ -23,7 +23,7 @@ const SeccionPrincipalInstitucion = ({ activeView = 'dashboard' }) => {
     if (!user?.id) return;
     try {
       setLoading(true);
-      const data = await oficialService.getFullDashboardData(user.id);
+      const data = await institucionService.getFullDashboardData(user.id);
       if (data) {
         setTareas(data.tareas);
         setEstadisticas(data.estadisticas);
@@ -49,10 +49,10 @@ const SeccionPrincipalInstitucion = ({ activeView = 'dashboard' }) => {
     const tareasCompletadas = tareas.filter(t => t.completada);
     const registros = tareasCompletadas.map(t => ({
       fecha: t.fechaCompletada,
-      oficial: t.oficialNombre,
-      zona: t.zona || 'Asignada', // Idealmente vendría de la línea
+      oficial: t.institucionNombre,
+      zona: t.zona || 'Asignada',
       lineaAccion: `${t.lineaNombre} - ${t.titulo}`,
-      comentario: t.reporteOficial || 'Sin reporte detallado'
+      comentario: t.reporteInstitucion || 'Sin reporte detallado'
     }));
     return (
       <div style={{ padding: '2rem 2.5rem' }}>

@@ -121,7 +121,7 @@ const PerfilUsuario = () => {
                 <h1>{user.nombre}</h1>
                 <div className="perfil-actions-header">
                   <span className={`badge-rol badge-rol--${user.rol}`}>
-                    {user.rol === 'admin' ? 'Administrador del Sistema' : 'Oficial de Seguridad'}
+                    {user.rol === 'admin' ? 'Administrador del Sistema' : 'Institución'}
                   </span>
                   <button className="btn-edit-profile" onClick={() => setIsEditing(true)}>
                     <Icon.Edit /> Editar Perfil

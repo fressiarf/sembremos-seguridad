@@ -1,47 +1,43 @@
 const BASE_URL = 'http://localhost:5000';
 
-export const oficialService = {
+export const institucionService = {
   /**
-   * Obtiene las líneas de acción que tienen tareas asignadas al oficial
+   * Obtiene las líneas de acción que tienen tareas asignadas a la institución
    */
-  getLineasDelOficial: async (oficialId) => {
+  getLineasDeInstitucion: async (institucionId) => {
     try {
-      // Primero traemos las tareas del oficial
-      const tareas = await oficialService.getTareasDelOficial(oficialId);
-      // Obtenemos IDs únicos de líneas
+      const tareas = await institucionService.getTareasDeInstitucion(institucionId);
       const lineaIds = [...new Set(tareas.map(t => t.lineaAccionId))];
-      // Traemos todas las líneas
       const resLineas = await fetch(`${BASE_URL}/lineasAccion`);
       const allLineas = await resLineas.json();
-      // Filtramos solo las que le corresponden
       return allLineas.filter(l => lineaIds.includes(l.id));
     } catch (error) {
-      console.error('Error in getLineasDelOficial:', error);
+      console.error('Error in getLineasDeInstitucion:', error);
       return [];
     }
   },
 
   /**
-   * Obtiene TODAS las tareas asignadas al oficial
+   * Obtiene TODAS las tareas asignadas a la institución
    */
-  getTareasDelOficial: async (oficialId) => {
+  getTareasDeInstitucion: async (institucionId) => {
     try {
-      const response = await fetch(`${BASE_URL}/tareas?oficialId=${oficialId}`);
+      const response = await fetch(`${BASE_URL}/tareas?institucionId=${institucionId}`);
       if (!response.ok) throw new Error('Error fetching tareas');
       return await response.json();
     } catch (error) {
-      console.error('Error in getTareasDelOficial:', error);
+      console.error('Error in getTareasDeInstitucion:', error);
       return [];
     }
   },
 
   /**
-   * Obtiene tareas de una línea de acción específica para un oficial
+   * Obtiene tareas de una línea de acción específica para una institución
    */
-  getTareasPorLinea: async (lineaAccionId, oficialId) => {
+  getTareasPorLinea: async (lineaAccionId, institucionId) => {
     try {
       let url = `${BASE_URL}/tareas?lineaAccionId=${lineaAccionId}`;
-      if (oficialId) url += `&oficialId=${oficialId}`;
+      if (institucionId) url += `&institucionId=${institucionId}`;
       const response = await fetch(url);
       if (!response.ok) throw new Error('Error fetching tareas por línea');
       return await response.json();
@@ -52,7 +48,7 @@ export const oficialService = {
   },
 
   /**
-   * Marca una tarea como completada con reporte del oficial
+   * Marca una tarea como completada con reporte de la institución
    */
   completarTarea: async (tareaId, reporteData) => {
     try {
@@ -62,7 +58,7 @@ export const oficialService = {
         body: JSON.stringify({
           completada: true,
           fechaCompletada: new Date().toISOString().split('T')[0],
-          reporteOficial: reporteData.reporteOficial || '',
+          reporteInstitucion: reporteData.reporteInstitucion || '',
           fotos: reporteData.fotos || [],
           inversionColones: reporteData.inversionColones || 0
         })
@@ -76,11 +72,11 @@ export const oficialService = {
   },
 
   /**
-   * Calcula estadísticas del oficial
+   * Calcula estadísticas de la institución
    */
-  getEstadisticas: async (oficialId) => {
+  getEstadisticas: async (institucionId) => {
     try {
-      const tareas = await oficialService.getTareasDelOficial(oficialId);
+      const tareas = await institucionService.getTareasDeInstitucion(institucionId);
       const completadas = tareas.filter(t => t.completada);
       const pendientes = tareas.filter(t => !t.completada);
       const inversionTotal = completadas.reduce((sum, t) => sum + (t.inversionColones || 0), 0);
@@ -100,13 +96,13 @@ export const oficialService = {
   },
 
   /**
-   * Obtiene todos los datos del dashboard del oficial
+   * Obtiene todos los datos del dashboard de la institución
    */
-  getFullDashboardData: async (oficialId) => {
+  getFullDashboardData: async (institucionId) => {
     try {
       const [tareas, estadisticas] = await Promise.all([
-        oficialService.getTareasDelOficial(oficialId),
-        oficialService.getEstadisticas(oficialId)
+        institucionService.getTareasDeInstitucion(institucionId),
+        institucionService.getEstadisticas(institucionId)
       ]);
 
       // Obtener las líneas relacionadas
@@ -141,7 +137,7 @@ export const oficialService = {
 
       return { lineas: lineasEnriquecidas, tareas: tareasEnriquecidas, estadisticas };
     } catch (error) {
-      console.error('Error fetching full oficial dashboard data:', error);
+      console.error('Error fetching full institucion dashboard data:', error);
       return null;
     }
   },
