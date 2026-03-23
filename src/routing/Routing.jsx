@@ -3,6 +3,7 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Login from '../pages/login';
 import DashboardInstitucion from '../pages/DashboardInstitucion';
 import Dashboard from '../pages/Dashboard';
+import SoporteAcceso from '../pages/SoporteAcceso';
 import PrivateRoutes from './PrivateRoutes';
 
 const Routing = () => {
@@ -10,6 +11,7 @@ const Routing = () => {
         <Router>
             <Routes>
                 <Route path="/" element={<Login />} />
+                <Route path="/soporte-acceso" element={<SoporteAcceso />} />
                 {/*  Rutas Privadas */}
 
                 <Route path="/dashboard" element={<PrivateRoutes><Dashboard /></PrivateRoutes>} />

@@ -1,4 +1,5 @@
 import React from 'react';
+import { FileText } from 'lucide-react';
 import './SeccionPrincipal.css';
 import TopbarInstitucion from '../../DashboardInstitucion/TopbarInstitucion';
 import DashboardGlobal from '../DashboardGlobal/DashboardGlobal';
