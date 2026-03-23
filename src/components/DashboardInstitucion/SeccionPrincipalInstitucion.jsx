@@ -130,40 +130,12 @@ const SeccionPrincipalInstitucion = ({ activeView = 'dashboard' }) => {
   });
 
   return (
-    <div style={{ padding: '2rem 2.5rem', fontFamily: 'Inter, sans-serif' }}>
-      <div style={{ marginBottom: '2rem' }}>
-        <h1 style={{ fontSize: '1.5rem', fontWeight: 700, color: '#fff', margin: '0 0 4px', textShadow: '0 2px 8px rgba(0,0,0,0.3)' }}>Mis Tareas Asignadas</h1>
-        <p style={{ color: 'rgba(255,255,255,0.75)', fontSize: '0.85rem', margin: 0, textShadow: '0 1px 4px rgba(0,0,0,0.2)' }}>Gestioná tus actividades y reportá tus avances diariamente.</p>
-      </div>
-
-      {/* Filtros */}
-      <div style={{ display: 'flex', gap: '10px', marginBottom: '1.5rem', flexWrap: 'wrap' }}>
-        {['Todas', 'Pendientes', 'Completadas'].map(f => (
-          <button
-            key={f}
-            onClick={() => setFilter(f)}
-            style={{
-              padding: '8px 18px',
-              borderRadius: '20px',
-              border: 'none',
-              background: filter === f ? '#0b2240' : '#fff',
-              color: filter === f ? '#fff' : '#0b2240',
-              fontSize: '0.85rem',
-              fontWeight: 700,
-              cursor: 'pointer',
-              transition: 'all 0.2s',
-              boxShadow: '0 2px 6px rgba(0,0,0,0.05)'
-            }}
-          >
-            {f}
-          </button>
-        ))}
-      </div>
-
-      {/* Lista de Tareas Flat */}
-      <ListaMisTareas
+    <div style={{ padding: '2rem 2.5rem' }}>
+      <ListaMisTareas 
         tareas={tareasFiltradas}
-        onUpdate={loadData}
+        filter={filter}
+        setFilter={setFilter}
+        onReload={loadData}
       />
     </div>
   );

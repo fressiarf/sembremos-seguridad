@@ -1,4 +1,4 @@
-import './Navegacion.css';
+import React from 'react';
 import logoMsp from '../../../assets/Msp_logo-removebg-preview.png';
 import logoInl from '../../../assets/inl-logo-acronym-vertical-navy-removebg-preview.png';
 import logoSembremos from '../../../assets/Captura_de_pantalla_2026-03-15_191337-removebg-preview.png';
