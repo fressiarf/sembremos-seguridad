@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import './SidebarAdmin.css';
+import '../../Dashboard/SidebarAdmin/SidebarAdmin.css';
 import { dashboardService } from '../../../services/dashboardService';
 import { useLogin } from "../../../context/LoginContext";
 import UserBrand from "../../Shared/Navegacion/UserBrand";
@@ -63,6 +63,7 @@ const SidebarAdmin = ({ collapsed = false, onToggle, activeView, onViewChange })
       label: 'ANÁLISIS',
       items: [
         { id: 'mapa',        label: 'Mapa de riesgos',       icon: MapPin,       path: '/mapa' },
+        { id: 'historial',   label: 'Historial',             icon: Clock,     path: '/historial' },
         { id: 'estadisticas',label: 'Estadísticas',          icon: Activity,     path: '/estadisticas' },
         { id: 'calendario',  label: 'Calendario',            icon: Calendar,  path: '/calendario' },
       ],
