@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import '../../Dashboard/SidebarAdmin/SidebarAdmin.css';
 import { useLogin } from "../../../context/LoginContext";
-import UserBrand from "./UserBrand";
+import UserBrand from "../../Shared/Navegacion/UserBrand";
 import { ChevronLeft, ChevronDown, LayoutDashboard, Activity, Clock, LogOut, User, MapPin, Calendar } from "lucide-react";
 
 const SidebarInstitucion = ({ collapsed = false, onToggle, activeView, onViewChange }) => {
