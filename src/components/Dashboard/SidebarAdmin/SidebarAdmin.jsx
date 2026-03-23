@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import './SidebarAdmin.css';
 import { dashboardService } from '../../../services/dashboardService';
 import { useLogin } from "../../../context/LoginContext";
-import UserBrand from "../../DashboardOficial/Navegacion/UserBrand";
+import UserBrand from "../../Shared/Navegacion/UserBrand";
 import { ChevronLeft, ChevronDown, LayoutGrid, Activity, Clock, LogOut, User, MapPin, Shield, Bell, TriangleAlert, FileText, Settings, Calendar, LayoutDashboard } from "lucide-react";
 
 

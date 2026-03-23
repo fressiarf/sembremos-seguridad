@@ -1,5 +1,5 @@
 import React from 'react';
-import LayoutDashboard from '../components/DashboardOficial/Navegacion/LayoutDashboard';
+import LayoutDashboard from '../components/Shared/Navegacion/LayoutDashboard';
 import SidebarInstitucion from '../components/DashboardInstitucion/SidebarInstitucion';
 import DashboardInstitucionContent from '../components/DashboardInstitucion/DashboardInstitucion';
 
