@@ -68,8 +68,10 @@ body:has(.LayoutDashboard) {
   flex-direction: column;
   padding: 0;
   overflow-y: auto;
+  overflow-x: hidden;
   max-height: 100vh;
   background: transparent;
+  min-width: 0; /* Crucial para evitar desbordamientos en CSS Grid */
 }
 
 @keyframes fadeIn {

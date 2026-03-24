@@ -162,7 +162,7 @@ export const dashboardService = {
     }
   },
   
-  /**
+  /*
    * Obtiene estadísticas rápidas para el Sidebar
    */
   getStats: async () => {
