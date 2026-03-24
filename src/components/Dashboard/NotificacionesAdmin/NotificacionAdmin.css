@@ -1,0 +1,222 @@
+.admin-notif-container {
+    background-color: #ffffff;
+    border-radius: 1rem;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    max-width: 500px;
+    width: 500px;
+    max-height: 260px;
+    border: 1px solid #e2e8f0;
+}
+
+.admin-notif-drawer {
+    position: fixed;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    height: 100vh !important;
+    max-height: 100vh !important;
+    width: 450px !important;
+    max-width: 450px !important;
+    border-radius: 1.5rem 0 0 1.5rem;
+    z-index: 10000;
+    border: none;
+    border-left: 1px solid #e2e8f0;
+    box-shadow: -10px 0 30px rgba(0, 0, 0, 0.08);
+    animation: slideInRight 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes slideInRight {
+    0% { transform: translateX(100%); }
+    100% { transform: translateX(0); }
+}
+
+.admin-notif-header {
+    background: #ffffff;
+    color: #1e293b;
+    padding: 1rem 1.25rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid #e2e8f0;
+}
+
+.admin-notif-title {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.admin-notif-title h2 {
+    font-size: 1.15rem;
+    font-weight: 500;
+    margin: 0;
+    letter-spacing: normal;
+}
+
+.admin-notif-settings-btn {
+    background: transparent;
+    border: none;
+    color: #64748b;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.35rem;
+    border-radius: 50%;
+    transition: all 0.2s;
+}
+
+.admin-notif-settings-btn:hover {
+    color: #1e293b;
+    background-color: #f1f5f9;
+}
+
+.admin-notif-content {
+    padding: 1rem;
+    overflow-y: auto;
+    background-color: #f8fafc;
+    max-height: 190px;
+}
+
+.admin-notif-drawer .admin-notif-content {
+    max-height: none !important;
+    flex: 1;
+    overflow-y: auto;
+}
+
+.admin-notif-drawer .admin-notif-header {
+    flex-shrink: 0;
+}
+
+.admin-notif-content::-webkit-scrollbar {
+    width: 6px;
+}
+
+.admin-notif-content::-webkit-scrollbar-thumb {
+    background: #cbd5e1;
+    border-radius: 999px;
+}
+
+.admin-notif-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.admin-notif-empty {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 1.5rem 1rem;
+    text-align: center;
+}
+
+.admin-notif-empty-icon {
+    color: #cbd5e1;
+    margin-bottom: 0.75rem;
+}
+
+.admin-notif-empty-title {
+    font-size: 1rem;
+    font-weight: 600;
+    color: #334155;
+    margin: 0 0 0.5rem 0;
+}
+
+.admin-notif-empty-subtitle {
+    font-size: 0.85rem;
+    color: #64748b;
+    margin: 0;
+    line-height: 1.4;
+    max-width: 85%;
+}
+
+.admin-notif-card {
+    background-color: #ffffff;
+    border-radius: 0.75rem;
+    padding: 0.75rem 0.75rem 0.75rem 1.25rem;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+    transition: all 0.2s ease;
+    border: 1px solid #f1f5f9;
+}
+
+.admin-notif-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.08);
+}
+
+.admin-notif-today {
+    border-color: #bfdbfe;
+    background-color: #eff6ff;
+}
+
+.admin-notif-color-bar {
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 6px;
+    border-radius: 0.75rem 0 0 0.75rem;
+}
+
+.admin-notif-info {
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+    flex: 1;
+}
+
+.admin-notif-event-title {
+    margin: 0;
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: #334155;
+    line-height: 1.2;
+}
+
+.admin-notif-details {
+    display: flex;
+    gap: 0.75rem;
+    font-size: 0.8rem;
+    color: #64748b;
+}
+
+.admin-notif-date,
+.admin-notif-time {
+    display: flex;
+    align-items: center;
+    gap: 0.375rem;
+}
+
+.admin-notif-category {
+    display: inline-block;
+    font-size: 0.7rem;
+    font-weight: 600;
+    padding: 0.2rem 0.4rem;
+    border-radius: 0.375rem;
+    width: fit-content;
+}
+
+.admin-notif-alert-icon {
+    animation: pulse 2s infinite cubic-bezier(0.4, 0, 0.6, 1);
+}
+
+@keyframes pulse {
+
+    0%,
+    100% {
+        opacity: 1;
+    }
+
+    50% {
+        opacity: .5;
+    }
+}

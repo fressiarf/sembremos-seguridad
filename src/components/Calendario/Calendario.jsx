@@ -7,10 +7,29 @@ const Calendario = () => {
     const { showToast } = useToast();
     const [fechaActual, setFechaActual] = useState(new Date());
     
-    // Cargar eventos desde localStorage
     const [eventos, setEventos] = useState(() => {
         const guardados = localStorage.getItem('sembremos_seguridad_eventos');
-        return guardados ? JSON.parse(guardados) : [];
+        const listaEventos = guardados ? JSON.parse(guardados) : [];
+        
+        const hoy = new Date();
+        const strHoy = `${hoy.getFullYear()}-${String(hoy.getMonth() + 1).padStart(2, '0')}-${String(hoy.getDate()).padStart(2, '0')}`;
+        const m = new Date(hoy); m.setDate(m.getDate() + 1);
+        const strMan = `${m.getFullYear()}-${String(m.getMonth() + 1).padStart(2, '0')}-${String(m.getDate()).padStart(2, '0')}`;
+        const p = new Date(hoy); p.setDate(p.getDate() + 2);
+        const strPas = `${p.getFullYear()}-${String(p.getMonth() + 1).padStart(2, '0')}-${String(p.getDate()).padStart(2, '0')}`;
+
+        const def = [
+            { id: 1001, titulo: "Transformación Áreas Deportivas Juv.", inicio: "09:00", fin: "13:00", categoria: "Operativos", fecha: strHoy },
+            { id: 1002, titulo: "Zonas de Encuentro Juvenil", inicio: "14:00", fin: "16:00", categoria: "Seguimiento de Matriz", fecha: strHoy },
+            { id: 1003, titulo: "Festival Juvenil Formativo", inicio: "10:00", fin: "15:00", categoria: "Reuniones", fecha: strMan },
+            { id: 1004, titulo: "Programa Voluntariado Recuperación", inicio: "08:00", fin: "12:00", categoria: "Operativos", fecha: strPas },
+            { id: 1005, titulo: "Feria Emprendimiento Juvenil", inicio: "09:00", fin: "17:00", categoria: "Seguimiento de Matriz", fecha: strPas }
+        ];
+
+        if (!listaEventos.some(e => e.id === 1001)) {
+            return [...listaEventos, ...def];
+        }
+        return listaEventos;
     });
 
     const [mostrarModal, setMostrarModal] = useState(false);
