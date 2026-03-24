@@ -10,6 +10,8 @@ import DashboardInstitucion from '../../DashboardInstitucion/DashboardInstitucio
 import MapaRiesgos from '../MapaRiesgos/MapaRiesgos';
 import ZonasCriticas from '../ZonasCriticas/ZonasCriticas';
 import { useLogin } from '../../../context/LoginContext';
+import { useToast } from '../../../context/ToastContext';
+import { Download, FileText } from 'lucide-react';
 
 import Calendario from '../../Calendario/Calendario';
 
@@ -34,13 +36,30 @@ const VIEW_LABELS = {
 
 const SeccionPrincipal = ({ collapsed, activeView }) => {
   const { user } = useLogin();
+  const { showToast } = useToast();
+
+  const handlePrintPDF = () => {
+    window.print();
+    showToast('Generando Ficha de Rendición de Cuentas...', 'info');
+  };
 
   return (
     <main className={`main-content ${collapsed ? 'main-content--collapsed' : ''}`}>
       <TopbarInstitucion 
         portalTitle={VIEW_LABELS[activeView] || activeView}
         badgeText={user?.rol === 'institucion' ? 'INSTITUCIÓN' : 'ADMINISTRADOR'}
-      />
+      >
+        {activeView === 'dashboard' && user?.rol === 'institucion' && (
+          <button 
+            className="btn-report-pdf" 
+            onClick={handlePrintPDF} 
+            title="Generar reporte visual para impresión"
+          >
+            <Download size={18} />
+            Generar Rendición de Cuentas
+          </button>
+        )}
+      </TopbarInstitucion>
 
       {activeView === 'dashboard' && (
         user?.rol === 'institucion' ? <DashboardInstitucion /> : <DashboardGlobal />

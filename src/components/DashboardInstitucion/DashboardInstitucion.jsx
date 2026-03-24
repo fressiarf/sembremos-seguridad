@@ -6,7 +6,6 @@ import { dashboardService } from '../../services/dashboardService';
 import CardLineaAccion from './CardLineaAccion';
 import ModuloDelegacion from './ModuloDelegacion';
 import CargaEvidencia from './CargaEvidencia';
-import TopbarInstitucion from './TopbarInstitucion';
 import { Building2, FileText, Download, Building } from 'lucide-react';
 
 const DashboardInstitucion = () => {
@@ -53,26 +52,12 @@ const DashboardInstitucion = () => {
     return matchesSearch && matchesFilter;
   });
 
-  const handlePrintPDF = () => {
-    window.print();
-    // Simulate generation with a toast delay
-    showToast('Generando Ficha de Rendición de Cuentas...', 'info');
-  };
-
   if (loading) {
     return <div style={{ padding: '3rem', color: '#64748b' }}>Cargando Panel Operativo...</div>;
   }
 
   return (
-    <div className="dashboard-institucion-wrapper" style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh', width: '100%' }}>
-      {/* Topbar Adaptado al diseño de la Institución - Pegado arriba (flush) */}
-      <TopbarInstitucion>
-        <button className="btn-report-pdf" onClick={handlePrintPDF} title="Generar reporte visual para impresión">
-          <Download size={18} />
-          Generar Rendición de Cuentas
-        </button>
-      </TopbarInstitucion>
-
+    <div className="dashboard-institucion-wrapper" style={{ width: '100%' }}>
       {/* Contenido Principal con fondo transparente para dejar ver el fondo global (navy azul) */}
       <div className="dashboard-institucion-content" style={{ 
         flex: 1, 

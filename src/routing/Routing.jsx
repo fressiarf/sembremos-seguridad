@@ -3,6 +3,7 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Login from '../pages/login';
 import DashboardInstitucion from '../pages/DashboardInstitucion';
 import Dashboard from '../pages/Dashboard';
+import DashboardAdminInstitucion from '../pages/DashboardAdminInstitucion';
 import PrivateRoutes from './PrivateRoutes';
 
 const Routing = () => {
@@ -14,6 +15,7 @@ const Routing = () => {
 
                 <Route path="/dashboard" element={<PrivateRoutes><Dashboard /></PrivateRoutes>} />
                 <Route path="/dashboardInstitucion" element={<PrivateRoutes><DashboardInstitucion /></PrivateRoutes>} />
+                <Route path="/dashboardAdminInstitucion" element={<PrivateRoutes><DashboardAdminInstitucion /></PrivateRoutes>} />
             </Routes>
         </Router>
     );
