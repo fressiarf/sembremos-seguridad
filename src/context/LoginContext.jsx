@@ -4,7 +4,6 @@ import mockData from '../../db.json';
 const LoginContext = createContext();
 
 export const LoginProvider = ({ children }) => {
-  const [metodo, setMetodo] = useState('email'); // 'email' o 'cedula'
 
   useEffect(() => {
     const savedUser = sessionStorage.getItem('currentUser');
@@ -12,12 +11,6 @@ export const LoginProvider = ({ children }) => {
       setUser(JSON.parse(savedUser));
     }
   }, []);
-
-  const cambiarMetodo = (nuevoMetodo) => {
-    setMetodo(nuevoMetodo);
-    // Limpiamos errores al cambiar de pestaña para que no salgan los "mensajitos" viejos
-    setErrors({ usuario: '', password: '' });
-  };
   const [errors, setErrors] = useState({
     usuario: '',
     password: ''
@@ -37,15 +30,9 @@ export const LoginProvider = ({ children }) => {
     };
 
     // 1. Validación de formato
-    if (metodo === 'email') {
-      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-      if (!formData.usuario) newErrors.usuario = 'El correo es requerido';
-      else if (!emailRegex.test(formData.usuario)) newErrors.usuario = 'Formato de correo inválido';
-    } else {
-      const cedulaRegex = /^[1-9][0-9]{8}$/;
-      if (!formData.usuario) newErrors.usuario = 'La cédula es requerida';
-      else if (!cedulaRegex.test(formData.usuario)) newErrors.usuario = 'Cédula debe tener 9 dígitos';
-    }
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!formData.usuario) newErrors.usuario = 'El correo es requerido';
+    else if (!emailRegex.test(formData.usuario)) newErrors.usuario = 'Formato de correo inválido';
 
     if (!formData.password) newErrors.password = 'La contraseña es requerida';
     else if (formData.password.length < 8) newErrors.password = 'Mínimo 8 caracteres';
@@ -57,16 +44,13 @@ export const LoginProvider = ({ children }) => {
     }
 
     // 2. Verificación contra la base de datos
-    const campo = metodo === 'email' ? 'usuario' : 'cedula';
-    const etiqueta = metodo === 'email' ? 'correo' : 'cédula';
-
     // Primero buscamos si existe el usuario
     const usuarioEncontrado = mockData.usuarios.find(
-      (u) => u[campo] === formData.usuario
+      (u) => u.usuario === formData.usuario
     );
 
     if (!usuarioEncontrado) {
-      newErrors.usuario = `Este ${etiqueta} no está registrado en el sistema`;
+      newErrors.usuario = 'Este correo no está registrado en el sistema';
       setErrors(newErrors);
       return false;
     }
@@ -102,8 +86,6 @@ export const LoginProvider = ({ children }) => {
   };
 
   const value = {
-    metodo,
-    setMetodo: cambiarMetodo, // Usamos la nueva función que limpia errores
     formData,
     setFormData,
     errors,

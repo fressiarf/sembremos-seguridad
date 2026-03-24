@@ -1,10 +1,10 @@
 import React from 'react';
 import { useLogin } from '../../../context/LoginContext';
 import './InputValidar.css';
-import { User, Lock, Eye, EyeOff, Mail, IdCard } from 'lucide-react';
+import { Lock, Eye, EyeOff, Mail } from 'lucide-react';
 
 const InputValidar = () => {
-  const { metodo, formData, setFormData, errors, setErrors } = useLogin();
+  const { formData, setFormData, errors, setErrors } = useLogin();
   const [showPassword, setShowPassword] = React.useState(false);
 
   const handleTogglePassword = () => {
@@ -25,20 +25,20 @@ const InputValidar = () => {
   return (
     <div className="SeccionEntradasValidar">
       
-      {/* Entrada de Usuario / Email / Cédula */}
+      {/* Entrada de Correo Institucional */}
       <div className="ContenedorInputValidar">
         <label htmlFor="EntradaUsuario" className="LabelValidacion">
-          {metodo === 'email' ? 'Correo Institucional' : 'Número de Cédula'}
+          Correo Institucional
         </label>
         <div className={`CajaEntradaInteractiva ${errors.usuario ? 'CajaError' : ''}`}>
           <span className="IconoEntrada">
-            {metodo === 'email' ? <Mail size={18} /> : <IdCard size={18} />}
+            <Mail size={18} />
           </span>
           <input 
             type="text" 
             id="EntradaUsuario" 
             className="InputCampoValidado" 
-            placeholder={metodo === 'email' ? "Ej: usuario@seguridad.go.cr" : "Ej: 101230456"}
+            placeholder="Ej: usuario@seguridad.go.cr"
             value={formData.usuario}
             onChange={handleChange}
           />
