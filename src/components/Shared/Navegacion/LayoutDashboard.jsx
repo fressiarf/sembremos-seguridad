@@ -37,5 +37,3 @@ const LayoutDashboard = ({ sidebar, children }) => {
 };
 
 export default LayoutDashboard;
-
-
