@@ -71,6 +71,7 @@ body:has(.LayoutDashboard) {
   overflow-x: hidden;
   max-height: 100vh;
   background: transparent;
+  min-width: 0; /* Crucial para evitar desbordamientos en CSS Grid */
 }
 
 @keyframes fadeIn {

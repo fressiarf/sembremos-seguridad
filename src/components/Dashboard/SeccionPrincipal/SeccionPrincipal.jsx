@@ -61,7 +61,7 @@ const SeccionPrincipal = ({ collapsed, activeView }) => {
       </TopbarInstitucion>
 
       {activeView === 'dashboard' && (
-        user?.rol === 'institucion' ? <DashboardInstitucion /> : <DashboardGlobal />
+        user?.rol === 'institucion' ? <DashboardInstitucion /> : <DashboardGlobal collapsed={collapsed} />
       )}
       {activeView === 'actividades' && <ActividadOficiales />}
       {activeView === 'usuarios' && <GestionUsuarios />}
