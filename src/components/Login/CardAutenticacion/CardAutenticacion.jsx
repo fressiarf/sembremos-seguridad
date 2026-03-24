@@ -1,5 +1,5 @@
 import React from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { useLogin } from '../../../context/LoginContext';
 import './CardAutenticacion.css';
 import { ShieldAlert } from 'lucide-react';
@@ -32,7 +32,7 @@ const CardAutenticacion = ({ children }) => {
         {children}
 
         <footer className="PieTarjetaLogin">
-          <a href="#" className="EnlaceRecuperacion">Restablecer una contraseña olvidada</a>
+          <Link to="/soporte-acceso" className="EnlaceRecuperacion">¿No puede ingresar?</Link>
           
           <div className="ContenedorRecordatorio">
             <div className="IconoTooltipSecurity" data-tooltip="Recuerde: Su acceso está siendo monitoreado por seguridad">

@@ -12,6 +12,7 @@ const Routing = () => {
         <Router>
             <Routes>
                 <Route path="/" element={<Login />} />
+                <Route path="/soporte-acceso" element={<SoporteAcceso />} />
                 {/*  Rutas Privadas */}
 
                 <Route path="/dashboard" element={<PrivateRoutes><Dashboard /></PrivateRoutes>} />
