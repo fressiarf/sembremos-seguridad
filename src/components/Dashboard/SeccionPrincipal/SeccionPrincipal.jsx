@@ -11,7 +11,7 @@ import MapaRiesgos from '../MapaRiesgos/MapaRiesgos';
 import ZonasCriticas from '../ZonasCriticas/ZonasCriticas';
 import { useLogin } from '../../../context/LoginContext';
 import { useToast } from '../../../context/ToastContext';
-import { FileText, Download } from 'lucide-react';
+import { Download, FileText } from 'lucide-react';
 import Calendario from '../../Calendario/Calendario';
 
 // Mapeo de vistas a nombres de sección para el TopbarInstitucion

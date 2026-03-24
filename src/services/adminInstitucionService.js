@@ -429,11 +429,16 @@ export const adminInstitucionService = {
    */
   getTareas: async (filtros = {}) => {
     await delay(150);
-    let resultado = TAREAS.map(t => ({
-      ...t,
-      responsable: getResponsable(t.responsableId),
-      linea: LINEAS_ACCION.find(l => l.id === t.lineaId),
-    }));
+    let resultado = TAREAS.map(t => {
+      const ids = t.responsableIds || (t.responsableId ? [t.responsableId] : []);
+      return {
+        ...t,
+        responsableIds: ids,
+        responsables: ids.map(getResponsable),
+        responsable: getResponsable(t.responsableId),
+        linea: LINEAS_ACCION.find(l => l.id === t.lineaId) || { id: t.lineaId, numero: t.lineaNumero, nombre: t.lineaNombre },
+      };
+    });
 
     if (filtros.estado && filtros.estado !== 'Todos') {
       resultado = resultado.filter(t => t.estado === filtros.estado);
@@ -459,12 +464,13 @@ export const adminInstitucionService = {
   /**
    * Asignar o reasignar responsable a una tarea
    */
-  asignarResponsable: async (tareaId, responsableId) => {
+  asignarResponsable: async (tareaId, responsableIds) => {
     await delay(200);
     const tarea = TAREAS.find(t => t.id === tareaId);
     if (tarea) {
-      tarea.responsableId = responsableId;
-      return { success: true, tarea: { ...tarea, responsable: getResponsable(responsableId) } };
+      tarea.responsableIds = Array.isArray(responsableIds) ? responsableIds : (responsableIds ? [responsableIds] : []);
+      tarea.responsableId = tarea.responsableIds[0] || null;
+      return { success: true, tarea: { ...tarea, responsableIds: tarea.responsableIds, responsables: tarea.responsableIds.map(getResponsable) } };
     }
     return { success: false, error: 'Tarea no encontrada' };
   },
@@ -498,6 +504,21 @@ export const adminInstitucionService = {
       return { success: true, reporte: { ...reporte } };
     }
     return { success: false };
+  },
+
+  /**
+   * Editar un reporte antes de aprobarlo
+   */
+  editarReporte: async (reporteId, nuevosDatos) => {
+    await delay(300);
+    const reporte = REPORTES.find(r => r.id === reporteId);
+    if (reporte) {
+      reporte.descripcion = nuevosDatos.descripcion || reporte.descripcion;
+      reporte.beneficiados = nuevosDatos.beneficiados !== undefined ? nuevosDatos.beneficiados : reporte.beneficiados;
+      reporte.editadoPorAdmin = true;
+      return { success: true, reporte: { ...reporte } };
+    }
+    return { success: false, error: 'Reporte no encontrado' };
   },
 
   /**
