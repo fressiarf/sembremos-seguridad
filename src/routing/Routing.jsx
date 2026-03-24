@@ -4,7 +4,6 @@ import Login from '../pages/login';
 import DashboardInstitucion from '../pages/DashboardInstitucion';
 import Dashboard from '../pages/Dashboard';
 import DashboardAdminInstitucion from '../pages/DashboardAdminInstitucion';
-import SoporteAcceso from '../pages/SoporteAcceso';
 import PrivateRoutes from './PrivateRoutes';
 
 const Routing = () => {
