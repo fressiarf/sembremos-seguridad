@@ -89,8 +89,6 @@ const TopbarInstitucion = ({ children, portalTitle = 'PORTAL INSTITUCIONAL DE GE
 
         {/* Lado derecho: Indicador Institución y Children (P.ej botón PDF) */}
         <div style={{ display: 'flex', alignItems: 'center', gap: '1.5rem' }}>
-          {children}
-          
           <div style={{
             display: 'flex',
             alignItems: 'center',
@@ -117,6 +115,8 @@ const TopbarInstitucion = ({ children, portalTitle = 'PORTAL INSTITUCIONAL DE GE
               {badgeText}
             </span>
           </div>
+          
+          {children}
         </div>
       </div>
     </div>

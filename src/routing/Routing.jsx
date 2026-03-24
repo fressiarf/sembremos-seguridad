@@ -5,6 +5,8 @@ import DashboardInstitucion from '../pages/DashboardInstitucion';
 import Dashboard from '../pages/Dashboard';
 import DashboardAdminInstitucion from '../pages/DashboardAdminInstitucion';
 import PrivateRoutes from './PrivateRoutes';
+import SoporteAcceso from '../components/Login/SoporteContra/SoporteAcceso';
+
 
 const Routing = () => {
     return (

@@ -3,7 +3,7 @@ import '../../Dashboard/SidebarAdmin/SidebarAdmin.css';
 import { dashboardService } from '../../../services/dashboardService';
 import { useLogin } from "../../../context/LoginContext";
 import UserBrand from "../../Shared/Navegacion/UserBrand";
-import { ChevronLeft, ChevronDown, LayoutGrid, Activity, Clock, LogOut, User, MapPin, Shield, Bell, TriangleAlert, FileText, Settings, Calendar, LayoutDashboard } from "lucide-react";
+import { ChevronLeft, ChevronDown, LayoutGrid, Activity, Clock, LogOut, User, MapPin, Shield, Bell, BellRing, TriangleAlert, FileText, Settings, Calendar, LayoutDashboard } from "lucide-react";
 
 
 // Navigation link items should be consistent, but for now we'll keep the admin structure
