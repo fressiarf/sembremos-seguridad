@@ -1,4 +1,5 @@
 import React from 'react';
+import { FileText } from 'lucide-react';
 import './SeccionPrincipal.css';
 import TopbarInstitucion from '../../DashboardInstitucion/TopbarInstitucion';
 import DashboardGlobal from '../DashboardGlobal/DashboardGlobal';
@@ -11,7 +12,7 @@ import MapaRiesgos from '../MapaRiesgos/MapaRiesgos';
 import ZonasCriticas from '../ZonasCriticas/ZonasCriticas';
 import { useLogin } from '../../../context/LoginContext';
 
-import { FileText } from 'lucide-react';
+
 import Calendario from '../../Calendario/Calendario';
 
 // Mapeo de vistas a nombres de sección para el TopbarInstitucion

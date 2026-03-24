@@ -160,5 +160,26 @@ export const dashboardService = {
       console.error('Error in postReporte:', error);
       throw error;
     }
+  },
+  
+  /**
+   * Obtiene estadísticas rápidas para el Sidebar
+   */
+  getStats: async () => {
+    try {
+      const [tareas, zonas, alertas] = await Promise.all([
+        fetch(`${BASE_URL}/tareas`).then(r => r.json()),
+        fetch(`${BASE_URL}/zonas`).then(r => r.json()),
+        fetch(`${BASE_URL}/alertas`).then(r => r.json())
+      ]);
+      return {
+        activitiesCount: tareas.length,
+        zonesCount: zonas.length,
+        alertsCount: alertas.length
+      };
+    } catch (error) {
+      console.error('Error in getStats:', error);
+      return { activitiesCount: 0, zonesCount: 0, alertsCount: 0 };
+    }
   }
 };
