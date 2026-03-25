@@ -1,36 +1,72 @@
 import React, { useState, useEffect } from 'react';
 import { useLogin } from '../../../context/LoginContext';
-import { AlertCircle, ArrowRight } from 'lucide-react';
+import { AlertCircle, ArrowRight, ArrowLeft } from 'lucide-react';
+import FormInstitucion from './FormInstitucion';
 
 const ReportesRechazadosEditor = () => {
   const { user } = useLogin();
   const [reportes, setReportes] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [editingReporte, setEditingReporte] = useState(null);
+
+  const fetchRechazados = async () => {
+    if (!user?.id) return;
+    try {
+      const [resReq, tareasReq] = await Promise.all([
+        fetch(`http://localhost:5000/reportes?estado=rechazado&responsableId=${user.id}`),
+        fetch('http://localhost:5000/tareas')
+      ]);
+      const rejected = await resReq.json();
+      const tareas = await tareasReq.json();
+
+      const enriquecidos = rejected.map(r => ({
+        ...r,
+        tarea: tareas.find(t => t.id === r.tareaId) || {}
+      }));
+      setReportes(enriquecidos);
+    } catch (e) {
+      console.error(e);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
-    if (!user?.id) return;
-    const fetchRechazados = async () => {
-      try {
-        const [resReq, tareasReq] = await Promise.all([
-          fetch(`http://localhost:5000/reportes?estado=rechazado&responsableId=${user.id}`),
-          fetch('http://localhost:5000/tareas')
-        ]);
-        const rejected = await resReq.json();
-        const tareas = await tareasReq.json();
-
-        const enriquecidos = rejected.map(r => ({
-          ...r,
-          tarea: tareas.find(t => t.id === r.tareaId) || {}
-        }));
-        setReportes(enriquecidos);
-      } catch (e) {
-        console.error(e);
-      } finally {
-        setLoading(false);
-      }
-    };
     fetchRechazados();
   }, [user]);
+
+  if (editingReporte) {
+    return (
+      <div style={{ fontFamily: 'Inter, sans-serif' }}>
+        <div style={{ marginBottom: '1.5rem', display: 'flex', alignItems: 'center', gap: '1rem' }}>
+          <button 
+            onClick={() => setEditingReporte(null)}
+            style={{ display: 'flex', alignItems: 'center', gap: '6px', cursor: 'pointer', background: 'none', border: 'none', color: '#64748b', fontSize: '1rem', fontWeight: 600 }}
+          >
+            <ArrowLeft size={18} /> Volver
+          </button>
+          <h1 style={{ fontSize: '1.5rem', fontWeight: 700, color: '#fff', margin: 0, textShadow: '0 2px 8px rgba(0,0,0,0.3)' }}>
+            Corrigiendo Reporte
+          </h1>
+        </div>
+        <div style={{ background: '#fef2f2', padding: '12px 16px', borderRadius: '10px', borderLeft: '4px solid #ef4444', marginBottom: '1.5rem', display: 'flex', alignItems: 'center', gap: '12px' }}>
+          <AlertCircle size={20} color="#b91c1c" />
+          <div style={{ color: '#991b1b', fontSize: '0.9rem', fontWeight: 500 }}>
+            <strong>Corrección requerida:</strong> "{editingReporte.observacionRechazo}"
+          </div>
+        </div>
+        <FormInstitucion 
+          tarea={editingReporte.tarea} 
+          initialReporte={editingReporte}
+          onComplete={() => {
+            setEditingReporte(null);
+            setLoading(true);
+            fetchRechazados();
+          }} 
+        />
+      </div>
+    );
+  }
 
   if (loading) return <div style={{ padding: '3rem', color: '#7a9cc4' }}>Cargando devoluciones...</div>;
 
@@ -63,7 +99,7 @@ const ReportesRechazadosEditor = () => {
               </div>
               <button 
                 style={{ background: '#3b82f6', color: '#fff', border: 'none', padding: '8px 16px', borderRadius: '6px', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer', transition: 'background 0.2s' }}
-                onClick={() => alert(`En la próxima fase, este botón conectará con FormInstitucion.jsx para editar el reporte ${r.id}`)}
+                onClick={() => setEditingReporte(r)}
                 onMouseOver={(e) => e.currentTarget.style.background = '#2563eb'}
                 onMouseOut={(e) => e.currentTarget.style.background = '#3b82f6'}
               >

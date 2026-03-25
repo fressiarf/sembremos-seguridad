@@ -3,9 +3,21 @@ import './ActividadOficiales.css';
 import { useToast } from '../../../context/ToastContext';
 import { dashboardService } from '../../../services/dashboardService';
 import { userService } from '../../../services/userService';
+import { useLogin } from '../../../context/LoginContext';
 import { Users, Edit, Plus, X, ListTodo, MapPin, DollarSign, CheckCircle, Clock, ChevronDown, ChevronUp } from 'lucide-react';
 
+const LOCATION_DATA = {
+  "Puntarenas": {
+    "Puntarenas": ["Puntarenas Centro", "Barranca", "El Roble", "Chacarita", "Fray Casiano", "El Carmen"],
+    "Esparza": ["Espíritu Santo", "San Juan", "Macacona", "San Rafael", "San Jerónimo"]
+  },
+  "San José": {
+    "San José": ["Carmen", "Merced", "Hospital", "Catedral", "Zapote", "San Francisco de Dos Ríos", "Uruca", "Mata Redonda", "Pavas", "Hatillo", "San Sebastián"]
+  }
+};
+
 const ActividadOficiales = () => {
+  const { user } = useLogin();
   const [officers, setOfficers] = useState([]);
   const [lineas, setLineas] = useState([]);
   const [tareas, setTareas] = useState([]);
@@ -22,7 +34,8 @@ const ActividadOficiales = () => {
 
   const [newTarea, setNewTarea] = useState({
     lineaAccionId: '', titulo: '', indicador: '', consideraciones: '', meta: '',
-    plazo: 'Anual', institucionId: '', corresponsable: ''
+    plazo: 'Anual', institucionId: '', corresponsable: '',
+    provincia: '', canton: '', distrito: ''
   });
 
   const formatColones = (amount) => {
@@ -81,11 +94,12 @@ const ActividadOficiales = () => {
       const institucion = officers.find(o => o.id === newTarea.institucionId);
       await dashboardService.createTarea({
         ...newTarea,
-        institucionNombre: institucion?.nombre || 'Sin nombre'
+        institucionNombre: institucion?.nombre || 'Sin nombre',
+        zona: newTarea.distrito ? `${newTarea.distrito}, ${newTarea.canton}` : 'General'
       });
       showToast('Tarea creada y asignada ✓', 'success');
       setShowTareaForm(false);
-      setNewTarea({ lineaAccionId: '', titulo: '', indicador: '', consideraciones: '', meta: '', plazo: 'Anual', institucionId: '', corresponsable: '' });
+      setNewTarea({ lineaAccionId: '', titulo: '', indicador: '', consideraciones: '', meta: '', plazo: 'Anual', institucionId: '', corresponsable: '', provincia: '', canton: '', distrito: '' });
       loadData();
     } catch (error) {
       showToast('Error al crear la tarea', 'error');
@@ -101,18 +115,20 @@ const ActividadOficiales = () => {
           <h1>Gestión de Líneas y Tareas</h1>
           <p>Crea líneas de acción y asigna tareas a las instituciones</p>
         </div>
-        <div style={{ display: 'flex', gap: '10px' }}>
-          <button className="btn-primary-assign" onClick={() => setShowLineaForm(true)}>
-            <Plus size={16} /> Crear Línea
-          </button>
-          <button className="btn-primary-assign" onClick={() => {
-            if (lineas.length === 0) { showToast('Primero crea una Línea de Acción', 'warning'); return; }
-            if (officers.length === 0) { showToast('Primero crea una Institución en Gestión de Usuarios', 'warning'); return; }
-            setShowTareaForm(true);
-          }}>
-            <Plus size={16} /> Asignar Tarea
-          </button>
-        </div>
+        {user?.rol !== 'auditor' && (
+          <div style={{ display: 'flex', gap: '10px' }}>
+            <button className="btn-primary-assign" onClick={() => setShowLineaForm(true)}>
+              <Plus size={16} /> Crear Línea
+            </button>
+            <button className="btn-primary-assign" onClick={() => {
+              if (lineas.length === 0) { showToast('Primero crea una Línea de Acción', 'warning'); return; }
+              if (officers.length === 0) { showToast('Primero crea una Institución en Gestión de Usuarios', 'warning'); return; }
+              setShowTareaForm(true);
+            }}>
+              <Plus size={16} /> Asignar Tarea
+            </button>
+          </div>
+        )}
       </header>
 
       {/* ── Modal Crear Línea ── */}
@@ -206,6 +222,30 @@ const ActividadOficiales = () => {
                 <div className="form-group">
                   <label>Co-gestor / Corresponsable</label>
                   <input type="text" placeholder="Ej: OIJ, PANI..." value={newTarea.corresponsable} onChange={e => setNewTarea({...newTarea, corresponsable: e.target.value})} />
+                </div>
+              </div>
+
+              <div className="form-row-grid" style={{ gridTemplateColumns: '1fr 1fr 1fr' }}>
+                <div className="form-group">
+                  <label>Provincia</label>
+                  <select value={newTarea.provincia} onChange={e => setNewTarea({...newTarea, provincia: e.target.value, canton: '', distrito: ''})}>
+                    <option value="">-- Provincia --</option>
+                    {Object.keys(LOCATION_DATA).map(p => <option key={p} value={p}>{p}</option>)}
+                  </select>
+                </div>
+                <div className="form-group">
+                  <label>Cantón</label>
+                  <select value={newTarea.canton} onChange={e => setNewTarea({...newTarea, canton: e.target.value, distrito: ''})} disabled={!newTarea.provincia}>
+                    <option value="">-- Cantón --</option>
+                    {newTarea.provincia && Object.keys(LOCATION_DATA[newTarea.provincia]).map(c => <option key={c} value={c}>{c}</option>)}
+                  </select>
+                </div>
+                <div className="form-group">
+                  <label>Distrito</label>
+                  <select value={newTarea.distrito} onChange={e => setNewTarea({...newTarea, distrito: e.target.value})} disabled={!newTarea.canton}>
+                    <option value="">-- Distrito --</option>
+                    {newTarea.canton && LOCATION_DATA[newTarea.provincia][newTarea.canton].map(d => <option key={d} value={d}>{d}</option>)}
+                  </select>
                 </div>
               </div>
 

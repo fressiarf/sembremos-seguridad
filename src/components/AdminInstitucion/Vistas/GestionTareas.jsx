@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { adminInstitucionService } from '../../../services/adminInstitucionService';
 import { useToast } from '../../../context/ToastContext';
-import { Activity, Users, Target, MapPin, Calendar, CheckSquare, Search, ChevronDown, ChevronUp } from 'lucide-react';
+import { useLogin } from '../../../context/LoginContext';
+import { Activity, Users, Target, MapPin, Calendar, CheckSquare, Search, ChevronDown, ChevronUp, Filter } from 'lucide-react';
+import '../AdminInstitucion.css';
 import '../AdminInstitucion.css';
 
 const LINEAS_ACCION_INFO = [
@@ -12,15 +14,26 @@ const LINEAS_ACCION_INFO = [
 ];
 
 const GestionTareas = () => {
-  const [tareasRaw, setTareasRaw] = useState([]);
+  const { user } = useLogin();
   const [tareas, setTareas] = useState([]);
   const [responsables, setResponsables] = useState([]);
+  const [lineasAccion, setLineasAccion] = useState([]);
   const [loading, setLoading] = useState(true);
   
-  const [filtroTrimestre, setFiltroTrimestre] = useState('Todos');
-  const [filtroMes, setFiltroMes] = useState('Todos');
-  const [filtroLugar, setFiltroLugar] = useState('Todos');
-  const [filtroOficial, setFiltroOficial] = useState('Todos');
+  const [filtros, setFiltros] = useState({
+    busqueda: '',
+    estado: 'Todos',
+    lineaId: 'Todos',
+    trimestre: 'Todos',
+    mes: 'Todos',
+    lugar: 'Todos',
+    oficial: 'Todos'
+  });
+  const [tareasRaw, setTareasRaw] = useState([]);
+
+  const [modalAsignacion, setModalAsignacion] = useState({
+    show: false, tareaId: null, currentResponsables: []
+  });
 
   const [lineasExpandidas, setLineasExpandidas] = useState({});
   const { showToast } = useToast();
@@ -32,6 +45,10 @@ const GestionTareas = () => {
     const meses = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
     const mesIndex = parseInt(partes[1], 10) - 1;
     return meses[mesIndex] || '';
+  };
+
+  const handleFiltro = (key, value) => {
+    setFiltros(prev => ({ ...prev, [key]: value }));
   };
 
   const loadData = async () => {
@@ -54,21 +71,21 @@ const GestionTareas = () => {
   useEffect(() => {
     let filtradas = [...tareasRaw];
 
-    if (filtroTrimestre !== 'Todos') {
-      filtradas = filtradas.filter(t => t.trimestre === filtroTrimestre);
+    if (filtros.trimestre !== 'Todos') {
+      filtradas = filtradas.filter(t => t.trimestre === filtros.trimestre);
     }
-    if (filtroMes !== 'Todos') {
-      filtradas = filtradas.filter(t => getMesNombre(t.fechaLimite) === filtroMes);
+    if (filtros.mes !== 'Todos') {
+      filtradas = filtradas.filter(t => getMesNombre(t.fechaLimite) === filtros.mes);
     }
-    if (filtroLugar !== 'Todos') {
-      filtradas = filtradas.filter(t => t.zona === filtroLugar);
+    if (filtros.lugar !== 'Todos') {
+      filtradas = filtradas.filter(t => t.zona === filtros.lugar);
     }
-    if (filtroOficial !== 'Todos') {
-      filtradas = filtradas.filter(t => (t.responsableIds || []).includes(filtroOficial));
+    if (filtros.oficial !== 'Todos') {
+      filtradas = filtradas.filter(t => (t.responsableIds || []).includes(filtros.oficial));
     }
 
     setTareas(filtradas);
-  }, [tareasRaw, filtroTrimestre, filtroMes, filtroLugar, filtroOficial]);
+  }, [tareasRaw, filtros]);
 
   const lugaresUnicos = [...new Set(tareasRaw.map(t => t.zona).filter(Boolean))].sort();
   const mesesUnicos = [...new Set(tareasRaw.map(t => getMesNombre(t.fechaLimite)).filter(Boolean))].sort((a,b) => {
@@ -121,7 +138,7 @@ const GestionTareas = () => {
       </div>
 
       <div className="admin-inst-filters" style={{ marginBottom: '1.5rem', display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
-        <select className="admin-inst-select" value={filtroTrimestre} onChange={e => setFiltroTrimestre(e.target.value)}>
+        <select className="admin-inst-select" value={filtros.trimestre} onChange={e => handleFiltro('trimestre', e.target.value)}>
           <option value="Todos">Todos los Trimestres</option>
           <option value="I Trimestre 2025">I Trimestre 2025</option>
           <option value="II Trimestre 2025">II Trimestre 2025</option>
@@ -129,21 +146,21 @@ const GestionTareas = () => {
           <option value="IV Trimestre 2025">IV Trimestre 2025</option>
         </select>
 
-        <select className="admin-inst-select" value={filtroMes} onChange={e => setFiltroMes(e.target.value)}>
+        <select className="admin-inst-select" value={filtros.mes} onChange={e => handleFiltro('mes', e.target.value)}>
           <option value="Todos">Todos los Meses</option>
           {mesesUnicos.map(mes => (
             <option key={mes} value={mes}>{mes}</option>
           ))}
         </select>
 
-        <select className="admin-inst-select" value={filtroLugar} onChange={e => setFiltroLugar(e.target.value)}>
+        <select className="admin-inst-select" value={filtros.lugar} onChange={e => handleFiltro('lugar', e.target.value)}>
           <option value="Todos">Todos los Lugares</option>
           {lugaresUnicos.map(lugar => (
             <option key={lugar} value={lugar}>{lugar}</option>
           ))}
         </select>
 
-        <select className="admin-inst-select" value={filtroOficial} onChange={e => setFiltroOficial(e.target.value)}>
+        <select className="admin-inst-select" value={filtros.oficial} onChange={e => handleFiltro('oficial', e.target.value)}>
           <option value="Todos">Todos los Oficiales</option>
           {responsables.map(r => (
             <option key={r.id} value={r.id}>{r.nombre}</option>

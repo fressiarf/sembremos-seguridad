@@ -27,11 +27,24 @@ const DashboardInstitucion = () => {
           // Filtrado estricto: solo líneas asignadas a esta institución
           // En modo mock, podemos simular que todo aplica o usar un filtro laxo si es necesario ver data
           const filtered = dashData.lineas.map(linea => {
+            const tareasLocales = linea.tareas ? linea.tareas.filter(t => String(t.institucionId) === String(user?.id)) : [];
+            const totalTareas = tareasLocales.length;
+            const tareasCompletadas = tareasLocales.filter(t => t.completada).length;
+            const progreso = totalTareas > 0 ? Math.round((tareasCompletadas / totalTareas) * 100) : 0;
+
             let estado = 'Pendiente';
-            if (linea.totalTareas > 0 && linea.progreso === 100) estado = 'Completada';
-            else if (linea.progreso > 0) estado = 'En ejecución';
-            return { ...linea, estado };
-          });
+            if (totalTareas > 0 && progreso === 100) estado = 'Completada';
+            else if (progreso > 0) estado = 'En ejecución';
+            
+            return { 
+              ...linea, 
+              tareas: tareasLocales,
+              totalTareas,
+              tareasCompletadas,
+              progreso,
+              estado 
+            };
+          }).filter(l => l.totalTareas > 0);
           setData(filtered);
         }
       } catch (error) {
@@ -68,6 +81,23 @@ const DashboardInstitucion = () => {
         gap: '2rem'
       }}>
         
+        {/* Print Official Header */}
+        <div className="print-header">
+          <div style={{ textAlign: 'center', color: '#1e3a8a' }}>
+             <Building size={48} />
+             <div style={{ fontSize: '0.7rem', fontWeight: 700, marginTop: '8px' }}>MINISTERIO DE<br/>SEGURIDAD PÚBLICA</div>
+          </div>
+          <div className="print-title">
+            <h2>Ficha Oficial de Rendición de Cuentas</h2>
+            <p>Programa Sembremos Seguridad • INL Costa Rica</p>
+            <p style={{ marginTop: '0.5rem', color: '#3b82f6' }}>{institucion.toUpperCase()}</p>
+          </div>
+          <div style={{ textAlign: 'center', color: '#0b2240' }}>
+             <Building2 size={48} />
+             <div style={{ fontSize: '0.7rem', fontWeight: 700, marginTop: '8px' }}>MUNICIPALIDAD<br/>PUBLICA</div>
+          </div>
+        </div>
+
         {/* Filters */}
         <div className="dashboard-inst-filters">
           <input 

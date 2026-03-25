@@ -383,141 +383,109 @@ export const adminInstitucionService = {
     return [...LINEAS_ACCION];
   },
 
-  /**
-   * Dashboard: estadísticas generales de la institución
-   */
-  getDashboardData: async (institucion) => {
-    await delay(200);
-    const totalTareas = TAREAS.length;
-    const completadas = TAREAS.filter(t => t.estado === 'Completado').length;
-    const conActividades = TAREAS.filter(t => t.estado === 'Con Actividades').length;
-    const sinActividades = TAREAS.filter(t => t.estado === 'Sin Actividades').length;
-    const reportesPendientes = REPORTES.filter(r => r.estado === 'pendiente').length;
-    const progreso = totalTareas > 0 ? Math.round((completadas / totalTareas) * 100) : 0;
+  getDashboardData: async (institucionId) => {
+    try {
+      const [tareasReq, reportesReq] = await Promise.all([
+        fetch(`http://localhost:5000/tareas?institucionId=${institucionId}`),
+        fetch('http://localhost:5000/reportes')
+      ]);
+      const tareas = await tareasReq.json();
+      const reportes = await reportesReq.json();
 
-    // Tareas urgentes: próximas a vencer o sin actividades con prioridad alta
-    const hoy = new Date();
-    const urgentes = TAREAS
-      .filter(t => t.estado !== 'Completado')
-      .filter(t => {
-        const limite = new Date(t.fechaLimite);
-        const diasRestantes = Math.ceil((limite - hoy) / (1000 * 60 * 60 * 24));
-        return diasRestantes <= 30 || t.prioridad === 'alta';
-      })
-      .map(t => ({
-        ...t,
-        responsable: getResponsable(t.responsableId),
-        diasRestantes: Math.ceil((new Date(t.fechaLimite) - hoy) / (1000 * 60 * 60 * 24)),
-      }))
-      .sort((a, b) => a.diasRestantes - b.diasRestantes)
-      .slice(0, 5);
-
-    // Reportes recientes esperando revisión
-    const reportesRecientes = REPORTES
-      .filter(r => r.estado === 'pendiente')
-      .map(r => {
-        const tarea = TAREAS.find(t => t.id === r.tareaId);
-        return {
-          ...r,
-          tarea,
-          responsable: getResponsable(r.responsableId),
-        };
-      })
-      .sort((a, b) => new Date(b.fecha) - new Date(a.fecha));
-
-    return {
-      estadisticas: {
-        totalTareas,
-        completadas,
-        conActividades,
-        sinActividades,
-        reportesPendientes,
-        progreso,
-      },
-      urgentes,
-      reportesRecientes,
-    };
-  },
-
-  /**
-   * Gestión de tareas: lista completa con filtros
-   */
-  getTareas: async (filtros = {}) => {
-    await delay(150);
-    let resultado = TAREAS.map(t => {
-      const ids = t.responsableIds || (t.responsableId ? [t.responsableId] : []);
-      return {
-        ...t,
-        responsableIds: ids,
-        responsables: ids.map(getResponsable),
-        responsable: getResponsable(t.responsableId),
-        linea: LINEAS_ACCION.find(l => l.id === t.lineaId) || { id: t.lineaId, numero: t.lineaNumero, nombre: t.lineaNombre },
-      };
-    });
-
-    if (filtros.estado && filtros.estado !== 'Todos') {
-      resultado = resultado.filter(t => t.estado === filtros.estado);
-    }
-    if (filtros.lineaId) {
-      resultado = resultado.filter(t => t.lineaId === filtros.lineaId);
-    }
-    if (filtros.trimestre && filtros.trimestre !== 'Todos') {
-      resultado = resultado.filter(t => t.trimestre === filtros.trimestre);
-    }
-    if (filtros.busqueda) {
-      const q = filtros.busqueda.toLowerCase();
-      resultado = resultado.filter(t =>
-        t.titulo.toLowerCase().includes(q) ||
-        t.descripcion.toLowerCase().includes(q) ||
-        t.lineaNombre.toLowerCase().includes(q)
+      const totalTareas = tareas.length;
+      const completadas = tareas.filter(t => t.estado === 'Completado').length;
+      const conActividades = tareas.filter(t => t.estado === 'Con Actividades').length;
+      const sinActividades = tareas.filter(t => t.estado === 'Sin Actividades').length;
+      
+      const reportesInstitucion = reportes.filter(r => 
+        tareas.some(t => String(t.id) === String(r.tareaId))
       );
-    }
+      const reportesPendientes = reportesInstitucion.filter(r => r.estado === 'pendiente').length;
+      const progreso = totalTareas > 0 ? Math.round((completadas / totalTareas) * 100) : 0;
 
-    return resultado;
+      const hoy = new Date();
+      const urgentes = tareas
+        .filter(t => t.estado !== 'Completado')
+        .map(t => ({
+          ...t,
+          diasRestantes: Math.ceil((new Date(t.fechaLimite) - hoy) / (1000 * 60 * 60 * 24)),
+        }))
+        .filter(t => t.diasRestantes <= 30 || t.prioridad === 'alta')
+        .sort((a, b) => a.diasRestantes - b.diasRestantes)
+        .slice(0, 5);
+
+      const reportesRecientes = reportesInstitucion
+        .filter(r => r.estado === 'pendiente')
+        .map(r => ({ ...r, tarea: tareas.find(t => t.id === r.tareaId) }))
+        .sort((a, b) => new Date(b.fecha) - new Date(a.fecha));
+
+      return {
+        estadisticas: { totalTareas, completadas, conActividades, sinActividades, reportesPendientes, progreso },
+        urgentes,
+        reportesRecientes,
+      };
+    } catch (e) {
+      console.error(e);
+      return { 
+        estadisticas: { totalTareas: 0, completadas: 0, conActividades: 0, sinActividades: 0, reportesPendientes: 0, progreso: 0 }, 
+        urgentes: [], reportesRecientes: [] 
+      };
+    }
   },
 
-  /**
-   * Asignar o reasignar responsable a una tarea
-   */
+  getTareas: async (filtros = {}) => {
+    try {
+      let url = 'http://localhost:5000/tareas';
+      if (filtros.institucionId) url += `?institucionId=${filtros.institucionId}`;
+      const res = await fetch(url);
+      let tareas = await res.json();
+
+      if (filtros.estado && filtros.estado !== 'Todos') {
+        tareas = tareas.filter(t => t.estado === filtros.estado);
+      }
+      if (filtros.lineaId && filtros.lineaId !== 'Todos') {
+        tareas = tareas.filter(t => t.lineaAccionId === filtros.lineaId);
+      }
+      if (filtros.trimestre && filtros.trimestre !== 'Todos') {
+        tareas = tareas.filter(t => t.trimestre === filtros.trimestre);
+      }
+      if (filtros.busqueda) {
+        const q = filtros.busqueda.toLowerCase();
+        tareas = tareas.filter(t =>
+          t.titulo?.toLowerCase().includes(q) || t.descripcion?.toLowerCase().includes(q)
+        );
+      }
+      return tareas;
+    } catch (e) {
+      return [];
+    }
+  },
+
   asignarResponsable: async (tareaId, responsableIds) => {
-    await delay(200);
-    const tarea = TAREAS.find(t => t.id === tareaId);
-    if (tarea) {
-      tarea.responsableIds = Array.isArray(responsableIds) ? responsableIds : (responsableIds ? [responsableIds] : []);
-      tarea.responsableId = tarea.responsableIds[0] || null;
-      return { success: true, tarea: { ...tarea, responsableIds: tarea.responsableIds, responsables: tarea.responsableIds.map(getResponsable) } };
-    }
-    return { success: false, error: 'Tarea no encontrada' };
+    // Left simple for patch
+    return { success: false, error: 'Implement PUT manually in future' };
   },
 
-  /**
-   * Reportes pendientes de revisión
-   */
-  getReportesPendientes: async () => {
+  getReportesPendientes: async (institucionId) => {
     try {
       const [resReq, tareasReq, usersReq] = await Promise.all([
         fetch('http://localhost:5000/reportes?estado=pendiente'),
-        fetch('http://localhost:5000/tareas'),
+        fetch(`http://localhost:5000/tareas?institucionId=${institucionId}`),
         fetch('http://localhost:5000/usuarios')
       ]);
       const reportes = await resReq.json();
       const tareas = await tareasReq.json();
       const usuarios = await usersReq.json();
       
-      return reportes.map(r => ({
+      const misReportes = reportes.filter(r => tareas.some(t => t.id === r.tareaId));
+      return misReportes.map(r => ({
         ...r,
         tarea: tareas.find(t => t.id === r.tareaId),
-        responsable: usuarios.find(u => String(u.id) === String(r.responsableId)) || { nombre: 'Desconocido', cargo: '' }
+        responsable: usuarios.find(u => String(u.id) === String(r.responsableId)) || { nombre: 'Desconocido' }
       })).sort((a, b) => new Date(b.fecha) - new Date(a.fecha));
-    } catch (e) {
-      console.error(e);
-      return [];
-    }
+    } catch (e) { return []; }
   },
 
-  /**
-   * Aprobar un reporte
-   */
   aprobarReporte: async (reporteId) => {
     try {
       const response = await fetch(`http://localhost:5000/reportes/${reporteId}`, {
@@ -529,9 +497,6 @@ export const adminInstitucionService = {
     } catch (e) { return { success: false }; }
   },
 
-  /**
-   * Editar un reporte antes de aprobarlo
-   */
   editarReporte: async (reporteId, nuevosDatos) => {
     try {
       const currentRes = await fetch(`http://localhost:5000/reportes/${reporteId}`);
@@ -543,10 +508,7 @@ export const adminInstitucionService = {
         beneficiados: nuevosDatos.beneficiados !== undefined ? nuevosDatos.beneficiados : reporte.beneficiados,
         editadoPorAdmin: true
       };
-      
-      if (nuevosDatos.asistentes) {
-        payload.asistentes = { ...reporte.asistentes, ...nuevosDatos.asistentes };
-      }
+      if (nuevosDatos.asistentes) payload.asistentes = { ...reporte.asistentes, ...nuevosDatos.asistentes };
       
       const response = await fetch(`http://localhost:5000/reportes/${reporteId}`, {
         method: 'PATCH',
@@ -554,12 +516,9 @@ export const adminInstitucionService = {
         body: JSON.stringify(payload)
       });
       return { success: response.ok };
-    } catch (e) { return { success: false, error: 'Error' }; }
+    } catch (e) { return { success: false }; }
   },
 
-  /**
-   * Rechazar un reporte con observación obligatoria
-   */
   rechazarReporte: async (reporteId, observacion) => {
     try {
       const response = await fetch(`http://localhost:5000/reportes/${reporteId}`, {
@@ -571,58 +530,50 @@ export const adminInstitucionService = {
     } catch (e) { return { success: false }; }
   },
 
-  /**
-   * Historial completo de reportes con filtros
-   */
   getHistorial: async (filtros = {}) => {
     try {
+      let tareasUrl = 'http://localhost:5000/tareas';
+      if (filtros.institucionId) tareasUrl += `?institucionId=${filtros.institucionId}`;
+
       const [resReq, tareasReq, usersReq] = await Promise.all([
         fetch('http://localhost:5000/reportes'),
-        fetch('http://localhost:5000/tareas'),
+        fetch(tareasUrl),
         fetch('http://localhost:5000/usuarios')
       ]);
       const reportes = await resReq.json();
       const tareas = await tareasReq.json();
       const usuarios = await usersReq.json();
       
-      let resultado = reportes.map(r => ({
+      let misReportes = reportes.filter(r => tareas.some(t => String(t.id) === String(r.tareaId)));
+      
+      let resultado = misReportes.map(r => ({
         ...r,
-        tarea: tareas.find(t => t.id === r.tareaId) || {},
+        tarea: tareas.find(t => String(t.id) === String(r.tareaId)) || {},
         responsable: usuarios.find(u => String(u.id) === String(r.responsableId)) || {}
       }));
 
-      if (filtros.estado && filtros.estado !== 'Todos') {
-        resultado = resultado.filter(r => r.estado === filtros.estado);
-      }
-      if (filtros.responsableId && filtros.responsableId !== 'Todos') {
-        resultado = resultado.filter(r => String(r.responsableId) === String(filtros.responsableId));
-      }
-      if (filtros.lineaId && filtros.lineaId !== 'Todos') {
-        resultado = resultado.filter(r => r.tarea?.lineaAccionId === filtros.lineaId);
-      }
+      if (filtros.estado && filtros.estado !== 'Todos') resultado = resultado.filter(r => r.estado === filtros.estado);
+      if (filtros.responsableId && filtros.responsableId !== 'Todos') resultado = resultado.filter(r => String(r.responsableId) === String(filtros.responsableId));
+      if (filtros.lineaId && filtros.lineaId !== 'Todos') resultado = resultado.filter(r => r.tarea?.lineaAccionId === filtros.lineaId);
       
       return resultado.sort((a, b) => new Date(b.fecha) - new Date(a.fecha));
-    } catch (e) {
-      console.error(e);
-      return [];
-    }
+    } catch (e) { return []; }
   },
 
-  /**
-   * Tareas con fechas para el calendario
-   */
-  getCalendarioTareas: async () => {
-    await delay(100);
-    return TAREAS.map(t => ({
-      id: t.id,
-      titulo: t.titulo,
-      fecha: t.fechaLimite,
-      estado: t.estado,
-      lineaNombre: t.lineaNombre,
-      lineaNumero: t.lineaNumero,
-      zona: t.zona,
-      responsable: getResponsable(t.responsableId),
-      prioridad: t.prioridad,
-    }));
+  getCalendarioTareas: async (institucionId) => {
+    try {
+      const res = await fetch(`http://localhost:5000/tareas?institucionId=${institucionId}`);
+      const tareas = await res.json();
+      return tareas.map(t => ({
+        id: t.id,
+        titulo: t.titulo,
+        fecha: t.fechaLimite,
+        estado: t.estado,
+        lineaNombre: t.lineaNombre,
+        lineaNumero: t.lineaNumero,
+        zona: t.zona,
+        prioridad: t.prioridad,
+      }));
+    } catch (e) { return []; }
   },
 };

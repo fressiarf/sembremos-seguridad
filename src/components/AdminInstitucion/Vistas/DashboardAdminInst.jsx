@@ -1,18 +1,27 @@
 import React, { useState, useEffect } from 'react';
 import { adminInstitucionService } from '../../../services/adminInstitucionService';
 import { useToast } from '../../../context/ToastContext';
-import { CheckCircle, Clock, FileSearch, Activity, AlertTriangle, Users, Target, MapPin, Calendar as CalIcon } from 'lucide-react';
+import { useLogin } from '../../../context/LoginContext';
+import { 
+  CheckCircle, Clock, Activity, AlertTriangle, 
+  MapPin, Flag, FileText, ChevronRight, FileSearch, Users, Calendar as CalIcon, Target
+} from 'lucide-react';
 import '../AdminInstitucion.css';
 
 const DashboardAdminInst = () => {
-  const [data, setData] = useState(null);
+  const { user } = useLogin();
+  const [data, setData] = useState({
+    estadisticas: { totalTareas: 0, completadas: 0, conActividades: 0, sinActividades: 0, reportesPendientes: 0, progreso: 0 },
+    urgentes: [], reportesRecientes: []
+  });
   const [loading, setLoading] = useState(true);
   const { showToast } = useToast();
 
   useEffect(() => {
-    const load = async () => {
+    const fetchData = async () => {
+      if (!user?.id) return;
       try {
-        const result = await adminInstitucionService.getDashboardData();
+        const result = await adminInstitucionService.getDashboardData(user.id);
         setData(result);
       } catch (e) {
         showToast('Error al cargar dashboard', 'error');
@@ -20,8 +29,8 @@ const DashboardAdminInst = () => {
         setLoading(false);
       }
     };
-    load();
-  }, []);
+    fetchData();
+  }, [user?.id]);
 
   if (loading) return <div style={{ padding: '3rem', color: '#7a9cc4' }}>Cargando dashboard...</div>;
   if (!data) return null;

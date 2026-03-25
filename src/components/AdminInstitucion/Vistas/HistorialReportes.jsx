@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { adminInstitucionService } from '../../../services/adminInstitucionService';
 import { useToast } from '../../../context/ToastContext';
+import { useLogin } from '../../../context/LoginContext';
 import { Clock, Users, Activity, CheckCircle, XCircle, AlertCircle, Image } from 'lucide-react';
 import '../AdminInstitucion.css';
 
 const HistorialReportes = () => {
+  const { user } = useLogin();
   const [reportes, setReportes] = useState([]);
   const [responsables, setResponsables] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -17,11 +19,12 @@ const HistorialReportes = () => {
   const { showToast } = useToast();
 
   const loadData = async () => {
+    if (!user?.id) return;
     try {
       setLoading(true);
       const [historial, resps] = await Promise.all([
-        adminInstitucionService.getHistorial(filtros),
-        adminInstitucionService.getResponsables(),
+        adminInstitucionService.getHistorial({ ...filtros, institucionId: user.id }),
+        adminInstitucionService.getResponsables()
       ]);
       setReportes(historial);
       setResponsables(resps);
@@ -32,7 +35,7 @@ const HistorialReportes = () => {
     }
   };
 
-  useEffect(() => { loadData(); }, [filtros]);
+  useEffect(() => { loadData(); }, [filtros, user?.id]);
 
   const handleFiltro = (key, value) => {
     setFiltros(prev => ({ ...prev, [key]: value }));

@@ -14,6 +14,16 @@ const TIPOS_ACTIVIDAD = [
   'Evento Deportivo', 'Mesa de Articulación', 'Otro'
 ];
 
+const LOCATION_DATA = {
+  "Puntarenas": {
+    "Puntarenas": ["Puntarenas Centro", "Barranca", "El Roble", "Chacarita", "Fray Casiano", "El Carmen"],
+    "Esparza": ["Espíritu Santo", "San Juan", "Macacona", "San Rafael", "San Jerónimo"]
+  },
+  "San José": {
+    "San José": ["Carmen", "Merced", "Hospital", "Catedral", "Zapote", "San Francisco de Dos Ríos", "Uruca", "Mata Redonda", "Pavas", "Hatillo", "San Sebastián"]
+  }
+};
+
 const AGE_GROUPS = [
   { key: 'ninos', label: 'Niñez', range: '0-12 años', emoji: '👶' },
   { key: 'adolescentes', label: 'Adolescencia', range: '13-17 años', emoji: '🧑' },
@@ -22,7 +32,7 @@ const AGE_GROUPS = [
   { key: 'adultoMayor', label: 'Adulto Mayor', range: '60+ años', emoji: '👴' },
 ];
 
-const FormInstitucion = ({ tarea, onComplete }) => {
+const FormInstitucion = ({ tarea, onComplete, initialReporte = null }) => {
   const { showToast } = useToast();
   const { user } = useLogin();
   const fileInputRef = useRef(null);
@@ -37,19 +47,25 @@ const FormInstitucion = ({ tarea, onComplete }) => {
     observaciones: false,
   });
 
-  // Form data
+  // Form data pre-filled if initialReporte is provided
   const [formData, setFormData] = useState({
-    tipoActividad: '',
-    fechaRealizacion: '',
-    lugar: '',
-    descripcion: '',
-    asistentes: { ninos: '', adolescentes: '', jovenes: '', adultos: '', adultoMayor: '' },
-    inversionColones: '',
-    detalleRecursos: '',
-    observaciones: '',
+    tipoActividad: initialReporte?.tipoActividad || '',
+    fechaRealizacion: initialReporte?.fecha || '',
+    provincia: '',
+    canton: '',
+    distrito: '',
+    lugarExacto: initialReporte?.lugar || '',
+    descripcion: initialReporte?.descripcion || '',
+    asistentes: initialReporte?.asistentes || { ninos: '', adolescentes: '', jovenes: '', adultos: '', adultoMayor: '' },
+    inversionColones: initialReporte?.inversionColones || '',
+    detalleRecursos: initialReporte?.detalleRecursos || '',
+    observaciones: initialReporte?.observaciones || '',
+    permisosImagen: false,
   });
 
-  const [archivos, setArchivos] = useState([]);
+  const [archivos, setArchivos] = useState(
+    initialReporte?.fotos ? initialReporte.fotos.map(f => ({ name: f, size: 'Pre-cargado' })) : []
+  );
 
   const toggleSection = (key) => {
     setSections(prev => ({ ...prev, [key]: !prev[key] }));
@@ -104,15 +120,19 @@ const FormInstitucion = ({ tarea, onComplete }) => {
       showToast('Ingresá al menos un asistente en la sección de población beneficiada', 'warning');
       return;
     }
+    if (archivos.length > 0 && !formData.permisosImagen) {
+      showToast('Debe confirmar el uso legal de las imágenes adjuntas marcando la casilla al final del formulario.', 'warning');
+      return;
+    }
 
     setLoading(true);
     try {
-      await institucionService.completarTarea(tarea.id, {
+      const payload = {
         responsableId: user?.id,
         reporteInstitucion: formData.descripcion,
         tipoActividad: formData.tipoActividad,
         fechaRealizacion: formData.fechaRealizacion || new Date().toISOString().split('T')[0],
-        lugar: formData.lugar,
+        lugar: formData.distrito ? `${formData.distrito}, ${formData.canton}. ${formData.lugarExacto}` : formData.lugarExacto,
         asistentes: {
           ninos: parseInt(formData.asistentes.ninos) || 0,
           adolescentes: parseInt(formData.asistentes.adolescentes) || 0,
@@ -126,9 +146,16 @@ const FormInstitucion = ({ tarea, onComplete }) => {
         archivos: archivos.map(f => f.name),
         observaciones: formData.observaciones,
         fotos: archivos.map(f => f.name),
-      });
+      };
 
-      showToast('¡Reporte enviado exitosamente! ✓', 'success');
+      if (initialReporte) {
+        await institucionService.editarReporteRechazado(initialReporte.id, payload);
+        showToast('¡Reporte corregido y enviado exitosamente! ✓', 'success');
+      } else {
+        await institucionService.completarTarea(tarea.id, payload);
+        showToast('¡Reporte generado exitosamente! ✓', 'success');
+      }
+      
       onComplete();
     } catch (error) {
       showToast('Error al enviar el reporte', 'error');
@@ -153,7 +180,7 @@ const FormInstitucion = ({ tarea, onComplete }) => {
         <SectionHeader icon={ClipboardList} title="Información de la Actividad" sectionKey="actividad" />
         {sections.actividad && (
           <div className="form-section-body">
-            <div className="fr-row-3">
+            <div className="fr-row-2">
               <div>
                 <label className="fr-label">Tipo de Actividad <span className="required">*</span></label>
                 <select 
@@ -176,18 +203,41 @@ const FormInstitucion = ({ tarea, onComplete }) => {
                   onChange={e => updateField('fechaRealizacion', e.target.value)}
                 />
               </div>
+            </div>
+            <div className="fr-row-3" style={{ marginTop: '1rem' }}>
               <div>
-                <label className="fr-label">Lugar / Ubicación</label>
-                <input 
-                  type="text" 
-                  className="fr-input"
-                  placeholder="Ej: Escuela de Barranca"
-                  value={formData.lugar}
-                  onChange={e => updateField('lugar', e.target.value)}
-                />
+                <label className="fr-label">Provincia</label>
+                <select className="fr-select" value={formData.provincia} onChange={e => setFormData({...formData, provincia: e.target.value, canton: '', distrito: ''})}>
+                  <option value="">Seleccionar...</option>
+                  {Object.keys(LOCATION_DATA).map(p => <option key={p} value={p}>{p}</option>)}
+                </select>
+              </div>
+              <div>
+                <label className="fr-label">Cantón</label>
+                <select className="fr-select" value={formData.canton} onChange={e => setFormData({...formData, canton: e.target.value, distrito: ''})} disabled={!formData.provincia}>
+                  <option value="">Seleccionar...</option>
+                  {formData.provincia && Object.keys(LOCATION_DATA[formData.provincia]).map(c => <option key={c} value={c}>{c}</option>)}
+                </select>
+              </div>
+              <div>
+                <label className="fr-label">Distrito</label>
+                <select className="fr-select" value={formData.distrito} onChange={e => setFormData({...formData, distrito: e.target.value})} disabled={!formData.canton}>
+                  <option value="">Seleccionar...</option>
+                  {formData.canton && LOCATION_DATA[formData.provincia][formData.canton].map(d => <option key={d} value={d}>{d}</option>)}
+                </select>
               </div>
             </div>
-            <div>
+            <div style={{ marginTop: '1rem' }}>
+              <label className="fr-label">Detalle Exacto del Lugar (Punto de Referencia)</label>
+              <input 
+                type="text" 
+                className="fr-input"
+                placeholder="Ej: Salón Comunal, Escuela..."
+                value={formData.lugarExacto}
+                onChange={e => updateField('lugarExacto', e.target.value)}
+              />
+            </div>
+            <div style={{ marginTop: '1rem' }}>
               <label className="fr-label">Descripción de lo realizado <span className="required">*</span></label>
               <textarea 
                 className="fr-textarea"
@@ -323,15 +373,30 @@ const FormInstitucion = ({ tarea, onComplete }) => {
         )}
       </div>
 
+      {/* ═══ CHECKBOX LEGAL ═══ */}
+      <div style={{ padding: '0 0.5rem', marginTop: '0.25rem', marginBottom: '0.5rem' }}>
+        <label style={{ display: 'flex', alignItems: 'flex-start', gap: '12px', cursor: 'pointer' }}>
+          <input 
+            type="checkbox" 
+            checked={formData.permisosImagen}
+            onChange={e => updateField('permisosImagen', e.target.checked)}
+            style={{ marginTop: '4px', width: '18px', height: '18px', accentColor: '#3b82f6', flexShrink: 0 }}
+          />
+          <span style={{ fontSize: '0.8rem', color: '#475569', lineHeight: 1.5 }}>
+            <strong style={{ color: '#0b2240' }}>Declaración jurada de uso de imagen:</strong> Confirmo que las fotografías o material audiovisual adjunto cuentan con los permisos y consentimientos informados requeridos por la legislación vigente para su uso como evidencia oficial en el programa Sembremos Seguridad y organismos cooperantes (INL).
+          </span>
+        </label>
+      </div>
+
       {/* ═══ SUBMIT ═══ */}
       <div className="fr-submit-wrapper">
         <button type="submit" disabled={loading} className="fr-submit-btn">
           {loading ? (
-            'Enviando Reporte...'
+            'Guardando Reporte...'
           ) : (
             <>
               <Send size={18} />
-              Enviar Reporte de Resultados
+              {initialReporte ? 'Enviar Corrección' : 'Enviar Reporte de Resultados'}
             </>
           )}
         </button>

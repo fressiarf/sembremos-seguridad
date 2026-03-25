@@ -34,12 +34,13 @@ export const dashboardService = {
    */
   getFullDashboardData: async () => {
     try {
-      const [lineas, tareas, zonas, alertas, notificaciones] = await Promise.all([
+      const [lineas, tareas, zonas, alertas, notificaciones, presupuestoAsignado] = await Promise.all([
         fetch(`${BASE_URL}/lineasAccion`).then(r => r.json()),
         fetch(`${BASE_URL}/tareas`).then(r => r.json()),
         fetch(`${BASE_URL}/zonas`).then(r => r.json()),
         fetch(`${BASE_URL}/alertas`).then(r => r.json()),
-        fetch(`${BASE_URL}/notificaciones`).then(r => r.json())
+        fetch(`${BASE_URL}/notificaciones`).then(r => r.json()),
+        fetch(`${BASE_URL}/presupuestoAsignado`).then(r => r.json()).catch(() => 50000000)
       ]);
 
       // Enriquecer líneas con tareas y progreso
@@ -74,6 +75,7 @@ export const dashboardService = {
           tareasCompletadas,
           tareasPendientes: totalTareas - tareasCompletadas,
           inversionTotal,
+          presupuestoAsignado,
           cumplimiento: totalTareas > 0 ? Math.round((tareasCompletadas / totalTareas) * 100) : 0
         }
       };

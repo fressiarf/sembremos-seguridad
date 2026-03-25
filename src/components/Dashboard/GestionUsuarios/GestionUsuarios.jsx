@@ -3,25 +3,13 @@ import './GestionUsuarios.css';
 import { userService } from '../../../services/userService';
 import { useToast } from '../../../context/ToastContext';
 import { Search, UserCog, Shield, UserPlus, X, Key, Mail, Fingerprint, User as UserIcon } from 'lucide-react';
+import { useLogin } from '../../../context/LoginContext';
 
 const GestionUsuarios = () => {
-  const [users, setUsers] = useState([]);
-  const [searchQuery, setSearchQuery] = useState('');
-  const [loading, setLoading] = useState(true);
-  const [updatingId, setUpdatingId] = useState(null);
-  const [showCreateModal, setShowCreateModal] = useState(false);
-  const [newUser, setNewUser] = useState({
-    nombre: '',
-    cedula: '',
-    usuario: '',
-    password: '',
-    rol: 'institución'
-  });
-  const { showToast } = useToast();
-
+  const { user } = useLogin();
+  const currentUser = user || { nombre: 'C. Araya', rol: 'admin' };
   
-  // En un sistema real, esto vendría del LoginContext
-  const currentUser = { nombre: 'C. Araya', rol: 'admin' };
+  const [users, setUsers] = useState([]);
 
   useEffect(() => {
     fetchUsers();
@@ -126,10 +114,12 @@ const GestionUsuarios = () => {
             </button>
           )}
         </div>
-        <button className="btn-create-user" onClick={() => setShowCreateModal(true)}>
-            <UserPlus size={18} />
-            <span>Nuevo Usuario</span>
-        </button>
+        {currentUser.rol !== 'auditor' && (
+          <button className="btn-create-user" onClick={() => setShowCreateModal(true)}>
+              <UserPlus size={18} />
+              <span>Nuevo Usuario</span>
+          </button>
+        )}
       </section>
 
       {showCreateModal && (
@@ -247,15 +237,19 @@ const GestionUsuarios = () => {
                 </td>
                 <td style={{ color: '#7a9cc4', fontSize: '0.8rem' }}>14 Mar, 2025</td>
                 <td style={{ textAlign: 'right' }}>
-                  <button 
-                    className="btn-change-role"
-                    onClick={() => handleToggleRole(user.id, user.rol)}
-                    disabled={updatingId === user.id}
-                    title={`Cambiar a ${user.rol === 'admin' ? 'Institución' : 'Administrador'}`}
-                  >
-                    <UserCog size={16} />
-                    {updatingId === user.id ? 'Actualizando...' : (user.rol === 'admin' ? 'Cambio a Institución' : 'Hacer Admin')}
-                  </button>
+                  {currentUser.rol !== 'auditor' ? (
+                    <button 
+                      className="btn-change-role"
+                      onClick={() => handleToggleRole(user.id, user.rol)}
+                      disabled={updatingId === user.id}
+                      title={`Cambiar a ${user.rol === 'admin' ? 'Institución' : 'Administrador'}`}
+                    >
+                      <UserCog size={16} />
+                      {updatingId === user.id ? 'Actualizando...' : (user.rol === 'admin' ? 'Cambio a Institución' : 'Hacer Admin')}
+                    </button>
+                  ) : (
+                    <span style={{ fontSize: '0.8rem', color: '#94a3b8' }}>Solo lectura</span>
+                  )}
                 </td>
 
               </tr>

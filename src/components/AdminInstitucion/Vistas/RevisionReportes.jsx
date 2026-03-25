@@ -1,7 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { adminInstitucionService } from '../../../services/adminInstitucionService';
 import { useToast } from '../../../context/ToastContext';
-import { FileSearch, CheckCircle, XCircle, Users, Calendar, Target, Activity, Image as ImageIcon, ChevronDown, ChevronUp, Edit3, Save, MapPin } from 'lucide-react';
+import { useLogin } from '../../../context/LoginContext';
+import { 
+  Clock, CheckCircle, XCircle, Search, 
+  Filter, FileText, Activity, AlertCircle, Edit, MessageSquare, ChevronDown,
+  FileSearch, ChevronUp, Save, Image as ImageIcon, Edit3, MapPin, Calendar
+} from 'lucide-react';
+import ReportePreviewCard from './ReportePreviewCard';
 import '../AdminInstitucion.css';
 
 const LINEAS_ACCION_INFO = [
@@ -12,10 +18,13 @@ const LINEAS_ACCION_INFO = [
 ];
 
 const RevisionReportes = () => {
+  const { user } = useLogin();
   const [reportes, setReportes] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [rechazandoId, setRechazandoId] = useState(null);
-  const [observacion, setObservacion] = useState('');
+  const [searchTerm, setSearchTerm] = useState('');
+  const [filtroLinea, setFiltroLinea] = useState('Todas');
+  const [modalRechazo, setModalRechazo] = useState({ show: false, reporteId: null, observacion: '' });
+  const [modalEdicion, setModalEdicion] = useState({ show: false, reporte: null });
   
   // Edit mode state
   const [editandoId, setEditandoId] = useState(null);
@@ -24,10 +33,11 @@ const RevisionReportes = () => {
   const [lineasExpandidas, setLineasExpandidas] = useState({});
   const { showToast } = useToast();
 
-  const loadReportes = async () => {
+  const loadData = async () => {
+    if (!user?.id) return;
     try {
       setLoading(true);
-      const data = await adminInstitucionService.getReportesPendientes();
+      const data = await adminInstitucionService.getReportesPendientes(user.id);
       setReportes(data);
     } catch (e) {
       showToast('Error al cargar reportes', 'error');
@@ -36,14 +46,14 @@ const RevisionReportes = () => {
     }
   };
 
-  useEffect(() => { loadReportes(); }, []);
+  useEffect(() => { loadData(); }, []);
 
   const handleAprobar = async (reporteId) => {
     try {
       const result = await adminInstitucionService.aprobarReporte(reporteId);
       if (result.success) {
         showToast('Reporte aprobado ✅ — Enviado al Admin Global', 'success');
-        loadReportes();
+        loadData();
       }
     } catch (e) {
       showToast('Error al aprobar', 'error');
@@ -51,17 +61,16 @@ const RevisionReportes = () => {
   };
 
   const handleRechazar = async (reporteId) => {
-    if (!observacion.trim()) {
+    if (!modalRechazo.observacion.trim()) {
       showToast('La observación es obligatoria al rechazar', 'warning');
       return;
     }
     try {
-      const result = await adminInstitucionService.rechazarReporte(reporteId, observacion.trim());
+      const result = await adminInstitucionService.rechazarReporte(reporteId, modalRechazo.observacion.trim());
       if (result.success) {
         showToast('Reporte rechazado ❌ — Devuelto al responsable', 'info');
-        setRechazandoId(null);
-        setObservacion('');
-        loadReportes();
+        setModalRechazo({ show: false, reporteId: null, observacion: '' });
+        loadData();
       }
     } catch (e) {
       showToast('Error al rechazar', 'error');
@@ -70,7 +79,7 @@ const RevisionReportes = () => {
 
   // Edición
   const handleIniciarEdicion = (reporte) => {
-    setRechazandoId(null); // Close reject form if open
+    setModalRechazo({ show: false, reporteId: null, observacion: '' }); 
     setEditandoId(reporte.id);
     setEditForm({ descripcion: reporte.descripcion, beneficiados: reporte.beneficiados });
   };
@@ -85,7 +94,7 @@ const RevisionReportes = () => {
       if (result.success) {
         showToast('Reporte editado correctamente 📝', 'success');
         setEditandoId(null);
-        loadReportes();
+        loadData();
       }
     } catch (e) {
       showToast('Error al editar el reporte', 'error');
@@ -318,7 +327,7 @@ const RevisionReportes = () => {
                         </div>
 
                         {/* Actions */}
-                        {rechazandoId !== reporte.id && editandoId !== reporte.id && (
+                        {!modalRechazo.show && editandoId !== reporte.id && (
                           <div className="admin-inst-report-actions">
                             <button
                               className="admin-inst-btn admin-inst-btn--aprobar"
@@ -340,8 +349,7 @@ const RevisionReportes = () => {
                               className="admin-inst-btn admin-inst-btn--rechazar"
                               onClick={() => {
                                 setEditandoId(null);
-                                setRechazandoId(reporte.id);
-                                setObservacion('');
+                                setModalRechazo({ show: true, reporteId: reporte.id, observacion: '' });
                               }}
                               title="Devolver al responsable para que lo corrija"
                             >
@@ -351,15 +359,15 @@ const RevisionReportes = () => {
                         )}
 
                         {/* Reject area */}
-                        {rechazandoId === reporte.id && (
+                        {modalRechazo.show && modalRechazo.reporteId === reporte.id && (
                           <div className="admin-inst-reject-area">
                             <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 700, color: '#991b1b', marginBottom: '6px' }}>
                               Observación (obligatoria) — ¿Qué debe corregir el responsable?
                             </label>
                             <textarea
                               className="admin-inst-reject-textarea"
-                              value={observacion}
-                              onChange={e => setObservacion(e.target.value)}
+                              value={modalRechazo.observacion}
+                              onChange={e => setModalRechazo({ ...modalRechazo, observacion: e.target.value })}
                               placeholder="Describa con detalle qué debe corregir o completar el responsable..."
                             />
                             <div style={{ display: 'flex', gap: '8px' }}>
@@ -373,8 +381,7 @@ const RevisionReportes = () => {
                               <button
                                 className="admin-inst-btn admin-inst-btn--secondary"
                                 onClick={() => {
-                                  setRechazandoId(null);
-                                  setObservacion('');
+                                  setModalRechazo({ show: false, reporteId: null, observacion: '' });
                                 }}
                               >
                                 Cancelar

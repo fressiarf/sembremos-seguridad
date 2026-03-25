@@ -85,6 +85,36 @@ export const institucionService = {
   },
 
   /**
+   * Corrige un reporte previamente rechazado y lo vuelve a poner en pendiente
+   */
+  editarReporteRechazado: async (reporteId, reporteData) => {
+    try {
+      const response = await fetch(`${BASE_URL}/reportes/${reporteId}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          estado: 'pendiente',
+          fecha: new Date().toISOString().split('T')[0],
+          descripcion: reporteData.reporteInstitucion || '',
+          beneficiados: reporteData.totalAsistentes || 0,
+          asistentes: reporteData.asistentes || {},
+          tipoActividad: reporteData.tipoActividad || '',
+          inversionColones: reporteData.inversionColones || 0,
+          detalleRecursos: reporteData.detalleRecursos || '',
+          fotos: reporteData.fotos || [],
+          observaciones: reporteData.observaciones || '',
+          observacionRechazo: '' // Resetea la observación del admin
+        })
+      });
+      if (!response.ok) throw new Error('Error updating reporte');
+      return await response.json();
+    } catch (error) {
+      console.error('Error in editarReporteRechazado:', error);
+      throw error;
+    }
+  },
+
+  /**
    * Calcula estadísticas de la institución
    */
   getEstadisticas: async (institucionId) => {
