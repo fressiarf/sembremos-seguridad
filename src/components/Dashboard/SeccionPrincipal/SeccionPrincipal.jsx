@@ -38,7 +38,7 @@ const SeccionPrincipal = ({ collapsed, setCollapsed, activeView }) => {
   const { user } = useLogin();
   const { showToast } = useToast();
   const [showTopbarNotifs, setShowTopbarNotifs] = useState(false);
-  const [hasNewNotifs, setHasNewNotifs] = useState(false);
+  const [notifCount, setNotifCount] = useState(0);
 
   const toggleDrawer = () => {
     setShowTopbarNotifs(prev => {
@@ -68,8 +68,8 @@ const SeccionPrincipal = ({ collapsed, setCollapsed, activeView }) => {
         const evs = JSON.parse(guardados);
         const hoy = new Date();
         const hoyStr = `${hoy.getFullYear()}-${String(hoy.getMonth() + 1).padStart(2, '0')}-${String(hoy.getDate()).padStart(2, '0')}`;
-        const hayNuevas = evs.some(e => e.fecha === hoyStr);
-        setHasNewNotifs(hayNuevas);
+        const hoyEvs = evs.filter(e => e.fecha === hoyStr);
+        setNotifCount(hoyEvs.length);
       }
     };
     checkNotifs();
@@ -105,12 +105,17 @@ const SeccionPrincipal = ({ collapsed, setCollapsed, activeView }) => {
               title="Ver notificaciones de eventos"
             >
                <Bell size={20} color="#002f6c" />
-               {hasNewNotifs && (
+               {notifCount > 0 && (
                  <span style={{ 
-                   position: 'absolute', top: '-1px', right: '-1px', 
-                   width: '10px', height: '10px', backgroundColor: '#ef4444', 
-                   borderRadius: '50%', border: '2px solid white' 
-                 }}></span>
+                    position: 'absolute', top: '-4px', right: '-4px', 
+                    minWidth: '18px', height: '18px', backgroundColor: '#ef4444', 
+                    borderRadius: '50%', border: '2px solid white',
+                    color: 'white', fontSize: '10px', fontWeight: 'bold',
+                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    boxShadow: '0 2px 4px rgba(239, 68, 68, 0.3)'
+                 }}>
+                   {notifCount}
+                 </span>
                )}
             </button>
             
