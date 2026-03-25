@@ -137,12 +137,12 @@
   background: #f8fafc;
   padding: 1rem 1.5rem;
   text-align: left;
-  font-weight: 700;
-  color: var(--inst-text-muted);
+  font-weight: 800;
+  color: #4b5563; /* Gris más oscuro para labels */
   text-transform: uppercase;
   font-size: 0.75rem;
   letter-spacing: 0.05em;
-  border-bottom: 1px solid var(--inst-border);
+  border-bottom: 2px solid #e2e8f0;
 }
 
 .matriz-table td {
@@ -166,8 +166,9 @@
 
 .col-prob strong {
   display: block;
-  font-size: 0.8rem;
-  color: var(--inst-text-dark);
+  font-size: 0.95rem;
+  color: #0f172a; /* Casi negro */
+  font-weight: 800;
 }
 
 .item-id-tag {
@@ -195,9 +196,9 @@
 }
 
 .action-title-main {
-  font-weight: 700;
-  color: var(--inst-text-dark);
-  font-size: 0.85rem;
+  font-weight: 800;
+  color: #0f172a; /* Más oscuro */
+  font-size: 1rem;
   line-height: 1.2;
 }
 

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { FileText, Image as ImageIcon, FileCheck, ChevronDown, Plus, Download, LayoutGrid } from 'lucide-react';
+import { FileText, ChevronDown, Download, LayoutGrid, MapPin, AlertTriangle, CheckSquare, BarChart3, TrendingUp } from 'lucide-react';
 import './DashboardGlobal.css';
 
 const DashboardGlobal = ({ collapsed }) => {
@@ -40,39 +40,17 @@ const DashboardGlobal = ({ collapsed }) => {
     }
   ];
 
-  const informesAvance = [
-    {
-      id: 101,
-      titulo: 'Centro Cívico por la Paz',
-      descripcion: 'Transformación de espacio y uso regular por jóvenes.',
-      lineaId: 4,
-      color: '#22c55e',
-      evidencias: [
-        { type: 'image', name: 'Fachada_Final.jpg' },
-        { type: 'pdf', name: 'Informe_Trimestral.pdf' }
-      ]
-    },
-    {
-      id: 102,
-      titulo: 'Mercadito Navideño',
-      descripcion: 'Feria de emprendimiento juvenil con éxito (L#4).',
-      lineaId: 4,
-      color: '#3b82f6',
-      evidencias: [
-        { type: 'image', name: 'Evento_INA.png' }
-      ]
-    },
-    {
-      id: 103,
-      titulo: 'Operativo "Parques Seguros"',
-      descripcion: 'Recuperación de 3 parques en zona central.',
-      lineaId: 1,
-      color: '#f59e0b',
-      evidencias: [
-        { type: 'pdf', name: 'Acta_Decomisos.pdf' },
-        { type: 'image', name: 'Antes_Despues.jpg' }
-      ]
-    }
+  const impactosDistrito = [
+    { nombre: 'Barranca', impacto: 85, color: '#ef4444', casos: 124, tendencia: 'up' },
+    { nombre: 'El Roble', impacto: 62, color: '#3b82f6', casos: 89, tendencia: 'down' },
+    { nombre: 'Chacarita', impacto: 45, color: '#f59e0b', casos: 67, tendencia: 'stable' },
+    { nombre: 'Puntarenas Centro', impacto: 30, color: '#10b981', casos: 42, tendencia: 'down' }
+  ];
+
+  const zonasCriticas = [
+    { id: 1, nombre: 'Parque Victoria', riesgo: 'Alto', hallazgo: 'Venta activa' },
+    { id: 2, nombre: 'Barrio El Carmen', riesgo: 'Medio', hallazgo: 'Falta alumbrado' },
+    { id: 3, nombre: 'Calle Lucrecia', riesgo: 'Crítico', hallazgo: 'Búnker detectado' }
   ];
 
   return (
@@ -81,39 +59,94 @@ const DashboardGlobal = ({ collapsed }) => {
       <header className="dashboard-global__banner">
         <div className="banner-content">
           <div className="dashboard-global__title-block">
-            <h1>Dashboard global</h1>
-            <p>Programa Sembremos Seguridad · Cantón Puntarenas (Periodo 2025)</p>
+            <div className="banner-badge">SISTEMA INTEGRAL DE MONITOREO</div>
+            <h1>Dashboard Global Estratégico</h1>
+            <p>Observatorio Sembremos Seguridad · Cantón Puntarenas (Periodo 2025)</p>
           </div>
 
-          {/* Dashboard Summary Stats (Top Right) */}
-          <div className="dashboard-summary-stats">
-            <div className="stat-pill">
-              <span className="stat-label">Progreso General</span>
-              <div className="stat-value-group">
-                <span className="stat-value">37.5%</span>
-                <div className="stat-mini-bar">
-                  <div className="stat-mini-fill" style={{ width: '37.5%' }}></div>
-                </div>
-              </div>
-            </div>
+          <div className="dashboard-top-stats-grid">
+             <div className="stat-card-mini">
+               <div className="mini-icon blue"><CheckSquare size={16} /></div>
+               <div className="mini-data">
+                 <span className="mini-val">42/120</span>
+                 <span className="mini-lbl">Tareas</span>
+               </div>
+             </div>
+             <div className="stat-card-mini">
+               <div className="mini-icon red"><AlertTriangle size={16} /></div>
+               <div className="mini-data">
+                 <span className="mini-val">12</span>
+                 <span className="mini-lbl">Alertas</span>
+               </div>
+             </div>
+             <div className="stat-card-mini progress-main-card">
+               <span className="mini-lbl">Progreso Cantonal</span>
+               <div className="main-prog-group">
+                 <span className="main-prog-val">37.5%</span>
+                 <div className="main-prog-bar"><div className="fill" style={{width:'37.5%'}}></div></div>
+               </div>
+             </div>
           </div>
         </div>
       </header>
 
       <div className="dashboard-global-body">
-        <div className="dashboard-sections-stack">
+        <div className="dashboard-main-grid-layout">
           
-          {/* ── Section 1: Avance Estratégico (Grid 2x2) ── */}
-          <section className="dashboard-section-v3">
-            <div className="section-header-row-v3">
-              <h2 className="section-subtitle-v3">
-                <FileText size={22} className="subtitle-icon" /> 
-                <span>Avance Estratégico por Línea de Acción</span>
-                <div className="section-badge inline">4 Líneas Activas</div>
-              </h2>
-            </div>
-            
-            <div className="lineas-cascade-container">
+          <div className="dashboard-left-column">
+            {/* ── Impacto Territorial ── */}
+            <section className="dashboard-card-v4 impact-section">
+              <div className="card-v4-header">
+                <BarChart3 size={20} className="header-icon" />
+                <h3>Impacto Territorial por Distrito</h3>
+              </div>
+              <div className="impact-distritos-list">
+                {impactosDistrito.map((d, i) => (
+                  <div key={i} className="distrito-impact-item">
+                    <div className="distrito-info">
+                      <span className="distrito-name">{d.nombre}</span>
+                      <span className="distrito-casos">{d.casos} Incidencias</span>
+                    </div>
+                    <div className="impact-bar-wrapper">
+                      <div className="impact-bar-track">
+                        <div className="impact-bar-fill" style={{ width: `${d.impacto}%`, backgroundColor: d.color }}></div>
+                      </div>
+                      <span className="impact-pct">{d.impacto}%</span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </section>
+
+            {/* ── Zonas Críticas ── */}
+            <section className="dashboard-card-v4 zones-section">
+              <div className="card-v4-header">
+                <MapPin size={20} className="header-icon" />
+                <h3>Focos de Atención Crítica</h3>
+              </div>
+              <div className="zones-summary-grid">
+                {zonasCriticas.map(z => (
+                  <div key={z.id} className="zone-summary-item">
+                    <div className="zone-badge" data-level={z.riesgo}>{z.riesgo}</div>
+                    <div className="zone-details">
+                      <strong>{z.nombre}</strong>
+                      <p>{z.hallazgo}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </section>
+          </div>
+
+          <div className="dashboard-right-column">
+            {/* ── Avance Estratégico (Cascade) ── */}
+            <section className="dashboard-card-v4 strategy-section">
+              <div className="card-v4-header">
+                <TrendingUp size={20} className="header-icon" />
+                <h3>Avance por Línea de Acción (Estratégico)</h3>
+              </div>
+              
+              <div className="lineas-cascade-container">
               {lineasDeAccion.map((linea) => (
                 <div 
                   key={linea.id} 
@@ -166,51 +199,16 @@ const DashboardGlobal = ({ collapsed }) => {
                           </div>
                         </div>
                       </div>
-
-                      {/* Informes vinculados */}
-                      <div className="bar-reports-container">
-                        <div className="reports-label-mini">
-                          <FileText size={14} />
-                          <span>Reportes de Ejecución</span>
-                        </div>
-                        <div className="reports-mini-grid">
-                          {informesAvance
-                            .filter(inf => inf.lineaId === linea.id)
-                            .map(informe => (
-                              <div key={informe.id} className="report-mini-card">
-                                <div className="report-mini-header">
-                                  <h5>{informe.titulo}</h5>
-                                  <span className="report-mini-date">Hace 2 días</span>
-                                </div>
-                                <p>{informe.descripcion}</p>
-                                <div className="report-mini-evidencia">
-                                  {informe.evidencias.map((ev, i) => (
-                                    <div key={i} className={`mini-ev-tag ${ev.type}`}>
-                                      {ev.type === 'image' ? <ImageIcon size={10} /> : <FileText size={10} />}
-                                      <span>{ev.name.split('.')[0]}</span>
-                                    </div>
-                                  ))}
-                                </div>
-                              </div>
-                            ))
-                          }
-                          <button className="btn-add-report-bar">
-                            <Plus size={14} />
-                            Añadir Avance
-                          </button>
-                        </div>
-                      </div>
                     </div>
                   )}
                 </div>
               ))}
             </div>
           </section>
-
+          </div>
         </div>
       </div>
     </div>
-
   );
 };
 

@@ -88,8 +88,8 @@ const MatrizSeguimiento = () => {
           <thead>
             <tr>
               <th>No.</th>
-              <th>Problemática</th>
               <th>Línea de Acción</th>
+              <th>Problemática</th>
               <th>Indicador / Meta</th>
               <th>Responsables</th>
               <th>Progreso</th>
@@ -101,13 +101,13 @@ const MatrizSeguimiento = () => {
               <React.Fragment key={item.id}>
                 <tr>
                   <td className="col-no"><small>#{item.no}</small></td>
+                  <td className="col-accion">
+                    <div className="action-title-main">{item.lineaAccion}</div>
+                  </td>
                   <td className="col-prob">
                     <div className="status-dot-mini" style={{ background: item.progreso === 100 ? '#22c55e' : item.progreso > 0 ? '#3b82f6' : '#94a3b8' }} />
                     <strong>{item.problematica}</strong>
                     <div className="item-id-tag">{item.id}</div>
-                  </td>
-                  <td className="col-accion">
-                    <div className="action-title-main">{item.lineaAccion}</div>
                   </td>
                   <td className="col-meta">
                     <div className="action-meta-main">{item.meta || '—'}</div>
