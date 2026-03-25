@@ -1,6 +1,81 @@
 import React, { useState } from 'react';
-import { FileText, ChevronDown, Download, LayoutGrid, MapPin, AlertTriangle, CheckSquare, BarChart3, TrendingUp } from 'lucide-react';
+import { FileText, ChevronDown, Download, LayoutGrid, MapPin, AlertTriangle, CheckSquare, BarChart3, TrendingUp, Activity } from 'lucide-react';
 import './DashboardGlobal.css';
+import ReactECharts from 'echarts-for-react';
+
+const RiskRadar = () => {
+  const option = {
+    radar: {
+      indicator: [
+        { name: 'Prevención', max: 100 },
+        { name: 'Entorno', max: 100 },
+        { name: 'Monitoreo', max: 100 },
+        { name: 'Operatividad', max: 100 },
+        { name: 'Ciudadanía', max: 100 }
+      ],
+      shape: 'circle',
+      splitNumber: 5,
+      axisName: {
+        color: '#002f6c',
+        fontWeight: '800',
+        fontSize: 10,
+        padding: [3, 5]
+      },
+      splitLine: {
+        lineStyle: {
+          color: [
+            'rgba(226, 232, 240, 0.5)',
+            'rgba(226, 232, 240, 0.6)',
+            'rgba(226, 232, 240, 0.7)',
+            'rgba(226, 232, 240, 0.8)',
+            'rgba(226, 232, 240, 1)'
+          ]
+        }
+      },
+      splitArea: {
+        areaStyle: {
+          color: ['#f8fafc', '#ffffff']
+        }
+      },
+      axisLine: {
+        lineStyle: {
+          color: '#e2e8f0'
+        }
+      }
+    },
+    series: [
+      {
+        name: 'Perfil de Riesgo',
+        type: 'radar',
+        data: [
+          {
+            value: [85, 42, 68, 35, 55],
+            name: 'Puntarenas Centro',
+            symbol: 'circle',
+            symbolSize: 6,
+            itemStyle: {
+              color: '#002f6c'
+            },
+            areaStyle: {
+              color: 'rgba(0, 47, 108, 0.15)',
+              opacity: 0.6
+            },
+            lineStyle: {
+              width: 3,
+              color: '#002f6c'
+            }
+          }
+        ]
+      }
+    ],
+    tooltip: {
+      show: true,
+      trigger: 'item'
+    }
+  };
+
+  return <ReactECharts option={option} style={{ height: '300px', width: '100%' }} />;
+};
 
 const DashboardGlobal = ({ collapsed }) => {
   const [expandedRow, setExpandedRow] = useState(null);
@@ -93,9 +168,100 @@ const DashboardGlobal = ({ collapsed }) => {
       <div className="dashboard-global-body">
         <div className="dashboard-main-grid-layout">
           
-          <div className="dashboard-left-column">
-            {/* ── Impacto Territorial ── */}
-            <section className="dashboard-card-v4 impact-section">
+          {/* ── Intelligence Quad Center (2x2) ── */}
+          <main className="intelligence-grid">
+            
+            {/* Cuadro 1: Avance Estratégico (Líneas de Acción con Despliegue) */}
+            <section className="dashboard-card-v4">
+              <div className="card-v4-header">
+                <TrendingUp size={20} className="header-icon" />
+                <h3>Avance Estratégico Cantonal</h3>
+              </div>
+              <div className="lineas-cascade-container">
+                {lineasDeAccion.map((linea) => (
+                  <div 
+                    key={linea.id} 
+                    className={`linea-bar-item ${expandedRow === linea.id ? 'is-expanded' : ''}`}
+                  >
+                    <div 
+                      className="linea-bar-header-click" 
+                      onClick={() => setExpandedRow(expandedRow === linea.id ? null : linea.id)}
+                      style={{ cursor: 'pointer', position: 'relative' }}
+                    >
+                      <div className="linea-bar-title-group">
+                        <div className="linea-bar-dot" style={{ backgroundColor: linea.progreso > 50 ? '#22c55e' : (linea.progreso > 20 ? '#3b82f6' : '#f59e0b') }} />
+                        <span className="linea-bar-label">{linea.titulo}</span>
+                      </div>
+                      <div className="linea-bar-progress-section">
+                        <div className="linea-bar-track">
+                          <div 
+                            className="linea-bar-fill" 
+                            style={{ 
+                              width: `${linea.progreso}%`, 
+                              backgroundColor: linea.progreso > 50 ? '#22c55e' : (linea.progreso > 20 ? '#3b82f6' : '#f59e0b') 
+                            }} 
+                          />
+                        </div>
+                        <span className="linea-bar-pct">{linea.progreso}%</span>
+                      </div>
+                      <div className={`linea-bar-toggle-icon ${expandedRow === linea.id ? 'rotated' : ''}`} style={{ position: 'absolute', top: '10px', right: '0', color: '#94a3b8', transition: 'transform 0.3s' }}>
+                        <ChevronDown size={14} />
+                      </div>
+                    </div>
+
+                    {expandedRow === linea.id && (
+                      <div className="linea-bar-content-mini" style={{ marginTop: '1rem', paddingTop: '1rem', borderTop: '1px solid #f1f5f9' }}>
+                        <div className="sidebar-detail-block">
+                          <label style={{ display: 'block', fontSize: '0.6rem', textTransform: 'uppercase', color: '#64748b', fontWeight: '900', marginBottom: '4px' }}>Problemática</label>
+                          <p style={{ margin: 0, fontSize: '0.8rem', color: '#1e293b', lineHeight: '1.4', fontWeight: '500' }}>{linea.problematica}</p>
+                        </div>
+                        <div className="sidebar-detail-block" style={{ marginTop: '1rem' }}>
+                          <label style={{ display: 'block', fontSize: '0.6rem', textTransform: 'uppercase', color: '#64748b', fontWeight: '900', marginBottom: '4px' }}>Responsables</label>
+                          <div className="sidebar-tags-mini" style={{ display: 'flex', flexWrap: 'wrap', gap: '4px', marginTop: '4px' }}>
+                            {linea.responsables.map((r, i) => (
+                              <span key={i} className="mini-tag" style={{ background: '#eff6ff', color: '#1e3a8a', fontSize: '0.65rem', fontWeight: '700', padding: '2px 8px', borderRadius: '4px', border: '1px solid #dbeafe' }}>{r}</span>
+                            ))}
+                          </div>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                ))}
+              </div>
+            </section>
+
+            {/* Cuadro 2: Perfil Dimensional (Radar) */}
+            <section className="dashboard-card-v4">
+              <div className="card-v4-header">
+                <Activity size={20} className="header-icon" />
+                <h3>Análisis Dimensional</h3>
+              </div>
+              <div className="radar-content" style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%' }}>
+                <RiskRadar />
+              </div>
+            </section>
+
+            {/* Cuadro 3: Zonas de Atención */}
+            <section className="dashboard-card-v4">
+              <div className="card-v4-header">
+                <MapPin size={20} className="header-icon" />
+                <h3>Zonas de Monitoreo Crítico</h3>
+              </div>
+              <div className="zones-summary-grid">
+                {zonasCriticas.map(z => (
+                  <div key={z.id} className="zone-summary-item">
+                    <div className="zone-badge" data-level={z.riesgo}>{z.riesgo}</div>
+                    <div className="zone-details">
+                      <strong>{z.nombre}</strong>
+                      <p>{z.hallazgo}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </section>
+
+            {/* Cuadro 4: Impacto Territorial */}
+            <section className="dashboard-card-v4">
               <div className="card-v4-header">
                 <BarChart3 size={20} className="header-icon" />
                 <h3>Impacto Territorial por Distrito</h3>
@@ -118,94 +284,7 @@ const DashboardGlobal = ({ collapsed }) => {
               </div>
             </section>
 
-            {/* ── Zonas Críticas ── */}
-            <section className="dashboard-card-v4 zones-section">
-              <div className="card-v4-header">
-                <MapPin size={20} className="header-icon" />
-                <h3>Focos de Atención Crítica</h3>
-              </div>
-              <div className="zones-summary-grid">
-                {zonasCriticas.map(z => (
-                  <div key={z.id} className="zone-summary-item">
-                    <div className="zone-badge" data-level={z.riesgo}>{z.riesgo}</div>
-                    <div className="zone-details">
-                      <strong>{z.nombre}</strong>
-                      <p>{z.hallazgo}</p>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </section>
-          </div>
-
-          <div className="dashboard-right-column">
-            {/* ── Avance Estratégico (Cascade) ── */}
-            <section className="dashboard-card-v4 strategy-section">
-              <div className="card-v4-header">
-                <TrendingUp size={20} className="header-icon" />
-                <h3>Avance por Línea de Acción (Estratégico)</h3>
-              </div>
-              
-              <div className="lineas-cascade-container">
-              {lineasDeAccion.map((linea) => (
-                <div 
-                  key={linea.id} 
-                  className={`linea-bar-item ${expandedRow === linea.id ? 'is-expanded' : ''}`}
-                >
-                  <div 
-                    className="linea-bar-header" 
-                    onClick={() => setExpandedRow(expandedRow === linea.id ? null : linea.id)}
-                  >
-                    <div className="linea-bar-title-group">
-                      <div className="linea-bar-dot" style={{ backgroundColor: linea.progreso > 50 ? '#22c55e' : (linea.progreso > 20 ? '#3b82f6' : '#f59e0b') }} />
-                      <span className="linea-bar-label">{linea.titulo}</span>
-                    </div>
-
-                    <div className="linea-bar-progress-section">
-                      <div className="linea-bar-track">
-                        <div 
-                          className="linea-bar-fill" 
-                          style={{ 
-                            width: `${linea.progreso}%`, 
-                            backgroundColor: linea.progreso > 50 ? '#22c55e' : (linea.progreso > 20 ? '#3b82f6' : '#f59e0b') 
-                          }} 
-                        />
-                      </div>
-                      <span className="linea-bar-pct">{linea.progreso}%</span>
-                    </div>
-
-                    <div className="linea-bar-toggle">
-                      <ChevronDown size={18} className={expandedRow === linea.id ? 'rotated' : ''} />
-                    </div>
-                  </div>
-
-                  {expandedRow === linea.id && (
-                    <div className="linea-bar-content">
-                      <div className="bar-details-grid">
-                        <div className="bar-detail">
-                          <label>Problemática</label>
-                          <p>{linea.problematica}</p>
-                        </div>
-                        <div className="bar-detail">
-                          <label>Indicador</label>
-                          <p>{linea.indicador}</p>
-                        </div>
-                        <div className="bar-detail full">
-                          <label>Responsables</label>
-                          <div className="bar-tags">
-                            {linea.responsables.map((resp, i) => (
-                              <span key={i} className="bar-tag">{resp}</span>
-                            ))}
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  )}
-                </div>
-              ))}
-            </div>
-          </section>
-          </div>
+          </main>
         </div>
       </div>
     </div>
