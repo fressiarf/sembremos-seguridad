@@ -5,7 +5,7 @@ import logoSembremos from '../../../assets/Captura_de_pantalla_2026-03-15_191337
 
 const TopbarInstitucion = ({ usuario, seccion, subtitulo, rol }) => {
   return (
-    <header className="TopbarInstitucion">
+    <header className="TopbarInstitucion" style={{ marginTop: '6px' }}>
       <div className="TopbarIzquierda">
         <div className="TopbarLogosInstitucionales">
           <img src={logoMsp} alt="MSP" className="TopbarLogo" />

@@ -12,20 +12,7 @@ const TopbarInstitucion = ({ children, portalTitle = 'PORTAL INSTITUCIONAL DE GE
       boxShadow: '0 2px 10px rgba(0,0,0,0.05)',
       fontFamily: "'Inter', sans-serif"
     }}>
-      {/* Línea tricolor superior (Bandera Costa Rica simplificada) */}
-      <div style={{
-        position: 'absolute',
-        top: 0,
-        left: 0,
-        width: '100%',
-        height: '6px',
-        display: 'flex'
-      }}>
-        <div style={{ flex: 1, backgroundColor: '#002f6c' }}></div>
-        <div style={{ flex: 1, backgroundColor: '#ce1126' }}></div>
-        <div style={{ flex: 1, backgroundColor: '#002f6c' }}></div>
-      </div>
-
+      {/* La línea tricolor superior ahora se maneja globalmente desde App.jsx */}
       <div style={{
         padding: '1.5rem 2.5rem',
         display: 'flex',
