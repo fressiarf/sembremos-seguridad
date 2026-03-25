@@ -2,9 +2,17 @@ import React, { useState, useEffect, useRef } from 'react';
 import './Calendario.css';
 import { ChevronLeft, ChevronRight, Clock, Tag, Trash2 } from 'lucide-react';
 import { useToast } from '../../context/ToastContext';
+import { useLogin } from '../../context/LoginContext';
+import emailjs from '@emailjs/browser';
 
 const Calendario = () => {
     const { showToast } = useToast();
+    const { user } = useLogin();
+
+    // Inicializar EmailJS una sola vez
+    useEffect(() => {
+        emailjs.init(import.meta.env.VITE_EMAILJS_PUBLIC_KEY);
+    }, []);
     const [fechaActual, setFechaActual] = useState(new Date());
     
     const [eventos, setEventos] = useState(() => {
@@ -250,6 +258,47 @@ const Calendario = () => {
             };
             setEventos([...eventos, eventoFinal]);
             showToast(`Evento "${eventoFinal.titulo}" agregado al ${diaSeleccionado}`, 'success');
+
+            // ── Correo de confirmación via EmailJS ──
+            const correoUsuario = user?.usuario || '';
+            if (correoUsuario) {
+                const templateParams = {
+                    correo_usuario: correoUsuario,
+                    nombre_usuario: user?.nombre || 'Usuario',
+                    titulo:    eventoFinal.titulo,
+                    fecha:     eventoFinal.fecha,
+                    inicio:    eventoFinal.inicio,
+                    fin:       eventoFinal.fin,
+                    categoria: eventoFinal.categoria,
+                };
+                emailjs
+                    .send(
+                        import.meta.env.VITE_EMAILJS_SERVICE_ID,
+                        import.meta.env.VITE_EMAILJS_TEMPLATE_ID,
+                        templateParams
+                    )
+                    .then(() => {
+                        showToast(`📧 Confirmación enviada a ${correoUsuario}`, 'info');
+                    })
+                    .catch((err) => {
+                        console.error('EmailJS error → status:', err?.status, '| text:', err?.text);
+                    });
+
+                // ── Registrar en Make → Google Sheets para recordatorios ──
+                fetch(import.meta.env.VITE_MAKE_WEBHOOK_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        titulo:          eventoFinal.titulo,
+                        fecha:           eventoFinal.fecha,
+                        inicio:          eventoFinal.inicio,
+                        fin:             eventoFinal.fin,
+                        categoria:       eventoFinal.categoria,
+                        correo_usuario:  correoUsuario,
+                        nombre_usuario:  user?.nombre || 'Usuario',
+                    }),
+                }).catch((err) => console.error('Make webhook error:', err));
+            }
         }
         
         cerrarModal();
