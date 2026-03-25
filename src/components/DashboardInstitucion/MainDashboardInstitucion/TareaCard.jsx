@@ -54,24 +54,44 @@ const TareaCard = ({ tarea, onUpdate }) => {
               
               {/* Información si está completada */}
               {tarea.completada && (
-                <div style={{ background: '#f0fdf4', padding: '10px 12px', borderRadius: '8px', border: '1px solid #bbf7d0', marginTop: '10px' }}>
+                <div style={{ background: '#f0fdf4', padding: '12px 14px', borderRadius: '8px', border: '1px solid #bbf7d0', marginTop: '10px' }}>
                   {tarea.reporteInstitucion && (
-                    <div style={{ fontSize: '0.85rem', color: '#166534', fontStyle: 'italic', marginBottom: '8px' }}>
+                    <div style={{ fontSize: '0.85rem', color: '#166534', fontStyle: 'italic', marginBottom: '10px' }}>
                       "{tarea.reporteInstitucion}"
                     </div>
                   )}
-                  <div style={{ display: 'flex', gap: '16px', fontSize: '0.75rem', color: '#166534', fontWeight: 600 }}>
+                  {/* Activity info row */}
+                  {(tarea.tipoActividad || tarea.lugar) && (
+                    <div style={{ display: 'flex', gap: '12px', fontSize: '0.75rem', color: '#166534', fontWeight: 600, marginBottom: '8px', flexWrap: 'wrap' }}>
+                      {tarea.tipoActividad && (
+                        <span style={{ background: '#dcfce7', padding: '2px 8px', borderRadius: '4px' }}>
+                          📋 {tarea.tipoActividad}
+                        </span>
+                      )}
+                      {tarea.lugar && (
+                        <span style={{ background: '#dcfce7', padding: '2px 8px', borderRadius: '4px' }}>
+                          📍 {tarea.lugar}
+                        </span>
+                      )}
+                    </div>
+                  )}
+                  <div style={{ display: 'flex', gap: '16px', fontSize: '0.75rem', color: '#166534', fontWeight: 600, flexWrap: 'wrap' }}>
                     <span style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-                      <Clock size={12} /> {tarea.fechaCompletada}
+                      <Clock size={12} /> {tarea.fechaRealizacion || tarea.fechaCompletada}
                     </span>
+                    {(tarea.totalAsistentes > 0) && (
+                      <span style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                        👥 {tarea.totalAsistentes} asistentes
+                      </span>
+                    )}
                     {tarea.inversionColones > 0 && (
                       <span style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
                         <DollarSign size={12} /> {formatColones(tarea.inversionColones)}
                       </span>
                     )}
-                    {tarea.fotos?.length > 0 && (
+                    {(tarea.archivos?.length > 0 || tarea.fotos?.length > 0) && (
                       <span style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-                        <Camera size={12} /> {tarea.fotos.length} foto(s)
+                        <Camera size={12} /> {(tarea.archivos?.length || tarea.fotos?.length)} archivo(s)
                       </span>
                     )}
                   </div>

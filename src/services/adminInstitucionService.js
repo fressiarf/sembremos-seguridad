@@ -264,6 +264,11 @@ const REPORTES = [
     fecha: '2025-03-15',
     descripcion: 'Se coordinó con el MEP la primera ronda de charlas preventivas en la Escuela de Barranca. Participaron 120 estudiantes y 8 docentes.',
     beneficiados: 120,
+    asistentes: { ninos: 20, adolescentes: 80, jovenes: 20, adultos: 0, adultoMayor: 0 },
+    tipoActividad: 'Charla',
+    inversionColones: 125000,
+    detalleRecursos: 'Refrigerios, material didáctico preventivo',
+    observaciones: 'Excelente disposición del cuerpo docente.',
     fotos: ['charla_barranca_01.jpg', 'charla_barranca_02.jpg'],
     accionEstrategica: 'Apoyar programas educativos y preventivos',
     indicador: 'Programas ejecutados',
@@ -277,6 +282,11 @@ const REPORTES = [
     fecha: '2025-03-20',
     descripcion: 'Se lanzó la campaña "Puntarenas Libre de Drogas" en redes sociales con alcance de 5,400 personas. Se distribuyeron 200 volantes físicos en El Roble.',
     beneficiados: 5400,
+    asistentes: { ninos: 0, adolescentes: 1500, jovenes: 2000, adultos: 1500, adultoMayor: 400 },
+    tipoActividad: 'Campaña',
+    inversionColones: 350000,
+    detalleRecursos: 'Pauta en redes, diseño gráfico e impresión de volantes',
+    observaciones: 'Alto nivel de compartidos en Facebook.',
     fotos: ['campana_redes_01.jpg'],
     accionEstrategica: 'Lanzar campañas de concientización en medios locales y redes',
     indicador: 'Campañas lanzadas',
@@ -290,6 +300,11 @@ const REPORTES = [
     fecha: '2025-03-18',
     descripcion: 'Se realizó la primera Mesa de Articulación Local con participación de 12 instituciones. Se validó la herramienta digital de seguimiento.',
     beneficiados: 35,
+    asistentes: { ninos: 0, adolescentes: 0, jovenes: 10, adultos: 25, adultoMayor: 0 },
+    tipoActividad: 'Mesa de Articulación',
+    inversionColones: 45000,
+    detalleRecursos: 'Alquiler de equipo de sonido, café',
+    observaciones: 'Faltó presencia del PANI.',
     fotos: ['mesa_articulacion_01.jpg', 'mesa_articulacion_02.jpg', 'mesa_articulacion_03.jpg'],
     accionEstrategica: 'Analizar y dar seguimiento a herramienta digital en Mesas de Articulación Local',
     indicador: 'Seguimientos realizados',
@@ -479,90 +494,118 @@ export const adminInstitucionService = {
    * Reportes pendientes de revisión
    */
   getReportesPendientes: async () => {
-    await delay(150);
-    return REPORTES
-      .filter(r => r.estado === 'pendiente')
-      .map(r => {
-        const tarea = TAREAS.find(t => t.id === r.tareaId);
-        return {
-          ...r,
-          tarea,
-          responsable: getResponsable(r.responsableId),
-        };
-      });
+    try {
+      const [resReq, tareasReq, usersReq] = await Promise.all([
+        fetch('http://localhost:5000/reportes?estado=pendiente'),
+        fetch('http://localhost:5000/tareas'),
+        fetch('http://localhost:5000/usuarios')
+      ]);
+      const reportes = await resReq.json();
+      const tareas = await tareasReq.json();
+      const usuarios = await usersReq.json();
+      
+      return reportes.map(r => ({
+        ...r,
+        tarea: tareas.find(t => t.id === r.tareaId),
+        responsable: usuarios.find(u => String(u.id) === String(r.responsableId)) || { nombre: 'Desconocido', cargo: '' }
+      })).sort((a, b) => new Date(b.fecha) - new Date(a.fecha));
+    } catch (e) {
+      console.error(e);
+      return [];
+    }
   },
 
   /**
    * Aprobar un reporte
    */
   aprobarReporte: async (reporteId) => {
-    await delay(300);
-    const reporte = REPORTES.find(r => r.id === reporteId);
-    if (reporte) {
-      reporte.estado = 'aprobado';
-      reporte.observacionRechazo = null;
-      return { success: true, reporte: { ...reporte } };
-    }
-    return { success: false };
+    try {
+      const response = await fetch(`http://localhost:5000/reportes/${reporteId}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ estado: 'aprobado', observacionRechazo: null })
+      });
+      return { success: response.ok };
+    } catch (e) { return { success: false }; }
   },
 
   /**
    * Editar un reporte antes de aprobarlo
    */
   editarReporte: async (reporteId, nuevosDatos) => {
-    await delay(300);
-    const reporte = REPORTES.find(r => r.id === reporteId);
-    if (reporte) {
-      reporte.descripcion = nuevosDatos.descripcion || reporte.descripcion;
-      reporte.beneficiados = nuevosDatos.beneficiados !== undefined ? nuevosDatos.beneficiados : reporte.beneficiados;
-      reporte.editadoPorAdmin = true;
-      return { success: true, reporte: { ...reporte } };
-    }
-    return { success: false, error: 'Reporte no encontrado' };
+    try {
+      const currentRes = await fetch(`http://localhost:5000/reportes/${reporteId}`);
+      if (!currentRes.ok) return { success: false };
+      const reporte = await currentRes.json();
+      
+      const payload = {
+        descripcion: nuevosDatos.descripcion !== undefined ? nuevosDatos.descripcion : reporte.descripcion,
+        beneficiados: nuevosDatos.beneficiados !== undefined ? nuevosDatos.beneficiados : reporte.beneficiados,
+        editadoPorAdmin: true
+      };
+      
+      if (nuevosDatos.asistentes) {
+        payload.asistentes = { ...reporte.asistentes, ...nuevosDatos.asistentes };
+      }
+      
+      const response = await fetch(`http://localhost:5000/reportes/${reporteId}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+      return { success: response.ok };
+    } catch (e) { return { success: false, error: 'Error' }; }
   },
 
   /**
    * Rechazar un reporte con observación obligatoria
    */
   rechazarReporte: async (reporteId, observacion) => {
-    await delay(300);
-    const reporte = REPORTES.find(r => r.id === reporteId);
-    if (reporte && observacion) {
-      reporte.estado = 'rechazado';
-      reporte.observacionRechazo = observacion;
-      return { success: true, reporte: { ...reporte } };
-    }
-    return { success: false, error: 'Observación requerida' };
+    try {
+      const response = await fetch(`http://localhost:5000/reportes/${reporteId}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ estado: 'rechazado', observacionRechazo: observacion })
+      });
+      return { success: response.ok };
+    } catch (e) { return { success: false }; }
   },
 
   /**
    * Historial completo de reportes con filtros
    */
   getHistorial: async (filtros = {}) => {
-    await delay(150);
-    let resultado = REPORTES.map(r => {
-      const tarea = TAREAS.find(t => t.id === r.tareaId);
-      return {
+    try {
+      const [resReq, tareasReq, usersReq] = await Promise.all([
+        fetch('http://localhost:5000/reportes'),
+        fetch('http://localhost:5000/tareas'),
+        fetch('http://localhost:5000/usuarios')
+      ]);
+      const reportes = await resReq.json();
+      const tareas = await tareasReq.json();
+      const usuarios = await usersReq.json();
+      
+      let resultado = reportes.map(r => ({
         ...r,
-        tarea,
-        responsable: getResponsable(r.responsableId),
-      };
-    });
+        tarea: tareas.find(t => t.id === r.tareaId) || {},
+        responsable: usuarios.find(u => String(u.id) === String(r.responsableId)) || {}
+      }));
 
-    if (filtros.estado && filtros.estado !== 'Todos') {
-      resultado = resultado.filter(r => r.estado === filtros.estado);
+      if (filtros.estado && filtros.estado !== 'Todos') {
+        resultado = resultado.filter(r => r.estado === filtros.estado);
+      }
+      if (filtros.responsableId && filtros.responsableId !== 'Todos') {
+        resultado = resultado.filter(r => String(r.responsableId) === String(filtros.responsableId));
+      }
+      if (filtros.lineaId && filtros.lineaId !== 'Todos') {
+        resultado = resultado.filter(r => r.tarea?.lineaAccionId === filtros.lineaId);
+      }
+      
+      return resultado.sort((a, b) => new Date(b.fecha) - new Date(a.fecha));
+    } catch (e) {
+      console.error(e);
+      return [];
     }
-    if (filtros.responsableId && filtros.responsableId !== 'Todos') {
-      resultado = resultado.filter(r => r.responsableId === filtros.responsableId);
-    }
-    if (filtros.lineaId && filtros.lineaId !== 'Todos') {
-      resultado = resultado.filter(r => r.tarea?.lineaId === filtros.lineaId);
-    }
-    if (filtros.trimestre && filtros.trimestre !== 'Todos') {
-      resultado = resultado.filter(r => r.tarea?.trimestre === filtros.trimestre);
-    }
-
-    return resultado.sort((a, b) => new Date(b.fecha) - new Date(a.fecha));
   },
 
   /**

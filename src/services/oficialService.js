@@ -48,22 +48,35 @@ export const institucionService = {
   },
 
   /**
-   * Marca una tarea como completada con reporte de la institución
+   * Marca una tarea como completada con reporte de la institución (Crea un Reporte real)
    */
   completarTarea: async (tareaId, reporteData) => {
     try {
-      const response = await fetch(`${BASE_URL}/tareas/${tareaId}`, {
-        method: 'PATCH',
+      const response = await fetch(`${BASE_URL}/reportes`, {
+        method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          completada: true,
-          fechaCompletada: new Date().toISOString().split('T')[0],
-          reporteInstitucion: reporteData.reporteInstitucion || '',
+          tareaId: tareaId,
+          responsableId: reporteData.responsableId || null,
+          estado: 'pendiente',
+          fecha: new Date().toISOString().split('T')[0],
+          
+          descripcion: reporteData.reporteInstitucion || '',
+          beneficiados: reporteData.totalAsistentes || 0,
+          asistentes: reporteData.asistentes || {},
+          
+          tipoActividad: reporteData.tipoActividad || '',
+          inversionColones: reporteData.inversionColones || 0,
+          detalleRecursos: reporteData.detalleRecursos || '',
+          
           fotos: reporteData.fotos || [],
-          inversionColones: reporteData.inversionColones || 0
+          observaciones: reporteData.observaciones || '',
+          
+          accionEstrategica: typeof reporteData.accionEstrategica === 'string' ? reporteData.accionEstrategica : '',
+          indicador: typeof reporteData.indicador === 'string' ? reporteData.indicador : ''
         })
       });
-      if (!response.ok) throw new Error('Error completing tarea');
+      if (!response.ok) throw new Error('Error creating reporte');
       return await response.json();
     } catch (error) {
       console.error('Error in completarTarea:', error);

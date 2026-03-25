@@ -14,12 +14,12 @@ const CardAutenticacion = ({ children }) => {
     if (user) {
       if (user.rol === 'admin') {
         navigate('/dashboard');
-      } else if (user.rol === 'adminInstitucion') {
+      } else if (user.rol === 'adminInstitucion' || user.rol === 'institucion') {
         navigate('/dashboardAdminInstitucion');
-      } else if (user.rol === 'oficial' || user.rol === 'institucion') {
-        navigate('/dashboardInstitucion');
+      } else if (user.rol === 'oficial' || user.rol === 'editor') {
+        navigate('/dashboardEditores');
       } else {
-        navigate('/dashboardInstitucion');
+        navigate('/dashboardEditores');
       }
     }
   };

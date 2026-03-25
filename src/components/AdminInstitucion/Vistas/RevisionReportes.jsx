@@ -244,11 +244,65 @@ const RevisionReportes = () => {
                                 </p>
                               </div>
 
-                              <div style={{ display: 'flex', gap: '16px', fontSize: '0.8rem', color: '#475569', fontWeight: 600 }}>
-                                <span style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-                                  👥 {reporte.beneficiados} beneficiados
-                                </span>
+                              <div style={{
+                                display: 'grid',
+                                gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
+                                gap: '12px',
+                                marginTop: '12px',
+                                marginBottom: '12px'
+                              }}>
+                                {/* Asistentes */}
+                                <div style={{ background: '#f1f5f9', padding: '10px 12px', borderRadius: '6px' }}>
+                                  <div style={{ fontSize: '0.75rem', color: '#64748b', fontWeight: 600, marginBottom: '4px' }}>POBLACIÓN BENEFICIADA</div>
+                                  <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.85rem', fontWeight: 700, color: '#0b2240', marginBottom: '6px' }}>
+                                    <Users size={14} color="#3b82f6" /> {reporte.beneficiados} total
+                                  </div>
+                                  {reporte.asistentes ? (
+                                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '4px', fontSize: '0.75rem', color: '#475569' }}>
+                                      <div><span style={{color: '#94a3b8'}}>Niñez:</span> <b>{reporte.asistentes.ninos || 0}</b></div>
+                                      <div><span style={{color: '#94a3b8'}}>Adolesc.:</span> <b>{reporte.asistentes.adolescentes || 0}</b></div>
+                                      <div><span style={{color: '#94a3b8'}}>Juventud:</span> <b>{reporte.asistentes.jovenes || 0}</b></div>
+                                      <div><span style={{color: '#94a3b8'}}>Adultos:</span> <b>{reporte.asistentes.adultos || 0}</b></div>
+                                      <div><span style={{color: '#94a3b8'}}>Adulto M.:</span> <b>{reporte.asistentes.adultoMayor || 0}</b></div>
+                                    </div>
+                                  ) : null}
+                                </div>
+                                
+                                {/* Detalles de actividad e Inversión */}
+                                <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                                  {reporte.tipoActividad && (
+                                    <div style={{ background: '#eff6ff', border: '1px solid #bfdbfe', padding: '8px 10px', borderRadius: '6px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                      <Target size={14} color="#2563eb" />
+                                      <div>
+                                        <div style={{ fontSize: '0.7rem', color: '#3b82f6', fontWeight: 700 }}>TIPO ACTIVIDAD</div>
+                                        <div style={{ fontSize: '0.8rem', color: '#1e3a8a', fontWeight: 600 }}>{reporte.tipoActividad}</div>
+                                      </div>
+                                    </div>
+                                  )}
+                                  
+                                  {reporte.inversionColones !== undefined && reporte.inversionColones > 0 && (
+                                    <div style={{ background: '#f0fdf4', border: '1px solid #bbf7d0', padding: '8px 10px', borderRadius: '6px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                      <Activity size={14} color="#16a34a" />
+                                      <div>
+                                        <div style={{ fontSize: '0.7rem', color: '#16a34a', fontWeight: 700 }}>INVERSIÓN Y RECURSOS</div>
+                                        <div style={{ fontSize: '0.8rem', color: '#14532d', fontWeight: 600 }}>
+                                          ₡{reporte.inversionColones.toLocaleString()}
+                                        </div>
+                                        {reporte.detalleRecursos && (
+                                          <div style={{ fontSize: '0.7rem', color: '#166534', marginTop: '2px' }}>{reporte.detalleRecursos}</div>
+                                        )}
+                                      </div>
+                                    </div>
+                                  )}
+                                </div>
                               </div>
+                              
+                              {reporte.observaciones && (
+                                <div style={{ background: '#fffbeb', borderLeft: '3px solid #f59e0b', padding: '8px 12px', marginBottom: '12px', borderRadius: '0 6px 6px 0' }}>
+                                  <div style={{ fontSize: '0.75rem', fontWeight: 700, color: '#b45309', marginBottom: '2px' }}>OBSERVACIONES ADICIONALES</div>
+                                  <div style={{ fontSize: '0.8rem', color: '#92400e', lineHeight: 1.4 }}>{reporte.observaciones}</div>
+                                </div>
+                              )}
 
                               {reporte.fotos && reporte.fotos.length > 0 && (
                                 <div className="admin-inst-report-evidence">

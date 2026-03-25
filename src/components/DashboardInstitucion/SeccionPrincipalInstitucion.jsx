@@ -3,6 +3,7 @@ import ListaMisTareas from './MainDashboardInstitucion/ListaMisTareas';
 import HistorialContainer from './Historial/HistorialContainer';
 import PerfilUsuario from '../Dashboard/PerfilUsuario/PerfilUsuario';
 import Calendario from '../Calendario/Calendario';
+import ReportesRechazadosEditor from './MainDashboardInstitucion/ReportesRechazadosEditor';
 import { institucionService } from '../../services/oficialService';
 import { useToast } from '../../context/ToastContext';
 import { useLogin } from '../../context/LoginContext';
@@ -66,6 +67,15 @@ const SeccionPrincipalInstitucion = ({ activeView = 'dashboard' }) => {
     return (
       <div style={{ padding: '2rem 2.5rem' }}>
         <Calendario />
+      </div>
+    );
+  }
+
+  // ── Vista Reportes Rechazados ──
+  if (activeView === 'rechazados') {
+    return (
+      <div style={{ padding: '2rem 2.5rem' }}>
+        <ReportesRechazadosEditor />
       </div>
     );
   }
@@ -135,7 +145,7 @@ const SeccionPrincipalInstitucion = ({ activeView = 'dashboard' }) => {
         tareas={tareasFiltradas}
         filter={filter}
         setFilter={setFilter}
-        onReload={loadData}
+        onUpdate={loadData}
       />
     </div>
   );

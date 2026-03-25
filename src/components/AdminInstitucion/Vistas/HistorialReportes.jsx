@@ -110,7 +110,7 @@ const HistorialReportes = () => {
               <th>Responsable</th>
               <th>Tarea / Acción Estratégica</th>
               <th>Línea</th>
-              <th>Beneficiados</th>
+              <th>Detalles de Ejecución</th>
               <th>Evidencia</th>
               <th>Estado</th>
             </tr>
@@ -145,7 +145,11 @@ const HistorialReportes = () => {
                     <Activity size={11} /> L#{r.tarea?.lineaNumero}
                   </span>
                 </td>
-                <td style={{ fontWeight: 700, textAlign: 'center' }}>{r.beneficiados}</td>
+                <td>
+                  <div style={{ fontWeight: 700, color: '#0b2240', fontSize: '0.85rem' }}>👥 {r.beneficiados} asist.</div>
+                  {r.tipoActividad && <div style={{ fontSize: '0.75rem', color: '#3b82f6', marginTop: '4px', fontWeight: 500 }}>🎯 {r.tipoActividad}</div>}
+                  {r.inversionColones > 0 && <div style={{ fontSize: '0.75rem', color: '#16a34a', marginTop: '2px', fontWeight: 500 }}>💰 ₡{r.inversionColones.toLocaleString()}</div>}
+                </td>
                 <td>
                   {r.fotos && r.fotos.length > 0 ? (
                     <span style={{ display: 'flex', alignItems: 'center', gap: '4px', fontSize: '0.78rem', color: '#1e40af' }}>
