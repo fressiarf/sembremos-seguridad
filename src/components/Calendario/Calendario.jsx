@@ -1,10 +1,18 @@
 import React, { useState, useEffect, useRef } from 'react';
 import './Calendario.css';
-import { ChevronLeft, ChevronRight, Clock, Tag, Bell, BellRing, Trash2, CalendarCheck, X, Edit2 } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Clock, Tag, Trash2 } from 'lucide-react';
 import { useToast } from '../../context/ToastContext';
+import { useLogin } from '../../context/LoginContext';
+import emailjs from '@emailjs/browser';
 
 const Calendario = () => {
     const { showToast } = useToast();
+    const { user } = useLogin();
+
+    // Inicializar EmailJS una sola vez
+    useEffect(() => {
+        emailjs.init(import.meta.env.VITE_EMAILJS_PUBLIC_KEY);
+    }, []);
     const [fechaActual, setFechaActual] = useState(new Date());
     
     const [eventos, setEventos] = useState(() => {
@@ -36,7 +44,6 @@ const Calendario = () => {
     const [diaSeleccionado, setDiaSeleccionado] = useState(null);
     const [nuevoEvento, setNuevoEvento] = useState({ titulo: '', inicio: '', fin: '', categoria: 'Operativos' });
     const [editandoId, setEditandoId] = useState(null);
-    const [mostrarNotificaciones, setMostrarNotificaciones] = useState(false);
     const notificadosRef = useRef(new Set());
 
     // Persistir eventos en localStorage
@@ -251,6 +258,47 @@ const Calendario = () => {
             };
             setEventos([...eventos, eventoFinal]);
             showToast(`Evento "${eventoFinal.titulo}" agregado al ${diaSeleccionado}`, 'success');
+
+            // ── Correo de confirmación via EmailJS ──
+            const correoUsuario = user?.usuario || '';
+            if (correoUsuario) {
+                const templateParams = {
+                    correo_usuario: correoUsuario,
+                    nombre_usuario: user?.nombre || 'Usuario',
+                    titulo:    eventoFinal.titulo,
+                    fecha:     eventoFinal.fecha,
+                    inicio:    eventoFinal.inicio,
+                    fin:       eventoFinal.fin,
+                    categoria: eventoFinal.categoria,
+                };
+                emailjs
+                    .send(
+                        import.meta.env.VITE_EMAILJS_SERVICE_ID,
+                        import.meta.env.VITE_EMAILJS_TEMPLATE_ID,
+                        templateParams
+                    )
+                    .then(() => {
+                        showToast(`📧 Confirmación enviada a ${correoUsuario}`, 'info');
+                    })
+                    .catch((err) => {
+                        console.error('EmailJS error → status:', err?.status, '| text:', err?.text);
+                    });
+
+                // ── Registrar en Make → Google Sheets para recordatorios ──
+                fetch(import.meta.env.VITE_MAKE_WEBHOOK_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        titulo:          eventoFinal.titulo,
+                        fecha:           eventoFinal.fecha,
+                        inicio:          eventoFinal.inicio,
+                        fin:             eventoFinal.fin,
+                        categoria:       eventoFinal.categoria,
+                        correo_usuario:  correoUsuario,
+                        nombre_usuario:  user?.nombre || 'Usuario',
+                    }),
+                }).catch((err) => console.error('Make webhook error:', err));
+            }
         }
         
         cerrarModal();
@@ -277,10 +325,7 @@ const Calendario = () => {
         }
     };
 
-    // Eventos de hoy para el panel de notificaciones
-    const hoy = new Date();
-    const hoyStr = `${hoy.getFullYear()}-${String(hoy.getMonth() + 1).padStart(2, '0')}-${String(hoy.getDate()).padStart(2, '0')}`;
-    const eventosHoy = eventos.filter(e => e.fecha === hoyStr).sort((a, b) => a.inicio.localeCompare(b.inicio));
+
 
     return (
         <div className="calendario-container">
@@ -290,16 +335,6 @@ const Calendario = () => {
                     <p>Gestión cronológica de actividades y tareas interinstitucionales.</p>
                 </div>
                 <div className="calendario-nav">
-                    {/* Botón de notificaciones */}
-                    <button 
-                        className={`notif-btn ${eventosHoy.length > 0 ? 'notif-btn--active' : ''}`}
-                        onClick={() => setMostrarNotificaciones(!mostrarNotificaciones)}
-                        title="Ver eventos de hoy"
-                    >
-                        {eventosHoy.length > 0 ? <BellRing size={20} /> : <Bell size={20} />}
-                        {eventosHoy.length > 0 && <span className="notif-badge">{eventosHoy.length}</span>}
-                    </button>
-
                     <button onClick={() => cambiarMes(-1)} className="nav-btn"><ChevronLeft size={20} /></button>
                     <button onClick={() => setFechaActual(new Date())} className="today-btn">Hoy</button>
                     <button onClick={() => cambiarMes(1)} className="nav-btn"><ChevronRight size={20} /></button>
@@ -326,49 +361,7 @@ const Calendario = () => {
                 </div>
             )}
 
-            {/* ── Panel de Notificaciones: Eventos de Hoy ── */}
-            {mostrarNotificaciones && (
-                <div className="notif-panel">
-                    <div className="notif-panel__header">
-                        <div className="notif-panel__title">
-                            <CalendarCheck size={18} />
-                            <span>Agenda del Día</span>
-                        </div>
-                        <button className="notif-panel__close" onClick={() => setMostrarNotificaciones(false)}>
-                            <X size={16} />
-                        </button>
-                    </div>
-                    {eventosHoy.length === 0 ? (
-                        <div className="notif-empty">
-                            <Bell size={32} />
-                            <p>No hay eventos programados para hoy.</p>
-                        </div>
-                    ) : (
-                        <div className="notif-list">
-                            {eventosHoy.map(ev => (
-                                <div key={ev.id} className="notif-item">
-                                    <div className="notif-item__color" style={{ backgroundColor: getColorCategoria(ev.categoria) }} />
-                                    <div className="notif-item__info">
-                                        <span className="notif-item__title">{ev.titulo}</span>
-                                        <span className="notif-item__time">
-                                            <Clock size={12} /> {ev.inicio} — {ev.fin}
-                                        </span>
-                                        <span className="notif-item__cat" style={{ color: getColorCategoria(ev.categoria) }}>{ev.categoria}</span>
-                                    </div>
-                                    <div className="notif-item__actions">
-                                        <button className="notif-item__action notif-item__edit" onClick={() => abrirModal(null, false, ev)} title="Editar evento">
-                                            <Edit2 size={14} />
-                                        </button>
-                                        <button className="notif-item__action notif-item__delete" onClick={() => eliminarEvento(ev.id)} title="Eliminar evento">
-                                            <Trash2 size={14} />
-                                        </button>
-                                    </div>
-                                </div>
-                            ))}
-                        </div>
-                    )}
-                </div>
-            )}
+
 
             <div className="calendario-grid">
                 {diasSemana.map(d => (

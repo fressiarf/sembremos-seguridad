@@ -181,15 +181,15 @@
 
 .excel-table th {
   background: #f8fafc;
-  color: #334155;
-  font-weight: 700;
+
+  padding: 1rem 1.5rem;
+  text-align: left;
+  font-weight: 800;
+  color: #4b5563; /* Gris más oscuro para labels */
   text-transform: uppercase;
   font-size: 0.72rem;
   letter-spacing: 0.05em;
-  position: sticky;
-  top: 0;
-  z-index: 10;
-  box-shadow: 0 1px 0 #e2e8f0;
+  border-bottom: 2px solid #e2e8f0;
 }
 
 /* Definición de anchos */
@@ -216,11 +216,27 @@
   font-size: 0.85rem;
 }
 
-.badge-canton {
-  background: #0284c7;
-  color: white;
-  padding: 2px 8px;
-  border-radius: 4px;
+
+.col-no {
+  width: 40px;
+  color: var(--inst-text-muted);
+}
+
+.col-prob {
+  min-width: 180px;
+}
+
+.col-prob strong {
+  display: block;
+  font-size: 0.95rem;
+  color: #0f172a; /* Casi negro */
+  font-weight: 800;
+}
+
+.item-id-tag {
+  display: inline-block;
+  margin-top: 4px;
+  font-size: 0.65rem;
   font-weight: 700;
   font-size: 0.7rem;
   text-transform: uppercase;
@@ -270,6 +286,22 @@
   color: #92400e;
   padding: 3px 8px;
   border-radius: 4px;
+  margin-right: 8px;
+  vertical-align: middle;
+}
+
+.col-accion {
+  max-width: 300px;
+}
+
+.action-title-main {
+  font-weight: 800;
+  color: #0f172a; /* Más oscuro */
+  font-size: 1rem;
+  line-height: 1.2;
+}
+
+.action-desc-sub {
   font-size: 0.75rem;
   font-weight: 600;
 }

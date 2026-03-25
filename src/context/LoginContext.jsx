@@ -29,35 +29,56 @@ export const LoginProvider = ({ children }) => {
       password: ''
     };
 
-    // 1. Validación de formato
+    const genericError = 'Las credenciales son incorrectas';
+
+    // 1. Validación de campos vacíos (Activa burbuja personalizada)
+    if (!formData.usuario.trim() || !formData.password.trim()) {
+      if (!formData.usuario.trim()) newErrors.usuario = 'campo-vacio';
+      if (!formData.password.trim()) newErrors.password = 'campo-vacio';
+      setErrors(newErrors);
+      return false;
+    }
+
+    // 2. Validación de signo @ (Muestra error genérico)
+    if (formData.usuario && !formData.usuario.includes('@')) {
+      newErrors.usuario = genericError;
+      newErrors.password = genericError;
+      setErrors(newErrors);
+      return false;
+    }
+
+    // 2. Validación de dominio (Muestra error genérico) con excepción para pruebas
+    const usuarioMinuscula = formData.usuario.toLowerCase();
+    const esDominioValido = usuarioMinuscula.endsWith('sembremosseguridad.go.cr');
+    const esCorreoExcepcion = usuarioMinuscula === 'friveraffwd@gmail.com';
+
+    if (formData.usuario && !esDominioValido && !esCorreoExcepcion) {
+      newErrors.usuario = genericError;
+      newErrors.password = genericError;
+      setErrors(newErrors);
+      return false;
+    }
+
+    // 3. Validación de formato general y presencia (Genérica)
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!formData.usuario) newErrors.usuario = 'El correo es requerido';
-    else if (!emailRegex.test(formData.usuario)) newErrors.usuario = 'Formato de correo inválido';
+    const isFormatInvalid = !formData.usuario || !emailRegex.test(formData.usuario) || 
+                            !formData.password || formData.password.length < 8;
 
-    if (!formData.password) newErrors.password = 'La contraseña es requerida';
-    else if (formData.password.length < 8) newErrors.password = 'Mínimo 8 caracteres';
-
-    // Si hay errores de formato, no seguimos
-    if (newErrors.usuario || newErrors.password) {
+    if (isFormatInvalid) {
+      newErrors.usuario = genericError;
+      newErrors.password = genericError;
       setErrors(newErrors);
       return false;
     }
 
     // 2. Verificación contra la base de datos
-    // Primero buscamos si existe el usuario
     const usuarioEncontrado = mockData.usuarios.find(
-      (u) => u.usuario === formData.usuario
+      (u) => u.usuario === formData.usuario && u.password === formData.password
     );
 
     if (!usuarioEncontrado) {
-      newErrors.usuario = 'Este correo no está registrado en el sistema';
-      setErrors(newErrors);
-      return false;
-    }
-
-    // Si el usuario existe, verificamos la contraseña
-    if (usuarioEncontrado.password !== formData.password) {
-      newErrors.password = 'Contraseña incorrecta';
+      newErrors.usuario = genericError;
+      newErrors.password = genericError;
       setErrors(newErrors);
       return false;
     }

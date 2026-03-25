@@ -1,7 +1,7 @@
 import React from 'react';
 import { useLogin } from '../../../context/LoginContext';
 import './InputValidar.css';
-import { Lock, Eye, EyeOff, Mail } from 'lucide-react';
+import { Lock, Eye, EyeOff, Mail, AlertCircle } from 'lucide-react';
 
 const InputValidar = () => {
   const { formData, setFormData, errors, setErrors } = useLogin();
@@ -25,6 +25,19 @@ const InputValidar = () => {
   return (
     <div className="SeccionEntradasValidar">
       
+      {/* Alerta de Error Global (Solo para errores de seguridad/credenciales) */}
+      {(errors.usuario === 'Las credenciales son incorrectas' || errors.password === 'Las credenciales son incorrectas') && (
+        <div className="AlertaErrorGlobal animacion-entrada-error">
+          <div className="ContenedorIconoError">
+            <AlertCircle size={18} />
+          </div>
+          <div className="ContenidoError">
+            <strong className="TituloError">Error de acceso</strong>
+            <p className="TextoError">Las credenciales son incorrectas.</p>
+          </div>
+        </div>
+      )}
+
       {/* Entrada de Correo Institucional */}
       <div className="ContenedorInputValidar">
         <label htmlFor="EntradaUsuario" className="LabelValidacion">
@@ -35,15 +48,23 @@ const InputValidar = () => {
             <Mail size={18} />
           </span>
           <input 
-            type="text" 
+            type="email" 
             id="EntradaUsuario" 
             className="InputCampoValidado" 
-            placeholder="Ej: usuario@seguridad.go.cr"
+            placeholder="Ej: usuario@sembremosseguridad.go.cr"
             value={formData.usuario}
             onChange={handleChange}
           />
+          {errors.usuario === 'campo-vacio' && (
+            <div className="BurbujaAlertaNativa">
+              <div className="IconoAdvertenciaNaranja">!</div>
+              <span className="TextoBurbujaNativa">Rellene este campo.</span>
+            </div>
+          )}
         </div>
-        {errors.usuario && <span className="MensajeErrorValidacion">{errors.usuario}</span>}
+        {errors.usuario && errors.usuario !== 'Las credenciales son incorrectas' && errors.usuario !== 'campo-vacio' && (
+          <span className="MensajeErrorValidacion">{errors.usuario}</span>
+        )}
       </div>
 
       {/* Entrada de Contraseña */}
@@ -70,8 +91,16 @@ const InputValidar = () => {
           >
             {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
           </button>
+          {errors.password === 'campo-vacio' && (
+            <div className="BurbujaAlertaNativa">
+              <div className="IconoAdvertenciaNaranja">!</div>
+              <span className="TextoBurbujaNativa">Rellene este campo.</span>
+            </div>
+          )}
         </div>
-        {errors.password && <span className="MensajeErrorValidacion">{errors.password}</span>}
+        {errors.password && errors.password !== 'Las credenciales son incorrectas' && errors.password !== 'campo-vacio' && (
+          <span className="MensajeErrorValidacion">{errors.password}</span>
+        )}
       </div>
 
     </div>

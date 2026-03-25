@@ -115,37 +115,48 @@ const MatrizSeguimiento = () => {
         <table className="excel-table">
           <thead>
             <tr>
-              <th>ID</th>
-              <th>Acción Estratégica</th>
-              <th>Indicador</th>
-              <th>Consideraciones / Objetivo</th>
-              <th>Meta</th>
-              <th>Plazo</th>
+              <th>No.</th>
+              <th>Problemática</th>
+              <th>Línea de Acción</th>
+              <th>Indicador / Meta</th>
               <th>Responsables</th>
               <th className="evidencia-col">Avance Cualitativo / Evidencia de Seguimiento</th>
             </tr>
           </thead>
           <tbody>
-            {filteredData.length === 0 ? (
-              <tr><td colSpan="8" className="empty-row">No hay líneas de acción que coincidan con la búsqueda.</td></tr>
-            ) : filteredData.map(linea => (
-              <React.Fragment key={linea.id}>
-                {/* FILA DE AGRUPAMIENTO GERÁRQUICO */}
-                <tr className="group-row">
-                  <td colSpan="8">
-                    <div className="group-content">
-                      <span className="badge-canton">{linea.canton}</span>
-                      <strong className="prob-label">Problemática:</strong> <span className="prob-text">{linea.problematica}</span>
-                      <span className="separator">|</span>
-                      <strong className="linea-label">Línea de Acción #{linea.no}:</strong> <span className="linea-text">{linea.titulo}</span>
+            {filteredData.map(item => (
+              <React.Fragment key={item.id}>
+                <tr>
+                  <td className="col-no"><small>#{item.no}</small></td>
+                  <td className="col-prob">
+                    <div className="status-dot-mini" style={{ background: item.progreso === 100 ? '#22c55e' : item.progreso > 0 ? '#3b82f6' : '#94a3b8' }} />
+                    <strong>{item.problematica}</strong>
+                    <div className="item-id-tag">{item.id}</div>
+                  </td>
+                  <td className="col-accion">
+                    <div className="action-title-main">{item.lineaAccion}</div>
+                  </td>
+                  <td className="col-meta">
+                    <div className="action-meta-main">{item.meta || '—'}</div>
+                    <div className="action-indicador-sub">Ind: {item.indicador || '—'}</div>
+                  </td>
+                  <td className="col-resp">
+                    <div className="resp-main">{item.responsable}</div>
+                    <div className="resp-sub">{item.corresponsable}</div>
+                  </td>
+                  <td className="col-progreso-status">
+                    <span className={`status-badge status--${item.estado.toLowerCase().replace(' ', '-')}`}>{item.estado}</span>
+                    <div className="progress-mini-bar" style={{ marginTop: '8px' }}>
+                      <div className="progress-mini-fill" style={{ width: `${item.progreso}%`, backgroundColor: item.progreso === 100 ? '#22c55e' : '#3b82f6' }} />
+                      <span className="progress-mini-text">{item.tareasCompletadas}/{item.totalTareas}</span>
                     </div>
                   </td>
                 </tr>
 
                 {/* FILAS DE LAS TAREAS (ACCIONES ESTRATÉGICAS) */}
-                {linea.tareas.length === 0 ? (
+                {item.tareas.length === 0 ? (
                   <tr><td colSpan="8" className="empty-subrow">Sin acciones estratégicas registradas.</td></tr>
-                ) : linea.tareas.map(tarea => {
+                ) : item.tareas.map(tarea => {
                   const isEditing = editingId === tarea.id;
                   return (
                     <tr key={tarea.id} className="data-row">
