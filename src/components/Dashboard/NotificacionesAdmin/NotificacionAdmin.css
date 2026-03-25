@@ -128,29 +128,44 @@
 }
 
 .admin-notif-empty-subtitle {
+    color: #94a3b8;
     font-size: 0.85rem;
-    color: #64748b;
-    margin: 0;
     line-height: 1.4;
-    max-width: 85%;
+}
+
+.admin-notif-section-label {
+    padding: 0.75rem 1rem 0.4rem;
+    font-size: 0.65rem;
+    font-weight: 800;
+    color: #94a3b8;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    background: #f8fafc;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+}
+
+.admin-notif-list {
+    display: flex;
+    flex-direction: column;
+    padding: 0;
+    gap: 0;
 }
 
 .admin-notif-card {
-    background-color: #ffffff;
-    border-radius: 0.75rem;
-    padding: 0.75rem 0.75rem 0.75rem 1.25rem;
-    position: relative;
     display: flex;
     align-items: center;
-    justify-content: space-between;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+    padding: 1rem;
+    background-color: #ffffff;
+    border-bottom: 1px solid #f1f5f9;
     transition: all 0.2s ease;
-    border: 1px solid #f1f5f9;
+    position: relative;
+    overflow: hidden;
 }
 
 .admin-notif-card:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.08);
+    background-color: #f8fafc;
 }
 
 .admin-notif-today {

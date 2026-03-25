@@ -1,12 +1,12 @@
 .calendario-container {
-    padding: 2rem 2.5rem;
+    padding: 1rem 1.5rem;
     background: #fff;
     border-radius: 16px;
     box-shadow: 0 10px 25px rgba(0,0,0,0.05);
     font-family: 'Inter', sans-serif;
     color: #1e293b;
-    max-width: 1100px;
-    margin: 1.5rem auto;
+    max-width: 1000px;
+    margin: 1rem auto;
     border: 1px solid #e2e8f0;
     box-sizing: border-box;
 }
@@ -16,8 +16,8 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 2rem;
-    padding-bottom: 1.5rem;
+    margin-bottom: 1.25rem;
+    padding-bottom: 1rem;
     border-bottom: 1px solid #f1f5f9;
 }
 
@@ -106,14 +106,15 @@
 
 .grid-day {
     background: #fff;
-    height: 120px;
-    padding: 8px;
+    height: 90px;
+    padding: 6px;
     display: flex;
     flex-direction: column;
-    gap: 4px;
+    gap: 3px;
     cursor: pointer;
     transition: background 0.2s ease;
     position: relative;
+    overflow: hidden;
 }
 
 .grid-day:hover {
@@ -127,9 +128,9 @@
 }
 
 .day-number {
-    font-weight: 600;
-    font-size: 0.9rem;
-    margin-bottom: 4px;
+    font-weight: 700;
+    font-size: 0.85rem;
+    margin-bottom: 2px;
 }
 
 .day-events {
@@ -138,7 +139,7 @@
     gap: 4px;
     overflow-y: auto;
     overflow-x: hidden;
-    max-height: 80px;
+    max-height: 58px;
 }
 
 /* Event Pill */
@@ -333,221 +334,7 @@
    NOTIFICACIONES
    ══════════════════════════════════════════════ */
 
-/* Botón campana */
-.notif-btn {
-    position: relative;
-    background: #f8fafc;
-    border: 1px solid #e2e8f0;
-    width: 40px;
-    height: 40px;
-    border-radius: 10px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    color: #64748b;
-    transition: all 0.2s ease;
-}
 
-.notif-btn:hover {
-    background: #0b2240;
-    color: #fff;
-    border-color: #0b2240;
-    transform: translateY(-2px);
-}
-
-.notif-btn--active {
-    color: #0b2240;
-    border-color: #3b82f6;
-    background: #eff6ff;
-}
-
-.notif-btn--active:hover {
-    background: #0b2240;
-    color: #fff;
-}
-
-/* Badge numérico */
-.notif-badge {
-    position: absolute;
-    top: -4px;
-    right: -4px;
-    background: #ef4444;
-    color: #fff;
-    font-size: 0.6rem;
-    font-weight: 800;
-    width: 18px;
-    height: 18px;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    box-shadow: 0 2px 6px rgba(239, 68, 68, 0.4);
-    animation: badge-pulse 2s ease-in-out infinite;
-}
-
-@keyframes badge-pulse {
-    0%, 100% { transform: scale(1); }
-    50% { transform: scale(1.15); }
-}
-
-/* Panel de Agenda */
-.notif-panel {
-    background: #f8fafc;
-    border: 1px solid #e2e8f0;
-    border-radius: 14px;
-    margin-bottom: 1.5rem;
-    overflow: hidden;
-    animation: slideDown 0.3s ease;
-}
-
-@keyframes slideDown {
-    from { opacity: 0; transform: translateY(-10px); }
-    to { opacity: 1; transform: translateY(0); }
-}
-
-.notif-panel__header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 14px 18px;
-    background: #0b2240;
-    color: #fff;
-}
-
-.notif-panel__title {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    font-weight: 700;
-    font-size: 0.9rem;
-}
-
-.notif-panel__close {
-    background: rgba(255,255,255,0.1);
-    border: none;
-    color: #fff;
-    width: 28px;
-    height: 28px;
-    border-radius: 8px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    transition: background 0.2s;
-}
-
-.notif-panel__close:hover {
-    background: rgba(255,255,255,0.2);
-}
-
-/* Estado vacío */
-.notif-empty {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 8px;
-    padding: 2rem;
-    color: #94a3b8;
-}
-
-.notif-empty p {
-    margin: 0;
-    font-size: 0.85rem;
-}
-
-/* Lista de eventos */
-.notif-list {
-    padding: 8px;
-    display: flex;
-    flex-direction: column;
-    gap: 6px;
-    max-height: 280px;
-    overflow-y: auto;
-}
-
-.notif-item {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    padding: 12px 14px;
-    background: #fff;
-    border-radius: 10px;
-    border: 1px solid #e2e8f0;
-    transition: all 0.2s;
-}
-
-.notif-item:hover {
-    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
-    transform: translateX(2px);
-}
-
-.notif-item__color {
-    width: 4px;
-    height: 36px;
-    border-radius: 4px;
-    flex-shrink: 0;
-}
-
-.notif-item__info {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    gap: 2px;
-    min-width: 0;
-}
-
-.notif-item__title {
-    font-weight: 600;
-    font-size: 0.88rem;
-    color: #0b2240;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-}
-
-.notif-item__time {
-    display: flex;
-    align-items: center;
-    gap: 4px;
-    font-size: 0.75rem;
-    color: #64748b;
-}
-
-.notif-item__cat {
-    font-size: 0.7rem;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 0.03em;
-}
-
-.notif-item__actions {
-    display: flex;
-    gap: 4px;
-}
-
-.notif-item__action {
-    background: none;
-    border: none;
-    cursor: pointer;
-    padding: 6px;
-    border-radius: 6px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: all 0.2s;
-    color: #cbd5e1;
-}
-
-.notif-item__edit:hover {
-    color: #3b82f6;
-    background: #eff6ff;
-}
-
-.notif-item__delete:hover {
-    color: #ef4444;
-    background: #fef2f2;
-}
 
 .btn-delete {
     padding: 12px;
