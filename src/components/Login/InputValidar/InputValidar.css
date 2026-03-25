@@ -96,10 +96,149 @@
   color: var(--text-dark);
 }
 
+/* Nueva Alerta de Error Global Estilizada */
+.AlertaErrorGlobal {
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+  background: linear-gradient(135deg, #fff5f5 0%, #fff 100%);
+  border: 1px solid #feb2b2;
+  border-left: 4px solid #f56565;
+  padding: 0.75rem 1rem;
+  border-radius: 8px;
+  margin-bottom: 1.5rem;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+  animation: slideInError 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.ContenedorIconoError {
+  background-color: #f56565;
+  color: white;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  box-shadow: 0 2px 4px rgba(245, 101, 101, 0.3);
+}
+
+.ContenidoError {
+  display: flex;
+  flex-direction: column;
+}
+
+.TituloError {
+  font-size: 0.88rem;
+  color: #c53030;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
+
+.TextoError {
+  font-size: 0.82rem;
+  color: #742a2a;
+  margin: 0;
+  opacity: 0.9;
+}
+
+@keyframes slideInError {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Burbuja de Alerta Estilo Nativo para Campos Vacíos */
+.BurbujaAlertaNativa {
+  position: absolute;
+  top: 110%;
+  left: 20px;
+  z-index: 999;
+  background-color: #ffffff;
+  border: 1px solid #707070;
+  padding: 8px 12px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  box-shadow: 2px 2px 6px rgba(0, 0, 0, 0.25);
+  border-radius: 1px;
+  pointer-events: none;
+  animation: slideInBubble 0.15s ease-out;
+  min-width: 180px;
+}
+
+/* El Triangulito superior */
+.BurbujaAlertaNativa::before {
+  content: '';
+  position: absolute;
+  top: -6px;
+  left: 15px;
+  width: 10px;
+  height: 10px;
+  background-color: #ffffff;
+  border-left: 1px solid #707070;
+  border-top: 1px solid #707070;
+  transform: rotate(45deg);
+}
+
+.IconoAdvertenciaNaranja {
+  background-color: #ff9900;
+  color: white;
+  width: 22px;
+  height: 22px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 800;
+  font-size: 15px;
+  border-radius: 2px;
+  flex-shrink: 0;
+  font-family: sans-serif;
+}
+
+.TextoBurbujaNativa {
+  color: #000000;
+  font-size: 0.88rem;
+  font-family: Arial, sans-serif;
+  letter-spacing: -0.01em;
+  white-space: nowrap;
+}
+
+@keyframes slideInBubble {
+  from {
+    opacity: 0;
+    transform: translateY(-5px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.CajaEntradaInteractiva.CajaError {
+  border-color: #fc8181;
+  background-color: #fffafb;
+  box-shadow: 0 0 0 1px #fc8181;
+}
+
 .MensajeErrorValidacion {
-  display: block;
-  color: #ef4444;
-  font-size: 0.8rem;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  color: #e53e3e;
+  font-size: 0.78rem;
   margin-top: 0.4rem;
-  font-weight: 500;
+  font-weight: 600;
+  animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
 }
