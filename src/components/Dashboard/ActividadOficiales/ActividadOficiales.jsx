@@ -17,13 +17,12 @@ const ActividadOficiales = () => {
   const { showToast } = useToast();
 
   const [newLinea, setNewLinea] = useState({
-    problematica: '', lineaAccion: '', objetivo: '',
-    indicador: '', meta: '', responsable: 'Municipalidad',
-    corresponsable: '', zona: 'Barranca'
+    canton: 'Puntarenas', problematica: '', titulo: ''
   });
 
   const [newTarea, setNewTarea] = useState({
-    lineaAccionId: '', titulo: '', descripcion: '', institucionId: ''
+    lineaAccionId: '', titulo: '', indicador: '', consideraciones: '', meta: '',
+    plazo: 'Anual', institucionId: '', corresponsable: ''
   });
 
   const formatColones = (amount) => {
@@ -53,10 +52,9 @@ const ActividadOficiales = () => {
 
   useEffect(() => { loadData(); }, []);
 
-  // ── Crear Línea de Acción ──
   const handleCreateLinea = async (e) => {
     e.preventDefault();
-    if (!newLinea.problematica || !newLinea.lineaAccion) {
+    if (!newLinea.problematica || !newLinea.titulo) {
       showToast('Completa los campos obligatorios (*)', 'warning');
       return;
     }
@@ -65,7 +63,7 @@ const ActividadOficiales = () => {
       await dashboardService.createLineaAccion({ ...newLinea, id: lineaId, no: lineas.length + 1 });
       showToast('Línea de acción creada ✓', 'success');
       setShowLineaForm(false);
-      setNewLinea({ problematica: '', lineaAccion: '', objetivo: '', indicador: '', meta: '', responsable: 'Municipalidad', corresponsable: '', zona: 'Barranca' });
+      setNewLinea({ canton: 'Puntarenas', problematica: '', titulo: '' });
       loadData();
     } catch (error) {
       showToast('Error al crear la línea', 'error');
@@ -87,7 +85,7 @@ const ActividadOficiales = () => {
       });
       showToast('Tarea creada y asignada ✓', 'success');
       setShowTareaForm(false);
-      setNewTarea({ lineaAccionId: '', titulo: '', descripcion: '', institucionId: '' });
+      setNewTarea({ lineaAccionId: '', titulo: '', indicador: '', consideraciones: '', meta: '', plazo: 'Anual', institucionId: '', corresponsable: '' });
       loadData();
     } catch (error) {
       showToast('Error al crear la tarea', 'error');
@@ -132,28 +130,15 @@ const ActividadOficiales = () => {
                   <input type="text" placeholder="Ej: CONSUMO DE DROGA" value={newLinea.problematica} onChange={e => setNewLinea({...newLinea, problematica: e.target.value})} />
                 </div>
                 <div className="form-group">
-                  <label>Zona</label>
-                  <select value={newLinea.zona} onChange={e => setNewLinea({...newLinea, zona: e.target.value})}>
-                    <option value="Barranca">Barranca</option>
-                    <option value="Chacarita">Chacarita</option>
-                    <option value="El Roble">El Roble</option>
+                  <label>Cantón</label>
+                  <select value={newLinea.canton} onChange={e => setNewLinea({...newLinea, canton: e.target.value})}>
                     <option value="Puntarenas">Puntarenas</option>
                   </select>
                 </div>
               </div>
               <div className="form-group">
-                <label>Línea de Acción *</label>
-                <textarea placeholder="Descripción de la línea estratégica..." value={newLinea.lineaAccion} onChange={e => setNewLinea({...newLinea, lineaAccion: e.target.value})} />
-              </div>
-              <div className="form-row-grid">
-                <div className="form-group">
-                  <label>Indicador</label>
-                  <input type="text" placeholder="Ej: Festivales realizados" value={newLinea.indicador} onChange={e => setNewLinea({...newLinea, indicador: e.target.value})} />
-                </div>
-                <div className="form-group">
-                  <label>Meta</label>
-                  <input type="text" placeholder="Ej: Red conformada" value={newLinea.meta} onChange={e => setNewLinea({...newLinea, meta: e.target.value})} />
-                </div>
+                <label>Título de la Línea de Acción *</label>
+                <textarea placeholder="Descripción de la línea estratégica..." value={newLinea.titulo} onChange={e => setNewLinea({...newLinea, titulo: e.target.value})} />
               </div>
               <div className="modal-actions">
                 <button type="button" onClick={() => setShowLineaForm(false)} className="btn-cancel">Cancelar</button>
@@ -197,9 +182,36 @@ const ActividadOficiales = () => {
                 <label>Título de la tarea *</label>
                 <input type="text" placeholder="Ej: Firmar convenio con MEP" value={newTarea.titulo} onChange={e => setNewTarea({...newTarea, titulo: e.target.value})} />
               </div>
+              
+              <div className="form-row-grid">
+                <div className="form-group">
+                  <label>Indicador *</label>
+                  <input type="text" placeholder="Ej: Talleres realizados" value={newTarea.indicador} onChange={e => setNewTarea({...newTarea, indicador: e.target.value})} />
+                </div>
+                <div className="form-group">
+                  <label>Meta *</label>
+                  <input type="text" placeholder="Ej: 50" value={newTarea.meta} onChange={e => setNewTarea({...newTarea, meta: e.target.value})} />
+                </div>
+              </div>
+
+              <div className="form-row-grid">
+                <div className="form-group">
+                  <label>Plazo *</label>
+                  <select value={newTarea.plazo} onChange={e => setNewTarea({...newTarea, plazo: e.target.value})}>
+                    <option value="Anual">Anual</option>
+                    <option value="Bimestral">Bimestral</option>
+                    <option value="Cuatrimestral">Cuatrimestral</option>
+                  </select>
+                </div>
+                <div className="form-group">
+                  <label>Co-gestor / Corresponsable</label>
+                  <input type="text" placeholder="Ej: OIJ, PANI..." value={newTarea.corresponsable} onChange={e => setNewTarea({...newTarea, corresponsable: e.target.value})} />
+                </div>
+              </div>
+
               <div className="form-group">
-                <label>Descripción (opcional)</label>
-                <textarea placeholder="Detalle de lo que debe hacer la institución..." value={newTarea.descripcion} onChange={e => setNewTarea({...newTarea, descripcion: e.target.value})} />
+                <label>Consideraciones / Objetivo</label>
+                <textarea placeholder="Consideraciones o instrucciones..." value={newTarea.consideraciones} onChange={e => setNewTarea({...newTarea, consideraciones: e.target.value})} />
               </div>
               <div className="modal-actions">
                 <button type="button" onClick={() => setShowTareaForm(false)} className="btn-cancel">Cancelar</button>
@@ -251,7 +263,7 @@ const ActividadOficiales = () => {
               >
                 <div>
                   <div style={{ fontSize: '0.7rem', fontWeight: 700, color: '#64748b', textTransform: 'uppercase', letterSpacing: '0.05em' }}>{linea.id} · {linea.problematica}</div>
-                  <div style={{ fontWeight: 700, color: '#0b2240', fontSize: '0.9rem', marginTop: '2px' }}>{linea.lineaAccion}</div>
+                  <div style={{ fontWeight: 700, color: '#0b2240', fontSize: '0.9rem', marginTop: '2px' }}>{linea.titulo}</div>
                 </div>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
                   {/* Progress bar */}
