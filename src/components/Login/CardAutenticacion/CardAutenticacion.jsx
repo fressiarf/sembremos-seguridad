@@ -32,7 +32,7 @@ const CardAutenticacion = ({ children }) => {
         {children}
 
         <footer className="PieTarjetaLogin">
-          <Link to="/soporte-acceso" className="EnlaceRecuperacion">¿No puede ingresar?</Link>
+          <Link to="/soporte-acceso" className="EnlaceRecuperacion">¿Problemas para ingresar?</Link>
           
           <div className="ContenedorRecordatorio">
             <div className="IconoTooltipSecurity" data-tooltip="Recuerde: Su acceso está siendo monitoreado por seguridad">

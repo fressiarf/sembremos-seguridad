@@ -141,7 +141,29 @@ body:has(.LayoutDashboard) {
 @media (max-width: 1024px) {
   .LayoutDashboard {
     grid-template-columns: 1fr;
+    display: block; /* Switch to block to manage stacking better */
+    position: relative;
   }
+
+  /* Hide sidebar by default on mobile/tablet to avoid pushing content */
+  .sidebar-admin {
+    position: fixed;
+    left: -280px;
+    z-index: 2000;
+    transition: left 0.3s ease;
+  }
+
+  .LayoutDashboard:not(.LayoutDashboard--collapsed) .sidebar-admin {
+    left: 0;
+  }
+
+  .ContenedorPrincipalDashboard {
+    width: 100%;
+    height: 100vh;
+  }
+}
+
+@media (max-width: 768px) {
   .GrillaPrincipalDosColumnas {
     grid-template-columns: 1fr;
   }

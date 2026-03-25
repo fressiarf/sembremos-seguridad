@@ -96,39 +96,66 @@ function NotificacionAdmin({ variant = 'fullpage' }) {
                     </div>
                 ) : (
                     <div className="admin-notif-list">
-                        {eventosFiltrados.map((ev) => {
-                            const esHoy = ev.fecha === hoyStr;
-                            return (
-                                <div key={ev.id} className={`admin-notif-card ${esHoy ? 'admin-notif-today' : ''}`}>
-                                    <div
-                                        className="admin-notif-color-bar"
-                                        style={{ backgroundColor: getColorCategoria(ev.categoria) }}
-                                    />
-                                    <div className="admin-notif-info">
-                                        <h4 className="admin-notif-event-title">{ev.titulo}</h4>
-                                        <div className="admin-notif-details">
-                                            <span className="admin-notif-date">
-                                                <CalendarIcon size={14} />
-                                                {esHoy ? 'Hoy' : ev.fecha}
-                                            </span>
-                                            <span className="admin-notif-time">
-                                                <Clock size={14} />
-                                                {ev.inicio} - {ev.fin}
-                                            </span>
-                                        </div>
-                                        <span
-                                            className="admin-notif-category"
-                                            style={{ color: getColorCategoria(ev.categoria), backgroundColor: `${getColorCategoria(ev.categoria)}22` }}
-                                        >
-                                            {ev.categoria}
+                        {/* Sección Hoy */}
+                        {eventosFiltrados.some(e => e.fecha === hoyStr) && (
+                            <div className="admin-notif-section-label">HOY — {hoyStr}</div>
+                        )}
+                        {eventosFiltrados.filter(e => e.fecha === hoyStr).map((ev) => (
+                            <div key={ev.id} className="admin-notif-card admin-notif-today">
+                                <div
+                                    className="admin-notif-color-bar"
+                                    style={{ backgroundColor: getColorCategoria(ev.categoria) }}
+                                />
+                                <div className="admin-notif-info">
+                                    <h4 className="admin-notif-event-title">{ev.titulo}</h4>
+                                    <div className="admin-notif-details">
+                                        <span className="admin-notif-time">
+                                            <Clock size={14} />
+                                            {ev.inicio} - {ev.fin}
                                         </span>
                                     </div>
-                                    {esHoy && (
-                                        <AlertCircle size={20} className="admin-notif-alert-icon" color="#ef4444" />
-                                    )}
+                                    <span
+                                        className="admin-notif-category"
+                                        style={{ color: getColorCategoria(ev.categoria), backgroundColor: `${getColorCategoria(ev.categoria)}22` }}
+                                    >
+                                        {ev.categoria}
+                                    </span>
                                 </div>
-                            );
-                        })}
+                                <AlertCircle size={20} className="admin-notif-alert-icon" color="#ef4444" />
+                            </div>
+                        ))}
+
+                        {/* Sección Próximos */}
+                        {eventosFiltrados.some(e => e.fecha !== hoyStr) && (
+                            <div className="admin-notif-section-label">PRÓXIMOS</div>
+                        )}
+                        {eventosFiltrados.filter(e => e.fecha !== hoyStr).map((ev) => (
+                            <div key={ev.id} className="admin-notif-card">
+                                <div
+                                    className="admin-notif-color-bar"
+                                    style={{ backgroundColor: getColorCategoria(ev.categoria) }}
+                                />
+                                <div className="admin-notif-info">
+                                    <h4 className="admin-notif-event-title">{ev.titulo}</h4>
+                                    <div className="admin-notif-details">
+                                        <span className="admin-notif-date">
+                                            <CalendarIcon size={14} />
+                                            {ev.fecha}
+                                        </span>
+                                        <span className="admin-notif-time">
+                                            <Clock size={14} />
+                                            {ev.inicio}
+                                        </span>
+                                    </div>
+                                    <span
+                                        className="admin-notif-category"
+                                        style={{ color: getColorCategoria(ev.categoria), backgroundColor: `${getColorCategoria(ev.categoria)}22` }}
+                                    >
+                                        {ev.categoria}
+                                    </span>
+                                </div>
+                            </div>
+                        ))}
                     </div>
                 )}
             </div>
