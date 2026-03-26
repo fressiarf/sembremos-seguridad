@@ -4,6 +4,7 @@ import GestionTareas from './Vistas/GestionTareas';
 import RevisionReportes from './Vistas/RevisionReportes';
 import HistorialReportes from './Vistas/HistorialReportes';
 import CalendarioAdminInst from './Vistas/CalendarioAdminInst';
+import GestionFuncionarios from './Vistas/GestionFuncionarios';
 import PerfilUsuario from '../Dashboard/PerfilUsuario/PerfilUsuario';
 import TopbarInstitucion from '../DashboardInstitucion/Navegacion/TopbarInstitucion';
 import { useLogin } from '../../context/LoginContext';
@@ -15,6 +16,7 @@ const SeccionPrincipalAdminInstitucion = ({ activeView = 'dashboard' }) => {
     const labels = {
       dashboard: 'Dashboard',
       tareas: 'Gestión de Tareas',
+      usuarios: 'Gestión de Funcionarios',
       reportes: 'Revisión de Reportes',
       historial: 'Historial de Reportes',
       calendario: 'Calendario',
@@ -29,6 +31,8 @@ const SeccionPrincipalAdminInstitucion = ({ activeView = 'dashboard' }) => {
         return <DashboardAdminInst />;
       case 'tareas':
         return <GestionTareas />;
+      case 'usuarios':
+        return <GestionFuncionarios />;
       case 'reportes':
         return <RevisionReportes />;
       case 'historial':

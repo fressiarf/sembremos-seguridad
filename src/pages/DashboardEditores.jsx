@@ -1,12 +1,12 @@
 import React from 'react';
 import LayoutDashboard from '../components/Shared/Navegacion/LayoutDashboard';
 import SidebarInstitucion from '../components/DashboardInstitucion/Navegacion/SidebarInstitucion';
-import SeccionPrincipal from '../components/Dashboard/SeccionPrincipal/SeccionPrincipal';
+import SeccionPrincipalInstitucion from '../components/DashboardInstitucion/SeccionPrincipalInstitucion';
 
-const DashboardInstitucion = () => (
+const DashboardEditores = () => (
   <LayoutDashboard sidebar={<SidebarInstitucion />}>
-    <SeccionPrincipal />
+    <SeccionPrincipalInstitucion />
   </LayoutDashboard>
 );
 
-export default DashboardInstitucion;
+export default DashboardEditores;

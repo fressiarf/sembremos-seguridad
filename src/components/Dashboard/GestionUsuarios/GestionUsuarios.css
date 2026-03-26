@@ -208,6 +208,24 @@
   border-color: #008d45;
 }
 
+.role-badge--adminInstitucion {
+  background: #e0f2fe;
+  color: #0369a1;
+  border-color: #0369a1;
+}
+
+.role-badge--auditor {
+  background: #fef3c7;
+  color: #92400e;
+  border-color: #d97706;
+}
+
+.role-badge--institucion {
+  background: #f3e8ff;
+  color: #7c3aed;
+  border-color: #8b5cf6;
+}
+
 .role-badge--oficial {
   background: #e0f2fe;
   color: #0369a1;

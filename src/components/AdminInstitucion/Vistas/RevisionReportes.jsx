@@ -1,7 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { adminInstitucionService } from '../../../services/adminInstitucionService';
 import { useToast } from '../../../context/ToastContext';
-import { FileSearch, CheckCircle, XCircle, Users, Calendar, Target, Activity, Image as ImageIcon, ChevronDown, ChevronUp, Edit3, Save, MapPin } from 'lucide-react';
+import { useLogin } from '../../../context/LoginContext';
+import { 
+  Clock, CheckCircle, XCircle, Search, 
+  Filter, FileText, Activity, AlertCircle, Edit, MessageSquare, ChevronDown,
+  FileSearch, ChevronUp, Save, Image as ImageIcon, Edit3, MapPin, Calendar
+} from 'lucide-react';
 import '../AdminInstitucion.css';
 
 const LINEAS_ACCION_INFO = [
@@ -12,10 +17,13 @@ const LINEAS_ACCION_INFO = [
 ];
 
 const RevisionReportes = () => {
+  const { user } = useLogin();
   const [reportes, setReportes] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [rechazandoId, setRechazandoId] = useState(null);
-  const [observacion, setObservacion] = useState('');
+  const [searchTerm, setSearchTerm] = useState('');
+  const [filtroLinea, setFiltroLinea] = useState('Todas');
+  const [modalRechazo, setModalRechazo] = useState({ show: false, reporteId: null, observacion: '' });
+  const [modalEdicion, setModalEdicion] = useState({ show: false, reporte: null });
   
   // Edit mode state
   const [editandoId, setEditandoId] = useState(null);
@@ -24,10 +32,11 @@ const RevisionReportes = () => {
   const [lineasExpandidas, setLineasExpandidas] = useState({});
   const { showToast } = useToast();
 
-  const loadReportes = async () => {
+  const loadData = async () => {
+    if (!user?.id) return;
     try {
       setLoading(true);
-      const data = await adminInstitucionService.getReportesPendientes();
+      const data = await adminInstitucionService.getReportesPendientes(user.id);
       setReportes(data);
     } catch (e) {
       showToast('Error al cargar reportes', 'error');
@@ -36,14 +45,14 @@ const RevisionReportes = () => {
     }
   };
 
-  useEffect(() => { loadReportes(); }, []);
+  useEffect(() => { loadData(); }, []);
 
   const handleAprobar = async (reporteId) => {
     try {
       const result = await adminInstitucionService.aprobarReporte(reporteId);
       if (result.success) {
         showToast('Reporte aprobado ✅ — Enviado al Admin Global', 'success');
-        loadReportes();
+        loadData();
       }
     } catch (e) {
       showToast('Error al aprobar', 'error');
@@ -51,17 +60,16 @@ const RevisionReportes = () => {
   };
 
   const handleRechazar = async (reporteId) => {
-    if (!observacion.trim()) {
+    if (!modalRechazo.observacion.trim()) {
       showToast('La observación es obligatoria al rechazar', 'warning');
       return;
     }
     try {
-      const result = await adminInstitucionService.rechazarReporte(reporteId, observacion.trim());
+      const result = await adminInstitucionService.rechazarReporte(reporteId, modalRechazo.observacion.trim());
       if (result.success) {
         showToast('Reporte rechazado ❌ — Devuelto al responsable', 'info');
-        setRechazandoId(null);
-        setObservacion('');
-        loadReportes();
+        setModalRechazo({ show: false, reporteId: null, observacion: '' });
+        loadData();
       }
     } catch (e) {
       showToast('Error al rechazar', 'error');
@@ -70,7 +78,7 @@ const RevisionReportes = () => {
 
   // Edición
   const handleIniciarEdicion = (reporte) => {
-    setRechazandoId(null); // Close reject form if open
+    setModalRechazo({ show: false, reporteId: null, observacion: '' }); 
     setEditandoId(reporte.id);
     setEditForm({ descripcion: reporte.descripcion, beneficiados: reporte.beneficiados });
   };
@@ -85,7 +93,7 @@ const RevisionReportes = () => {
       if (result.success) {
         showToast('Reporte editado correctamente 📝', 'success');
         setEditandoId(null);
-        loadReportes();
+        loadData();
       }
     } catch (e) {
       showToast('Error al editar el reporte', 'error');
@@ -244,11 +252,65 @@ const RevisionReportes = () => {
                                 </p>
                               </div>
 
-                              <div style={{ display: 'flex', gap: '16px', fontSize: '0.8rem', color: '#475569', fontWeight: 600 }}>
-                                <span style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-                                  👥 {reporte.beneficiados} beneficiados
-                                </span>
+                              <div style={{
+                                display: 'grid',
+                                gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
+                                gap: '12px',
+                                marginTop: '12px',
+                                marginBottom: '12px'
+                              }}>
+                                {/* Asistentes */}
+                                <div style={{ background: '#f1f5f9', padding: '10px 12px', borderRadius: '6px' }}>
+                                  <div style={{ fontSize: '0.75rem', color: '#64748b', fontWeight: 600, marginBottom: '4px' }}>POBLACIÓN BENEFICIADA</div>
+                                  <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.85rem', fontWeight: 700, color: '#0b2240', marginBottom: '6px' }}>
+                                    <Users size={14} color="#3b82f6" /> {reporte.beneficiados} total
+                                  </div>
+                                  {reporte.asistentes ? (
+                                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '4px', fontSize: '0.75rem', color: '#475569' }}>
+                                      <div><span style={{color: '#94a3b8'}}>Niñez:</span> <b>{reporte.asistentes.ninos || 0}</b></div>
+                                      <div><span style={{color: '#94a3b8'}}>Adolesc.:</span> <b>{reporte.asistentes.adolescentes || 0}</b></div>
+                                      <div><span style={{color: '#94a3b8'}}>Juventud:</span> <b>{reporte.asistentes.jovenes || 0}</b></div>
+                                      <div><span style={{color: '#94a3b8'}}>Adultos:</span> <b>{reporte.asistentes.adultos || 0}</b></div>
+                                      <div><span style={{color: '#94a3b8'}}>Adulto M.:</span> <b>{reporte.asistentes.adultoMayor || 0}</b></div>
+                                    </div>
+                                  ) : null}
+                                </div>
+                                
+                                {/* Detalles de actividad e Inversión */}
+                                <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                                  {reporte.tipoActividad && (
+                                    <div style={{ background: '#eff6ff', border: '1px solid #bfdbfe', padding: '8px 10px', borderRadius: '6px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                      <Target size={14} color="#2563eb" />
+                                      <div>
+                                        <div style={{ fontSize: '0.7rem', color: '#3b82f6', fontWeight: 700 }}>TIPO ACTIVIDAD</div>
+                                        <div style={{ fontSize: '0.8rem', color: '#1e3a8a', fontWeight: 600 }}>{reporte.tipoActividad}</div>
+                                      </div>
+                                    </div>
+                                  )}
+                                  
+                                  {reporte.inversionColones !== undefined && reporte.inversionColones > 0 && (
+                                    <div style={{ background: '#f0fdf4', border: '1px solid #bbf7d0', padding: '8px 10px', borderRadius: '6px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                      <Activity size={14} color="#16a34a" />
+                                      <div>
+                                        <div style={{ fontSize: '0.7rem', color: '#16a34a', fontWeight: 700 }}>INVERSIÓN Y RECURSOS</div>
+                                        <div style={{ fontSize: '0.8rem', color: '#14532d', fontWeight: 600 }}>
+                                          ₡{reporte.inversionColones.toLocaleString()}
+                                        </div>
+                                        {reporte.detalleRecursos && (
+                                          <div style={{ fontSize: '0.7rem', color: '#166534', marginTop: '2px' }}>{reporte.detalleRecursos}</div>
+                                        )}
+                                      </div>
+                                    </div>
+                                  )}
+                                </div>
                               </div>
+                              
+                              {reporte.observaciones && (
+                                <div style={{ background: '#fffbeb', borderLeft: '3px solid #f59e0b', padding: '8px 12px', marginBottom: '12px', borderRadius: '0 6px 6px 0' }}>
+                                  <div style={{ fontSize: '0.75rem', fontWeight: 700, color: '#b45309', marginBottom: '2px' }}>OBSERVACIONES ADICIONALES</div>
+                                  <div style={{ fontSize: '0.8rem', color: '#92400e', lineHeight: 1.4 }}>{reporte.observaciones}</div>
+                                </div>
+                              )}
 
                               {reporte.fotos && reporte.fotos.length > 0 && (
                                 <div className="admin-inst-report-evidence">
@@ -264,7 +326,7 @@ const RevisionReportes = () => {
                         </div>
 
                         {/* Actions */}
-                        {rechazandoId !== reporte.id && editandoId !== reporte.id && (
+                        {!modalRechazo.show && editandoId !== reporte.id && (
                           <div className="admin-inst-report-actions">
                             <button
                               className="admin-inst-btn admin-inst-btn--aprobar"
@@ -286,8 +348,7 @@ const RevisionReportes = () => {
                               className="admin-inst-btn admin-inst-btn--rechazar"
                               onClick={() => {
                                 setEditandoId(null);
-                                setRechazandoId(reporte.id);
-                                setObservacion('');
+                                setModalRechazo({ show: true, reporteId: reporte.id, observacion: '' });
                               }}
                               title="Devolver al responsable para que lo corrija"
                             >
@@ -297,15 +358,15 @@ const RevisionReportes = () => {
                         )}
 
                         {/* Reject area */}
-                        {rechazandoId === reporte.id && (
+                        {modalRechazo.show && modalRechazo.reporteId === reporte.id && (
                           <div className="admin-inst-reject-area">
                             <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 700, color: '#991b1b', marginBottom: '6px' }}>
                               Observación (obligatoria) — ¿Qué debe corregir el responsable?
                             </label>
                             <textarea
                               className="admin-inst-reject-textarea"
-                              value={observacion}
-                              onChange={e => setObservacion(e.target.value)}
+                              value={modalRechazo.observacion}
+                              onChange={e => setModalRechazo({ ...modalRechazo, observacion: e.target.value })}
                               placeholder="Describa con detalle qué debe corregir o completar el responsable..."
                             />
                             <div style={{ display: 'flex', gap: '8px' }}>
@@ -319,8 +380,7 @@ const RevisionReportes = () => {
                               <button
                                 className="admin-inst-btn admin-inst-btn--secondary"
                                 onClick={() => {
-                                  setRechazandoId(null);
-                                  setObservacion('');
+                                  setModalRechazo({ show: false, reporteId: null, observacion: '' });
                                 }}
                               >
                                 Cancelar

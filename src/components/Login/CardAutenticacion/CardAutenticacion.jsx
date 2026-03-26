@@ -15,6 +15,8 @@ const CardAutenticacion = ({ children }) => {
     const user = validateAll();
     
     if (user) {
+      if (typeof setShowSuccess === 'function') setShowSuccess(true);
+      
       setShowSuccess(true);
       
       // Delay navigation to show success message
@@ -23,6 +25,10 @@ const CardAutenticacion = ({ children }) => {
           navigate('/dashboard');
         } else if (user.rol === 'adminInstitucion') {
           navigate('/dashboardAdminInstitucion');
+        } else if (user.rol === 'institucion' || user.rol === 'oficial' || user.rol === 'editor') {
+          navigate('/dashboardEditores');
+        } else {
+          navigate('/dashboardEditores');
         } else if (user.rol === 'oficial' || user.rol === 'institucion') {
           navigate('/dashboardInstitucion');
         } else {

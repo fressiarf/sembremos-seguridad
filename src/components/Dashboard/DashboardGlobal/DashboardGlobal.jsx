@@ -1,3 +1,6 @@
+import React, { useState, useEffect } from 'react';
+import { FileText, ChevronDown, Download, LayoutGrid, MapPin, AlertTriangle, CheckSquare, BarChart3, TrendingUp, DollarSign, Activity } from 'lucide-react';
+import { dashboardService } from '../../../services/dashboardService';
 import React, { useState } from 'react';
 import { FileText, ChevronDown, Download, LayoutGrid, MapPin, AlertTriangle, CheckSquare, BarChart3, TrendingUp, Activity } from 'lucide-react';
 import './DashboardGlobal.css';
@@ -79,6 +82,24 @@ const RiskRadar = () => {
 
 const DashboardGlobal = ({ collapsed }) => {
   const [expandedRow, setExpandedRow] = useState(null);
+  const [presupuesto, setPresupuesto] = useState({ ejecutado: 0, asignado: 50000000 });
+
+  useEffect(() => {
+    const fetchPresupuesto = async () => {
+      try {
+        const dashData = await dashboardService.getFullDashboardData();
+        if (dashData && dashData.stats) {
+          setPresupuesto({
+            ejecutado: dashData.stats.inversionTotal || 0,
+            asignado: dashData.stats.presupuestoAsignado || 50000000
+          });
+        }
+      } catch (e) {
+        console.error("Error al obtener presupuesto", e);
+      }
+    };
+    fetchPresupuesto();
+  }, []);
 
   const lineasDeAccion = [
     {
@@ -147,11 +168,19 @@ const DashboardGlobal = ({ collapsed }) => {
                  <span className="mini-lbl">Tareas</span>
                </div>
              </div>
-             <div className="stat-card-mini">
-               <div className="mini-icon red"><AlertTriangle size={16} /></div>
-               <div className="mini-data">
-                 <span className="mini-val">12</span>
-                 <span className="mini-lbl">Alertas</span>
+             <div className="stat-card-mini progress-main-card">
+               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                 <div className="mini-icon red"><DollarSign size={16} /></div>
+                 <span className="mini-val" style={{ fontSize: '0.9rem', color: '#0b2240' }}>
+                   ₡{presupuesto.ejecutado ? presupuesto.ejecutado.toLocaleString('es-CR') : '0'} / ₡{presupuesto.asignado.toLocaleString('es-CR')}
+                 </span>
+               </div>
+               <span className="mini-lbl" style={{ marginTop: '4px', display: 'block' }}>Ejecución P.</span>
+               <div className="main-prog-group" style={{ marginTop: '6px' }}>
+                 <span className="main-prog-val">{Math.round((presupuesto.ejecutado / presupuesto.asignado) * 100)}%</span>
+                 <div className="main-prog-bar">
+                   <div className="fill" style={{ width: `${Math.min(100, (presupuesto.ejecutado / presupuesto.asignado) * 100)}%`, backgroundColor: '#3b82f6' }}></div>
+                 </div>
                </div>
              </div>
              <div className="stat-card-mini progress-main-card">

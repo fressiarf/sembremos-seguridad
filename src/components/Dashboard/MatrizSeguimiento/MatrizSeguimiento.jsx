@@ -2,9 +2,11 @@ import React, { useState, useEffect } from 'react';
 import './MatrizSeguimiento.css';
 import { useToast } from '../../../context/ToastContext';
 import { dashboardService } from '../../../services/dashboardService';
+import { useLogin } from '../../../context/LoginContext';
 import { Save, Edit2, Search, Filter, Download, Plus } from 'lucide-react';
 
 const MatrizSeguimiento = () => {
+  const { user } = useLogin();
   const { showToast } = useToast();
   const [searchTerm, setSearchTerm] = useState('');
   const [data, setData] = useState([]);
@@ -80,9 +82,11 @@ const MatrizSeguimiento = () => {
           <button className="btn-secondary" onClick={() => showToast('Generando Excel...', 'info')}>
             <Download size={16} /> Exportar Excel
           </button>
-          <button className="btn-primary" onClick={() => showToast('Módulo en desarrollo', 'info')}>
-            <Plus size={16} /> Nueva Línea Estratégica
-          </button>
+          {user?.rol !== 'auditor' && (
+            <button className="btn-primary" onClick={() => showToast('Módulo en desarrollo', 'info')}>
+              <Plus size={16} /> Nueva Línea Estratégica
+            </button>
+          )}
         </div>
       </header>
 
@@ -186,7 +190,7 @@ const MatrizSeguimiento = () => {
                           <div className="resp-co"><strong>Co-gestor:</strong> {tarea.corresponsable}</div>
                         )}
                       </td>
-                      <td className="cell-evidencia" onClick={() => !isEditing && handleEditClick(tarea)}>
+                      <td className="cell-evidencia" onClick={() => !isEditing && user?.rol !== 'auditor' && handleEditClick(tarea)}>
                         {isEditing ? (
                           <div className="edit-mode">
                             <textarea 
@@ -203,9 +207,9 @@ const MatrizSeguimiento = () => {
                         ) : (
                           <div className="view-mode">
                             <span className={tarea.evidenciaSeguimiento ? "evidencia-text" : "evidencia-empty"}>
-                              {tarea.evidenciaSeguimiento || 'Click para agregar avance / observaciones de seguimiento...'}
+                              {tarea.evidenciaSeguimiento || (user?.rol !== 'auditor' ? 'Click para agregar avance / observaciones de seguimiento...' : 'Sin evidencia de seguimiento')}
                             </span>
-                            <Edit2 size={13} className="edit-icon" />
+                            {user?.rol !== 'auditor' && <Edit2 size={13} className="edit-icon" />}
                           </div>
                         )}
                       </td>

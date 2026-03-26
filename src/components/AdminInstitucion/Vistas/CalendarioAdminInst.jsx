@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { adminInstitucionService } from '../../../services/adminInstitucionService';
+import { useLogin } from '../../../context/LoginContext';
 import { useToast } from '../../../context/ToastContext';
 import { ChevronLeft, ChevronRight, Activity, MapPin, Users } from 'lucide-react';
 import '../AdminInstitucion.css';
@@ -8,6 +9,7 @@ const DIAS = ['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb'];
 const MESES = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
 
 const CalendarioAdminInst = () => {
+  const { user } = useLogin();
   const [tareas, setTareas] = useState([]);
   const [loading, setLoading] = useState(true);
   const [currentDate, setCurrentDate] = useState(new Date(2025, 2, 1)); // March 2025 to show mock data
@@ -16,8 +18,9 @@ const CalendarioAdminInst = () => {
 
   useEffect(() => {
     const load = async () => {
+      if (!user?.id) return;
       try {
-        const data = await adminInstitucionService.getCalendarioTareas();
+        const data = await adminInstitucionService.getCalendarioTareas(user.id);
         setTareas(data);
       } catch (e) {
         showToast('Error al cargar calendario', 'error');

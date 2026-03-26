@@ -14,6 +14,7 @@ import { useToast } from '../../../context/ToastContext';
 import { Download, FileText, Bell } from 'lucide-react';
 import Calendario from '../../Calendario/Calendario';
 import NotificacionAdmin from '../NotificacionesAdmin/NotificacionAdmin';
+import HistorialReportes from '../../AdminInstitucion/Vistas/HistorialReportes';
 
 // Mapeo de vistas a nombres de sección para el TopbarInstitucion
 const VIEW_LABELS = {
@@ -154,13 +155,7 @@ const SeccionPrincipal = ({ collapsed, setCollapsed, activeView }) => {
       {activeView === 'zonas' && <ZonasCriticas />}
       {activeView === 'calendario' && <Calendario />}
       {(activeView === 'reportes' || activeView === 'historial') && (
-        <div style={{ padding: '2.5rem', color: '#64748b' }}>
-          <h2 style={{ fontSize: '1.5rem', marginBottom: '1rem', color: '#1e3a8a' }}>{VIEW_LABELS[activeView]}</h2>
-          <div style={{ padding: '3rem', border: '2px dashed #94a3b833', borderRadius: '1.5rem', textAlign: 'center', backgroundColor: '#ffffff05' }}>
-            <FileText size={48} style={{ margin: '0 auto 1.5rem', opacity: 0.3 }} />
-            <p>Aquí se reflejará el historial consolidado de reportes e incidencias.</p>
-          </div>
-        </div>
+        <HistorialReportes isGlobal={true} />
       )}
 
       {/* Placeholder para otras vistas no mapeadas */}
