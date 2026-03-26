@@ -47,17 +47,8 @@ export const LoginProvider = ({ children }) => {
       return false;
     }
 
-    // 2. Validación de dominio (Muestra error genérico) con excepción para pruebas
-    const usuarioMinuscula = formData.usuario.toLowerCase();
-    const esDominioValido = usuarioMinuscula.endsWith('sembremosseguridad.go.cr') || usuarioMinuscula.endsWith('sembremos.cr');
-    const esCorreoExcepcion = usuarioMinuscula === 'friveraffwd@gmail.com';
+    // Se eliminó la validación estricta de dominio para permitir @gmail.com y otros dominios
 
-    if (formData.usuario && !esDominioValido && !esCorreoExcepcion) {
-      newErrors.usuario = genericError;
-      newErrors.password = genericError;
-      setErrors(newErrors);
-      return false;
-    }
 
     // 3. Validación de formato general y presencia (Genérica)
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
