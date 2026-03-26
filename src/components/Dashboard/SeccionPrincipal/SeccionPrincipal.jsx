@@ -16,6 +16,7 @@ import Calendario from '../../Calendario/Calendario';
 import NotificacionAdmin from '../NotificacionesAdmin/NotificacionAdmin';
 import HistorialReportes from '../../AdminInstitucion/Vistas/HistorialReportes';
 import SoporteInstitucional from '../SoporteInstitucional/SoporteInstitucional';
+import EstadisticasGlobal from '../Estadisticas/EstadisticasGlobal';
 
 // Mapeo de vistas a nombres de sección para el TopbarInstitucion
 const VIEW_LABELS = {
@@ -32,7 +33,6 @@ const VIEW_LABELS = {
   calendario: 'Calendario de Operaciones',
   reportes: 'Reportes INL/MSP',
   historial: 'Historial de Reportes',
-  configuracion: 'Configuración',
   lineas: 'Mis Tareas / Líneas de Acción',
 };
 
@@ -156,13 +156,14 @@ const SeccionPrincipal = ({ collapsed, setCollapsed, activeView }) => {
       {activeView === 'zonas' && <ZonasCriticas />}
       {activeView === 'calendario' && <Calendario />}
       {activeView === 'alertas' && <SoporteInstitucional />}
+      {activeView === 'estadisticas' && <EstadisticasGlobal />}
       {(activeView === 'reportes' || activeView === 'historial') && (
         <HistorialReportes isGlobal={true} />
       )}
 
 
       {/* Placeholder para otras vistas no mapeadas */}
-      {!['dashboard', 'actividades', 'usuarios', 'perfil', 'matrices', 'mapa', 'zonas', 'calendario', 'reportes', 'historial', 'lineas', 'alertas'].includes(activeView) && (
+      {!['dashboard', 'actividades', 'usuarios', 'perfil', 'matrices', 'mapa', 'zonas', 'calendario', 'reportes', 'historial', 'lineas', 'alertas', 'estadisticas'].includes(activeView) && (
         <div style={{ padding: '2rem', color: '#7a9cc4' }}>
           <h2>Vista en desarrollo: {activeView}</h2>
           <p>Esta sección se implementará próximamente.</p>

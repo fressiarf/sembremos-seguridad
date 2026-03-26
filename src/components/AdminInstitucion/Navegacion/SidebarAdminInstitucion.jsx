@@ -4,7 +4,7 @@ import { useLogin } from "../../../context/LoginContext";
 import UserBrand from "../../Shared/Navegacion/UserBrand";
 import {
   ChevronLeft, ChevronDown, LayoutDashboard, ClipboardList,
-  FileSearch, Clock, Calendar, LogOut, Users
+  FileSearch, Clock, Calendar, LogOut, Users, BarChart3
 } from "lucide-react";
 
 const SidebarAdminInstitucion = ({ collapsed = false, onToggle, activeView, onViewChange }) => {
@@ -12,6 +12,7 @@ const SidebarAdminInstitucion = ({ collapsed = false, onToggle, activeView, onVi
   const [openSections, setOpenSections] = useState({
     OPERATIVO: true,
     SUPERVISIÓN: true,
+    ANÁLISIS: true,
     PLANIFICACIÓN: true,
   });
 
@@ -29,6 +30,12 @@ const SidebarAdminInstitucion = ({ collapsed = false, onToggle, activeView, onVi
       items: [
         { id: 'reportes',   label: 'Revisión de Reportes', icon: FileSearch },
         { id: 'historial',  label: 'Historial de Reportes', icon: Clock },
+      ],
+    },
+    {
+      label: 'ANÁLISIS',
+      items: [
+        { id: 'estadisticas', label: 'Estadísticas', icon: BarChart3 },
       ],
     },
     {
