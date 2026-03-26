@@ -84,6 +84,7 @@ body:has(.LayoutDashboard) {
   flex-direction: column;
   gap: 2.5rem;
   width: 100%;
+  flex: 1;
 }
 
 /* ─── Sección Hero ─── */

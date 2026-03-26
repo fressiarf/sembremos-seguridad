@@ -5,14 +5,20 @@ import { useToast } from '../../context/ToastContext';
 import { useLogin } from '../../context/LoginContext';
 import emailjs from '@emailjs/browser';
 
+
 const Calendario = () => {
     const { showToast } = useToast();
     const { user } = useLogin();
 
-    // Inicializar EmailJS una sola vez
+    // Inicializar EmailJS si la llave pública existe
     useEffect(() => {
-        emailjs.init(import.meta.env.VITE_EMAILJS_PUBLIC_KEY);
+        const publicKey = import.meta.env.VITE_EMAILJS_PUBLIC_KEY;
+        if (publicKey) {
+            emailjs.init(publicKey);
+        }
     }, []);
+
+
     const [fechaActual, setFechaActual] = useState(new Date());
     
     const [eventos, setEventos] = useState(() => {
@@ -259,45 +265,44 @@ const Calendario = () => {
             setEventos([...eventos, eventoFinal]);
             showToast(`Evento "${eventoFinal.titulo}" agregado al ${diaSeleccionado}`, 'success');
 
-            // ── Correo de confirmación via EmailJS ──
+            // ── Lógica de Notificaciones Externas ──
             const correoUsuario = user?.usuario || '';
-            if (correoUsuario) {
-                const templateParams = {
-                    correo_usuario: correoUsuario,
-                    nombre_usuario: user?.nombre || 'Usuario',
-                    titulo:    eventoFinal.titulo,
-                    fecha:     eventoFinal.fecha,
-                    inicio:    eventoFinal.inicio,
-                    fin:       eventoFinal.fin,
-                    categoria: eventoFinal.categoria,
-                };
-                emailjs
-                    .send(
-                        import.meta.env.VITE_EMAILJS_SERVICE_ID,
-                        import.meta.env.VITE_EMAILJS_TEMPLATE_ID,
-                        templateParams
-                    )
-                    .then(() => {
-                        showToast(`📧 Confirmación enviada a ${correoUsuario}`, 'info');
-                    })
-                    .catch((err) => {
-                        console.error('EmailJS error → status:', err?.status, '| text:', err?.text);
-                    });
+            const { VITE_EMAILJS_SERVICE_ID, VITE_EMAILJS_TEMPLATE_ID, VITE_MAKE_WEBHOOK_URL } = import.meta.env;
 
-                // ── Registrar en Make → Google Sheets para recordatorios ──
-                fetch(import.meta.env.VITE_MAKE_WEBHOOK_URL, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        titulo:          eventoFinal.titulo,
-                        fecha:           eventoFinal.fecha,
-                        inicio:          eventoFinal.inicio,
-                        fin:             eventoFinal.fin,
-                        categoria:       eventoFinal.categoria,
-                        correo_usuario:  correoUsuario,
-                        nombre_usuario:  user?.nombre || 'Usuario',
-                    }),
-                }).catch((err) => console.error('Make webhook error:', err));
+            if (correoUsuario) {
+                // 1. EmailJS (Confirmación)
+                if (VITE_EMAILJS_SERVICE_ID && VITE_EMAILJS_TEMPLATE_ID) {
+                    const templateParams = {
+                        correo_usuario: correoUsuario,
+                        nombre_usuario: user?.nombre || 'Usuario',
+                        titulo:    eventoFinal.titulo,
+                        fecha:     eventoFinal.fecha,
+                        inicio:    eventoFinal.inicio,
+                        fin:       eventoFinal.fin,
+                        categoria: eventoFinal.categoria,
+                    };
+
+                    emailjs.send(VITE_EMAILJS_SERVICE_ID, VITE_EMAILJS_TEMPLATE_ID, templateParams)
+                        .then(() => showToast(`📧 Confirmación enviada a ${correoUsuario}`, 'info'))
+                        .catch(err => console.error('EmailJS error:', err));
+                }
+
+                // 2. Make Webhook (Recordatorios)
+                if (VITE_MAKE_WEBHOOK_URL && VITE_MAKE_WEBHOOK_URL !== 'undefined') {
+                    fetch(VITE_MAKE_WEBHOOK_URL, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            titulo:          eventoFinal.titulo,
+                            fecha:           eventoFinal.fecha,
+                            inicio:          eventoFinal.inicio,
+                            fin:             eventoFinal.fin,
+                            categoria:       eventoFinal.categoria,
+                            correo_usuario:  correoUsuario,
+                            nombre_usuario:  user?.nombre || 'Usuario',
+                        }),
+                    }).catch(err => console.error('Make webhook error:', err));
+                }
             }
         }
         
