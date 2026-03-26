@@ -6,6 +6,7 @@ import HistorialReportes from './Vistas/HistorialReportes';
 import CalendarioAdminInst from './Vistas/CalendarioAdminInst';
 import GestionFuncionarios from './Vistas/GestionFuncionarios';
 import PerfilUsuario from '../Dashboard/PerfilUsuario/PerfilUsuario';
+import EstadisticasInstitucion from './Vistas/EstadisticasInstitucion';
 import TopbarInstitucion from '../DashboardInstitucion/Navegacion/TopbarInstitucion';
 import { useLogin } from '../../context/LoginContext';
 
@@ -20,6 +21,7 @@ const SeccionPrincipalAdminInstitucion = ({ activeView = 'dashboard' }) => {
       reportes: 'Revisión de Reportes',
       historial: 'Historial de Reportes',
       calendario: 'Calendario',
+      estadisticas: 'Estadísticas',
       perfil: 'Mi Perfil',
     };
     return labels[activeView] || 'Dashboard';
@@ -39,6 +41,8 @@ const SeccionPrincipalAdminInstitucion = ({ activeView = 'dashboard' }) => {
         return <HistorialReportes />;
       case 'calendario':
         return <CalendarioAdminInst />;
+      case 'estadisticas':
+        return <EstadisticasInstitucion />;
       case 'perfil':
         return (
           <div style={{ padding: '2rem 2.5rem' }}>

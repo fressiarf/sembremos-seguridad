@@ -73,7 +73,6 @@ const SidebarAdmin = ({ collapsed = false, onToggle, activeView, onViewChange })
       items: [
         { id: 'usuarios',    label: 'Gestión de usuarios',   icon: User,     path: '/usuarios' },
         { id: 'reportes',    label: 'Reportes INL/MSP',      icon: FileText,    path: '/reportes' },
-        { id: 'configuracion',label: 'Configuración',        icon: Settings,  path: '/configuracion' },
       ],
     },
   ];
