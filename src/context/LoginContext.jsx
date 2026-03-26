@@ -46,10 +46,6 @@ export const LoginProvider = ({ children }) => {
       setErrors(newErrors);
       return false;
     }
-
-    // Se eliminó la validación estricta de dominio para permitir @gmail.com y otros dominios
-
-
     // 3. Validación de formato general y presencia (Genérica)
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     const isFormatInvalid = !formData.usuario || !emailRegex.test(formData.usuario) || 
