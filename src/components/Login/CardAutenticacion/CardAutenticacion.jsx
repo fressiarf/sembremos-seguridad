@@ -1,19 +1,25 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useLogin } from '../../../context/LoginContext';
 import './CardAutenticacion.css';
-import { ShieldAlert } from 'lucide-react';
+import { ShieldAlert, CheckCircle2 } from 'lucide-react';
 
 const CardAutenticacion = ({ children }) => {
   const navigate = useNavigate();
   const { validateAll } = useLogin();
 
+  const [showSuccess, setShowSuccess] = useState(false);
+
   const handleSubmit = (e) => {
     e.preventDefault();
     const user = validateAll();
+    
     if (user) {
       if (typeof setShowSuccess === 'function') setShowSuccess(true);
       
+      setShowSuccess(true);
+      
+      // Delay navigation to show success message
       setTimeout(() => {
         if (user.rol === 'admin') {
           navigate('/dashboard');
@@ -23,6 +29,10 @@ const CardAutenticacion = ({ children }) => {
           navigate('/dashboardEditores');
         } else {
           navigate('/dashboardEditores');
+        } else if (user.rol === 'oficial' || user.rol === 'institucion') {
+          navigate('/dashboardInstitucion');
+        } else {
+          navigate('/dashboardInstitucion');
         }
       }, 500);
     }
@@ -33,6 +43,21 @@ const CardAutenticacion = ({ children }) => {
       
       <form onSubmit={handleSubmit} className="TarjetaLogin">
         
+        {showSuccess && (
+          <div className="OverlayExito">
+            <div className="ContenedorMensajeExito">
+              <div className="IconoExitoAnimado">
+                <CheckCircle2 size={64} strokeWidth={1.5} />
+              </div>
+              <h2 className="TituloExito">¡Acceso Correcto!</h2>
+              <p className="SubtituloExito">Iniciando sesión de forma segura...</p>
+              <div className="BarraProgresoExito">
+                <div className="ProgresoAnimado"></div>
+              </div>
+            </div>
+          </div>
+        )}
+
         {children}
 
         <footer className="PieTarjetaLogin">

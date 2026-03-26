@@ -149,7 +149,7 @@ const MatrizSeguimiento = () => {
                     <div className="resp-sub">{item.corresponsable}</div>
                   </td>
                   <td className="col-progreso-status">
-                    <span className={`status-badge status--${item.estado.toLowerCase().replace(' ', '-')}`}>{item.estado}</span>
+                    <span className={`status-badge status--${(item.estado || 'Pendiente').toLowerCase().replace(' ', '-')}`}>{item.estado || 'Pendiente'}</span>
                     <div className="progress-mini-bar" style={{ marginTop: '8px' }}>
                       <div className="progress-mini-fill" style={{ width: `${item.progreso}%`, backgroundColor: item.progreso === 100 ? '#22c55e' : '#3b82f6' }} />
                       <span className="progress-mini-text">{item.tareasCompletadas}/{item.totalTareas}</span>
