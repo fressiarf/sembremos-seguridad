@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { FileText, ChevronDown, Download, LayoutGrid, MapPin, AlertTriangle, CheckSquare, BarChart3, TrendingUp, DollarSign, Activity } from 'lucide-react';
+import { FileText, ChevronDown, Download, LayoutGrid, MapPin, AlertTriangle, CheckSquare, BarChart3, TrendingUp, DollarSign, Activity, MessageSquare } from 'lucide-react';
 import { dashboardService } from '../../../services/dashboardService';
 import './DashboardGlobal.css';
 import ReactECharts from 'echarts-for-react';
+import { exportToCSV } from '../../../utils/exportUtils';
 
 const RiskRadar = () => {
   const option = {
@@ -99,6 +100,24 @@ const DashboardGlobal = ({ collapsed }) => {
     fetchPresupuesto();
   }, []);
 
+  const handleExportExcel = () => {
+    const columns = [
+      { label: 'Título', key: 'titulo' },
+      { label: 'Problemática', key: 'problematica' },
+      { label: 'Indicador', key: 'indicador' },
+      { label: 'Responsables', key: 'responsables' },
+      { label: 'Progreso %', key: 'progreso' }
+    ];
+
+    // Flatten responsables array for CSV
+    const exportData = lineasDeAccion.map(l => ({
+      ...l,
+      responsables: l.responsables.join(' | ')
+    }));
+
+    exportToCSV(exportData, `Indicadores_SembremosSeguridad_${new Date().toLocaleDateString()}`, columns);
+  };
+
   const lineasDeAccion = [
     {
       id: 1,
@@ -156,6 +175,29 @@ const DashboardGlobal = ({ collapsed }) => {
             <div className="banner-badge">SISTEMA INTEGRAL DE MONITOREO</div>
             <h1>Dashboard Global Estratégico</h1>
             <p>Observatorio Sembremos Seguridad · Cantón Puntarenas (Periodo 2025)</p>
+            <div className="banner-actions" style={{ marginTop: '1rem' }}>
+              <button 
+                className="btn-export-excel-v4" 
+                onClick={handleExportExcel}
+                style={{
+                  background: 'rgba(255,255,255,0.1)',
+                  backdropFilter: 'blur(10px)',
+                  border: '1px solid rgba(255,255,255,0.2)',
+                  color: 'white',
+                  padding: '8px 16px',
+                  borderRadius: '12px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '8px',
+                  cursor: 'pointer',
+                  fontSize: '0.85rem',
+                  fontWeight: '700',
+                  transition: 'all 0.3s ease'
+                }}
+              >
+                <Download size={16} /> Exportar Indicadores
+              </button>
+            </div>
           </div>
 
           <div className="dashboard-top-stats-grid">
@@ -268,22 +310,29 @@ const DashboardGlobal = ({ collapsed }) => {
               </div>
             </section>
 
-            {/* Cuadro 3: Zonas de Atención */}
+            {/* Cuadro 3: Soporte & Comunicación */}
             <section className="dashboard-card-v4">
               <div className="card-v4-header">
-                <MapPin size={20} className="header-icon" />
-                <h3>Zonas de Monitoreo Crítico</h3>
+                <MessageSquare size={20} className="header-icon" />
+                <h3>Centro de Comunicación de Soporte</h3>
               </div>
-              <div className="zones-summary-grid">
-                {zonasCriticas.map(z => (
-                  <div key={z.id} className="zone-summary-item">
-                    <div className="zone-badge" data-level={z.riesgo}>{z.riesgo}</div>
-                    <div className="zone-details">
-                      <strong>{z.nombre}</strong>
-                      <p>{z.hallazgo}</p>
+              <div className="support-summary-list">
+                {[
+                  { id: 1, inst: 'PANI', msg: 'Solicitud de refuerzo técnico en Tarea #4', status: 'Pendiente' },
+                  { id: 2, inst: 'Fuerza Pública', msg: 'Reporte de patrullaje subido', status: 'Respondido' },
+                  { id: 3, inst: 'IMAS', msg: 'Duda con asignación presupuestaria', status: 'Leído' }
+                ].map(msg => (
+                  <div key={msg.id} className="support-summary-item">
+                    <div className="support-msg-info">
+                       <span className="support-inst-badge">{msg.inst}</span>
+                       <p className="support-msg-text">{msg.msg}</p>
                     </div>
+                    <div className={`support-status-dot ${msg.status.toLowerCase()}`}></div>
                   </div>
                 ))}
+              </div>
+              <div className="card-v4-footer-info">
+                 <p>Canal directo con el Administrador para gestiones técnicas.</p>
               </div>
             </section>
 

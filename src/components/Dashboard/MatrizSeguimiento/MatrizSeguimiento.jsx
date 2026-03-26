@@ -4,6 +4,7 @@ import { useToast } from '../../../context/ToastContext';
 import { dashboardService } from '../../../services/dashboardService';
 import { useLogin } from '../../../context/LoginContext';
 import { Save, Edit2, Search, Filter, Download, Plus } from 'lucide-react';
+import { exportToCSV } from '../../../utils/exportUtils';
 
 const MatrizSeguimiento = () => {
   const { user } = useLogin();
@@ -34,6 +35,47 @@ const MatrizSeguimiento = () => {
     }
   };
 
+  const handleExportExcel = () => {
+    if (!data || !data.length) return;
+
+    // Aplanamos la data para que cada tarea sea una fila
+    const flattenedData = [];
+    data.forEach(linea => {
+      linea.tareas.forEach((tarea, index) => {
+        flattenedData.push({
+          no: index === 0 ? linea.no : '', // Solo mostramos el no de linea en la primera tarea
+          problematica: index === 0 ? linea.problematica : '', 
+          lineaAccion: index === 0 ? linea.titulo : '',
+          tareaId: tarea.id,
+          tareaTitulo: tarea.titulo,
+          indicador: tarea.indicador,
+          meta: tarea.meta,
+          plazo: tarea.plazo,
+          responsable: tarea.institucionNombre,
+          corresponsable: tarea.corresponsable,
+          evidencia: tarea.evidenciaSeguimiento || '—'
+        });
+      });
+    });
+
+    const columns = [
+      { label: 'No.', key: 'no' },
+      { label: 'Problemática', key: 'problematica' },
+      { label: 'Línea de Acción', key: 'lineaAccion' },
+      { label: 'ID Tarea', key: 'tareaId' },
+      { label: 'Acción Estratégica', key: 'tareaTitulo' },
+      { label: 'Indicador', key: 'indicador' },
+      { label: 'Meta', key: 'meta' },
+      { label: 'Plazo', key: 'plazo' },
+      { label: 'Institución Responsable', key: 'responsable' },
+      { label: 'Corresponsable', key: 'corresponsable' },
+      { label: 'Evidencia de Seguimiento', key: 'evidencia' }
+    ];
+
+    exportToCSV(flattenedData, `Matriz_Seguimiento_SembremosSeguridad_${new Date().toLocaleDateString()}`, columns);
+    showToast('Exportando matriz a CSV/Excel...', 'success');
+  };
+
   const handleEditClick = (tarea) => {
     setEditingId(tarea.id);
     setEditValue(tarea.evidenciaSeguimiento || '');
@@ -42,8 +84,6 @@ const MatrizSeguimiento = () => {
   const handleSaveEdit = async (tarea) => {
     try {
       showToast('Guardando seguimiento...', 'info');
-      // Aquí idealmente llamaríamos a un endpoint PUT /tareas/:id
-      // Simularemos la actualización localmente por ahora:
       setData(prev => prev.map(linea => {
         if (linea.id === tarea.lineaAccionId) {
           return {
@@ -79,7 +119,7 @@ const MatrizSeguimiento = () => {
           <p>Módulo de Control y Seguimiento Estratégico Multidisciplinario</p>
         </div>
         <div className="header-actions">
-          <button className="btn-secondary" onClick={() => showToast('Generando Excel...', 'info')}>
+          <button className="btn-secondary" onClick={handleExportExcel}>
             <Download size={16} /> Exportar Excel
           </button>
           {user?.rol !== 'auditor' && (

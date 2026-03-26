@@ -183,5 +183,34 @@ export const dashboardService = {
       console.error('Error in getStats:', error);
       return { activitiesCount: 0, zonesCount: 0, alertsCount: 0 };
     }
+  },
+
+  getComentariosSoporte: async () => {
+    try {
+      const response = await fetch(`${BASE_URL}/comentariosSoporte?_sort=fecha&_order=desc`);
+      if (!response.ok) throw new Error('Error fetching comentarios');
+      return await response.json();
+    } catch (error) {
+      console.error('Error in getComentariosSoporte:', error);
+      return [];
+    }
+  },
+
+  postComentarioSoporte: async (comentarioData) => {
+    try {
+      const response = await fetch(`${BASE_URL}/comentariosSoporte`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          ...comentarioData,
+          fecha: new Date().toISOString()
+        })
+      });
+      if (!response.ok) throw new Error('Error enviando comentario');
+      return await response.json();
+    } catch (error) {
+      console.error('Error in postComentarioSoporte:', error);
+      throw error;
+    }
   }
 };

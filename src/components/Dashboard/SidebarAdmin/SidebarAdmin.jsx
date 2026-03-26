@@ -3,7 +3,7 @@ import '../../Dashboard/SidebarAdmin/SidebarAdmin.css';
 import { dashboardService } from '../../../services/dashboardService';
 import { useLogin } from "../../../context/LoginContext";
 import UserBrand from "../../Shared/Navegacion/UserBrand";
-import { ChevronLeft, ChevronDown, LayoutGrid, Activity, Clock, LogOut, User, MapPin, Shield, Bell, BellRing, TriangleAlert, FileText, Settings, Calendar, LayoutDashboard } from "lucide-react";
+import { ChevronLeft, ChevronDown, LayoutGrid, Activity, Clock, LogOut, User, MapPin, Shield, Bell, BellRing, TriangleAlert, FileText, Settings, Calendar, LayoutDashboard, MessageCircle } from "lucide-react";
 
 
 // Navigation link items should be consistent, but for now we'll keep the admin structure
@@ -56,7 +56,7 @@ const SidebarAdmin = ({ collapsed = false, onToggle, activeView, onViewChange })
         { id: 'matrices',    label: 'Todas las matrices',    icon: FileText,    path: '/matrices' },
         { id: 'zonas',       label: 'Zonas críticas',        icon: MapPin,      path: '/zonas',    badge: stats.zonesCount },
         { id: 'incidentes',  label: 'Incidentes',            icon: TriangleAlert,  path: '/incidentes' },
-        { id: 'alertas',     label: 'Alertas activas',       icon: Bell,     path: '/alertas',  badge: stats.alertsCount },
+        { id: 'alertas',     label: 'Soporte y Comentarios',  icon: MessageCircle, path: '/alertas',  badge: stats.alertsCount },
       ],
     },
     {
