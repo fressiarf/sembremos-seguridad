@@ -29,10 +29,6 @@ const CardAutenticacion = ({ children }) => {
           navigate('/dashboardEditores');
         } else {
           navigate('/dashboardEditores');
-        } else if (user.rol === 'oficial' || user.rol === 'institucion') {
-          navigate('/dashboardInstitucion');
-        } else {
-          navigate('/dashboardInstitucion');
         }
       }, 500);
     }
