@@ -1,8 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { FileText, ChevronDown, Download, LayoutGrid, MapPin, AlertTriangle, CheckSquare, BarChart3, TrendingUp, DollarSign, Activity } from 'lucide-react';
 import { dashboardService } from '../../../services/dashboardService';
-import React, { useState } from 'react';
-import { FileText, ChevronDown, Download, LayoutGrid, MapPin, AlertTriangle, CheckSquare, BarChart3, TrendingUp, Activity } from 'lucide-react';
 import './DashboardGlobal.css';
 import ReactECharts from 'echarts-for-react';
 
