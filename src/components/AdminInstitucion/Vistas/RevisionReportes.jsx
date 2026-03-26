@@ -7,7 +7,6 @@ import {
   Filter, FileText, Activity, AlertCircle, Edit, MessageSquare, ChevronDown,
   FileSearch, ChevronUp, Save, Image as ImageIcon, Edit3, MapPin, Calendar
 } from 'lucide-react';
-import ReportePreviewCard from './ReportePreviewCard';
 import '../AdminInstitucion.css';
 
 const LINEAS_ACCION_INFO = [

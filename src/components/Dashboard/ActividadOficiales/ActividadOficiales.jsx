@@ -35,7 +35,8 @@ const ActividadOficiales = () => {
   const [newTarea, setNewTarea] = useState({
     lineaAccionId: '', titulo: '', indicador: '', consideraciones: '', meta: '',
     plazo: 'Anual', institucionId: '', corresponsable: '',
-    provincia: '', canton: '', distrito: ''
+    provincia: '', canton: '', distrito: '',
+    tipo: 1, presupuestoEstimado: ''
   });
 
   const formatColones = (amount) => {
@@ -99,7 +100,13 @@ const ActividadOficiales = () => {
       });
       showToast('Tarea creada y asignada ✓', 'success');
       setShowTareaForm(false);
-      setNewTarea({ lineaAccionId: '', titulo: '', indicador: '', consideraciones: '', meta: '', plazo: 'Anual', institucionId: '', corresponsable: '', provincia: '', canton: '', distrito: '' });
+      loadData();
+      setNewTarea({ 
+        lineaAccionId: '', titulo: '', indicador: '', consideraciones: '', meta: '', 
+        plazo: 'Anual', institucionId: '', corresponsable: '', 
+        provincia: '', canton: '', distrito: '', 
+        tipo: 1, presupuestoEstimado: '' 
+      });
       loadData();
     } catch (error) {
       showToast('Error al crear la tarea', 'error');
@@ -165,102 +172,120 @@ const ActividadOficiales = () => {
         </div>
       )}
 
-      {/* ── Modal Crear Tarea ── */}
-      {showTareaForm && (
-        <div className="assign-modal-overlay">
-          <div className="assign-modal" style={{ maxWidth: '550px' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '1.5rem' }}>
-              <h3 style={{ margin: 0, color: '#0b2240' }}>Asignar Tarea a Institución</h3>
-              <button onClick={() => setShowTareaForm(false)} style={{ background: 'none', border: 'none', cursor: 'pointer' }}><X size={20} /></button>
-            </div>
-            <form onSubmit={handleCreateTarea}>
-              <div className="form-row-grid">
-                <div className="form-group">
-                  <label>Línea de Acción *</label>
-                  <select value={newTarea.lineaAccionId} onChange={e => setNewTarea({...newTarea, lineaAccionId: e.target.value})}>
-                    <option value="">-- Seleccionar --</option>
-                    {lineas.map(l => (
-                      <option key={l.id} value={l.id}>{l.id} · {l.problematica}</option>
-                    ))}
-                  </select>
-                </div>
-                <div className="form-group">
-                  <label>Institución Asignada *</label>
-                  <select value={newTarea.institucionId} onChange={e => setNewTarea({...newTarea, institucionId: e.target.value})}>
-                    <option value="">-- Seleccionar --</option>
-                    {officers.map(o => (
-                      <option key={o.id} value={o.id}>{o.nombre}</option>
-                    ))}
-                  </select>
-                </div>
-              </div>
-              <div className="form-group">
-                <label>Título de la tarea *</label>
-                <input type="text" placeholder="Ej: Firmar convenio con MEP" value={newTarea.titulo} onChange={e => setNewTarea({...newTarea, titulo: e.target.value})} />
-              </div>
-              
-              <div className="form-row-grid">
-                <div className="form-group">
-                  <label>Indicador *</label>
-                  <input type="text" placeholder="Ej: Talleres realizados" value={newTarea.indicador} onChange={e => setNewTarea({...newTarea, indicador: e.target.value})} />
-                </div>
-                <div className="form-group">
-                  <label>Meta *</label>
-                  <input type="text" placeholder="Ej: 50" value={newTarea.meta} onChange={e => setNewTarea({...newTarea, meta: e.target.value})} />
-                </div>
-              </div>
-
-              <div className="form-row-grid">
-                <div className="form-group">
-                  <label>Plazo *</label>
-                  <select value={newTarea.plazo} onChange={e => setNewTarea({...newTarea, plazo: e.target.value})}>
-                    <option value="Anual">Anual</option>
-                    <option value="Bimestral">Bimestral</option>
-                    <option value="Cuatrimestral">Cuatrimestral</option>
-                  </select>
-                </div>
-                <div className="form-group">
-                  <label>Co-gestor / Corresponsable</label>
-                  <input type="text" placeholder="Ej: OIJ, PANI..." value={newTarea.corresponsable} onChange={e => setNewTarea({...newTarea, corresponsable: e.target.value})} />
-                </div>
-              </div>
-
-              <div className="form-row-grid" style={{ gridTemplateColumns: '1fr 1fr 1fr' }}>
-                <div className="form-group">
-                  <label>Provincia</label>
-                  <select value={newTarea.provincia} onChange={e => setNewTarea({...newTarea, provincia: e.target.value, canton: '', distrito: ''})}>
-                    <option value="">-- Provincia --</option>
-                    {Object.keys(LOCATION_DATA).map(p => <option key={p} value={p}>{p}</option>)}
-                  </select>
-                </div>
-                <div className="form-group">
-                  <label>Cantón</label>
-                  <select value={newTarea.canton} onChange={e => setNewTarea({...newTarea, canton: e.target.value, distrito: ''})} disabled={!newTarea.provincia}>
-                    <option value="">-- Cantón --</option>
-                    {newTarea.provincia && Object.keys(LOCATION_DATA[newTarea.provincia]).map(c => <option key={c} value={c}>{c}</option>)}
-                  </select>
-                </div>
-                <div className="form-group">
-                  <label>Distrito</label>
-                  <select value={newTarea.distrito} onChange={e => setNewTarea({...newTarea, distrito: e.target.value})} disabled={!newTarea.canton}>
-                    <option value="">-- Distrito --</option>
-                    {newTarea.canton && LOCATION_DATA[newTarea.provincia][newTarea.canton].map(d => <option key={d} value={d}>{d}</option>)}
-                  </select>
-                </div>
-              </div>
-
-              <div className="form-group">
-                <label>Consideraciones / Objetivo</label>
-                <textarea placeholder="Consideraciones o instrucciones..." value={newTarea.consideraciones} onChange={e => setNewTarea({...newTarea, consideraciones: e.target.value})} />
-              </div>
-              <div className="modal-actions">
-                <button type="button" onClick={() => setShowTareaForm(false)} className="btn-cancel">Cancelar</button>
-                <button type="submit" className="btn-assign-submit">Asignar Tarea</button>
-              </div>
-            </form>
-          </div>
+  // ── Modal Crear Tarea ──
+  {showTareaForm && (
+    <div className="assign-modal-overlay">
+      <div className="assign-modal" style={{ maxWidth: '600px' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '1.5rem' }}>
+          <h3 style={{ margin: 0, color: '#0b2240' }}>Asignar Tarea a Institución</h3>
+          <button onClick={() => setShowTareaForm(false)} style={{ background: 'none', border: 'none', cursor: 'pointer' }}><X size={20} /></button>
         </div>
-      )}
+        <form onSubmit={handleCreateTarea}>
+          <div className="form-row-grid">
+            <div className="form-group">
+              <label>Línea de Acción *</label>
+              <select value={newTarea.lineaAccionId} onChange={e => setNewTarea({...newTarea, lineaAccionId: e.target.value})}>
+                <option value="">-- Seleccionar --</option>
+                {lineas.map(l => (
+                  <option key={l.id} value={l.id}>{l.id} · {l.problematica}</option>
+                ))}
+              </select>
+            </div>
+            <div className="form-group">
+              <label>Institución Asignada *</label>
+              <select value={newTarea.institucionId} onChange={e => setNewTarea({...newTarea, institucionId: e.target.value})}>
+                <option value="">-- Seleccionar --</option>
+                {officers.map(o => (
+                  <option key={o.id} value={o.id}>{o.nombre}</option>
+                ))}
+              </select>
+            </div>
+          </div>
+
+          <div className="form-row-grid">
+            <div className="form-group">
+              <label>Tipo de Tarea de Reporte *</label>
+              <select value={newTarea.tipo} onChange={e => setNewTarea({...newTarea, tipo: parseInt(e.target.value)})}>
+                <option value="1">Tipo 1: Social / Preventivo</option>
+                <option value="2">Tipo 2: Infraestructura / Obra</option>
+                <option value="3">Tipo 3: Seguridad / Operativo</option>
+                <option value="4">Tipo 4: Gestión / Coordinación</option>
+                <option value="5">Tipo 5: Recursos / Donación</option>
+              </select>
+            </div>
+            <div className="form-group">
+              <label>Presupuesto Estimado (₡) *</label>
+              <input type="number" placeholder="Ej: 5000000" value={newTarea.presupuestoEstimado} onChange={e => setNewTarea({...newTarea, presupuestoEstimado: parseInt(e.target.value) || 0})} />
+            </div>
+          </div>
+
+          <div className="form-group">
+            <label>Título de la tarea *</label>
+            <input type="text" placeholder="Ej: Firmar convenio con MEP" value={newTarea.titulo} onChange={e => setNewTarea({...newTarea, titulo: e.target.value})} />
+          </div>
+          
+          <div className="form-row-grid">
+            <div className="form-group">
+              <label>Indicador *</label>
+              <input type="text" placeholder="Ej: Talleres realizados" value={newTarea.indicador} onChange={e => setNewTarea({...newTarea, indicador: e.target.value})} />
+            </div>
+            <div className="form-group">
+              <label>Meta *</label>
+              <input type="text" placeholder="Ej: 50" value={newTarea.meta} onChange={e => setNewTarea({...newTarea, meta: e.target.value})} />
+            </div>
+          </div>
+
+          <div className="form-row-grid">
+            <div className="form-group">
+              <label>Plazo *</label>
+              <select value={newTarea.plazo} onChange={e => setNewTarea({...newTarea, plazo: e.target.value})}>
+                <option value="Anual">Anual</option>
+                <option value="Bimestral">Bimestral</option>
+                <option value="Cuatrimestral">Cuatrimestral</option>
+              </select>
+            </div>
+            <div className="form-group">
+              <label>Co-gestor / Corresponsable</label>
+              <input type="text" placeholder="Ej: OIJ, PANI..." value={newTarea.corresponsable} onChange={e => setNewTarea({...newTarea, corresponsable: e.target.value})} />
+            </div>
+          </div>
+
+          <div className="form-row-grid" style={{ gridTemplateColumns: '1fr 1fr 1fr' }}>
+            <div className="form-group">
+              <label>Provincia</label>
+              <select value={newTarea.provincia} onChange={e => setNewTarea({...newTarea, provincia: e.target.value, canton: '', distrito: ''})}>
+                <option value="">-- Provincia --</option>
+                {Object.keys(LOCATION_DATA).map(p => <option key={p} value={p}>{p}</option>)}
+              </select>
+            </div>
+            <div className="form-group">
+              <label>Cantón</label>
+              <select value={newTarea.canton} onChange={e => setNewTarea({...newTarea, canton: e.target.value, distrito: ''})} disabled={!newTarea.provincia}>
+                <option value="">-- Cantón --</option>
+                {newTarea.provincia && Object.keys(LOCATION_DATA[newTarea.provincia]).map(c => <option key={c} value={c}>{c}</option>)}
+              </select>
+            </div>
+            <div className="form-group">
+              <label>Distrito</label>
+              <select value={newTarea.distrito} onChange={e => setNewTarea({...newTarea, distrito: e.target.value})} disabled={!newTarea.canton}>
+                <option value="">-- Distrito --</option>
+                {newTarea.canton && LOCATION_DATA[newTarea.provincia][newTarea.canton].map(d => <option key={d} value={d}>{d}</option>)}
+              </select>
+            </div>
+          </div>
+
+          <div className="form-group">
+            <label>Consideraciones / Objetivo</label>
+            <textarea placeholder="Consideraciones o instrucciones..." value={newTarea.consideraciones} onChange={e => setNewTarea({...newTarea, consideraciones: e.target.value})} />
+          </div>
+          <div className="modal-actions">
+            <button type="button" onClick={() => setShowTareaForm(false)} className="btn-cancel">Cancelar</button>
+            <button type="submit" className="btn-assign-submit">Asignar Tarea</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  )}
 
       {/* ── Stats ── */}
       <section className="actividad-oficiales__stats">

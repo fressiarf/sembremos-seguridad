@@ -54,6 +54,24 @@
   border-radius: 6px;
 }
 
+.form-section-header .section-title-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.form-section-header .section-title-text {
+  font-size: 0.8rem;
+  letter-spacing: 0.5px;
+}
+
+.form-section-header .section-subtitle-text {
+  font-size: 0.65rem;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.7);
+  text-transform: none;
+}
+
 .form-section-header .section-chevron {
   margin-left: auto;
   transition: transform 0.3s;
@@ -236,12 +254,64 @@
   font-size: 0.7rem;
 }
 
-.age-total .total-number {
-  font-size: 1.6rem;
-  font-weight: 800;
-  color: #fff;
-  margin-top: 4px;
+/* ── Progress & Checklists ── */
+.hitos-checklist {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  background: #f8fafc;
+  padding: 12px;
+  border-radius: 10px;
+  border: 1px solid #e2e8f0;
 }
+
+.hito-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 8px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.hito-item:hover {
+  background: #f1f5f9;
+}
+
+.hito-item input[type="checkbox"] {
+  width: 18px;
+  height: 18px;
+  accent-color: #3b82f6;
+  cursor: pointer;
+}
+
+.hito-label {
+  font-size: 0.85rem;
+  color: #1e293b;
+  font-weight: 500;
+}
+
+.infra-progress-bar {
+  height: 8px;
+  background: #e2e8f0;
+  border-radius: 4px;
+  overflow: hidden;
+  margin-top: 10px;
+}
+
+.infra-progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #3b82f6, #60a5fa);
+  transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* ── Highlighted Sections by Type ── */
+.section--social { border-left: 4px solid #3b82f6; }
+.section--infra { border-left: 4px solid #f59e0b; }
+.section--seguro { border-left: 4px solid #ef4444; }
+.section--gestion { border-left: 4px solid #8b5cf6; }
+.section--recursos { border-left: 4px solid #10b981; }
 
 /* ── File Upload Zone ── */
 .file-upload-zone {

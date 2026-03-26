@@ -386,11 +386,12 @@ export const adminInstitucionService = {
   getDashboardData: async (institucionId) => {
     try {
       const [tareasReq, reportesReq] = await Promise.all([
-        fetch(`http://localhost:5000/tareas?institucionId=${institucionId}`),
+        fetch('http://localhost:5000/tareas'),
         fetch('http://localhost:5000/reportes')
       ]);
-      const tareas = await tareasReq.json();
+      const allTareas = await tareasReq.json();
       const reportes = await reportesReq.json();
+      const tareas = allTareas.filter(t => String(t.institucionId) === String(institucionId));
 
       const totalTareas = tareas.length;
       const completadas = tareas.filter(t => t.estado === 'Completado').length;
@@ -435,10 +436,11 @@ export const adminInstitucionService = {
 
   getTareas: async (filtros = {}) => {
     try {
-      let url = 'http://localhost:5000/tareas';
-      if (filtros.institucionId) url += `?institucionId=${filtros.institucionId}`;
-      const res = await fetch(url);
+      const res = await fetch('http://localhost:5000/tareas');
       let tareas = await res.json();
+      if (filtros.institucionId) {
+        tareas = tareas.filter(t => String(t.institucionId) === String(filtros.institucionId));
+      }
 
       if (filtros.estado && filtros.estado !== 'Todos') {
         tareas = tareas.filter(t => t.estado === filtros.estado);
@@ -469,12 +471,14 @@ export const adminInstitucionService = {
   getReportesPendientes: async (institucionId) => {
     try {
       const [resReq, tareasReq, usersReq] = await Promise.all([
-        fetch('http://localhost:5000/reportes?estado=pendiente'),
-        fetch(`http://localhost:5000/tareas?institucionId=${institucionId}`),
+        fetch('http://localhost:5000/reportes'),
+        fetch('http://localhost:5000/tareas'),
         fetch('http://localhost:5000/usuarios')
       ]);
-      const reportes = await resReq.json();
-      const tareas = await tareasReq.json();
+      const allReportes = await resReq.json();
+      const reportes = allReportes.filter(r => r.estado === 'pendiente');
+      const allTareas = await tareasReq.json();
+      const tareas = allTareas.filter(t => String(t.institucionId) === String(institucionId));
       const usuarios = await usersReq.json();
       
       const misReportes = reportes.filter(r => tareas.some(t => t.id === r.tareaId));
@@ -532,12 +536,9 @@ export const adminInstitucionService = {
 
   getHistorial: async (filtros = {}) => {
     try {
-      let tareasUrl = 'http://localhost:5000/tareas';
-      if (filtros.institucionId) tareasUrl += `?institucionId=${filtros.institucionId}`;
-
       const [resReq, tareasReq, usersReq] = await Promise.all([
         fetch('http://localhost:5000/reportes'),
-        fetch(tareasUrl),
+        fetch('http://localhost:5000/tareas'),
         fetch('http://localhost:5000/usuarios')
       ]);
       const reportes = await resReq.json();
@@ -552,18 +553,51 @@ export const adminInstitucionService = {
         responsable: usuarios.find(u => String(u.id) === String(r.responsableId)) || {}
       }));
 
+      // Filtros base
       if (filtros.estado && filtros.estado !== 'Todos') resultado = resultado.filter(r => r.estado === filtros.estado);
       if (filtros.responsableId && filtros.responsableId !== 'Todos') resultado = resultado.filter(r => String(r.responsableId) === String(filtros.responsableId));
+      if (filtros.institucionId && filtros.institucionId !== 'Todos') {
+        const targetId = String(filtros.institucionId);
+        resultado = resultado.filter(r => String(r.tarea?.institucionId) === targetId);
+      }
       if (filtros.lineaId && filtros.lineaId !== 'Todos') resultado = resultado.filter(r => r.tarea?.lineaAccionId === filtros.lineaId);
       
+      // Filtro de Búsqueda
+      if (filtros.busqueda) {
+        const q = filtros.busqueda.toLowerCase();
+        resultado = resultado.filter(r => 
+          r.tarea?.titulo?.toLowerCase().includes(q) || 
+          r.descripcion?.toLowerCase().includes(q) ||
+          r.accionEstrategica?.toLowerCase().includes(q)
+        );
+      }
+
+      // Filtro de Rango de Tiempo
+      if (filtros.rango && filtros.rango !== 'Todos') {
+        const hoy = new Date();
+        resultado = resultado.filter(r => {
+          const fechaRep = new Date(r.fecha);
+          if (filtros.rango === 'Hoy') {
+            return fechaRep.toDateString() === hoy.toDateString();
+          }
+          if (filtros.rango === 'Semana') {
+            const haceUnaSemana = new Date();
+            haceUnaSemana.setDate(hoy.getDate() - 7);
+            return fechaRep >= haceUnaSemana;
+          }
+          return true;
+        });
+      }
+
       return resultado.sort((a, b) => new Date(b.fecha) - new Date(a.fecha));
     } catch (e) { return []; }
   },
 
   getCalendarioTareas: async (institucionId) => {
     try {
-      const res = await fetch(`http://localhost:5000/tareas?institucionId=${institucionId}`);
-      const tareas = await res.json();
+      const res = await fetch('http://localhost:5000/tareas');
+      const allTareas = await res.json();
+      const tareas = allTareas.filter(t => String(t.institucionId) === String(institucionId));
       return tareas.map(t => ({
         id: t.id,
         titulo: t.titulo,

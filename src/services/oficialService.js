@@ -72,6 +72,16 @@ export const institucionService = {
           fotos: reporteData.fotos || [],
           observaciones: reporteData.observaciones || '',
           
+          // Nuevos campos dinámicos
+          tipoTarea: reporteData.tipoTarea || 1,
+          hitos: reporteData.hitos || [],
+          incidencias: reporteData.incidencias || 0,
+          numeroPatrullajes: reporteData.numeroPatrullajes || 0,
+          acuerdos: reporteData.acuerdos || '',
+          institucionesPresentes: reporteData.institucionesPresentes || '',
+          itemsEntregados: reporteData.itemsEntregados || '',
+          numeroSerie: reporteData.numeroSerie || '',
+
           accionEstrategica: typeof reporteData.accionEstrategica === 'string' ? reporteData.accionEstrategica : '',
           indicador: typeof reporteData.indicador === 'string' ? reporteData.indicador : ''
         })
@@ -103,6 +113,15 @@ export const institucionService = {
           detalleRecursos: reporteData.detalleRecursos || '',
           fotos: reporteData.fotos || [],
           observaciones: reporteData.observaciones || '',
+          // Campos dinámicos para edición
+          tipoTarea: reporteData.tipoTarea || 1,
+          hitos: reporteData.hitos || [],
+          incidencias: reporteData.incidencias || 0,
+          numeroPatrullajes: reporteData.numeroPatrullajes || 0,
+          acuerdos: reporteData.acuerdos || '',
+          institucionesPresentes: reporteData.institucionesPresentes || '',
+          itemsEntregados: reporteData.itemsEntregados || '',
+          numeroSerie: reporteData.numeroSerie || '',
           observacionRechazo: '' // Resetea la observación del admin
         })
       });

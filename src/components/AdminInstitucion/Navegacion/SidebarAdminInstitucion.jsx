@@ -4,7 +4,7 @@ import { useLogin } from "../../../context/LoginContext";
 import UserBrand from "../../Shared/Navegacion/UserBrand";
 import {
   ChevronLeft, ChevronDown, LayoutDashboard, ClipboardList,
-  FileSearch, Clock, Calendar, LogOut
+  FileSearch, Clock, Calendar, LogOut, Users
 } from "lucide-react";
 
 const SidebarAdminInstitucion = ({ collapsed = false, onToggle, activeView, onViewChange }) => {
@@ -21,6 +21,7 @@ const SidebarAdminInstitucion = ({ collapsed = false, onToggle, activeView, onVi
       items: [
         { id: 'dashboard',  label: 'Dashboard',            icon: LayoutDashboard },
         { id: 'tareas',     label: 'Gestión de Tareas',    icon: ClipboardList },
+        { id: 'usuarios',   label: 'Gestión de Funcionarios', icon: Users },
       ],
     },
     {

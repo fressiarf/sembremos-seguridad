@@ -2,14 +2,33 @@ import React, { useState, useEffect } from 'react';
 import './GestionUsuarios.css';
 import { userService } from '../../../services/userService';
 import { useToast } from '../../../context/ToastContext';
-import { Search, UserCog, Shield, UserPlus, X, Key, Mail, Fingerprint, User as UserIcon } from 'lucide-react';
+import { Search, UserCog, Shield, UserPlus, X, Key, Mail, Fingerprint, User as UserIcon, Building2 } from 'lucide-react';
 import { useLogin } from '../../../context/LoginContext';
+
+const INSTITUCIONES = [
+  'PANI', 'IMAS', 'CCSS', 'MEP', 'IAFA',
+  'Ministerio de Salud', 'Bomberos', 'Cruz Roja',
+  'Municipalidad de Puntarenas', 'Fuerza Pública', 'INL'
+];
 
 const GestionUsuarios = () => {
   const { user } = useLogin();
+  const { showToast } = useToast();
   const currentUser = user || { nombre: 'C. Araya', rol: 'admin' };
   
   const [users, setUsers] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [showCreateModal, setShowCreateModal] = useState(false);
+  const [updatingId, setUpdatingId] = useState(null);
+  const [newUser, setNewUser] = useState({
+    nombre: '',
+    cedula: '',
+    usuario: '',
+    password: '',
+    rol: 'adminInstitucion',
+    institucion: ''
+  });
 
   useEffect(() => {
     fetchUsers();
@@ -17,8 +36,11 @@ const GestionUsuarios = () => {
 
   const fetchUsers = async () => {
     try {
+      setLoading(true);
       const data = await userService.getUsers();
-      setUsers(data);
+      // Admin global solo ve admins e instituciones, NO funcionarios
+      const filtered = data.filter(u => u.rol === 'admin' || u.rol === 'adminInstitucion' || u.rol === 'auditor');
+      setUsers(filtered);
     } catch (error) {
       console.error('Error al cargar usuarios');
     } finally {
@@ -28,19 +50,17 @@ const GestionUsuarios = () => {
 
   const handleToggleRole = async (userId, currentRol) => {
     if (currentUser.rol !== 'admin') {
-        showToast('Acceso denegado: Solo administradores pueden realizar esta acción', 'error');
-        return;
+      showToast('Acceso denegado: Solo administradores pueden realizar esta acción', 'error');
+      return;
     }
 
-    
-    const newRol = currentRol === 'admin' ? 'institución' : 'admin';
+    const newRol = currentRol === 'admin' ? 'adminInstitucion' : 'admin';
     setUpdatingId(userId);
 
     try {
       await userService.updateUserRole(userId, newRol);
-      // Actualizamos solo el usuario modificado en el estado local
       setUsers(prev => prev.map(u => u.id === userId ? { ...u, rol: newRol } : u));
-      showToast(`Rol actualizado: El usuario ahora es ${newRol}`, 'success');
+      showToast(`Rol actualizado: El usuario ahora es ${newRol === 'admin' ? 'Administrador Global' : 'Admin Institución'}`, 'success');
     } catch (error) {
       showToast('Error crítico al actualizar el rol en la base de datos', 'error');
     } finally {
@@ -54,29 +74,45 @@ const GestionUsuarios = () => {
       showToast('Por favor completa todos los campos', 'warning');
       return;
     }
+    if (newUser.rol === 'adminInstitucion' && !newUser.institucion) {
+      showToast('Selecciona una institución para el admin institucional', 'warning');
+      return;
+    }
 
     try {
       await userService.createUser(newUser);
       showToast('Usuario creado exitosamente', 'success');
       setShowCreateModal(false);
-      setNewUser({
-        nombre: '',
-        cedula: '',
-        usuario: '',
-        password: '',
-        rol: 'institución'
-      });
+      setNewUser({ nombre: '', cedula: '', usuario: '', password: '', rol: 'adminInstitucion', institucion: '' });
       fetchUsers();
     } catch (error) {
       showToast('Error al crear el usuario', 'error');
     }
   };
 
+  const getRolLabel = (rol) => {
+    switch (rol) {
+      case 'admin': return 'Administrador Global';
+      case 'adminInstitucion': return 'Admin Institución';
+      case 'auditor': return 'Auditor';
+      default: return rol;
+    }
+  };
 
-  const filteredUsers = users.filter(user => 
-    user.nombre.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    user.usuario.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    user.cedula.includes(searchQuery)
+  const getRolBadgeClass = (rol) => {
+    switch (rol) {
+      case 'admin': return 'role-badge role-badge--admin';
+      case 'adminInstitucion': return 'role-badge role-badge--adminInstitucion';
+      case 'auditor': return 'role-badge role-badge--auditor';
+      default: return 'role-badge';
+    }
+  };
+
+  const filteredUsers = users.filter(u =>
+    u.nombre?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    u.usuario?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    u.cedula?.includes(searchQuery) ||
+    u.institucion?.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
   if (loading) return <div style={{ color: '#7a9cc4', padding: '2rem' }}>Cargando usuarios...</div>;
@@ -86,8 +122,8 @@ const GestionUsuarios = () => {
       
       <header className="gestion-usuarios__header">
         <div className="gestion-usuarios__title">
-          <h1>Gestión de Usuarios</h1>
-          <p>Control de acceso y roles para personal administrativo e instituciones</p>
+          <h1>Gestión de Instituciones y Administradores</h1>
+          <p>Control de acceso para administradores globales e institucionales. Los funcionarios internos son gestionados por cada institución.</p>
         </div>
       </header>
 
@@ -98,7 +134,7 @@ const GestionUsuarios = () => {
           </div>
           <input 
             type="text" 
-            placeholder="Buscar por nombre, correo o cédula..." 
+            placeholder="Buscar por nombre, correo, cédula o institución..." 
             className="search-input"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
@@ -114,10 +150,10 @@ const GestionUsuarios = () => {
             </button>
           )}
         </div>
-        {currentUser.rol !== 'auditor' && (
+        {currentUser.rol === 'admin' && (
           <button className="btn-create-user" onClick={() => setShowCreateModal(true)}>
               <UserPlus size={18} />
-              <span>Nuevo Usuario</span>
+              <span>Nueva Institución</span>
           </button>
         )}
       </section>
@@ -126,7 +162,7 @@ const GestionUsuarios = () => {
         <div className="modal-overlay">
           <div className="user-modal">
             <div className="user-modal__header">
-              <h3>Registrar Personal</h3>
+              <h3>Registrar Administrador / Institución</h3>
               <button className="btn-close-modal" onClick={() => setShowCreateModal(false)}>
                 <X size={20} />
               </button>
@@ -158,12 +194,12 @@ const GestionUsuarios = () => {
                   </div>
                 </div>
                 <div className="form-group">
-                  <label>Correo Electrónico (Gmail)</label>
+                  <label>Correo Electrónico</label>
                   <div className="input-with-icon">
                     <Mail size={16} />
                     <input 
                       type="email" 
-                      placeholder="usuario@gmail.com" 
+                      placeholder="usuario@sembremos.cr" 
                       value={newUser.usuario}
                       onChange={e => setNewUser({...newUser, usuario: e.target.value})}
                     />
@@ -181,16 +217,34 @@ const GestionUsuarios = () => {
                     />
                   </div>
                 </div>
-                <div className="form-group full-width">
-                  <label>Rol asignado</label>
+                <div className="form-group">
+                  <label>Rol Asignado</label>
                   <select 
                     value={newUser.rol}
                     onChange={e => setNewUser({...newUser, rol: e.target.value})}
                     className="modal-select"
                   >
-                    <option value="institución">Institución</option>
-                    <option value="admin">Administrador del sistema</option>
+                    <option value="adminInstitucion">Admin Institución</option>
+                    <option value="admin">Administrador Global</option>
+                    <option value="auditor">Auditor</option>
                   </select>
+                </div>
+                <div className="form-group">
+                  <label>Institución</label>
+                  <div className="input-with-icon">
+                    <Building2 size={16} />
+                    <select 
+                      value={newUser.institucion}
+                      onChange={e => setNewUser({...newUser, institucion: e.target.value})}
+                      className="modal-select"
+                      style={{ paddingLeft: '40px' }}
+                    >
+                      <option value="">Seleccionar institución...</option>
+                      {INSTITUCIONES.map(inst => (
+                        <option key={inst} value={inst}>{inst}</option>
+                      ))}
+                    </select>
+                  </div>
                 </div>
               </div>
               <div className="user-modal__footer">
@@ -202,56 +256,60 @@ const GestionUsuarios = () => {
         </div>
       )}
 
-
       <div className="usuarios-table-container">
         <table className="usuarios-table">
           <thead>
             <tr>
               <th>Usuario</th>
+              <th>Institución</th>
               <th>Cédula</th>
               <th>Rol</th>
-              <th>Fecha Registro</th>
               <th style={{ textAlign: 'right' }}>Acciones</th>
             </tr>
           </thead>
           <tbody>
-            {filteredUsers.map(user => (
-              <tr key={user.id}>
+            {filteredUsers.map(u => (
+              <tr key={u.id}>
                 <td>
                   <div className="user-info-cell">
                     <div className="user-avatar-mini">
-                      {user.nombre.split(' ').map(n => n[0]).join('')}
+                      {u.nombre?.split(' ').map(n => n[0]).join('').slice(0, 2)}
                     </div>
                     <div className="user-details">
-                      <span className="user-name">{user.nombre}</span>
-                      <span className="user-email">{user.usuario}</span>
+                      <span className="user-name">{u.nombre}</span>
+                      <span className="user-email">{u.usuario}</span>
                     </div>
                   </div>
                 </td>
-                <td>{user.cedula}</td>
                 <td>
-                  <span className={`role-badge role-badge--${user.rol}`}>
-                    <Shield size={14} style={{ marginRight: '6px' }} /> 
-                    {user.rol === 'admin' ? 'Administrador' : 'Institución'}
+                  <span style={{ fontSize: '0.85rem', color: '#334155', fontWeight: 500 }}>
+                    {u.institucion || '—'}
                   </span>
                 </td>
-                <td style={{ color: '#7a9cc4', fontSize: '0.8rem' }}>14 Mar, 2025</td>
+                <td>{u.cedula}</td>
+                <td>
+                  <span className={getRolBadgeClass(u.rol)}>
+                    <Shield size={14} style={{ marginRight: '6px' }} /> 
+                    {getRolLabel(u.rol)}
+                  </span>
+                </td>
                 <td style={{ textAlign: 'right' }}>
-                  {currentUser.rol !== 'auditor' ? (
+                  {currentUser.rol === 'admin' && u.id !== currentUser.id ? (
                     <button 
                       className="btn-change-role"
-                      onClick={() => handleToggleRole(user.id, user.rol)}
-                      disabled={updatingId === user.id}
-                      title={`Cambiar a ${user.rol === 'admin' ? 'Institución' : 'Administrador'}`}
+                      onClick={() => handleToggleRole(u.id, u.rol)}
+                      disabled={updatingId === u.id}
+                      title={`Cambiar a ${u.rol === 'admin' ? 'Admin Institución' : 'Administrador Global'}`}
                     >
                       <UserCog size={16} />
-                      {updatingId === user.id ? 'Actualizando...' : (user.rol === 'admin' ? 'Cambio a Institución' : 'Hacer Admin')}
+                      {updatingId === u.id ? 'Actualizando...' : (u.rol === 'admin' ? 'Pasar a Institución' : 'Hacer Admin Global')}
                     </button>
+                  ) : u.id === currentUser.id ? (
+                    <span style={{ fontSize: '0.8rem', color: '#94a3b8', fontStyle: 'italic' }}>Tú</span>
                   ) : (
                     <span style={{ fontSize: '0.8rem', color: '#94a3b8' }}>Solo lectura</span>
                   )}
                 </td>
-
               </tr>
             ))}
           </tbody>
