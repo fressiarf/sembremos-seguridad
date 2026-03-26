@@ -49,7 +49,15 @@ export const LoginProvider = ({ children }) => {
 
     // 2. Validación de dominio (Muestra error genérico) con excepción para pruebas
     const usuarioMinuscula = formData.usuario.toLowerCase();
-    const esDominioValido = usuarioMinuscula.endsWith('sembremosseguridad.go.cr') || usuarioMinuscula.endsWith('sembremos.cr');
+    const dominiosPermitidos = [
+      'sembremosseguridad.go.cr',
+      'sembremos.cr',
+      'muni.cr',
+      'pani.cr',
+      'inl.cr'
+    ];
+    
+    const esDominioValido = dominiosPermitidos.some(dominio => usuarioMinuscula.endsWith(dominio));
     const esCorreoExcepcion = usuarioMinuscula === 'friveraffwd@gmail.com';
 
     if (formData.usuario && !esDominioValido && !esCorreoExcepcion) {

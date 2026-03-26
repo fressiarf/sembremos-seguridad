@@ -45,7 +45,7 @@ const FormInstitucion = ({ tarea, onComplete, initialReporte = null }) => {
   const [sections, setSections] = useState({
     actividad: true,
     cuantificacion: tarea?.seguimientoTipo === 'numerico' || (!tarea?.seguimientoTipo && tipoTarea !== 2),
-    asistentes: tipoTarea === 1,
+    asistentes: tarea?.enfoqueHumano !== false && tipoTarea === 1,
     hitos: tarea?.seguimientoTipo === 'hitos' || tipoTarea === 2,
     seguridad: tipoTarea === 3,
     gestion: tipoTarea === 4,
@@ -145,8 +145,8 @@ const FormInstitucion = ({ tarea, onComplete, initialReporte = null }) => {
     }
     
     // Validaciones por tipo
-    if (tipoTarea === 1 && totalAsistentes === 0) {
-      showToast('Ingresá al menos un asistente', 'warning');
+    if (tarea?.enfoqueHumano !== false && tipoTarea === 1 && totalAsistentes === 0) {
+      showToast('Ingresá al menos un beneficiario', 'warning');
       return;
     }
 
@@ -270,7 +270,7 @@ const FormInstitucion = ({ tarea, onComplete, initialReporte = null }) => {
 
       {/* ═══ SECCIONES DINÁMICAS POR TIPO (Detalles Cualitativos) ═══ */}
 
-      {tipoTarea === 1 && (
+      {tarea?.enfoqueHumano !== false && tipoTarea === 1 && (
         <div className="form-section section--social">
           <SectionHeader icon={Users} title="Detalle Demográfico" subtitle="Opcional: Desglose de beneficiados" sectionKey="asistentes" />
           {sections.asistentes && (

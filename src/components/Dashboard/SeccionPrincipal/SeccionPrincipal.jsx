@@ -155,6 +155,10 @@ const SeccionPrincipal = ({ collapsed, setCollapsed, activeView, onViewChange })
       {activeView === 'matriz-seguimiento' && <MatrizSeguimiento />}
       {activeView === 'reportes-resultados' && <ReportesResultados />}
       {activeView === 'lineas-accion' && <LineasAccionView onViewChange={onViewChange} />}
+      {activeView === 'mapa' && <MapaRiesgos />}
+      {activeView === 'zonas' && <ZonasCriticas />}
+      {activeView === 'calendario' && <Calendario />}
+      {activeView === 'alertas' && <SoporteInstitucional />}
       {(activeView === 'reportes' || activeView === 'historial') && (
         <HistorialReportes isGlobal={true} />
       )}
