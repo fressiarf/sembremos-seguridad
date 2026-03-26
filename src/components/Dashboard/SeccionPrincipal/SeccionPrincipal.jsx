@@ -15,6 +15,7 @@ import { Download, FileText, Bell } from 'lucide-react';
 import Calendario from '../../Calendario/Calendario';
 import NotificacionAdmin from '../NotificacionesAdmin/NotificacionAdmin';
 import HistorialReportes from '../../AdminInstitucion/Vistas/HistorialReportes';
+import SoporteInstitucional from '../SoporteInstitucional/SoporteInstitucional';
 
 // Mapeo de vistas a nombres de sección para el TopbarInstitucion
 const VIEW_LABELS = {
@@ -25,7 +26,7 @@ const VIEW_LABELS = {
   matrices: 'Todas las Matrices',
   zonas: 'Zonas Críticas',
   incidentes: 'Incidentes',
-  alertas: 'Alertas Activas',
+  alertas: 'Soporte y Comentarios',
   mapa: 'Mapa de Riesgos',
   estadisticas: 'Estadísticas',
   calendario: 'Calendario de Operaciones',
@@ -154,12 +155,14 @@ const SeccionPrincipal = ({ collapsed, setCollapsed, activeView }) => {
       {activeView === 'mapa' && <MapaRiesgos />}
       {activeView === 'zonas' && <ZonasCriticas />}
       {activeView === 'calendario' && <Calendario />}
+      {activeView === 'alertas' && <SoporteInstitucional />}
       {(activeView === 'reportes' || activeView === 'historial') && (
         <HistorialReportes isGlobal={true} />
       )}
 
+
       {/* Placeholder para otras vistas no mapeadas */}
-      {!['dashboard', 'actividades', 'usuarios', 'perfil', 'matrices', 'mapa', 'zonas', 'calendario', 'reportes', 'historial', 'lineas'].includes(activeView) && (
+      {!['dashboard', 'actividades', 'usuarios', 'perfil', 'matrices', 'mapa', 'zonas', 'calendario', 'reportes', 'historial', 'lineas', 'alertas'].includes(activeView) && (
         <div style={{ padding: '2rem', color: '#7a9cc4' }}>
           <h2>Vista en desarrollo: {activeView}</h2>
           <p>Esta sección se implementará próximamente.</p>
