@@ -12,15 +12,19 @@ const CardAutenticacion = ({ children }) => {
     e.preventDefault();
     const user = validateAll();
     if (user) {
-      if (user.rol === 'admin') {
-        navigate('/dashboard');
-      } else if (user.rol === 'adminInstitucion' || user.rol === 'institucion') {
-        navigate('/dashboardAdminInstitucion');
-      } else if (user.rol === 'oficial' || user.rol === 'editor') {
-        navigate('/dashboardEditores');
-      } else {
-        navigate('/dashboardEditores');
-      }
+      if (typeof setShowSuccess === 'function') setShowSuccess(true);
+      
+      setTimeout(() => {
+        if (user.rol === 'admin') {
+          navigate('/dashboard');
+        } else if (user.rol === 'adminInstitucion') {
+          navigate('/dashboardAdminInstitucion');
+        } else if (user.rol === 'institucion' || user.rol === 'oficial' || user.rol === 'editor') {
+          navigate('/dashboardEditores');
+        } else {
+          navigate('/dashboardEditores');
+        }
+      }, 500);
     }
   };
 
