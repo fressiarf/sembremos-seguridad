@@ -44,8 +44,9 @@ const FormInstitucion = ({ tarea, onComplete, initialReporte = null }) => {
   // Sections collapse state
   const [sections, setSections] = useState({
     actividad: true,
+    cuantificacion: tarea?.seguimientoTipo === 'numerico' || (!tarea?.seguimientoTipo && tipoTarea !== 2),
     asistentes: tipoTarea === 1,
-    hitos: tipoTarea === 2,
+    hitos: tarea?.seguimientoTipo === 'hitos' || tipoTarea === 2,
     seguridad: tipoTarea === 3,
     gestion: tipoTarea === 4,
     recursos: tipoTarea === 5,
@@ -65,8 +66,8 @@ const FormInstitucion = ({ tarea, onComplete, initialReporte = null }) => {
     descripcion: initialReporte?.descripcion || '',
     // Tipo 1: Asistentes
     asistentes: initialReporte?.asistentes || { ninos: '', adolescentes: '', jovenes: '', adultos: '', adultoMayor: '' },
-    // Tipo 2: Hitos
-    hitos: initialReporte?.hitos || [
+    // Tipo 2 o Seguimiento por Hitos: Hitos
+    hitos: initialReporte?.hitos || tarea?.hitos || [
       { id: 'h1', label: 'Planificación / Diseño', completado: false },
       { id: 'h2', label: 'Licitación / Adjudicación', completado: false },
       { id: 'h3', label: 'Inicio de Obra', completado: false },
@@ -149,8 +150,12 @@ const FormInstitucion = ({ tarea, onComplete, initialReporte = null }) => {
       return;
     }
 
-    setLoading(true);
     try {
+      // Priorizamos la cantidad de impacto manual (ej: escuelas) sobre la suma demográfica si existe
+      const impactoFinal = formData.cantidadImpacto !== undefined && formData.cantidadImpacto > 0 
+        ? formData.cantidadImpacto 
+        : totalAsistentes;
+
       const payload = {
         responsableId: user?.id,
         reporteInstitucion: formData.descripcion,
@@ -159,6 +164,7 @@ const FormInstitucion = ({ tarea, onComplete, initialReporte = null }) => {
         lugar: formData.distrito ? `${formData.distrito}, ${formData.canton}. ${formData.lugarExacto}` : formData.lugarExacto,
         tipoTarea: tipoTarea,
         ...formData,
+        totalAsistentes: impactoFinal, // Este campo es el que mapea a 'beneficiados' en el servicio
         archivos: archivos.map(f => f.name),
         fotos: archivos.map(f => f.name),
       };
@@ -223,9 +229,50 @@ const FormInstitucion = ({ tarea, onComplete, initialReporte = null }) => {
 
       {/* ═══ SECCIONES DINÁMICAS POR TIPO ═══ */}
 
+      {/* ═══ SECCIÓN COMÚN: REGISTRO DE AVANCE CUANTITATIVO ═══ */}
+      {(tarea?.seguimientoTipo === 'numerico' || (!tarea?.seguimientoTipo && tipoTarea !== 2)) && (
+        <div className="form-section">
+          <SectionHeader icon={Activity} title="Cuantificación del Avance" subtitle="Datos para la Barra de Progreso" sectionKey="cuantificacion" />
+          {sections.cuantificacion && (
+            <div className="form-section-body">
+              <div style={{ background: '#f0f9ff', padding: '15px', borderRadius: '8px', border: '1px solid #bae6fd' }}>
+                <label className="fr-label" style={{ color: '#0369a1', fontWeight: 700 }}>
+                  {tarea?.detalleMeta ? `Cantidad de ${tarea.detalleMeta} a reportar` : 'Avance Cuantitativo del Objetivo'} <span className="required">*</span>
+                </label>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
+                  <input 
+                    type="number" 
+                    className="fr-input" 
+                    placeholder="0" 
+                    style={{ fontSize: '1.2rem', fontWeight: 800, width: '120px', textAlign: 'center' }}
+                    value={formData.cantidadImpacto || ''} 
+                    onChange={e => {
+                      const val = parseInt(e.target.value) || 0;
+                      updateField('cantidadImpacto', val);
+                      // Sincronizar con campos específicos por retrocompatibilidad
+                      if (tipoTarea === 3) updateField('numeroPatrullajes', val);
+                    }} 
+                  />
+                  <div>
+                    <div style={{ fontSize: '0.85rem', color: '#64748b' }}>
+                      Meta de la Tarea: <strong>{tarea?.meta}</strong> {tarea?.detalleMeta || 'unidades'}
+                    </div>
+                    <div style={{ fontSize: '0.75rem', color: '#0369a1', fontWeight: 600 }}>
+                      Este valor alimentará directamente la barra de progreso de la Matriz.
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* ═══ SECCIONES DINÁMICAS POR TIPO (Detalles Cualitativos) ═══ */}
+
       {tipoTarea === 1 && (
         <div className="form-section section--social">
-          <SectionHeader icon={Users} title="Población Beneficiada" subtitle="Demografía y Asistencia" sectionKey="asistentes" />
+          <SectionHeader icon={Users} title="Detalle Demográfico" subtitle="Opcional: Desglose de beneficiados" sectionKey="asistentes" />
           {sections.asistentes && (
             <div className="form-section-body">
               <div className="age-grid">
@@ -237,7 +284,7 @@ const FormInstitucion = ({ tarea, onComplete, initialReporte = null }) => {
                   </div>
                 ))}
                 <div className="age-total">
-                  <span className="age-label">TOTAL ASISTENTES</span>
+                  <span className="age-label">Suma Demográfica</span>
                   <span className="total-number">{totalAsistentes}</span>
                 </div>
               </div>
@@ -246,7 +293,9 @@ const FormInstitucion = ({ tarea, onComplete, initialReporte = null }) => {
         </div>
       )}
 
-      {tipoTarea === 2 && (
+      {/* ═══ SECCIÓN DE HITOS / FASES (Si aplica) ═══ */}
+
+      {(tarea?.seguimientoTipo === 'hitos' || tipoTarea === 2) && (
         <div className="form-section section--infra">
           <SectionHeader icon={LayoutGrid} title="Control de Hitos Técnicos" subtitle={`Avance: ${porcentajeHitos}%`} sectionKey="hitos" />
           {sections.hitos && (
@@ -274,12 +323,13 @@ const FormInstitucion = ({ tarea, onComplete, initialReporte = null }) => {
             <div className="form-section-body">
               <div className="fr-row-2">
                 <div>
-                  <label className="fr-label">Número de Patrullajes / Rondas</label>
-                  <input type="number" className="fr-input" value={formData.numeroPatrullajes} onChange={e => updateField('numeroPatrullajes', e.target.value)} placeholder="0" />
-                </div>
-                <div>
                   <label className="fr-label">Incidencias Detectadas</label>
                   <input type="number" className="fr-input" value={formData.incidencias} onChange={e => updateField('incidencias', e.target.value)} placeholder="0" />
+                </div>
+                <div>
+                   {/* El número de patrullajes se maneja en la sección de cuantificación arriba */}
+                   <label className="fr-label">Observaciones Operativas</label>
+                   <input type="text" className="fr-input" value={formData.lugarExacto} onChange={e => updateField('lugarExacto', e.target.value)} placeholder="Sector, unidad..." />
                 </div>
               </div>
             </div>

@@ -70,13 +70,16 @@ const GestionUsuarios = () => {
 
   const handleCreateUser = async (e) => {
     e.preventDefault();
-    if (!newUser.nombre || !newUser.cedula || !newUser.usuario || !newUser.password) {
-      showToast('Por favor completa todos los campos', 'warning');
-      return;
-    }
-    if (newUser.rol === 'adminInstitucion' && !newUser.institucion) {
-      showToast('Selecciona una institución para el admin institucional', 'warning');
-      return;
+    if (newUser.rol === 'admin') {
+      if (!newUser.nombre || !newUser.usuario || !newUser.password || !newUser.cedula) {
+        showToast('Completa todos los campos del Administrador', 'warning');
+        return;
+      }
+    } else {
+      if (!newUser.institucion || !newUser.usuario || !newUser.password) {
+        showToast('Selecciona la Institución y completa los datos de acceso para la misma', 'warning');
+        return;
+      }
     }
 
     try {
@@ -119,15 +122,7 @@ const GestionUsuarios = () => {
 
   return (
     <div className="gestion-usuarios">
-      
-      <header className="gestion-usuarios__header">
-        <div className="gestion-usuarios__title">
-          <h1>Gestión de Instituciones y Administradores</h1>
-          <p>Control de acceso para administradores globales e institucionales. Los funcionarios internos son gestionados por cada institución.</p>
-        </div>
-      </header>
-
-      <section className="gestion-usuarios__filters">
+      <section className="gestion-usuarios__filters" style={{ marginTop: '0' }}>
         <div className="search-wrapper">
           <div className="search-icon">
             <Search size={18} />
@@ -170,31 +165,77 @@ const GestionUsuarios = () => {
             <form onSubmit={handleCreateUser} className="user-modal__form">
               <div className="form-grid">
                 <div className="form-group">
-                  <label>Nombre Completo</label>
-                  <div className="input-with-icon">
-                    <UserIcon size={16} />
-                    <input 
-                      type="text" 
-                      placeholder="Ej: Juan Pérez" 
-                      value={newUser.nombre}
-                      onChange={e => setNewUser({...newUser, nombre: e.target.value})}
-                    />
-                  </div>
+                  <label>Perfil (Tipo de Cuenta)</label>
+                  <select 
+                    value={newUser.rol}
+                    onChange={e => {
+                      const newRol = e.target.value;
+                      setNewUser({
+                        ...newUser, 
+                        rol: newRol,
+                        nombre: newRol === 'adminInstitucion' ? '' : newUser.nombre,
+                        cedula: newRol === 'adminInstitucion' ? '' : newUser.cedula,
+                        institucion: newRol === 'admin' ? '' : newUser.institucion
+                      });
+                    }}
+                    className="modal-select"
+                  >
+                    <option value="adminInstitucion">Institución</option>
+                    <option value="admin">Administrador Global</option>
+                  </select>
                 </div>
-                <div className="form-group">
-                  <label>Número de Cédula</label>
-                  <div className="input-with-icon">
-                    <Fingerprint size={16} />
-                    <input 
-                      type="text" 
-                      placeholder="Ej: 102340567" 
-                      value={newUser.cedula}
-                      onChange={e => setNewUser({...newUser, cedula: e.target.value})}
-                    />
+
+                {newUser.rol === 'admin' && (
+                  <>
+                    <div className="form-group">
+                      <label>Nombre del Funcionario *</label>
+                      <div className="input-with-icon">
+                        <UserIcon size={16} />
+                        <input 
+                          type="text" 
+                          placeholder="Ej: Juan Pérez" 
+                          value={newUser.nombre}
+                          onChange={e => setNewUser({...newUser, nombre: e.target.value})}
+                        />
+                      </div>
+                    </div>
+                    <div className="form-group">
+                      <label>Identificación (Cédula) *</label>
+                      <div className="input-with-icon">
+                        <Fingerprint size={16} />
+                        <input 
+                          type="text" 
+                          placeholder="Ej: 102340567" 
+                          value={newUser.cedula}
+                          onChange={e => setNewUser({...newUser, cedula: e.target.value})}
+                        />
+                      </div>
+                    </div>
+                  </>
+                )}
+
+                {newUser.rol === 'adminInstitucion' && (
+                  <div className="form-group">
+                    <label>Institución a Registrar *</label>
+                    <div className="input-with-icon">
+                      <Building2 size={16} />
+                      <select 
+                        value={newUser.institucion}
+                        onChange={e => setNewUser({...newUser, institucion: e.target.value, nombre: e.target.value})}
+                        className="modal-select"
+                        style={{ paddingLeft: '40px' }}
+                      >
+                        <option value="">Seleccionar institución...</option>
+                        {INSTITUCIONES.map(inst => (
+                          <option key={inst} value={inst}>{inst}</option>
+                        ))}
+                      </select>
+                    </div>
                   </div>
-                </div>
+                )}
+
                 <div className="form-group">
-                  <label>Correo Electrónico</label>
+                  <label>Correo Electrónico *</label>
                   <div className="input-with-icon">
                     <Mail size={16} />
                     <input 
@@ -206,7 +247,7 @@ const GestionUsuarios = () => {
                   </div>
                 </div>
                 <div className="form-group">
-                  <label>Contraseña Temporal</label>
+                  <label>Contraseña *</label>
                   <div className="input-with-icon">
                     <Key size={16} />
                     <input 
@@ -215,35 +256,6 @@ const GestionUsuarios = () => {
                       value={newUser.password}
                       onChange={e => setNewUser({...newUser, password: e.target.value})}
                     />
-                  </div>
-                </div>
-                <div className="form-group">
-                  <label>Rol Asignado</label>
-                  <select 
-                    value={newUser.rol}
-                    onChange={e => setNewUser({...newUser, rol: e.target.value})}
-                    className="modal-select"
-                  >
-                    <option value="adminInstitucion">Admin Institución</option>
-                    <option value="admin">Administrador Global</option>
-                    <option value="auditor">Auditor</option>
-                  </select>
-                </div>
-                <div className="form-group">
-                  <label>Institución</label>
-                  <div className="input-with-icon">
-                    <Building2 size={16} />
-                    <select 
-                      value={newUser.institucion}
-                      onChange={e => setNewUser({...newUser, institucion: e.target.value})}
-                      className="modal-select"
-                      style={{ paddingLeft: '40px' }}
-                    >
-                      <option value="">Seleccionar institución...</option>
-                      {INSTITUCIONES.map(inst => (
-                        <option key={inst} value={inst}>{inst}</option>
-                      ))}
-                    </select>
                   </div>
                 </div>
               </div>
@@ -286,7 +298,7 @@ const GestionUsuarios = () => {
                     {u.institucion || '—'}
                   </span>
                 </td>
-                <td>{u.cedula}</td>
+                <td>{u.cedula || <span style={{ color: '#94a3b8' }}>N/A</span>}</td>
                 <td>
                   <span className={getRolBadgeClass(u.rol)}>
                     <Shield size={14} style={{ marginRight: '6px' }} /> 

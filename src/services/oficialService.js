@@ -162,33 +162,76 @@ export const institucionService = {
    */
   getFullDashboardData: async (institucionId) => {
     try {
-      const [tareas, estadisticas] = await Promise.all([
+      const [tareas, reportesRes] = await Promise.all([
         institucionService.getTareasDeInstitucion(institucionId),
-        institucionService.getEstadisticas(institucionId)
+        fetch(`${BASE_URL}/reportes`)
       ]);
+      const reportes = await reportesRes.json();
+
+      // Enriquecer tareas con su progreso real (suma de reportes aprobados)
+      const tareasConProgreso = tareas.map(tarea => {
+        const reportesAprobados = reportes.filter(r => String(r.tareaId) === String(tarea.id) && r.estado === 'aprobado');
+        
+        let avanceAcumulado = 0;
+        if (tarea.seguimientoTipo === 'hitos' || (tarea.tipo === 2 && !tarea.seguimientoTipo)) { // Seguimiento por Hitos
+          avanceAcumulado = reportesAprobados.length > 0 ? Math.max(...reportesAprobados.map(r => {
+             const hitosCompletados = r.hitos?.filter(h => h.completado).length || 0;
+             const totalHitos = r.hitos?.length || 5;
+             return Math.round((hitosCompletados / totalHitos) * 100);
+          })) : 0;
+        } else {
+          avanceAcumulado = reportesAprobados.reduce((sum, r) => sum + (parseInt(r.beneficiados) || 0), 0);
+        }
+
+        const metaNum = parseInt(tarea.meta) || 1;
+        const porcentaje = tarea.tipo === 2 ? avanceAcumulado : Math.min(Math.round((avanceAcumulado / metaNum) * 100), 100);
+
+        return {
+          ...tarea,
+          avanceAcumulado,
+          progresoReal: porcentaje,
+          completada: porcentaje >= 100 || tarea.completada
+        };
+      });
 
       // Obtener las líneas relacionadas
-      const lineaIds = [...new Set(tareas.map(t => t.lineaAccionId))];
+      const lineaIds = [...new Set(tareasConProgreso.map(t => t.lineaAccionId))];
       const resLineas = await fetch(`${BASE_URL}/lineasAccion`);
       const allLineas = await resLineas.json();
       const lineas = allLineas.filter(l => lineaIds.includes(l.id));
 
-      // Enriquecer líneas con sus tareas y progreso
+      // Enriquecer líneas con sus tareas y progreso acumulado
       const lineasEnriquecidas = lineas.map(linea => {
-        const tareasLinea = tareas.filter(t => t.lineaAccionId === linea.id);
-        const completadas = tareasLinea.filter(t => t.completada);
+        const tareasLinea = tareasConProgreso.filter(t => t.lineaAccionId === linea.id);
+        const progresoTotal = tareasLinea.reduce((sum, t) => sum + (t.progresoReal || 0), 0);
+        const completadasCount = tareasLinea.filter(t => t.completada).length;
+        
         return {
           ...linea,
           tareas: tareasLinea,
           totalTareas: tareasLinea.length,
-          tareasCompletadas: completadas.length,
-          progreso: tareasLinea.length > 0 ? Math.round((completadas.length / tareasLinea.length) * 100) : 0,
-          inversionLinea: completadas.reduce((sum, t) => sum + (t.inversionColones || 0), 0)
+          tareasCompletadas: completadasCount,
+          progreso: tareasLinea.length > 0 ? Math.round(progresoTotal / tareasLinea.length) : 0,
+          inversionLinea: tareasLinea.reduce((sum, t) => sum + (t.inversionColones || 0), 0)
         };
       });
 
-      // Enriquecer tareas con el nombre de su línea
-      const tareasEnriquecidas = tareas.map(t => {
+      // Stats consolidadas
+      const totalInversion = tareasConProgreso.reduce((sum, t) => sum + (t.inversionColones || 0), 0);
+      const totalProgreso = lineasEnriquecidas.length > 0 
+        ? Math.round(lineasEnriquecidas.reduce((sum, l) => sum + l.progreso, 0) / lineasEnriquecidas.length) 
+        : 0;
+
+      const estadisticas = {
+        totalTareas: tareasConProgreso.length,
+        completadas: tareasConProgreso.filter(t => t.completada).length,
+        pendientes: tareasConProgreso.filter(t => !t.completada).length,
+        inversionTotal: totalInversion,
+        progresoGeneral: totalProgreso
+      };
+
+      // Tareas enriquecidas para la lista
+      const tareasEnriquecidas = tareasConProgreso.map(t => {
         const linea = lineas.find(l => l.id === t.lineaAccionId);
         return {
           ...t,

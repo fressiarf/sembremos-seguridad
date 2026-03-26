@@ -34,26 +34,55 @@ export const dashboardService = {
    */
   getFullDashboardData: async () => {
     try {
-      const [lineas, tareas, zonas, alertas, notificaciones, presupuestoAsignado] = await Promise.all([
+      const [lineas, tareas, zonas, alertas, notificaciones, presupuestoAsignado, reportes] = await Promise.all([
         fetch(`${BASE_URL}/lineasAccion`).then(r => r.json()),
         fetch(`${BASE_URL}/tareas`).then(r => r.json()),
         fetch(`${BASE_URL}/zonas`).then(r => r.json()),
         fetch(`${BASE_URL}/alertas`).then(r => r.json()),
         fetch(`${BASE_URL}/notificaciones`).then(r => r.json()),
-        fetch(`${BASE_URL}/presupuestoAsignado`).then(r => r.json()).catch(() => 50000000)
+        fetch(`${BASE_URL}/presupuestoAsignado`).then(r => r.json()).catch(() => 50000000),
+        fetch(`${BASE_URL}/reportes`).then(r => r.json()).catch(() => [])
       ]);
 
-      // Enriquecer líneas con tareas y progreso
+      // Enriquecer tareas con su progreso real (suma de reportes aprobados)
+      const tareasConProgreso = tareas.map(tarea => {
+        const reportesAprobados = reportes.filter(r => String(r.tareaId) === String(tarea.id) && r.estado === 'aprobado');
+        
+        let avanceAcumulado = 0;
+        if (tarea.seguimientoTipo === 'hitos' || (tarea.tipo === 2 && !tarea.seguimientoTipo)) { // Seguimiento por Hitos
+          avanceAcumulado = reportesAprobados.length > 0 ? Math.max(...reportesAprobados.map(r => {
+             const hitosCompletados = r.hitos?.filter(h => h.completado).length || 0;
+             const totalHitos = r.hitos?.length || 5;
+             return Math.round((hitosCompletados / totalHitos) * 100);
+          })) : 0;
+        } else {
+          avanceAcumulado = reportesAprobados.reduce((sum, r) => sum + (parseInt(r.beneficiados) || 0), 0);
+        }
+
+        const metaNum = parseInt(tarea.meta) || 1;
+        const porcentaje = tarea.tipo === 2 ? avanceAcumulado : Math.min(Math.round((avanceAcumulado / metaNum) * 100), 100);
+
+        return {
+          ...tarea,
+          avanceAcumulado,
+          progresoReal: porcentaje,
+          completada: porcentaje >= 100 || tarea.completada
+        };
+      });
+
+      // Enriquecer líneas con tareas y progreso promedio
       const lineasEnriquecidas = lineas.map(linea => {
-        const tareasLinea = tareas.filter(t => t.lineaAccionId === linea.id);
+        const tareasLinea = tareasConProgreso.filter(t => t.lineaAccionId === linea.id);
+        const progresoTotal = tareasLinea.reduce((sum, t) => sum + (t.progresoReal || 0), 0);
         const completadas = tareasLinea.filter(t => t.completada);
+        
         return {
           ...linea,
           tareas: tareasLinea,
           totalTareas: tareasLinea.length,
           tareasCompletadas: completadas.length,
-          progreso: tareasLinea.length > 0 ? Math.round((completadas.length / tareasLinea.length) * 100) : 0,
-          inversionLinea: completadas.reduce((sum, t) => sum + (t.inversionColones || 0), 0)
+          progreso: tareasLinea.length > 0 ? Math.round(progresoTotal / tareasLinea.length) : 0,
+          inversionLinea: tareasLinea.reduce((sum, t) => sum + (t.inversionColones || 0), 0)
         };
       });
 
