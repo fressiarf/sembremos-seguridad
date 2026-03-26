@@ -5,7 +5,6 @@ import DashboardGlobal from '../DashboardGlobal/DashboardGlobal';
 import ActividadOficiales from '../ActividadOficiales/ActividadOficiales';
 import GestionUsuarios from '../GestionUsuarios/GestionUsuarios';
 import PerfilUsuario from '../PerfilUsuario/PerfilUsuario';
-import MatrizSeguimiento from '../MatrizSeguimiento/MatrizSeguimiento';
 import DashboardInstitucion from '../../DashboardInstitucion/DashboardInstitucion';
 import MapaRiesgos from '../MapaRiesgos/MapaRiesgos';
 import ZonasCriticas from '../ZonasCriticas/ZonasCriticas';
@@ -17,13 +16,18 @@ import NotificacionAdmin from '../NotificacionesAdmin/NotificacionAdmin';
 import HistorialReportes from '../../AdminInstitucion/Vistas/HistorialReportes';
 import SoporteInstitucional from '../SoporteInstitucional/SoporteInstitucional';
 
+import LineasAccionView from '../LineasAccion/LineasAccionView';
+import MatrizSeguimiento from '../LineasAccion/MatrizSeguimiento';
+import ReportesResultados from '../LineasAccion/ReportesResultados';
+
 // Mapeo de vistas a nombres de sección para el TopbarInstitucion
 const VIEW_LABELS = {
-  dashboard: 'Dashboard Global',
-  actividades: 'Actividad Oficiales',
+  dashboard: 'Resumen Ejecutivo',
+  actividades: 'Gestión de Tareas',
   usuarios: 'Gestión de Usuarios',
   perfil: 'Mi Perfil',
-  matrices: 'Todas las Matrices',
+  'matriz-seguimiento': 'Matriz de Seguimiento',
+  'reportes-resultados': 'Reportes de Resultados',
   zonas: 'Zonas Críticas',
   incidentes: 'Incidentes',
   alertas: 'Soporte y Comentarios',
@@ -33,10 +37,10 @@ const VIEW_LABELS = {
   reportes: 'Reportes INL/MSP',
   historial: 'Historial de Reportes',
   configuracion: 'Configuración',
-  lineas: 'Mis Tareas / Líneas de Acción',
+  'lineas-accion': 'Líneas de Acción',
 };
 
-const SeccionPrincipal = ({ collapsed, setCollapsed, activeView }) => {
+const SeccionPrincipal = ({ collapsed, setCollapsed, activeView, onViewChange }) => {
   const { user } = useLogin();
   const { showToast } = useToast();
   const [showTopbarNotifs, setShowTopbarNotifs] = useState(false);
@@ -143,26 +147,21 @@ const SeccionPrincipal = ({ collapsed, setCollapsed, activeView }) => {
       </TopbarInstitucion>
 
       {activeView === 'dashboard' && (
-        user?.rol === 'institucion' ? <DashboardInstitucion /> : <DashboardGlobal collapsed={collapsed} />
+        user?.rol === 'institucion' ? <DashboardInstitucion /> : <DashboardGlobal collapsed={collapsed} onViewChange={onViewChange} />
       )}
       {activeView === 'actividades' && <ActividadOficiales />}
       {activeView === 'usuarios' && <GestionUsuarios />}
       {activeView === 'perfil' && <PerfilUsuario />}
-      {activeView === 'matrices' && (
-        user?.rol === 'institucion' ? <DashboardInstitucion /> : <MatrizSeguimiento />
-      )}
-      {activeView === 'lineas' && user?.rol === 'institucion' && <DashboardInstitucion />}
-      {activeView === 'mapa' && <MapaRiesgos />}
-      {activeView === 'zonas' && <ZonasCriticas />}
-      {activeView === 'calendario' && <Calendario />}
-      {activeView === 'alertas' && <SoporteInstitucional />}
+      {activeView === 'matriz-seguimiento' && <MatrizSeguimiento />}
+      {activeView === 'reportes-resultados' && <ReportesResultados />}
+      {activeView === 'lineas-accion' && <LineasAccionView onViewChange={onViewChange} />}
       {(activeView === 'reportes' || activeView === 'historial') && (
         <HistorialReportes isGlobal={true} />
       )}
 
 
       {/* Placeholder para otras vistas no mapeadas */}
-      {!['dashboard', 'actividades', 'usuarios', 'perfil', 'matrices', 'mapa', 'zonas', 'calendario', 'reportes', 'historial', 'lineas', 'alertas'].includes(activeView) && (
+      {!['dashboard', 'actividades', 'usuarios', 'perfil', 'matriz-seguimiento', 'reportes-resultados', 'lineas-accion', 'mapa', 'zonas', 'calendario', 'reportes', 'historial', 'configuracion', 'alertas'].includes(activeView) && (
         <div style={{ padding: '2rem', color: '#7a9cc4' }}>
           <h2>Vista en desarrollo: {activeView}</h2>
           <p>Esta sección se implementará próximamente.</p>

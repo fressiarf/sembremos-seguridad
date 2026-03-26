@@ -34,15 +34,22 @@ export const dashboardService = {
    */
   getFullDashboardData: async () => {
     try {
-      const [lineas, tareas, zonas, alertas, notificaciones, presupuestoAsignado, reportes] = await Promise.all([
+      const [lineas, tareas, zonas, alertas, notificaciones, presupuestoAsignado, reportes, usuarios] = await Promise.all([
         fetch(`${BASE_URL}/lineasAccion`).then(r => r.json()),
         fetch(`${BASE_URL}/tareas`).then(r => r.json()),
         fetch(`${BASE_URL}/zonas`).then(r => r.json()),
         fetch(`${BASE_URL}/alertas`).then(r => r.json()),
         fetch(`${BASE_URL}/notificaciones`).then(r => r.json()),
-        fetch(`${BASE_URL}/presupuestoAsignado`).then(r => r.json()).catch(() => 50000000),
-        fetch(`${BASE_URL}/reportes`).then(r => r.json()).catch(() => [])
+        fetch(`${BASE_URL}/presupuestoAsignado`).then(r => r.json()).catch(() => 65000000),
+        fetch(`${BASE_URL}/reportes`).then(r => r.json()).catch(() => []),
+        fetch(`${BASE_URL}/usuarios`).then(r => r.json()).catch(() => [])
       ]);
+
+      // Mapa de ID de usuario/institución a nombre de institución
+      const instMap = {};
+      usuarios.forEach(u => {
+        if (u.id && u.institucion) instMap[String(u.id)] = u.institucion;
+      });
 
       // Enriquecer tareas con su progreso real (suma de reportes aprobados)
       const tareasConProgreso = tareas.map(tarea => {
@@ -76,8 +83,15 @@ export const dashboardService = {
         const progresoTotal = tareasLinea.reduce((sum, t) => sum + (t.progresoReal || 0), 0);
         const completadas = tareasLinea.filter(t => t.completada);
         
+        // Resolver nombres de responsables si no existen
+        let responsables = linea.responsables || [];
+        if (responsables.length === 0 && linea.institucionesLideres) {
+          responsables = linea.institucionesLideres.map(id => instMap[String(id)]).filter(Boolean);
+        }
+        
         return {
           ...linea,
+          responsables,
           tareas: tareasLinea,
           totalTareas: tareasLinea.length,
           tareasCompletadas: completadas.length,
@@ -93,8 +107,12 @@ export const dashboardService = {
 
       return {
         lineas: lineasEnriquecidas,
-        tareas,
-        activities: tareas,
+        lineasEnriquecidas,
+        tareas: tareasConProgreso,
+        tareasConProgreso,
+        reportes,
+        usuarios,
+        activities: tareasConProgreso,
         zones: zonas,
         alerts: alertas,
         notifications: notificaciones,

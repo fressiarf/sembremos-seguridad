@@ -1,0 +1,141 @@
+.matriz-container {
+  padding: 2rem;
+  background: #f8fafc;
+  min-height: calc(100vh - 64px);
+  animation: fadeIn 0.5s ease-out;
+}
+
+.matriz-header {
+  margin-bottom: 2rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.matriz-header h1 {
+  font-size: 1.875rem;
+  font-weight: 800;
+  color: #1e293b;
+  letter-spacing: -0.025em;
+}
+
+.matriz-card {
+  background: white;
+  border-radius: 16px;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  overflow: hidden;
+  border: 1px solid #e2e8f0;
+}
+
+.matriz-table-wrapper {
+  overflow-x: auto;
+  width: 100%;
+}
+
+.matriz-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.875rem;
+  text-align: left;
+}
+
+.matriz-table th {
+  background: #f1f5f9;
+  padding: 1rem;
+  font-weight: 700;
+  color: #475569;
+  text-transform: uppercase;
+  font-size: 0.75rem;
+  letter-spacing: 0.05em;
+  border-bottom: 2px solid #e2e8f0;
+  white-space: nowrap;
+}
+
+.matriz-table td {
+  padding: 1rem;
+  border-bottom: 1px solid #f1f5f9;
+  vertical-align: top;
+  color: #334155;
+  line-height: 1.5;
+}
+
+.matriz-table tr:hover {
+  background: #f8fafc;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.col-no { width: 50px; text-align: center; }
+.col-canton { width: 100px; font-weight: 600; }
+.col-problematica { width: 150px; color: #64748b; }
+.col-titulo { min-width: 250px; font-weight: 600; color: #1e3a8a; }
+.col-objetivo { min-width: 300px; font-style: italic; font-size: 0.8rem; }
+.col-meta { width: 150px; }
+.col-responsables { width: 200px; }
+
+.tag-meta {
+  background: #ecfdf5;
+  color: #065f46;
+  padding: 0.25rem 0.75rem;
+  border-radius: 9999px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  display: inline-block;
+}
+
+.tag-plazo {
+  background: #fef2f2;
+  color: #991b1b;
+  padding: 0.25rem 0.75rem;
+  border-radius: 9999px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  display: inline-block;
+  margin-top: 0.5rem;
+}
+
+.responsables-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+/* Planificación Detail */
+.planificacion-row {
+  background: #fdfdfd !important;
+}
+
+.planificacion-content {
+  padding: 1.5rem;
+  background: #eff6ff;
+  border-radius: 8px;
+  margin: 0.5rem 1rem 1.5rem 1rem;
+  border-left: 4px solid #3b82f6;
+}
+
+.planificacion-table {
+  width: 100%;
+  background: white;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+  margin-top: 1rem;
+}
+
+.planificacion-table th {
+  background: #1e3a8a;
+  color: white;
+  padding: 0.75rem;
+  font-size: 0.7rem;
+}
+
+.planificacion-table td {
+  padding: 0.75rem;
+  font-size: 0.75rem;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
