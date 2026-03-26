@@ -1,0 +1,193 @@
+/* Footer Institutional CSS */
+
+.footer-institutional {
+    /* Usando variables globales para consistencia perfecta */
+    background: linear-gradient(135deg, var(--navy-blue) 0%, var(--navy-blue-light) 100%);
+    color: var(--white);
+    padding: 50px 5% 30px 5%; /* Padding superior reducido de 80px a 50px */
+    font-family: 'Inter', sans-serif;
+    border-top: 3px solid var(--inst-red); /* Línea más elegante (3px) */
+    margin-top: auto;
+    width: 100%;
+    box-sizing: border-box;
+    position: relative;
+    box-shadow: 0 -10px 30px rgba(0, 0, 0, 0.2); /* Sombra superior para profundidad */
+}
+
+/* Subtle background accent */
+.footer-institutional::before {
+    content: '';
+    position: absolute;
+    top: -50px;
+    right: -50px;
+    width: 300px;
+    height: 300px;
+    background: radial-gradient(circle, rgba(206, 17, 38, 0.05) 0%, transparent 70%);
+    border-radius: 50%;
+    pointer-events: none;
+}
+
+.footer-container {
+    max-width: 1400px;
+    margin: 0 auto;
+    display: flex;
+    justify-content: space-between;
+    gap: 40px;
+    flex-wrap: wrap;
+    position: relative;
+    z-index: 1;
+}
+
+.footer-brand {
+    flex: 1.2;
+    min-width: 280px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.footer-logos-container {
+    display: flex;
+    gap: 20px;
+    align-items: center;
+}
+
+.footer-logo {
+    height: 48px; /* Tamaño más balanceado */
+    width: auto;
+    object-fit: contain;
+    filter: brightness(0) invert(1) opacity(0.9); /* Un poco de opacidad para no saturar */
+    transition: all 0.3s ease;
+}
+
+.footer-logo:hover {
+    transform: scale(1.05);
+}
+
+.footer-brand-text h3 {
+    margin: 0 0 8px 0;
+    font-size: 1.6rem;
+    font-family: 'Outfit', sans-serif;
+    font-weight: 800;
+    letter-spacing: -0.5px;
+    color: #fff;
+}
+
+.footer-brand-text p {
+    font-size: 0.9rem;
+    line-height: 1.6;
+    color: rgba(255, 255, 255, 0.6);
+    margin: 0;
+}
+
+.footer-links-grid {
+    flex: 2.5;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 30px;
+}
+
+.footer-column h4 {
+    margin: 0 0 20px 0;
+    font-size: 0.95rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--inst-red); /* Títulos en rojo institucional para contraste */
+}
+
+.footer-column ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.footer-column li a {
+    color: rgba(255, 255, 255, 0.6) !important;
+    text-decoration: none;
+    font-size: 0.91rem;
+    transition: all 0.25s ease;
+    display: inline-block;
+}
+
+.footer-column li a:hover {
+    color: #fff !important;
+    padding-left: 5px;
+}
+
+.footer-bottom {
+    margin-top: 50px;
+    padding-top: 25px;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.footer-bottom-content {
+    max-width: 1400px;
+    margin: 0 auto;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 20px;
+    flex-wrap: wrap;
+    font-size: 0.8rem;
+    color: rgba(255, 255, 255, 0.4);
+}
+
+.footer-v-line {
+    width: 1px;
+    height: 15px;
+    background-color: rgba(255, 255, 255, 0.2);
+}
+
+/* Responsiveness */
+@media (max-width: 1024px) {
+    .footer-container {
+        gap: 30px;
+    }
+}
+
+@media (max-width: 768px) {
+    .footer-institutional {
+        padding: 40px 20px 30px 20px;
+        text-align: center;
+    }
+    
+    .footer-container {
+        flex-direction: column;
+        align-items: center;
+    }
+    
+    .footer-logos-container {
+        justify-content: center;
+    }
+    
+    .footer-brand-text p {
+        margin: 0 auto;
+    }
+    
+    .footer-links-grid {
+        width: 100%;
+        text-align: center;
+    }
+    
+    .footer-column h4 {
+        justify-content: center;
+    }
+    
+    .footer-column li a:hover {
+        transform: translateY(-3px);
+    }
+    
+    .footer-bottom-content {
+        justify-content: center;
+        flex-direction: column;
+        gap: 15px;
+    }
+    
+    .footer-v-line {
+        display: none;
+    }
+}
