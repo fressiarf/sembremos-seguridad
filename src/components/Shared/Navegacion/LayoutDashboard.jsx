@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import './LayoutDashboard.css';
+import Footer from '../Footer/Footer';
 
 const LayoutDashboard = ({ sidebar, children }) => {
   const [activeView, setActiveView] = useState('dashboard');
@@ -30,7 +31,10 @@ const LayoutDashboard = ({ sidebar, children }) => {
     <div className={`LayoutDashboard ${collapsed ? 'LayoutDashboard--collapsed' : ''}`}>
       {renderSidebar()}
       <div className="ContenedorPrincipalDashboard">
-        {renderContent()}
+        <div className="ContenidoVistasOficial">
+            {renderContent()}
+        </div>
+        <Footer onViewChange={setActiveView} />
       </div>
     </div>
   );

@@ -26,13 +26,18 @@ const SidebarAdmin = ({ collapsed = false, onToggle, activeView, onViewChange })
   const [stats, setStats] = useState({
     activitiesCount: 0,
     zonesCount: 0,
-    alertsCount: 0
+    alertsCount: 0,
+    solicitudesCount: 0
   });
 
   useEffect(() => {
     const fetchStats = async () => {
       const data = await dashboardService.getStats();
-      setStats(data);
+      const solicitudes = JSON.parse(localStorage.getItem('solicitudes_acceso') || '[]');
+      setStats({
+        ...data,
+        solicitudesCount: solicitudes.length
+      });
     };
     fetchStats();
     
@@ -57,14 +62,13 @@ const SidebarAdmin = ({ collapsed = false, onToggle, activeView, onViewChange })
       items: [
         { id: 'actividades', label: 'Gestión de Tareas', icon: Activity, path: '/actividades', badge: stats.activitiesCount },
         { id: 'zonas',       label: 'Zonas críticas',        icon: MapPin,      path: '/zonas',    badge: stats.zonesCount },
-        { id: 'incidentes',  label: 'Incidentes',            icon: TriangleAlert,  path: '/incidentes' },
         { id: 'alertas',     label: 'Soporte y Comentarios',  icon: MessageCircle, path: '/alertas',  badge: stats.alertsCount },
       ],
     },
     {
       label: 'ANÁLISIS',
       items: [
-        { id: 'mapa',        label: 'Mapa de riesgos',       icon: MapPin,       path: '/mapa' },
+        { id: 'mapa',        label: 'Distribución policial', icon: MapPin,       path: '/mapa' },
         { id: 'historial',   label: 'Historial',             icon: Clock,     path: '/historial' },
         { id: 'estadisticas',label: 'Estadísticas',          icon: Activity,     path: '/estadisticas' },
         { id: 'calendario',  label: 'Calendario',            icon: Calendar,  path: '/calendario' },
@@ -73,9 +77,8 @@ const SidebarAdmin = ({ collapsed = false, onToggle, activeView, onViewChange })
     {
       label: 'ADMINISTRACIÓN',
       items: [
-        { id: 'usuarios',    label: 'Gestión de usuarios',   icon: User,     path: '/usuarios' },
+        { id: 'usuarios',    label: 'Gestión de usuarios',   icon: User,     path: '/usuarios', badge: stats.solicitudesCount },
         { id: 'reportes',    label: 'Reportes INL/MSP',      icon: FileText,    path: '/reportes' },
-        { id: 'configuracion',label: 'Configuración',        icon: Settings,  path: '/configuracion' },
       ],
     },
   ];

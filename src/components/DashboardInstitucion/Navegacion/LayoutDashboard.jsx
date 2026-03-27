@@ -15,7 +15,7 @@ const LayoutDashboard = ({ sidebar, children }) => {
       })}
       <div style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
         {React.Children.map(children, child =>
-          child ? React.cloneElement(child, { collapsed, activeView }) : null
+          child ? React.cloneElement(child, { collapsed, setCollapsed, activeView, setActiveView }) : null
         )}
       </div>
     </div>

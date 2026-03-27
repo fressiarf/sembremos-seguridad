@@ -21,6 +21,8 @@ const GestionUsuarios = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [updatingId, setUpdatingId] = useState(null);
+  const [solicitudes, setSolicitudes] = useState([]);
+  const [showSolicitudes, setShowSolicitudes] = useState(false);
   const [newUser, setNewUser] = useState({
     nombre: '',
     cedula: '',
@@ -32,7 +34,47 @@ const GestionUsuarios = () => {
 
   useEffect(() => {
     fetchUsers();
+    fetchSolicitudes();
   }, []);
+
+  const fetchSolicitudes = () => {
+    const saved = JSON.parse(localStorage.getItem('solicitudes_acceso') || '[]');
+    setSolicitudes(saved);
+  };
+
+  const handleDeleteSolicitud = (id) => {
+    const updated = solicitudes.filter(s => s.id !== id);
+    localStorage.setItem('solicitudes_acceso', JSON.stringify(updated));
+    setSolicitudes(updated);
+    showToast('Solicitud removida de la lista', 'info');
+  };
+
+  const handleResetPassword = async (sol) => {
+    // 1. Buscar el usuario correspondiente al correo de la solicitud
+    const foundUser = users.find(u => u.usuario.toLowerCase() === sol.correo.toLowerCase());
+    
+    if (!foundUser) {
+      showToast(`No se encontró ningún usuario con el correo: ${sol.correo}`, 'error');
+      return;
+    }
+
+    // 2. Definir una contraseña temporal
+    const tempPassword = `Sembremos.${Math.floor(Math.random() * 9000 + 1000)}`;
+
+    try {
+      // 3. Actualizar en la base de datos
+      await userService.updateUser(foundUser.id, { password: tempPassword });
+      
+      // 4. Notificar éxito y quitar de la lista
+      showToast(`Contraseña restablecida exitosamente para ${foundUser.nombre}. Nueva clave: ${tempPassword}`, 'success', 8000);
+      handleDeleteSolicitud(sol.id);
+      
+      // Actualizar la lista local de usuarios (opcional, pero útil si se muestra la clave en otro sitio)
+      setUsers(prev => prev.map(u => u.id === foundUser.id ? { ...u, password: tempPassword } : u));
+    } catch (error) {
+      showToast('Error técnico al intentar restablecer la contraseña', 'error');
+    }
+  };
 
   const fetchUsers = async () => {
     try {
@@ -80,6 +122,40 @@ const GestionUsuarios = () => {
         showToast('Selecciona la Institución y completa los datos de acceso para la misma', 'warning');
         return;
       }
+    
+    // Básicos
+    if (!newUser.nombre || !newUser.cedula || !newUser.usuario || !newUser.password) {
+      showToast('Por favor completa todos los campos', 'warning');
+      return;
+    }
+
+    // Validación de Cédula (numérica)
+    if (!/^\d+$/.test(newUser.cedula)) {
+      showToast('La cédula debe contener solo números', 'warning');
+      return;
+    }
+    
+    if (newUser.cedula.length < 9) {
+      showToast('La cédula debe tener al menos 9 dígitos', 'warning');
+      return;
+    }
+
+    // Validación de Email
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(newUser.usuario)) {
+      showToast('Por favor ingresa un correo electrónico válido', 'warning');
+      return;
+    }
+
+    // Validación de Contraseña
+    if (newUser.password.length < 6) {
+      showToast('La contraseña debe tener al menos 6 caracteres', 'warning');
+      return;
+    }
+
+    if (newUser.rol === 'adminInstitucion' && !newUser.institucion) {
+      showToast('Selecciona una institución para el admin institucional', 'warning');
+      return;
     }
 
     try {
@@ -145,13 +221,62 @@ const GestionUsuarios = () => {
             </button>
           )}
         </div>
-        {currentUser.rol === 'admin' && (
-          <button className="btn-create-user" onClick={() => setShowCreateModal(true)}>
-              <UserPlus size={18} />
-              <span>Nueva Institución</span>
-          </button>
-        )}
+        <div className="header-actions">
+          {solicitudes.length > 0 && (
+            <button 
+              className={`btn-solicitudes ${showSolicitudes ? 'active' : ''}`} 
+              onClick={() => setShowSolicitudes(!showSolicitudes)}
+            >
+              <Mail size={18} />
+              <span>Solicitudes ({solicitudes.length})</span>
+              <span className="dot-alert"></span>
+            </button>
+          )}
+          {currentUser.rol === 'admin' && (
+            <button className="btn-create-user" onClick={() => setShowCreateModal(true)}>
+                <UserPlus size={18} />
+                <span>Nueva Institución</span>
+            </button>
+          )}
+        </div>
       </section>
+
+      {showSolicitudes && solicitudes.length > 0 && (
+        <div className="solicitudes-container animacion-entrada">
+          <div className="solicitudes-grid">
+            {solicitudes.map(sol => (
+              <div key={sol.id} className="solicitud-card">
+                <div className="solicitud-info">
+                  <div className="solicitud-icon">
+                    <Key size={18} />
+                  </div>
+                  <div>
+                    <strong>{sol.correo}</strong>
+                    <p>Solicitó reseteo el {sol.fecha}</p>
+                  </div>
+                </div>
+                <div className="solicitud-actions">
+                  <button 
+                    className="btn-reset-password-mini" 
+                    onClick={() => handleResetPassword(sol)}
+                    title="Generar nueva clave"
+                  >
+                    <Key size={14} />
+                    <span>Restablecer</span>
+                  </button>
+                  <button 
+                    className="btn-resolve-solicitud" 
+                    onClick={() => handleDeleteSolicitud(sol.id)}
+                    title="Ignorar / Remover"
+                  >
+                    <X size={14} />
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
 
       {showCreateModal && (
         <div className="modal-overlay">
@@ -231,6 +356,34 @@ const GestionUsuarios = () => {
                         ))}
                       </select>
                     </div>
+                  <label>Nombre Completo</label>
+                  <div className="input-with-icon">
+                    <UserIcon size={16} />
+                    <input 
+                      type="text" 
+                      placeholder="Ej: Juan Pérez" 
+                      value={newUser.nombre}
+                      onChange={e => {
+                        const val = e.target.value.replace(/[^a-zA-ZáéíóúÁÉÍÓÚñÑ ]/g, '');
+                        setNewUser({...newUser, nombre: val});
+                      }}
+                    />
+                  </div>
+                </div>
+                <div className="form-group">
+                  <label>Número de Cédula</label>
+                  <div className="input-with-icon">
+                    <Fingerprint size={16} />
+                    <input 
+                      type="text" 
+                      placeholder="Ej: 102340567" 
+                      maxLength={12}
+                      value={newUser.cedula}
+                      onChange={e => {
+                        const val = e.target.value.replace(/\D/g, ''); // Solo números
+                        setNewUser({...newUser, cedula: val});
+                      }}
+                    />
                   </div>
                 )}
 
@@ -241,8 +394,9 @@ const GestionUsuarios = () => {
                     <input 
                       type="email" 
                       placeholder="usuario@sembremos.cr" 
-                      value={newUser.usuario}
-                      onChange={e => setNewUser({...newUser, usuario: e.target.value})}
+                      value={newUser.usuario.toLowerCase().trim()}
+                      onKeyDown={(e) => { if (e.key === ' ') e.preventDefault(); }}
+                      onChange={e => setNewUser({...newUser, usuario: e.target.value.replace(/\s/g, '').toLowerCase()})}
                     />
                   </div>
                 </div>
