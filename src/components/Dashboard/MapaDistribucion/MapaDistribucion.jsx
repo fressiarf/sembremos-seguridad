@@ -292,8 +292,8 @@ export const MapaRiesgos = () => {
           <div className="tooltip-stat" style={{ color: (NIVEL_CONFIG[hoveredZona.nivel] || {}).color || '#ef4444' }}>
             Cobertura {(NIVEL_CONFIG[hoveredZona.nivel] || {}).label || 'N/A'}
           </div>
-          <div className="tooltip-stat">👥 {hoveredZona.oficiales} oficiales</div>
-          <div className="tooltip-stat">🚓 {hoveredZona.patrullas} patrullas</div>
+          <div className="tooltip-stat">{hoveredZona.oficiales} oficiales</div>
+          <div className="tooltip-stat">{hoveredZona.patrullas} patrullas</div>
         </div>
       )}
     </div>
