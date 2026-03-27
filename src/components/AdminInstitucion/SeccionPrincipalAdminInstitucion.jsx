@@ -9,9 +9,34 @@ import PerfilUsuario from '../Dashboard/PerfilUsuario/PerfilUsuario';
 import EstadisticasInstitucion from './Vistas/EstadisticasInstitucion';
 import TopbarInstitucion from '../DashboardInstitucion/Navegacion/TopbarInstitucion';
 import { useLogin } from '../../context/LoginContext';
+import { useState, useEffect, useRef } from 'react';
+import { Bot, Bell, X } from 'lucide-react';
+import ChatBotWindow from '../Shared/ChatBot/ChatBotWindow';
+import NotificacionAdmin from '../Dashboard/NotificacionesAdmin/NotificacionAdmin';
 
-const SeccionPrincipalAdminInstitucion = ({ activeView = 'dashboard' }) => {
+const SeccionPrincipalAdminInstitucion = ({ activeView = 'dashboard', collapsed, setCollapsed }) => {
   const { user } = useLogin();
+  const [showTopbarNotifs, setShowTopbarNotifs] = useState(false);
+  const [showChatBot, setShowChatBot] = useState(false);
+  const notifRef = useRef(null);
+
+  const toggleDrawer = () => setShowTopbarNotifs(prev => !prev);
+  const toggleChatBot = () => setShowChatBot(prev => !prev);
+
+  // Efecto para manejar la exclusividad y el colapso del sidebar
+  useEffect(() => {
+    if (showTopbarNotifs) {
+      setShowChatBot(false);
+      if (setCollapsed) setCollapsed(true);
+    }
+  }, [showTopbarNotifs, setCollapsed]);
+
+  useEffect(() => {
+    if (showChatBot) {
+      setShowTopbarNotifs(false);
+      if (setCollapsed) setCollapsed(true);
+    }
+  }, [showChatBot, setCollapsed]);
 
   const getSeccionLabel = () => {
     const labels = {
@@ -61,7 +86,53 @@ const SeccionPrincipalAdminInstitucion = ({ activeView = 'dashboard' }) => {
         seccion={getSeccionLabel()}
         subtitulo="Portal Admin Institución"
         rol={`ADMIN · ${user?.institucion || 'INSTITUCIÓN'}`}
-      />
+      >
+        <div style={{ display: 'flex', gap: '1rem', alignItems: 'center', marginLeft: '1rem' }}>
+          <button 
+            onClick={toggleChatBot}
+            style={{
+              background: showChatBot ? '#002f6c' : 'transparent', 
+              border: '1px solid #e2e8f0', 
+              cursor: 'pointer', padding: '8px',
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              borderRadius: '50%', transition: 'all 0.2s',
+              backgroundColor: showChatBot ? '#002f6c' : '#ffffff',
+            }}
+          >
+            <Bot size={20} color={showChatBot ? '#ffffff' : '#002f6c'} />
+          </button>
+
+          <div ref={notifRef} style={{ position: 'relative' }}>
+            <button 
+              onClick={toggleDrawer}
+              style={{
+                background: showTopbarNotifs ? '#002f6c' : 'transparent', 
+                border: '1px solid #e2e8f0', 
+                cursor: 'pointer', padding: '8px',
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                borderRadius: '50%', transition: 'all 0.2s',
+                backgroundColor: showTopbarNotifs ? '#002f6c' : '#ffffff',
+              }}
+            >
+              <Bell size={20} color={showTopbarNotifs ? '#ffffff' : '#002f6c'} />
+            </button>
+          </div>
+        </div>
+      </TopbarInstitucion>
+
+      {showTopbarNotifs && (
+        <>
+          <div style={{ position: 'fixed', inset: 0, zIndex: 9999, backgroundColor: 'rgba(0,0,0,0.1)' }} onClick={() => setShowTopbarNotifs(false)}></div>
+          <NotificacionAdmin variant="drawer" />
+        </>
+      )}
+
+      {showChatBot && (
+        <>
+          <div style={{ position: 'fixed', inset: 0, zIndex: 9998, backgroundColor: 'rgba(0,0,0,0.05)' }} onClick={() => setShowChatBot(false)}></div>
+          <ChatBotWindow onClose={() => setShowChatBot(false)} user={user} />
+        </>
+      )}
       {renderView()}
     </>
   );

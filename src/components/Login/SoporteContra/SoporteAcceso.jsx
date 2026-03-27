@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import {
   ShieldOff,
   Users,
@@ -20,7 +20,11 @@ import './SoporteAcceso.css';
 
 const SoporteAcceso = () => {
   const navigate = useNavigate();
-  const [correo, setCorreo] = useState('');
+  const { search } = useLocation();
+  const queryParams = new URLSearchParams(search);
+  const emailParam = queryParams.get('email') || '';
+
+  const [correo, setCorreo] = useState(emailParam);
   const [enviado, setEnviado] = useState(false);
   const [error, setError] = useState('');
 

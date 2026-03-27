@@ -26,13 +26,18 @@ const SidebarAdmin = ({ collapsed = false, onToggle, activeView, onViewChange })
   const [stats, setStats] = useState({
     activitiesCount: 0,
     zonesCount: 0,
-    alertsCount: 0
+    alertsCount: 0,
+    solicitudesCount: 0
   });
 
   useEffect(() => {
     const fetchStats = async () => {
       const data = await dashboardService.getStats();
-      setStats(data);
+      const solicitudes = JSON.parse(localStorage.getItem('solicitudes_acceso') || '[]');
+      setStats({
+        ...data,
+        solicitudesCount: solicitudes.length
+      });
     };
     fetchStats();
     
@@ -55,7 +60,6 @@ const SidebarAdmin = ({ collapsed = false, onToggle, activeView, onViewChange })
       items: [
         { id: 'matrices',    label: 'Todas las matrices',    icon: FileText,    path: '/matrices' },
         { id: 'zonas',       label: 'Zonas críticas',        icon: MapPin,      path: '/zonas',    badge: stats.zonesCount },
-        { id: 'incidentes',  label: 'Incidentes',            icon: TriangleAlert,  path: '/incidentes' },
         { id: 'alertas',     label: 'Soporte y Comentarios',  icon: MessageCircle, path: '/alertas',  badge: stats.alertsCount },
       ],
     },
@@ -71,7 +75,7 @@ const SidebarAdmin = ({ collapsed = false, onToggle, activeView, onViewChange })
     {
       label: 'ADMINISTRACIÓN',
       items: [
-        { id: 'usuarios',    label: 'Gestión de usuarios',   icon: User,     path: '/usuarios' },
+        { id: 'usuarios',    label: 'Gestión de usuarios',   icon: User,     path: '/usuarios', badge: stats.solicitudesCount },
         { id: 'reportes',    label: 'Reportes INL/MSP',      icon: FileText,    path: '/reportes' },
       ],
     },

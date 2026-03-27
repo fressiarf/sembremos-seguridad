@@ -50,7 +50,7 @@ const SoporteInstitucional = () => {
       
       // Limpiar y recargar
       setNuevoComentario('');
-      showToast('Comentario enviado al Administrador', 'success');
+      showToast('Comentario publicado en el canal de soporte', 'success');
       cargarComentarios();
     } catch (error) {
       showToast('Error al enviar el comentario', 'error');

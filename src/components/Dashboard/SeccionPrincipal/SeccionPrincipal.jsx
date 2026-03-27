@@ -11,10 +11,11 @@ import MapaRiesgos from '../MapaDistribucion/MapaDistribucion';
 import ZonasCriticas from '../ZonasCriticas/ZonasCriticas';
 import { useLogin } from '../../../context/LoginContext';
 import { useToast } from '../../../context/ToastContext';
-import { Download, FileText, Bell } from 'lucide-react';
+import { Download, FileText, Bell, MessageSquare, Bot, X, Send, User } from 'lucide-react';
 import Calendario from '../../Calendario/Calendario';
 import NotificacionAdmin from '../NotificacionesAdmin/NotificacionAdmin';
 import HistorialReportes from '../../AdminInstitucion/Vistas/HistorialReportes';
+import ChatBotWindow from '../../Shared/ChatBot/ChatBotWindow';
 import SoporteInstitucional from '../SoporteInstitucional/SoporteInstitucional';
 import EstadisticasGlobal from '../Estadisticas/EstadisticasGlobal';
 
@@ -26,7 +27,6 @@ const VIEW_LABELS = {
   perfil: 'Mi Perfil',
   matrices: 'Todas las Matrices',
   zonas: 'Zonas Críticas',
-  incidentes: 'Incidentes',
   alertas: 'Soporte y Comentarios',
   mapa: 'Mapa de Riesgos',
   estadisticas: 'Estadísticas',
@@ -41,16 +41,25 @@ const SeccionPrincipal = ({ collapsed, setCollapsed, activeView }) => {
   const { showToast } = useToast();
   const [showTopbarNotifs, setShowTopbarNotifs] = useState(false);
   const [notifCount, setNotifCount] = useState(0);
+  const [showChatBot, setShowChatBot] = useState(false);
 
-  const toggleDrawer = () => {
-    setShowTopbarNotifs(prev => {
-      const isOpening = !prev;
-      if (isOpening && setCollapsed) {
-        setCollapsed(true);
-      }
-      return isOpening;
-    });
-  };
+  const toggleDrawer = () => setShowTopbarNotifs(prev => !prev);
+  const toggleChatBot = () => setShowChatBot(prev => !prev);
+
+  // Efecto para manejar la exclusividad y el colapso del sidebar
+  useEffect(() => {
+    if (showTopbarNotifs) {
+      setShowChatBot(false);
+      if (setCollapsed) setCollapsed(true);
+    }
+  }, [showTopbarNotifs, setCollapsed]);
+
+  useEffect(() => {
+    if (showChatBot) {
+      setShowTopbarNotifs(false);
+      if (setCollapsed) setCollapsed(true);
+    }
+  }, [showChatBot, setCollapsed]);
   const notifRef = useRef(null);
 
   useEffect(() => {
@@ -91,22 +100,40 @@ const SeccionPrincipal = ({ collapsed, setCollapsed, activeView }) => {
         badgeText={user?.rol === 'institucion' ? 'INSTITUCIÓN' : 'ADMINISTRADOR'}
       >
         <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
+          
+          {/* BOTÓN CHAT BOT (Privado para todos los roles) */}
+          <div style={{ position: 'relative' }}>
+            <button 
+              onClick={toggleChatBot}
+              style={{
+                background: showChatBot ? '#002f6c' : 'transparent', 
+                border: '1px solid #e2e8f0', 
+                cursor: 'pointer', padding: '10px',
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                borderRadius: '50%', transition: 'all 0.2s',
+                backgroundColor: showChatBot ? '#002f6c' : '#ffffff',
+                boxShadow: '0 2px 8px rgba(0,0,0,0.05)'
+              }}
+            >
+              <Bot size={22} color={showChatBot ? '#ffffff' : '#002f6c'} />
+            </button>
+          </div>
+
           <div ref={notifRef} style={{ position: 'relative' }}>
             <button 
               onClick={toggleDrawer}
               style={{
-                background: 'transparent', border: '1px solid #e2e8f0', cursor: 'pointer', padding: '8px',
+                background: showTopbarNotifs ? '#002f6c' : 'transparent', 
+                border: '1px solid #e2e8f0', cursor: 'pointer', padding: '10px',
                 display: 'flex', alignItems: 'center', justifyContent: 'center',
                 borderRadius: '50%', transition: 'all 0.2s',
-                backgroundColor: '#ffffff',
+                backgroundColor: showTopbarNotifs ? '#002f6c' : '#ffffff',
                 position: 'relative',
-                boxShadow: '0 1px 2px rgba(0,0,0,0.05)',
+                boxShadow: '0 2px 8px rgba(0,0,0,0.05)',
               }}
-              onMouseOver={(e) => { e.currentTarget.style.backgroundColor = '#f8fafc'; e.currentTarget.style.boxShadow = '0 3px 6px rgba(0,0,0,0.08)'; }}
-              onMouseOut={(e) => { e.currentTarget.style.backgroundColor = '#ffffff'; e.currentTarget.style.boxShadow = '0 1px 2px rgba(0,0,0,0.05)'; }}
               title="Ver notificaciones de eventos"
             >
-               <Bell size={20} color="#002f6c" />
+               <Bell size={20} color={showTopbarNotifs ? '#ffffff' : '#002f6c'} />
                {notifCount > 0 && (
                  <span style={{ 
                     position: 'absolute', top: '-4px', right: '-4px', 
@@ -128,19 +155,39 @@ const SeccionPrincipal = ({ collapsed, setCollapsed, activeView }) => {
                </>
             )}
           </div>
-
           {activeView === 'dashboard' && user?.rol === 'institucion' && (
-          <button
-            className="btn-report-pdf"
-            onClick={handlePrintPDF}
-            title="Generar reporte visual para impresión"
-          >
-            <Download size={18} />
-            Generar Rendición de Cuentas
-          </button>
-        )}
+            <button
+              className="btn-report-pdf"
+              onClick={handlePrintPDF}
+              style={{
+                marginLeft: '1rem',
+                backgroundColor: '#ffffff',
+                border: '1px solid #e2e8f0',
+                padding: '8px 16px',
+                borderRadius: '8px',
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '8px',
+                color: '#002f6c',
+                fontSize: '0.85rem',
+                fontWeight: '600'
+              }}
+              title="Generar reporte visual para impresión"
+            >
+              <Download size={18} />
+              Generar Rendición de Cuentas
+            </button>
+          )}
         </div>
       </TopbarInstitucion>
+
+      {showChatBot && (
+        <>
+          <div style={{ position: 'fixed', inset: 0, zIndex: 9998, backgroundColor: 'rgba(0,0,0,0.05)' }} onClick={() => setShowChatBot(false)}></div>
+          <ChatBotWindow onClose={() => setShowChatBot(false)} user={user} isDrawer={true} />
+        </>
+      )}
 
       {activeView === 'dashboard' && (
         user?.rol === 'institucion' ? <DashboardInstitucion /> : <DashboardGlobal collapsed={collapsed} />
@@ -172,5 +219,7 @@ const SeccionPrincipal = ({ collapsed, setCollapsed, activeView }) => {
     </main>
   );
 };
+
+
 
 export default SeccionPrincipal;
