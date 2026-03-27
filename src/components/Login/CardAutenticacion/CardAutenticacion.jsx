@@ -10,9 +10,9 @@ const CardAutenticacion = ({ children }) => {
 
   const [showSuccess, setShowSuccess] = useState(false);
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    const user = validateAll();
+    const user = await validateAll();
     
     if (user) {
       if (typeof setShowSuccess === 'function') setShowSuccess(true);

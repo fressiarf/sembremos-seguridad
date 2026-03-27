@@ -259,5 +259,53 @@ export const dashboardService = {
       console.error('Error in postComentarioSoporte:', error);
       throw error;
     }
+  },
+
+  /**
+   * Obtiene todos los eventos del calendario
+   */
+  getEventos: async () => {
+    try {
+      const response = await fetch(`${BASE_URL}/eventos`);
+      if (!response.ok) throw new Error('Error fetching eventos');
+      return await response.json();
+    } catch (error) {
+      console.error('Error fetching eventos:', error);
+      return [];
+    }
+  },
+
+  /**
+   * Crea un nuevo evento en el calendario
+   */
+  createEvento: async (eventoData) => {
+    try {
+      const response = await fetch(`${BASE_URL}/eventos`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(eventoData)
+      });
+      if (!response.ok) throw new Error('Error creating evento');
+      return await response.json();
+    } catch (error) {
+      console.error('Error in createEvento:', error);
+      throw error;
+    }
+  },
+
+  /**
+   * Elimina un evento del calendario
+   */
+  deleteEvento: async (eventoId) => {
+    try {
+      const response = await fetch(`${BASE_URL}/eventos/${eventoId}`, {
+        method: 'DELETE'
+      });
+      if (!response.ok) throw new Error('Error deleting evento');
+      return true;
+    } catch (error) {
+      console.error('Error in deleteEvento:', error);
+      throw error;
+    }
   }
 };
