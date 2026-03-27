@@ -21,7 +21,7 @@ const LayoutDashboard = ({ sidebar, children }) => {
   const renderContent = () => {
     return React.Children.map(children, child => {
       if (React.isValidElement(child)) {
-        return React.cloneElement(child, { activeView, collapsed, setCollapsed });
+        return React.cloneElement(child, { activeView, collapsed, setCollapsed, onViewChange: setActiveView });
       }
       return child;
     });

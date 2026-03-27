@@ -391,22 +391,55 @@ export const adminInstitucionService = {
       ]);
       const allTareas = await tareasReq.json();
       const reportes = await reportesReq.json();
-      const tareas = allTareas.filter(t => String(t.institucionId) === String(institucionId));
+      const tareas = allTareas.filter(t => {
+        if (t.institucionesIds && Array.isArray(t.institucionesIds)) {
+          return t.institucionesIds.includes(String(institucionId));
+        }
+        return String(t.institucionId) === String(institucionId);
+      });
+
+      // Calcular progreso real por tarea basado en reportes aprobados
+      let progresoTotalAcumulado = 0;
+      let inversionTotal = 0;
+
+      const tareasEnriquecidas = tareas.map(tarea => {
+        const reportesAprobados = reportes.filter(r => String(r.tareaId) === String(tarea.id) && r.estado === 'aprobado');
+        
+        // Sumamos beneficiados (o avance % para tipo 2)
+        let avance = 0;
+        if (tarea.seguimientoTipo === 'hitos' || (tarea.tipo === 2 && !tarea.seguimientoTipo)) {
+          avance = reportesAprobados.length > 0 ? Math.max(...reportesAprobados.map(r => {
+            const hitosCompletados = r.hitos?.filter(h => h.completado).length || 0;
+            const totalHitos = r.hitos?.length || 5;
+            return Math.round((hitosCompletados / totalHitos) * 100);
+          })) : 0;
+        } else {
+          avance = reportesAprobados.reduce((sum, r) => sum + (parseInt(r.beneficiados) || 0), 0);
+        }
+
+        const metaNum = parseInt(tarea.meta) || 1;
+        const porcentaje = tarea.tipo === 2 ? avance : Math.min(Math.round((avance / metaNum) * 100), 100);
+        
+        progresoTotalAcumulado += porcentaje;
+        inversionTotal += reportesAprobados.reduce((sum, r) => sum + (r.inversionColones || 0), 0);
+
+        return { ...tarea, progresoReal: porcentaje, isCompletada: porcentaje >= 100 };
+      });
 
       const totalTareas = tareas.length;
-      const completadas = tareas.filter(t => t.estado === 'Completado').length;
-      const conActividades = tareas.filter(t => t.estado === 'Con Actividades').length;
-      const sinActividades = tareas.filter(t => t.estado === 'Sin Actividades').length;
+      const completadas = tareasEnriquecidas.filter(t => t.isCompletada).length;
+      const conActividades = tareasEnriquecidas.filter(t => t.progresoReal > 0 && t.progresoReal < 100).length;
+      const sinActividades = tareasEnriquecidas.filter(t => t.progresoReal === 0).length;
       
       const reportesInstitucion = reportes.filter(r => 
         tareas.some(t => String(t.id) === String(r.tareaId))
       );
       const reportesPendientes = reportesInstitucion.filter(r => r.estado === 'pendiente').length;
-      const progreso = totalTareas > 0 ? Math.round((completadas / totalTareas) * 100) : 0;
+      const progreso = totalTareas > 0 ? Math.round(progresoTotalAcumulado / totalTareas) : 0;
 
       const hoy = new Date();
       const urgentes = tareas
-        .filter(t => t.estado !== 'Completado')
+        .filter(t => !tareasEnriquecidas.find(te => te.id === t.id)?.isCompletada)
         .map(t => ({
           ...t,
           diasRestantes: Math.ceil((new Date(t.fechaLimite) - hoy) / (1000 * 60 * 60 * 24)),
@@ -439,7 +472,12 @@ export const adminInstitucionService = {
       const res = await fetch('http://localhost:5000/tareas');
       let tareas = await res.json();
       if (filtros.institucionId) {
-        tareas = tareas.filter(t => String(t.institucionId) === String(filtros.institucionId));
+        tareas = tareas.filter(t => {
+          if (t.institucionesIds && Array.isArray(t.institucionesIds)) {
+            return t.institucionesIds.includes(String(filtros.institucionId));
+          }
+          return String(t.institucionId) === String(filtros.institucionId);
+        });
       }
 
       if (filtros.estado && filtros.estado !== 'Todos') {
@@ -478,7 +516,12 @@ export const adminInstitucionService = {
       const allReportes = await resReq.json();
       const reportes = allReportes.filter(r => r.estado === 'pendiente');
       const allTareas = await tareasReq.json();
-      const tareas = allTareas.filter(t => String(t.institucionId) === String(institucionId));
+      const tareas = allTareas.filter(t => {
+        if (t.institucionesIds && Array.isArray(t.institucionesIds)) {
+          return t.institucionesIds.includes(String(institucionId));
+        }
+        return String(t.institucionId) === String(institucionId);
+      });
       const usuarios = await usersReq.json();
       
       const misReportes = reportes.filter(r => tareas.some(t => t.id === r.tareaId));
@@ -492,12 +535,53 @@ export const adminInstitucionService = {
 
   aprobarReporte: async (reporteId) => {
     try {
+      // 1. Obtener el reporte para saber a qué tarea pertenece
+      const resRep = await fetch(`http://localhost:5000/reportes/${reporteId}`);
+      if (!resRep.ok) return { success: false };
+      const reporte = await resRep.json();
+
+      // 2. Aprobar el reporte
       const response = await fetch(`http://localhost:5000/reportes/${reporteId}`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ estado: 'aprobado', observacionRechazo: null })
       });
-      return { success: response.ok };
+      if (!response.ok) return { success: false };
+
+      // 3. Actualizar los datos de seguimiento en la tarea
+      if (reporte.tareaId) {
+        // Obtenemos todos los reportes aprobados para esta tarea para calcular el progreso total
+        const [resRep, resTarea] = await Promise.all([
+          fetch(`http://localhost:5000/reportes?tareaId=${reporte.tareaId}&estado=aprobado`),
+          fetch(`http://localhost:5000/tareas/${reporte.tareaId}`)
+        ]);
+        
+        const reportesAprobados = resRep.ok ? await resRep.json() : [];
+        const tareaActual = resTarea.ok ? await resTarea.json() : {};
+
+        // Calcular avance acumulado
+        let avanceTotal = reportesAprobados.reduce((sum, r) => sum + (parseInt(r.beneficiados) || 0), 0);
+        const metaNum = parseInt(tareaActual.meta) || 1;
+        const reachedMeta = avanceTotal >= metaNum;
+
+        const updatePayload = {
+          evidenciaSeguimiento: reporte.descripcion,
+          ultimoAvance: reporte.fecha,
+          reporteInstitucion: reporte.descripcion,
+          inversionColones: reportesAprobados.reduce((sum, r) => sum + (r.inversionColones || 0), 0),
+          estado: reachedMeta ? 'Completado' : 'Con Actividades',
+          completada: reachedMeta,
+          fechaCompletada: reachedMeta ? new Date().toISOString().split('T')[0] : null
+        };
+
+        await fetch(`http://localhost:5000/tareas/${reporte.tareaId}`, {
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(updatePayload)
+        });
+      }
+
+      return { success: true };
     } catch (e) { return { success: false }; }
   },
 
@@ -597,7 +681,12 @@ export const adminInstitucionService = {
     try {
       const res = await fetch('http://localhost:5000/tareas');
       const allTareas = await res.json();
-      const tareas = allTareas.filter(t => String(t.institucionId) === String(institucionId));
+      const tareas = allTareas.filter(t => {
+        if (t.institucionesIds && Array.isArray(t.institucionesIds)) {
+          return t.institucionesIds.includes(String(institucionId));
+        }
+        return String(t.institucionId) === String(institucionId);
+      });
       return tareas.map(t => ({
         id: t.id,
         titulo: t.titulo,

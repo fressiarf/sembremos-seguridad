@@ -5,9 +5,8 @@ import DashboardGlobal from '../DashboardGlobal/DashboardGlobal';
 import ActividadOficiales from '../ActividadOficiales/ActividadOficiales';
 import GestionUsuarios from '../GestionUsuarios/GestionUsuarios';
 import PerfilUsuario from '../PerfilUsuario/PerfilUsuario';
-import MatrizSeguimiento from '../MatrizSeguimiento/MatrizSeguimiento';
 import DashboardInstitucion from '../../DashboardInstitucion/DashboardInstitucion';
-import MapaRiesgos from '../MapaRiesgos/MapaRiesgos';
+import MapaRiesgos from '../MapaDistribucion/MapaDistribucion';
 import ZonasCriticas from '../ZonasCriticas/ZonasCriticas';
 import { useLogin } from '../../../context/LoginContext';
 import { useToast } from '../../../context/ToastContext';
@@ -19,13 +18,18 @@ import ChatBotWindow from '../../Shared/ChatBot/ChatBotWindow';
 import SoporteInstitucional from '../SoporteInstitucional/SoporteInstitucional';
 import EstadisticasGlobal from '../Estadisticas/EstadisticasGlobal';
 
+import LineasAccionView from '../LineasAccion/LineasAccionView';
+import MatrizSeguimiento from '../LineasAccion/MatrizSeguimiento';
+import ReportesResultados from '../LineasAccion/ReportesResultados';
+
 // Mapeo de vistas a nombres de sección para el TopbarInstitucion
 const VIEW_LABELS = {
-  dashboard: 'Dashboard Global',
-  actividades: 'Actividad Oficiales',
+  dashboard: 'Resumen Ejecutivo',
+  actividades: 'Gestión de Tareas',
   usuarios: 'Gestión de Usuarios',
   perfil: 'Mi Perfil',
-  matrices: 'Todas las Matrices',
+  'matriz-seguimiento': 'Matriz de Seguimiento',
+  'reportes-resultados': 'Reportes de Resultados',
   zonas: 'Zonas Críticas',
   alertas: 'Soporte y Comentarios',
   mapa: 'Mapa de Riesgos',
@@ -33,10 +37,12 @@ const VIEW_LABELS = {
   calendario: 'Calendario de Operaciones',
   reportes: 'Reportes INL/MSP',
   historial: 'Historial de Reportes',
+  configuracion: 'Configuración',
+  'lineas-accion': 'Líneas de Acción',
   lineas: 'Mis Tareas / Líneas de Acción',
 };
 
-const SeccionPrincipal = ({ collapsed, setCollapsed, activeView }) => {
+const SeccionPrincipal = ({ collapsed, setCollapsed, activeView, onViewChange }) => {
   const { user } = useLogin();
   const { showToast } = useToast();
   const [showTopbarNotifs, setShowTopbarNotifs] = useState(false);
@@ -190,15 +196,14 @@ const SeccionPrincipal = ({ collapsed, setCollapsed, activeView }) => {
       )}
 
       {activeView === 'dashboard' && (
-        user?.rol === 'institucion' ? <DashboardInstitucion /> : <DashboardGlobal collapsed={collapsed} />
+        user?.rol === 'institucion' ? <DashboardInstitucion /> : <DashboardGlobal collapsed={collapsed} onViewChange={onViewChange} />
       )}
       {activeView === 'actividades' && <ActividadOficiales />}
       {activeView === 'usuarios' && <GestionUsuarios />}
       {activeView === 'perfil' && <PerfilUsuario />}
-      {activeView === 'matrices' && (
-        user?.rol === 'institucion' ? <DashboardInstitucion /> : <MatrizSeguimiento />
-      )}
-      {activeView === 'lineas' && user?.rol === 'institucion' && <DashboardInstitucion />}
+      {activeView === 'matriz-seguimiento' && <MatrizSeguimiento />}
+      {activeView === 'reportes-resultados' && <ReportesResultados />}
+      {activeView === 'lineas-accion' && <LineasAccionView onViewChange={onViewChange} />}
       {activeView === 'mapa' && <MapaRiesgos />}
       {activeView === 'zonas' && <ZonasCriticas />}
       {activeView === 'calendario' && <Calendario />}
@@ -210,6 +215,7 @@ const SeccionPrincipal = ({ collapsed, setCollapsed, activeView }) => {
 
 
       {/* Placeholder para otras vistas no mapeadas */}
+      {!['dashboard', 'actividades', 'usuarios', 'perfil', 'matriz-seguimiento', 'reportes-resultados', 'lineas-accion', 'mapa', 'zonas', 'calendario', 'reportes', 'historial', 'configuracion', 'alertas'].includes(activeView) && (
       {!['dashboard', 'actividades', 'usuarios', 'perfil', 'matrices', 'mapa', 'zonas', 'calendario', 'reportes', 'historial', 'lineas', 'alertas', 'estadisticas'].includes(activeView) && (
         <div style={{ padding: '2rem', color: '#7a9cc4' }}>
           <h2>Vista en desarrollo: {activeView}</h2>

@@ -261,19 +261,68 @@ const RevisionReportes = () => {
                               }}>
                                 {/* Asistentes */}
                                 <div style={{ background: '#f1f5f9', padding: '10px 12px', borderRadius: '6px' }}>
-                                  <div style={{ fontSize: '0.75rem', color: '#64748b', fontWeight: 600, marginBottom: '4px' }}>POBLACIÓN BENEFICIADA</div>
+                                  <div style={{ fontSize: '0.75rem', color: '#64748b', fontWeight: 600, marginBottom: '4px' }}>
+                                    {reporte.tarea?.detalleMeta || (reporte.tipoTarea === 2 ? 'AVANCE DE OBRA' : 'POBLACIÓN BENEFICIADA')}
+                                  </div>
                                   <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.85rem', fontWeight: 700, color: '#0b2240', marginBottom: '6px' }}>
                                     <Users size={14} color="#3b82f6" /> {reporte.beneficiados} total
                                   </div>
-                                  {reporte.asistentes ? (
-                                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '4px', fontSize: '0.75rem', color: '#475569' }}>
+                                  {reporte.asistentes && (
+                                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(80px, 1fr))', gap: '8px', fontSize: '0.72rem', color: '#475569', background: '#fff', padding: '8px', borderRadius: '6px', marginBottom: '8px' }}>
                                       <div><span style={{color: '#94a3b8'}}>Niñez:</span> <b>{reporte.asistentes.ninos || 0}</b></div>
-                                      <div><span style={{color: '#94a3b8'}}>Adolesc.:</span> <b>{reporte.asistentes.adolescentes || 0}</b></div>
-                                      <div><span style={{color: '#94a3b8'}}>Juventud:</span> <b>{reporte.asistentes.jovenes || 0}</b></div>
-                                      <div><span style={{color: '#94a3b8'}}>Adultos:</span> <b>{reporte.asistentes.adultos || 0}</b></div>
-                                      <div><span style={{color: '#94a3b8'}}>Adulto M.:</span> <b>{reporte.asistentes.adultoMayor || 0}</b></div>
+                                      <div><span style={{color: '#94a3b8'}}>Adol.:</span> <b>{reporte.asistentes.adolescentes || 0}</b></div>
+                                      <div><span style={{color: '#94a3b8'}}>Juv.:</span> <b>{reporte.asistentes.jovenes || 0}</b></div>
+                                      <div><span style={{color: '#94a3b8'}}>Adult.:</span> <b>{reporte.asistentes.adultos || 0}</b></div>
+                                      <div><span style={{color: '#94a3b8'}}>Mayor:</span> <b>{reporte.asistentes.adultoMayor || 0}</b></div>
                                     </div>
-                                  ) : null}
+                                  )}
+
+                                  {/* Hitos / Fases (Si existen) */}
+                                  {reporte.hitos && reporte.hitos.length > 0 && (
+                                    <div style={{ background: '#fff', padding: '10px', borderRadius: '6px', border: '1px solid #e2e8f0', marginBottom: '8px' }}>
+                                      <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '6px' }}>
+                                        <span style={{ fontSize: '0.75rem', fontWeight: 700 }}>Hitos de Obra:</span>
+                                        <span style={{ fontSize: '0.75rem', fontWeight: 800, color: '#3b82f6' }}>{Math.round((reporte.hitos.filter(h => h.completado).length / reporte.hitos.length) * 100)}%</span>
+                                      </div>
+                                      <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px' }}>
+                                        {reporte.hitos.map(h => (
+                                          <div key={h.id} style={{ fontSize: '0.65rem', padding: '2px 8px', borderRadius: '10px', background: h.completado ? '#dcfce7' : '#f1f5f9', color: h.completado ? '#166534' : '#64748b', border: `1px solid ${h.completado ? '#bbf7d0' : '#e2e8f0'}`, opacity: h.completado ? 1 : 0.6 }}>
+                                            {h.label}
+                                          </div>
+                                        ))}
+                                      </div>
+                                    </div>
+                                  )}
+
+                                  {/* Tipo 3: Seguridad (Operativos) */}
+                                  {reporte.tipoTarea === 3 && (
+                                    <div style={{ display: 'flex', gap: '8px', marginBottom: '8px' }}>
+                                      <div style={{ flex: 1, background: '#fff', padding: '6px 10px', borderRadius: '6px', border: '1px solid #e2e8f0' }}>
+                                        <div style={{ fontSize: '0.65rem', color: '#64748b', fontWeight: 600 }}>PATRULLAJES</div>
+                                        <div style={{ fontSize: '0.9rem', fontWeight: 800 }}>{reporte.numeroPatrullajes || 0}</div>
+                                      </div>
+                                      <div style={{ flex: 1, background: '#fff', padding: '6px 10px', borderRadius: '6px', border: '1px solid #e2e8f0' }}>
+                                        <div style={{ fontSize: '0.65rem', color: '#64748b', fontWeight: 600 }}>INCIDENCIAS</div>
+                                        <div style={{ fontSize: '0.9rem', fontWeight: 800, color: reporte.incidencias > 0 ? '#ef4444' : '#22c55e' }}>{reporte.incidencias || 0}</div>
+                                      </div>
+                                    </div>
+                                  )}
+
+                                  {/* Tipo 4: Gestión (Acuerdos) */}
+                                  {reporte.tipoTarea === 4 && (
+                                    <div style={{ background: '#fff', padding: '10px', borderRadius: '6px', border: '1px solid #e2e8f0', marginBottom: '8px' }}>
+                                      <div style={{ fontSize: '0.72rem', color: '#475569', marginBottom: '4px' }}><b>Instituciones:</b> {reporte.institucionesPresentes || 'N/A'}</div>
+                                      <div style={{ fontSize: '0.72rem', color: '#475569', borderTop: '1px solid #f1f5f9', paddingTop: '4px' }}><b>Acuerdos:</b> {reporte.acuerdos || 'N/A'}</div>
+                                    </div>
+                                  )}
+
+                                  {/* Tipo 5: Recursos (Entregables) */}
+                                  {reporte.tipoTarea === 5 && (
+                                    <div style={{ background: '#fff', padding: '10px', borderRadius: '6px', border: '1px solid #e2e8f0', marginBottom: '8px' }}>
+                                      <div style={{ fontSize: '0.75rem', color: '#1e293b', fontWeight: 700 }}>📦 {reporte.itemsEntregados || 'Items'}</div>
+                                      <div style={{ fontSize: '0.65rem', color: '#64748b' }}>S/N: {reporte.numeroSerie || 'N/A'}</div>
+                                    </div>
+                                  )}
                                 </div>
                                 
                                 {/* Detalles de actividad e Inversión */}

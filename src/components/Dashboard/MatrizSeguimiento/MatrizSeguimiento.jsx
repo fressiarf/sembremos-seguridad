@@ -202,32 +202,51 @@ const MatrizSeguimiento = () => {
                   <tr><td colSpan="8" className="empty-subrow">Sin acciones estratégicas registradas.</td></tr>
                 ) : item.tareas.map(tarea => {
                   const isEditing = editingId === tarea.id;
+                  const progreso = tarea.progresoReal || 0;
+                  
                   return (
                     <tr key={tarea.id} className="data-row">
                       <td className="cell-id">
                         <span className="id-tag">{tarea.id}</span>
                       </td>
                       <td className="cell-accion">
-                        <div className="text-wrap">{tarea.titulo}</div>
+                        <div className="text-wrap" style={{ fontWeight: 500 }}>{tarea.titulo}</div>
+                        <div className="progress-container-mini" style={{ marginTop: '8px', maxWidth: '180px' }}>
+                          <div className="progress-bar-bg" style={{ height: '6px', background: '#e2e8f0', borderRadius: '3px', overflow: 'hidden', position: 'relative' }}>
+                            <div className="progress-bar-fill" style={{ 
+                              height: '100%', 
+                              width: `${progreso}%`, 
+                              background: progreso === 100 ? '#22c55e' : '#3b82f6',
+                              transition: 'width 0.4s ease'
+                            }} />
+                          </div>
+                          <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '4px' }}>
+                            <span style={{ fontSize: '10px', color: '#64748b', fontWeight: 600 }}>Avance: {progreso}%</span>
+                            <span style={{ fontSize: '10px', color: '#64748b' }}>{tarea.avanceAcumulado || 0} / {tarea.meta || 1}</span>
+                          </div>
+                        </div>
                       </td>
                       <td className="cell-indicador">
                         <div className="text-wrap">{tarea.indicador}</div>
                       </td>
                       <td className="cell-consideraciones">
-                        <div className="text-wrap">
+                        <div className="text-wrap" style={{ fontSize: '0.8rem', color: '#475569' }}>
                           {tarea.consideraciones ? tarea.consideraciones.split('\n').map((line, idx) => (
                             <React.Fragment key={idx}>{line}<br/></React.Fragment>
                           )) : '—'}
                         </div>
                       </td>
-                      <td className="cell-meta"><strong>{tarea.meta || '—'}</strong></td>
+                      <td className="cell-meta">
+                        <div style={{ fontWeight: 700, color: '#0f172a' }}>{tarea.meta || '—'}</div>
+                        <div style={{ fontSize: '10px', color: '#64748b', textTransform: 'uppercase' }}>Objetivo</div>
+                      </td>
                       <td className="cell-plazo">
                         <span className="badge-plazo">{tarea.plazo || 'N/A'}</span>
                       </td>
                       <td className="cell-responsables">
-                        <div className="resp-lider"><strong>Líder:</strong> {tarea.institucionNombre}</div>
+                        <div className="resp-lider"><strong>Líder:</strong> {tarea.institucionNombre || 'Sin asignar'}</div>
                         {tarea.corresponsable && tarea.corresponsable !== '-' && (
-                          <div className="resp-co"><strong>Co-gestor:</strong> {tarea.corresponsable}</div>
+                          <div className="resp-co"><strong>Aliado:</strong> {tarea.corresponsable}</div>
                         )}
                       </td>
                       <td className="cell-evidencia" onClick={() => !isEditing && user?.rol !== 'auditor' && handleEditClick(tarea)}>
@@ -246,8 +265,11 @@ const MatrizSeguimiento = () => {
                           </div>
                         ) : (
                           <div className="view-mode">
-                            <span className={tarea.evidenciaSeguimiento ? "evidencia-text" : "evidencia-empty"}>
-                              {tarea.evidenciaSeguimiento || (user?.rol !== 'auditor' ? 'Click para agregar avance / observaciones de seguimiento...' : 'Sin evidencia de seguimiento')}
+                             <div className={`status-pill ${tarea.completada ? 'status--completado' : 'status--pendiente'}`} style={{ marginBottom: '8px', display: 'inline-block' }}>
+                              {tarea.completada ? 'Finalizado' : 'En Ejecución'}
+                            </div>
+                            <span className={tarea.evidenciaSeguimiento ? "evidencia-text" : "evidencia-empty"} style={{ display: 'block', fontSize: '0.85rem' }}>
+                              {tarea.evidenciaSeguimiento || (user?.rol !== 'auditor' ? 'Escribe aquí el seguimiento manual...' : 'Sin evidencia')}
                             </span>
                             {user?.rol !== 'auditor' && <Edit2 size={13} className="edit-icon" />}
                           </div>

@@ -27,7 +27,12 @@ const DashboardInstitucion = () => {
           // Filtrado estricto: solo líneas asignadas a esta institución
           // En modo mock, podemos simular que todo aplica o usar un filtro laxo si es necesario ver data
           const filtered = dashData.lineas.map(linea => {
-            const tareasLocales = linea.tareas ? linea.tareas.filter(t => String(t.institucionId) === String(user?.id)) : [];
+            const tareasLocales = linea.tareas ? linea.tareas.filter(t => {
+              if (t.institucionesIds && Array.isArray(t.institucionesIds)) {
+                return t.institucionesIds.includes(String(user?.id));
+              }
+              return String(t.institucionId) === String(user?.id);
+            }) : [];
             const totalTareas = tareasLocales.length;
             const tareasCompletadas = tareasLocales.filter(t => t.completada).length;
             const progreso = totalTareas > 0 ? Math.round((tareasCompletadas / totalTareas) * 100) : 0;
