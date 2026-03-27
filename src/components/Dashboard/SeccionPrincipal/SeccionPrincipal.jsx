@@ -10,7 +10,7 @@ import MapaRiesgos from '../MapaDistribucion/MapaDistribucion';
 import ZonasCriticas from '../ZonasCriticas/ZonasCriticas';
 import { useLogin } from '../../../context/LoginContext';
 import { useToast } from '../../../context/ToastContext';
-import { Download, FileText, Bell, MessageSquare, Bot, X, Send, User } from 'lucide-react';
+import { Download, FileText, Bell, Bot } from 'lucide-react';
 import Calendario from '../../Calendario/Calendario';
 import NotificacionAdmin from '../NotificacionesAdmin/NotificacionAdmin';
 import HistorialReportes from '../../AdminInstitucion/Vistas/HistorialReportes';
@@ -98,6 +98,12 @@ const SeccionPrincipal = ({ collapsed, setCollapsed, activeView, onViewChange })
     window.print();
     showToast('Generando Ficha de Rendición de Cuentas...', 'info');
   };
+
+  const knownViews = [
+    'dashboard', 'actividades', 'usuarios', 'perfil', 'matriz-seguimiento', 
+    'reportes-resultados', 'lineas-accion', 'mapa', 'zonas', 'calendario', 
+    'reportes', 'historial', 'configuracion', 'alertas', 'estadisticas', 'lineas'
+  ];
 
   return (
     <main className={`main-content ${collapsed ? 'main-content--collapsed' : ''}`}>
@@ -215,8 +221,7 @@ const SeccionPrincipal = ({ collapsed, setCollapsed, activeView, onViewChange })
 
 
       {/* Placeholder para otras vistas no mapeadas */}
-      {!['dashboard', 'actividades', 'usuarios', 'perfil', 'matriz-seguimiento', 'reportes-resultados', 'lineas-accion', 'mapa', 'zonas', 'calendario', 'reportes', 'historial', 'configuracion', 'alertas'].includes(activeView) && (
-      {!['dashboard', 'actividades', 'usuarios', 'perfil', 'matrices', 'mapa', 'zonas', 'calendario', 'reportes', 'historial', 'lineas', 'alertas', 'estadisticas'].includes(activeView) && (
+      {!knownViews.includes(activeView) && (
         <div style={{ padding: '2rem', color: '#7a9cc4' }}>
           <h2>Vista en desarrollo: {activeView}</h2>
           <p>Esta sección se implementará próximamente.</p>

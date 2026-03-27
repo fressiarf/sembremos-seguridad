@@ -3,7 +3,7 @@ import { dashboardService } from '../../../services/dashboardService';
 import { TrendingUp, ChevronDown, ChevronUp, Search, Filter, Info, Users, BarChart3 } from 'lucide-react';
 import './LineasAccionView.css';
 
-const LineasAccionView = () => {
+const LineasAccionView = ({ onViewChange }) => {
   const [lineas, setLineas] = useState([]);
   const [loading, setLoading] = useState(true);
   const [expandedId, setExpandedId] = useState(null);
@@ -65,6 +65,13 @@ const LineasAccionView = () => {
             <TrendingUp size={16} />
             <span>{lineas.length} Líneas Activas</span>
           </div>
+          <button 
+            className="btn-create-linea" 
+            onClick={() => onViewChange('actividades')}
+          >
+            <TrendingUp size={16} />
+            Crear Nueva Línea
+          </button>
         </div>
       </header>
 

@@ -3,7 +3,7 @@ import DashboardAdminInst from './Vistas/DashboardAdminInst';
 import GestionTareas from './Vistas/GestionTareas';
 import RevisionReportes from './Vistas/RevisionReportes';
 import HistorialReportes from './Vistas/HistorialReportes';
-import CalendarioAdminInst from './Vistas/CalendarioAdminInst';
+import Calendario from '../Calendario/Calendario';
 import GestionFuncionarios from './Vistas/GestionFuncionarios';
 import PerfilUsuario from '../Dashboard/PerfilUsuario/PerfilUsuario';
 import EstadisticasInstitucion from './Vistas/EstadisticasInstitucion';
@@ -65,7 +65,11 @@ const SeccionPrincipalAdminInstitucion = ({ activeView = 'dashboard', collapsed,
       case 'historial':
         return <HistorialReportes />;
       case 'calendario':
-        return <CalendarioAdminInst />;
+        return (
+          <div style={{ padding: '1rem 2rem' }}>
+             <Calendario />
+          </div>
+        );
       case 'estadisticas':
         return <EstadisticasInstitucion />;
       case 'perfil':

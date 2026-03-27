@@ -168,8 +168,8 @@ const ActividadOficiales = () => {
 
       {/* ── Modal Crear Línea ── */}
       {showLineaForm && (
-        <div className="assign-modal-overlay" style={{ zIndex: 1000, position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '1rem' }}>
-          <div className="assign-modal" style={{ maxWidth: '600px', width: '100%', maxHeight: '90vh', overflowY: 'auto', backgroundColor: '#fff', borderRadius: '8px', padding: '2rem', boxShadow: '0 4px 6px rgba(0,0,0,0.1)' }}>
+        <div className="assign-modal-overlay">
+          <div className="assign-modal">
             <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '1.5rem' }}>
               <h3 style={{ margin: 0, color: '#0b2240' }}>Nueva Línea de Acción</h3>
               <button onClick={() => setShowLineaForm(false)} style={{ background: 'none', border: 'none', cursor: 'pointer' }}><X size={20} /></button>
@@ -239,7 +239,7 @@ const ActividadOficiales = () => {
               </div>
               <div className="modal-actions">
                 <button type="button" onClick={() => setShowLineaForm(false)} className="btn-cancel">Cancelar</button>
-                <button type="submit" className="btn-assign-submit">Crear Línea</button>
+                <button type="submit" className="btn-assign-submit">Guardar Línea de Acción</button>
               </div>
             </form>
           </div>
@@ -248,8 +248,8 @@ const ActividadOficiales = () => {
 
   // ── Modal Crear Tarea ──
   {showTareaForm && (
-    <div className="assign-modal-overlay" style={{ zIndex: 1000, position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '1rem' }}>
-      <div className="assign-modal" style={{ maxWidth: '600px', width: '100%', maxHeight: '90vh', overflowY: 'auto', backgroundColor: '#fff', borderRadius: '8px', padding: '2rem', boxShadow: '0 4px 6px rgba(0,0,0,0.1)' }}>
+    <div className="assign-modal-overlay">
+      <div className="assign-modal">
         <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '1.5rem' }}>
           <h3 style={{ margin: 0, color: '#0b2240' }}>Asignar Tarea a Institución</h3>
           <button onClick={() => setShowTareaForm(false)} style={{ background: 'none', border: 'none', cursor: 'pointer' }}><X size={20} /></button>
@@ -533,7 +533,7 @@ const ActividadOficiales = () => {
           </div>
           <div className="modal-actions">
             <button type="button" onClick={() => setShowTareaForm(false)} className="btn-cancel">Cancelar</button>
-            <button type="submit" className="btn-assign-submit">Asignar Tarea</button>
+            <button type="submit" className="btn-assign-submit">Guardar Tarea</button>
           </div>
         </form>
       </div>

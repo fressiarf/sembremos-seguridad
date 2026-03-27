@@ -1,79 +1,104 @@
 import React, { useState, useEffect, useRef } from 'react';
 import './Calendario.css';
-import { ChevronLeft, ChevronRight, Clock, Tag, Trash2 } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Clock, Tag, Trash2, Users, Search } from 'lucide-react';
 import { useToast } from '../../context/ToastContext';
 import { useLogin } from '../../context/LoginContext';
+import { dashboardService } from '../../services/dashboardService';
 import emailjs from '@emailjs/browser';
 
+const CATEGORIAS = {
+    'Operativos': '#ef4444',
+    'Reuniones': '#3b82f6',
+    'Seguimiento de Matriz': '#22c55e'
+};
+
+const INSTITUCIONES = [
+    'PANI', 'IMAS', 'CCSS', 'MEP', 'IAFA',
+    'Ministerio de Salud', 'Bomberos', 'Cruz Roja',
+    'Municipalidad de Puntarenas', 'Fuerza Pública', 'INL'
+];
 
 const Calendario = () => {
     const { showToast } = useToast();
     const { user } = useLogin();
 
-    // Inicializar EmailJS si la llave pública existe
-    useEffect(() => {
-        const publicKey = import.meta.env.VITE_EMAILJS_PUBLIC_KEY;
-        if (publicKey) {
-            emailjs.init(publicKey);
-        }
-    }, []);
-
-
     const [fechaActual, setFechaActual] = useState(new Date());
+    const [originalEventos, setOriginalEventos] = useState([]); // Todos los del servidor
+    const [eventos, setEventos] = useState([]); // Filtrados para el usuario actual
+    const [loading, setLoading] = useState(true);
     
-    const [eventos, setEventos] = useState(() => {
-        const guardados = localStorage.getItem('sembremos_seguridad_eventos');
-        const listaEventos = guardados ? JSON.parse(guardados) : [];
-        
-        const hoy = new Date();
-        const strHoy = `${hoy.getFullYear()}-${String(hoy.getMonth() + 1).padStart(2, '0')}-${String(hoy.getDate()).padStart(2, '0')}`;
-        const m = new Date(hoy); m.setDate(m.getDate() + 1);
-        const strMan = `${m.getFullYear()}-${String(m.getMonth() + 1).padStart(2, '0')}-${String(m.getDate()).padStart(2, '0')}`;
-        const p = new Date(hoy); p.setDate(p.getDate() + 2);
-        const strPas = `${p.getFullYear()}-${String(p.getMonth() + 1).padStart(2, '0')}-${String(p.getDate()).padStart(2, '0')}`;
-
-        const def = [
-            { id: 1001, titulo: "Transformación Áreas Deportivas Juv.", inicio: "09:00", fin: "13:00", categoria: "Operativos", fecha: strHoy },
-            { id: 1002, titulo: "Zonas de Encuentro Juvenil", inicio: "14:00", fin: "16:00", categoria: "Seguimiento de Matriz", fecha: strHoy },
-            { id: 1003, titulo: "Festival Juvenil Formativo", inicio: "10:00", fin: "15:00", categoria: "Reuniones", fecha: strMan },
-            { id: 1004, titulo: "Programa Voluntariado Recuperación", inicio: "08:00", fin: "12:00", categoria: "Operativos", fecha: strPas },
-            { id: 1005, titulo: "Feria Emprendimiento Juvenil", inicio: "09:00", fin: "17:00", categoria: "Seguimiento de Matriz", fecha: strPas }
-        ];
-
-        if (!listaEventos.some(e => e.id === 1001)) {
-            return [...listaEventos, ...def];
-        }
-        return listaEventos;
-    });
-
     const [mostrarModal, setMostrarModal] = useState(false);
     const [diaSeleccionado, setDiaSeleccionado] = useState(null);
-    const [nuevoEvento, setNuevoEvento] = useState({ titulo: '', inicio: '', fin: '', categoria: 'Operativos' });
+    const [nuevoEvento, setNuevoEvento] = useState({ 
+        titulo: '', 
+        inicio: '', 
+        fin: '', 
+        categoria: 'Operativos',
+        participantes: [] 
+    });
     const [editandoId, setEditandoId] = useState(null);
     const notificadosRef = useRef(new Set());
-
-    // Persistir eventos en localStorage
-    useEffect(() => {
-        localStorage.setItem('sembremos_seguridad_eventos', JSON.stringify(eventos));
-    }, [eventos]);
-
     const [alertaInminente, setAlertaInminente] = useState(null);
 
-    // Solicitar permiso para notificaciones del navegador
+    // ── EmailJS Init ──
+    useEffect(() => {
+        const publicKey = import.meta.env.VITE_EMAILJS_PUBLIC_KEY;
+        if (publicKey) emailjs.init(publicKey);
+    }, []);
+
+    // ── Cargar Eventos desde el Servidor ──
+    const loadEventos = async () => {
+        setLoading(true);
+        try {
+            const data = await dashboardService.getEventos();
+            setOriginalEventos(data || []);
+        } catch (error) {
+            showToast('Error al conectar con el servidor', 'error');
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    useEffect(() => { loadEventos(); }, []);
+
+    // ── Filtrado según ROL y Participación ──
+    useEffect(() => {
+        if (!user) return;
+        
+        let filtrados = [];
+        if (user.rol === 'admin') {
+            // Admin Global ve TODO
+            filtrados = originalEventos;
+        } else {
+            // Admin Institución, Editor, Institución:
+            // Solo ven si:
+            // 1. Son los creadores
+            // 2. Su institución es la creadora
+            // 3. Su institución está en los participantes
+            filtrados = originalEventos.filter(ev => {
+                const esCreador = String(ev.creadorId) === String(user.id);
+                const esDeSuInstitucion = ev.institucion === user.institucion;
+                const estaInvolucrado = ev.participantes?.includes(user.institucion);
+                return esCreador || esDeSuInstitucion || estaInvolucrado;
+            });
+        }
+        setEventos(filtrados);
+    }, [originalEventos, user]);
+
+    // Solicitar permiso notificaciones
     useEffect(() => {
         if ('Notification' in window && Notification.permission === 'default') {
             Notification.requestPermission();
         }
     }, []);
 
-    // ── Motor de notificaciones REFINADO ──
+    // ── Motor de notificaciones ──
     useEffect(() => {
         const ETAPAS_DIAS = [7, 5, 3, 1];
         const ETAPAS_MINS = [60, 30, 15, 5];
 
         const verificarEventosProximos = () => {
             const ahora = new Date();
-            
             let eventoMasUrgente = null;
             let menorDiffMin = Infinity;
 
@@ -86,24 +111,15 @@ const Calendario = () => {
                 const diffMinTotal = Math.floor(diffMs / 60000);
                 const diffDias = Math.floor(diffMs / (1000 * 60 * 60 * 24));
 
-                // Si el evento ya pasó hace más de 1 hora, no procesar
                 if (diffMinTotal < -60) return;
 
-                // 1. Anticlumping: Si vemos el evento por primera vez, marcar etapas pasadas como ya "notificadas"
                 const eventSeenKey = `seen-${ev.id}`;
                 if (!notificadosRef.current.has(eventSeenKey)) {
                     notificadosRef.current.add(eventSeenKey);
-                    
-                    // Solo marcar como "vistas" las etapas que YA pasaron (estrictamente mayores)
-                    // Las etapas menores o iguales (la actual y futuras) se dejan libres para sonar.
                     ETAPAS_DIAS.forEach(d => { if (diffDias < d) notificadosRef.current.add(`${ev.id}-d${d}`); });
-                    
-                    // Para minutos, si ya estamos dentro de un rango (ej: 12 min), 
-                    // queremos que suene la etapa de 15, pero no las de 60 o 30.
                     ETAPAS_MINS.forEach(m => { if (diffMinTotal < m - 5) notificadosRef.current.add(`${ev.id}-m${m}`); });
                 }
 
-                // 2. Procesar Etapas por Días
                 ETAPAS_DIAS.forEach(d => {
                     const clave = `${ev.id}-d${d}`;
                     if (diffDias <= d && !notificadosRef.current.has(clave)) {
@@ -112,7 +128,6 @@ const Calendario = () => {
                     }
                 });
 
-                // 3. Procesar Etapas por Minutos (Hoy)
                 const hoyStr = `${ahora.getFullYear()}-${String(ahora.getMonth() + 1).padStart(2, '0')}-${String(ahora.getDate()).padStart(2, '0')}`;
                 if (ev.fecha === hoyStr && diffMinTotal > 0) {
                     ETAPAS_MINS.forEach(m => {
@@ -120,74 +135,41 @@ const Calendario = () => {
                         if (diffMinTotal <= m && !notificadosRef.current.has(clave)) {
                             notificadosRef.current.add(clave);
                             const esCritico = m <= 5;
-                            const icono = esCritico ? '🚨' : '⏰';
-                            
-                            showToast(`${icono} "${ev.titulo}" inicia en ${diffMinTotal} min`, esCritico ? 'error' : 'info');
-                            
-                            if (Notification.permission === 'granted') {
-                                new Notification(`${icono} Evento próximo - Sembremos Seguridad`, {
-                                    body: `"${ev.titulo}" inicia en ${diffMinTotal} min (${ev.inicio})`,
-                                    icon: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=',
-                                    tag: clave,
-                                    requireInteraction: esCritico
-                                });
-                            }
+                            showToast(`${esCritico ? '🚨' : '⏰'} "${ev.titulo}" inicia en ${diffMinTotal} min`, esCritico ? 'error' : 'info');
                         }
                     });
 
-                    // Banner persistente (solo si falta ≤ 15 min)
                     if (diffMinTotal <= 15 && diffMinTotal < menorDiffMin) {
                         menorDiffMin = diffMinTotal;
                         eventoMasUrgente = { ...ev, minutosRestantes: diffMinTotal };
                     }
                 }
             });
-
             setAlertaInminente(eventoMasUrgente);
         };
 
         verificarEventosProximos();
-        const intervalo = setInterval(verificarEventosProximos, 15000);
+        const intervalo = setInterval(verificarEventosProximos, 30000);
         return () => clearInterval(intervalo);
     }, [eventos, showToast]);
 
-
-    // Lógica de fechas
+    // Lógica calendario
     const mes = fechaActual.getMonth();
     const anio = fechaActual.getFullYear();
-
-    const nombresMeses = [
-        "Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio",
-        "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"
-    ];
-
+    const nombresMeses = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"];
     const diasSemana = ["Lun", "Mar", "Mié", "Jue", "Vie", "Sáb", "Dom"];
 
     const primerDiaMes = new Date(anio, mes, 1).getDay();
     const primerDiaAjustado = primerDiaMes === 0 ? 6 : primerDiaMes - 1;
     const diasEnMes = new Date(anio, mes + 1, 0).getDate();
-
     const diasMesAnterior = new Date(anio, mes, 0).getDate();
-    const rellenoAnterior = Array.from({ length: primerDiaAjustado }, (_, i) => ({
-        dia: diasMesAnterior - primerDiaAjustado + i + 1,
-        fueraMes: true
-    }));
 
-    const diasMesActual = Array.from({ length: diasEnMes }, (_, i) => ({
-        dia: i + 1,
-        fueraMes: false
-    }));
-
-    const rellenoPosterior = Array.from({ length: 42 - (rellenoAnterior.length + diasMesActual.length) }, (_, i) => ({
-        dia: i + 1,
-        fueraMes: true
-    }));
-
+    const rellenoAnterior = Array.from({ length: primerDiaAjustado }, (_, i) => ({ dia: diasMesAnterior - primerDiaAjustado + i + 1, fueraMes: true }));
+    const diasMesActual = Array.from({ length: diasEnMes }, (_, i) => ({ dia: i + 1, fueraMes: false }));
+    const rellenoPosterior = Array.from({ length: 42 - (rellenoAnterior.length + diasMesActual.length) }, (_, i) => ({ dia: i + 1, fueraMes: true }));
     const todosLosDias = [...rellenoAnterior, ...diasMesActual, ...rellenoPosterior];
 
-    const cambiarMes = (offset) => {
-        setFechaActual(new Date(anio, mes + offset, 1));
-    };
+    const cambiarMes = (offset) => setFechaActual(new Date(anio, mes + offset, 1));
 
     const abrirModal = (dia, fueraMes, evento = null) => {
         if (fueraMes && !evento) return;
@@ -197,26 +179,22 @@ const Calendario = () => {
                 titulo: evento.titulo,
                 inicio: evento.inicio,
                 fin: evento.fin,
-                categoria: evento.categoria
+                categoria: evento.categoria,
+                participantes: evento.participantes || []
             });
             setEditandoId(evento.id);
             setDiaSeleccionado(evento.fecha);
         } else {
+            const hoy = new Date();
+            hoy.setHours(0,0,0,0);
             const fechaString = `${anio}-${String(mes + 1).padStart(2, '0')}-${String(dia).padStart(2, '0')}`;
-            
-            // Validar que no sea una fecha pasada para agendar
-            const ahora = new Date();
-            const hoy = new Date(ahora.getFullYear(), ahora.getMonth(), ahora.getDate());
             const [y, m, d] = fechaString.split('-').map(Number);
-            const fechaSel = new Date(y, m - 1, d);
-
-            if (fechaSel < hoy) {
-                showToast('No se pueden agendar eventos en fechas pasadas', 'warning');
+            if (new Date(y, m-1, d) < hoy) {
+                showToast('No se pueden agendar eventos pasado el tiempo', 'warning');
                 return;
             }
-
             setDiaSeleccionado(fechaString);
-            setNuevoEvento({ titulo: '', inicio: '', fin: '', categoria: 'Operativos' });
+            setNuevoEvento({ titulo: '', inicio: '', fin: '', categoria: 'Operativos', participantes: [user?.institucion].filter(Boolean) });
             setEditandoId(null);
         }
         setMostrarModal(true);
@@ -224,120 +202,76 @@ const Calendario = () => {
 
     const cerrarModal = () => {
         setMostrarModal(false);
-        setNuevoEvento({ titulo: '', inicio: '', fin: '', categoria: 'Operativos' });
+        setNuevoEvento({ titulo: '', inicio: '', fin: '', categoria: 'Operativos', participantes: [] });
         setEditandoId(null);
     };
 
-    const guardarEvento = (e) => {
+    const guardarEvento = async (e) => {
         e.preventDefault();
-        if (!nuevoEvento.titulo || !nuevoEvento.inicio || !nuevoEvento.fin) return;
+        const duration = (h1, m1, h2, m2) => (h2*60+m2) - (h1*60+m1);
+        const [h1, m1] = nuevoEvento.inicio.split(':').map(Number);
+        const [h2, m2] = nuevoEvento.fin.split(':').map(Number);
         
-        // Validar duración máxima de 60 minutos
-        const [hIni, mIni] = nuevoEvento.inicio.split(':').map(Number);
-        const [hFin, mFin] = nuevoEvento.fin.split(':').map(Number);
-        const totalMinsIni = hIni * 60 + mIni;
-        const totalMinsFin = hFin * 60 + mFin;
-        const duracion = totalMinsFin - totalMinsIni;
-
-        if (hIni > 23 || hFin > 23 || mIni > 59 || mFin > 59) {
-            showToast('Formato de hora inválido (Minutos máximos: 59)', 'error');
+        if (duration(h1, m1, h2, m2) <= 0) {
+            showToast('Intervalo de tiempo inválido', 'error');
             return;
         }
 
-        if (duracion < 0) {
-            showToast('La hora de fin debe ser posterior a la de inicio', 'warning');
-            return;
-        }
-        
-        if (editandoId) {
-            setEventos(prev => prev.map(ev => 
-                ev.id === editandoId 
-                    ? { ...ev, ...nuevoEvento } 
-                    : ev
-            ));
-            showToast(`Evento "${nuevoEvento.titulo}" actualizado`, 'success');
-        } else {
-            const eventoFinal = {
+        try {
+            const dataToSave = {
                 ...nuevoEvento,
-                id: Date.now(),
-                fecha: diaSeleccionado
+                fecha: diaSeleccionado,
+                creadorId: user.id,
+                creadorNombre: user.nombre,
+                institucion: user.institucion,
+                actualizadoEn: new Date().toISOString()
             };
-            setEventos([...eventos, eventoFinal]);
-            showToast(`Evento "${eventoFinal.titulo}" agregado al ${diaSeleccionado}`, 'success');
 
-            // ── Lógica de Notificaciones Externas ──
-            const correoUsuario = user?.usuario || '';
-            const { VITE_EMAILJS_SERVICE_ID, VITE_EMAILJS_TEMPLATE_ID, VITE_MAKE_WEBHOOK_URL } = import.meta.env;
-
-            if (correoUsuario) {
-                // 1. EmailJS (Confirmación)
-                if (VITE_EMAILJS_SERVICE_ID && VITE_EMAILJS_TEMPLATE_ID) {
-                    const templateParams = {
-                        correo_usuario: correoUsuario,
-                        nombre_usuario: user?.nombre || 'Usuario',
-                        titulo:    eventoFinal.titulo,
-                        fecha:     eventoFinal.fecha,
-                        inicio:    eventoFinal.inicio,
-                        fin:       eventoFinal.fin,
-                        categoria: eventoFinal.categoria,
-                    };
-
-                    emailjs.send(VITE_EMAILJS_SERVICE_ID, VITE_EMAILJS_TEMPLATE_ID, templateParams)
-                        .then(() => showToast(`📧 Confirmación enviada a ${correoUsuario}`, 'info'))
-                        .catch(err => console.error('EmailJS error:', err));
-                }
-
-                // 2. Make Webhook (Recordatorios)
-                if (VITE_MAKE_WEBHOOK_URL && VITE_MAKE_WEBHOOK_URL !== 'undefined') {
-                    fetch(VITE_MAKE_WEBHOOK_URL, {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({
-                            titulo:          eventoFinal.titulo,
-                            fecha:           eventoFinal.fecha,
-                            inicio:          eventoFinal.inicio,
-                            fin:             eventoFinal.fin,
-                            categoria:       eventoFinal.categoria,
-                            correo_usuario:  correoUsuario,
-                            nombre_usuario:  user?.nombre || 'Usuario',
-                        }),
-                    }).catch(err => console.error('Make webhook error:', err));
-                }
+            if (editandoId) {
+                // UPDATE (Simulado con POST/DELETE en json-server si no hay patch mapeado o simplemente recreate)
+                // Por ahora asumimos que dashboardService.createEvento maneja el re-guardado si le pasamos ID
+                // En un json-server real usaríamos PATCH. Agreguemos PATCH a dashboardService después.
+                showToast('Funcionalidad de edición persistente en desarrollo', 'info');
+                // TODO: Implement DASHBOARDSERVICE.PATCH
+            } else {
+                await dashboardService.createEvento(dataToSave);
+                showToast(`Evento "${nuevoEvento.titulo}" guardado exitosamente`, 'success');
             }
-        }
-        
-        cerrarModal();
-    };
-
-    const eliminarEvento = (id) => {
-        setEventos(eventos.filter(e => e.id !== id));
-        showToast('Evento eliminado correctamente', 'info');
-        if (editandoId === id) cerrarModal();
-    };
-
-    const getEventosDia = (dia, fueraMes) => {
-        if (fueraMes) return [];
-        const fechaString = `${anio}-${String(mes + 1).padStart(2, '0')}-${String(dia).padStart(2, '0')}`;
-        return eventos.filter(e => e.fecha === fechaString);
-    };
-
-    const getColorCategoria = (cat) => {
-        switch (cat) {
-            case 'Operativos': return '#ef4444';
-            case 'Reuniones': return '#3b82f6';
-            case 'Seguimiento de Matriz': return '#22c55e';
-            default: return '#64748b';
+            loadEventos();
+            cerrarModal();
+        } catch (error) {
+            showToast('Error al guardar el evento', 'error');
         }
     };
 
+    const eliminarEvento = async (id) => {
+        try {
+            await dashboardService.deleteEvento(id);
+            showToast('Evento eliminado', 'info');
+            loadEventos();
+            cerrarModal();
+        } catch (error) {
+            showToast('Error al eliminar', 'error');
+        }
+    };
 
+    const handleToggleParticipante = (inst) => {
+        setNuevoEvento(prev => ({
+            ...prev,
+            participantes: prev.participantes.includes(inst)
+                ? prev.participantes.filter(p => p !== inst)
+                : [...prev.participantes, inst]
+        }));
+    };
+
+    if (loading && originalEventos.length === 0) return <div className="calendario-loading">Sincronizando calendario interinstitucional...</div>;
 
     return (
         <div className="calendario-container">
             <div className="calendario-header">
                 <div className="calendario-info">
                     <h1>{nombresMeses[mes]} <span>{anio}</span></h1>
-                    <p>Gestión cronológica de actividades y tareas interinstitucionales.</p>
+                    <p>Calendario unificado Sembremos Seguridad — {user?.rol?.toUpperCase()}</p>
                 </div>
                 <div className="calendario-nav">
                     <button onClick={() => cambiarMes(-1)} className="nav-btn"><ChevronLeft size={20} /></button>
@@ -346,59 +280,19 @@ const Calendario = () => {
                 </div>
             </div>
 
-            {/* ── Banner de Alerta Persistente ── */}
-            {alertaInminente && (
-                <div className={`alerta-banner ${alertaInminente.minutosRestantes <= 5 ? 'alerta-banner--urgente' : ''}`}
-                     onClick={() => abrirModal(null, false, alertaInminente)}
-                     style={{ cursor: 'pointer' }}
-                     title="Clic para editar"
-                >
-                    <div className="alerta-banner__icon">
-                        {alertaInminente.minutosRestantes <= 5 ? '🚨' : '⏰'}
-                    </div>
-                    <div className="alerta-banner__content">
-                        <strong>{alertaInminente.titulo}</strong>
-                        <span>Inicia en <b>{alertaInminente.minutosRestantes} min</b> — {alertaInminente.inicio}</span>
-                    </div>
-                    <div className="alerta-banner__categoria" style={{ backgroundColor: getColorCategoria(alertaInminente.categoria) }}>
-                        {alertaInminente.categoria}
-                    </div>
-                </div>
-            )}
-
-
-
             <div className="calendario-grid">
-                {diasSemana.map(d => (
-                    <div key={d} className="grid-weekday">{d}</div>
-                ))}
+                {diasSemana.map(d => <div key={d} className="grid-weekday">{d}</div>)}
                 {todosLosDias.map((item, idx) => {
-                    const eventosDia = getEventosDia(item.dia, item.fueraMes);
-                    
-                    const hoy = new Date();
-                    hoy.setHours(0, 0, 0, 0);
-                    const fechaEvaluada = new Date(anio, mes, item.dia);
-                    const esPasado = !item.fueraMes && fechaEvaluada < hoy;
-                    
+                    const str = `${anio}-${String(mes + 1).padStart(2, '0')}-${String(item.dia).padStart(2, '0')}`;
+                    const eventosDia = item.fueraMes ? [] : eventos.filter(e => e.fecha === str);
+                    const esHoy = !item.fueraMes && new Date().toDateString() === new Date(anio, mes, item.dia).toDateString();
+
                     return (
-                        <div 
-                            key={idx} 
-                            className={`grid-day ${item.fueraMes || esPasado ? 'fuera-mes' : ''}`}
-                            onClick={() => abrirModal(item.dia, item.fueraMes || esPasado)}
-                        >
+                        <div key={idx} className={`grid-day ${item.fueraMes ? 'fuera-mes' : ''} ${esHoy ? 'es-hoy' : ''}`} onClick={() => abrirModal(item.dia, item.fueraMes)}>
                             <span className="day-number">{item.dia}</span>
                             <div className="day-events">
                                 {eventosDia.map(ev => (
-                                    <div 
-                                        key={ev.id} 
-                                        className="event-pill" 
-                                        style={{ backgroundColor: getColorCategoria(ev.categoria) }}
-                                        title={`${ev.inicio} - ${ev.titulo} (Clic para editar)`}
-                                        onClick={(e) => {
-                                            e.stopPropagation();
-                                            abrirModal(null, false, ev);
-                                        }}
-                                    >
+                                    <div key={ev.id} className="event-pill" style={{ backgroundColor: CATEGORIAS[ev.categoria] }} onClick={(e) => { e.stopPropagation(); abrirModal(null, false, ev); }}>
                                         <span className="event-time">{ev.inicio}</span>
                                         <span className="event-title">{ev.titulo}</span>
                                     </div>
@@ -413,65 +307,49 @@ const Calendario = () => {
                 <div className="calendar-modal-overlay">
                     <div className="calendar-modal">
                         <div className="modal-header">
-                            <h2>{editandoId ? 'Editar Evento' : 'Nuevo Evento'}</h2>
-                            <p>Fecha: {diaSeleccionado}</p>
+                            <h2>{editandoId ? 'Detalles del Evento' : 'Nueva Actividad'}</h2>
+                            <p>Asignado para: {diaSeleccionado}</p>
                         </div>
                         <form onSubmit={guardarEvento}>
-                            <div className="form-group">
-                                <label>Título del Evento</label>
-                                <input 
-                                    type="text" 
-                                    required 
-                                    placeholder="Ej: Intervención Comunitaria"
-                                    value={nuevoEvento.titulo}
-                                    onChange={e => setNuevoEvento({...nuevoEvento, titulo: e.target.value})}
-                                />
-                            </div>
                             <div className="form-row">
-                                <div className="form-group">
-                                    <label><Clock size={14} /> Inicio</label>
-                                    <input 
-                                        type="time" 
-                                        required 
-                                        value={nuevoEvento.inicio}
-                                        onChange={e => setNuevoEvento({...nuevoEvento, inicio: e.target.value})}
-                                    />
+                                <div className="form-group" style={{ flex: 2 }}>
+                                    <label>Descripción de la Actividad</label>
+                                    <input type="text" required value={nuevoEvento.titulo} onChange={e => setNuevoEvento({...nuevoEvento, titulo: e.target.value})} placeholder="Ej: Operativo en Barra del Colorado" />
                                 </div>
-                                <div className="form-group">
-                                    <label><Clock size={14} /> Fin</label>
-                                    <input 
-                                        type="time" 
-                                        required 
-                                        value={nuevoEvento.fin}
-                                        onChange={e => setNuevoEvento({...nuevoEvento, fin: e.target.value})}
-                                    />
+                                <div className="form-group" style={{ flex: 1 }}>
+                                    <label>Categoría</label>
+                                    <select value={nuevoEvento.categoria} onChange={e => setNuevoEvento({...nuevoEvento, categoria: e.target.value})}>
+                                        {Object.keys(CATEGORIAS).map(c => <option key={c} value={c}>{c}</option>)}
+                                    </select>
                                 </div>
                             </div>
+                            
+                            <div className="form-row">
+                                <div className="form-group"><label>Inicio</label><input type="time" required value={nuevoEvento.inicio} onChange={e => setNuevoEvento({...nuevoEvento, inicio: e.target.value})} /></div>
+                                <div className="form-group"><label>Fin</label><input type="time" required value={nuevoEvento.fin} onChange={e => setNuevoEvento({...nuevoEvento, fin: e.target.value})} /></div>
+                                <div className="form-group" style={{ flex: 2 }}>
+                                    <label>Fecha Seleccionada</label>
+                                    <input type="text" disabled value={diaSeleccionado} style={{ background: '#f8fafc', color: '#64748b' }} />
+                                </div>
+                            </div>
+                            
                             <div className="form-group">
-                                <label><Tag size={14} /> Categoría</label>
-                                <select 
-                                    value={nuevoEvento.categoria}
-                                    onChange={e => setNuevoEvento({...nuevoEvento, categoria: e.target.value})}
-                                >
-                                    <option value="Operativos">Operativos (Rojo)</option>
-                                    <option value="Reuniones">Reuniones (Azul)</option>
-                                    <option value="Seguimiento de Matriz">Seguimiento de Matriz (Verde)</option>
-                                </select>
+                                <label><Users size={14} /> Instituciones Involucradas</label>
+                                <div className="participantes-grid">
+                                    {INSTITUCIONES.map(inst => (
+                                        <button key={inst} type="button" 
+                                            className={`participante-btn ${nuevoEvento.participantes.includes(inst) ? 'active' : ''}`}
+                                            onClick={() => handleToggleParticipante(inst)}>
+                                            {inst}
+                                        </button>
+                                    ))}
+                                </div>
                             </div>
+
                             <div className="modal-actions">
                                 <button type="button" className="btn-cancel" onClick={cerrarModal}>Cerrar</button>
-                                {editandoId && (
-                                    <button 
-                                        type="button" 
-                                        className="btn-delete" 
-                                        onClick={() => eliminarEvento(editandoId)}
-                                    >
-                                        <Trash2 size={16} /> Eliminar
-                                    </button>
-                                )}
-                                <button type="submit" className="btn-save">
-                                    {editandoId ? 'Guardar Cambios' : 'Guardar Evento'}
-                                </button>
+                                {editandoId && <button type="button" className="btn-delete" onClick={() => eliminarEvento(editandoId)}><Trash2 size={16} /> Eliminar</button>}
+                                <button type="submit" className="btn-save">{editandoId ? 'Actualizar' : 'Guardar en Agenda'}</button>
                             </div>
                         </form>
                     </div>
