@@ -15,7 +15,7 @@
   --mr-radius-sm: 12px;
 
   font-family: 'Inter', system-ui, sans-serif;
-  background: var(--inst-light-bg, #f0f4f8);
+  background: transparent;
   padding: 2.5rem;
   display: flex;
   flex-direction: column;
@@ -65,14 +65,15 @@
 .mapa-riesgos__title-block h1 {
   font-size: 1.5rem;
   font-weight: 800;
-  color: var(--inst-text-dark, #0f172a);
+  color: #ffffff;
   margin: 0;
   letter-spacing: -0.02em;
+  text-shadow: 0 2px 4px rgba(0,0,0,0.2);
 }
 
 .mapa-riesgos__title-block p {
   font-size: 0.8rem;
-  color: var(--inst-text-muted, #64748b);
+  color: rgba(255, 255, 255, 0.7);
   margin: 3px 0 0;
   font-weight: 500;
 }
@@ -91,8 +92,10 @@
   padding: 0.65rem 1.25rem;
   border-radius: var(--mr-radius-sm);
   border: 1px solid var(--mr-border);
-  background: var(--mr-white);
-  box-shadow: 0 4px 16px rgba(0,0,0,0.04);
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  backdrop-filter: blur(8px);
+  box-shadow: 0 4px 16px rgba(0,0,0,0.1);
   min-width: 80px;
   transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
@@ -112,14 +115,14 @@
 .mapa-kpi__lbl {
   font-size: 0.7rem;
   font-weight: 600;
-  color: var(--inst-text-muted, #64748b);
+  color: rgba(255, 255, 255, 0.6);
   text-transform: uppercase;
   letter-spacing: 0.05em;
 }
 
 .mapa-kpi--red   .mapa-kpi__val { color: #ef4444; }
 .mapa-kpi--orange .mapa-kpi__val { color: #f97316; }
-.mapa-kpi--blue  .mapa-kpi__val { color: var(--mr-blue); }
+.mapa-kpi--blue  .mapa-kpi__val { color: #ffffff; }
 .mapa-kpi--red   { border-bottom: 3px solid #ef4444; }
 .mapa-kpi--orange { border-bottom: 3px solid #f97316; }
 .mapa-kpi--blue  { border-bottom: 3px solid var(--mr-blue); }
@@ -140,9 +143,9 @@
   font-weight: 600;
   font-family: inherit;
   cursor: pointer;
-  border: 1.5px solid var(--mr-border);
-  background: var(--mr-white);
-  color: var(--inst-text-muted, #64748b);
+  border: 1.5px solid rgba(255,255,255,0.15);
+  background: rgba(255, 255, 255, 0.05);
+  color: rgba(255, 255, 255, 0.7);
   transition: all 0.22s cubic-bezier(0.34, 1.56, 0.64, 1);
   letter-spacing: 0.01em;
 }
@@ -259,13 +262,14 @@
   position: absolute;
   pointer-events: none;
   z-index: 100;
-  background: var(--mr-white);
-  border: 1px solid var(--mr-border);
+  background: rgba(11, 34, 64, 0.85);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.15);
   border-radius: 14px;
   padding: 0.9rem 1rem;
   min-width: 210px;
   max-width: 240px;
-  box-shadow: 0 20px 50px rgba(0,47,108,0.15), 0 4px 16px rgba(0,0,0,0.08);
+  box-shadow: 0 20px 50px rgba(0,0,0,0.3);
   animation: tooltipIn 0.18s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
@@ -293,7 +297,7 @@
 .mapa-tooltip__header strong {
   font-size: 0.92rem;
   font-weight: 700;
-  color: #0f172a;
+  color: #ffffff;
   flex: 1;
 }
 
@@ -308,7 +312,7 @@
 
 .mapa-tooltip__desc {
   font-size: 0.75rem;
-  color: #64748b;
+  color: rgba(255, 255, 255, 0.6);
   margin: 0 0 0.65rem;
   line-height: 1.4;
 }
@@ -324,7 +328,7 @@
   align-items: center;
   gap: 6px;
   font-size: 0.8rem;
-  color: #374151;
+  color: rgba(255, 255, 255, 0.85);
   font-weight: 500;
 }
 
@@ -340,15 +344,15 @@
   position: absolute;
   bottom: 16px;
   right: 16px;
-  background: rgba(255,255,255,0.92);
+  background: rgba(11, 34, 64, 0.7);
   backdrop-filter: blur(8px);
-  border: 1px solid var(--mr-border);
+  border: 1px solid rgba(255,255,255,0.1);
   border-radius: 10px;
   padding: 0.6rem 0.85rem;
   display: flex;
   flex-direction: column;
   gap: 0.35rem;
-  box-shadow: 0 4px 20px rgba(0,47,108,0.08);
+  box-shadow: 0 4px 20px rgba(0,0,0,0.2);
 }
 
 .mapa-leyenda__item {
@@ -357,7 +361,7 @@
   gap: 7px;
   font-size: 0.72rem;
   font-weight: 600;
-  color: #374151;
+  color: #ffffff;
 }
 
 .mapa-leyenda__dot {
@@ -371,10 +375,10 @@
    Panel lateral
    ════════════════════════════════ */
 .mapa-riesgos__panel {
-  background: var(--mr-white);
-  border: 1px solid var(--mr-border);
-  border-radius: var(--mr-radius);
-  box-shadow: var(--mr-shadow);
+  background: rgba(11, 34, 64, 0.4);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 30px 60px rgba(0, 0, 0, 0.2);
   display: flex;
   flex-direction: column;
   overflow: hidden;
@@ -391,7 +395,7 @@
 .panel-header h3 {
   font-size: 0.95rem;
   font-weight: 700;
-  color: #0f172a;
+  color: #ffffff;
   margin: 0;
 }
 
@@ -425,7 +429,7 @@
 }
 
 .panel-item:hover {
-  background: #f8fafc;
+  background: rgba(255,255,255,0.08);
 }
 
 .panel-item--selected {
@@ -452,7 +456,7 @@
 .panel-item__name {
   font-size: 0.85rem;
   font-weight: 700;
-  color: #1e293b;
+  color: #ffffff;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -507,11 +511,12 @@
   position: relative;
   z-index: 10;
   margin-top: 1.5rem;
-  border: 2px solid;
+  background: rgba(11, 34, 64, 0.6);
+  backdrop-filter: blur(25px);
+  border: 1px solid rgba(255, 255, 255, 0.15);
   border-radius: var(--mr-radius-sm);
   padding: 1.5rem;
-  background: var(--mr-white);
-  box-shadow: 0 15px 40px rgba(0, 47, 108, 0.1);
+  box-shadow: 0 15px 40px rgba(0, 0, 0, 0.3);
   animation: detailIn 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
@@ -529,7 +534,7 @@
 
 .panel-detalle__desc {
   font-size: 0.85rem;
-  color: #64748b;
+  color: rgba(255, 255, 255, 0.7);
   margin: 0 0 1rem;
   line-height: 1.5;
 }
@@ -545,8 +550,8 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  background: #f8fafc;
-  border: 1px solid #e2e8f0;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
   border-radius: 12px;
   padding: 0.75rem 0.5rem;
   transition: transform 0.2s ease;
@@ -562,7 +567,7 @@
 .panel-detalle__val {
   font-size: 1.5rem;
   font-weight: 800;
-  color: var(--mr-blue);
+  color: #ffffff;
   line-height: 1;
 }
 
@@ -579,10 +584,10 @@
   width: auto;
   min-width: 140px;
   padding: 0.65rem 1.25rem;
-  border: 1.5px solid #e2e8f0;
+  border: 1.5px solid rgba(255, 255, 255, 0.15);
   border-radius: 10px;
-  background: #fff;
-  color: #64748b;
+  background: rgba(255, 255, 255, 0.1);
+  color: #ffffff;
   font-size: 0.85rem;
   font-weight: 600;
   font-family: inherit;

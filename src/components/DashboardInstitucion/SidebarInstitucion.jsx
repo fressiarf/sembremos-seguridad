@@ -2,7 +2,7 @@ import React from 'react';
 import '../Dashboard/SidebarAdmin/SidebarAdmin.css';
 import { useLogin } from '../../context/LoginContext';
 import UserBrand from '../Shared/Navegacion/UserBrand';
-import { ChevronLeft, LayoutDashboard, FileText, Send, LogOut, Building2 } from 'lucide-react';
+import { ChevronLeft, LayoutDashboard, FileText, Send, LogOut, Building2, MessageCircle } from 'lucide-react';
 
 const SidebarInstitucion = ({ collapsed = false, onToggle, activeView, onViewChange }) => {
   const { logout, user } = useLogin();
@@ -12,6 +12,7 @@ const SidebarInstitucion = ({ collapsed = false, onToggle, activeView, onViewCha
     { id: 'dashboard', label: 'Panel Institucional', icon: LayoutDashboard },
     { id: 'lineas', label: 'Mis Líneas de Acción', icon: FileText },
     { id: 'reportes', label: 'Historial de Reportes', icon: Send },
+    { id: 'alertas', label: 'Soporte y Comentarios', icon: MessageCircle },
   ];
 
   return (

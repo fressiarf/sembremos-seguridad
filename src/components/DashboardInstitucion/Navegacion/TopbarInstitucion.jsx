@@ -34,6 +34,7 @@ const TopbarInstitucion = ({ usuario, seccion, subtitulo, rol }) => {
             <span className="UsuarioZona">{usuario?.zona}</span>
           </div>
         </div>
+        {children}
       </div>
     </header>
   );
