@@ -523,14 +523,13 @@ const MapaRiesgos = () => {
           {selectedCanton && (
             <div className="panel-detalle"
               style={{ borderColor: NIVEL_CONFIG[selectedCanton.nivel].color }}>
-              <div className="panel-detalle__title"
-                style={{ color: NIVEL_CONFIG[selectedCanton.nivel].dark }}>
+              <div className="panel-detalle__title">
                 {selectedCanton.nombre}
               </div>
               <p className="panel-detalle__desc">{selectedCanton.descripcion}</p>
               <div className="panel-detalle__grid">
                 <div className="panel-detalle__cell">
-                  <span className="panel-detalle__val" style={{ color: NIVEL_CONFIG[selectedCanton.nivel].color }}>
+                  <span className="panel-detalle__val">
                     {selectedCanton.incidentes}
                   </span>
                   <span className="panel-detalle__key">Incidentes</span>
@@ -571,15 +570,16 @@ const MapaRiesgos = () => {
                   onClick={() => handleCantonClick(c)}
                 >
                   <div className="panel-item__rank"
-                    style={{ background: i < 3 ? cfg.light : '#f8fafc',
-                             color: i < 3 ? cfg.dark : '#64748b' }}>
+                      style={{ background: `${cfg.color}33`,
+                               color: '#fff',
+                               border: `1px solid ${cfg.color}66` }}>
                     {i + 1}
                   </div>
                   <div className="panel-item__info">
                     <div className="panel-item__name">{c.nombre}</div>
                     <div className="panel-item__meta">
                       <span className="nivel-badge"
-                        style={{ background: cfg.light, color: cfg.dark }}>
+                        style={{ background: `${cfg.color}22`, color: cfg.color, border: `1px solid ${cfg.color}44` }}>
                         {cfg.label}
                       </span>
                       <TrendIcon t={c.tendencia} />

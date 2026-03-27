@@ -169,15 +169,15 @@ export const dashboardService = {
    */
   getStats: async () => {
     try {
-      const [tareas, zonas, alertas] = await Promise.all([
+      const [tareas, zonas, comentarios] = await Promise.all([
         fetch(`${BASE_URL}/tareas`).then(r => r.json()),
         fetch(`${BASE_URL}/zonas`).then(r => r.json()),
-        fetch(`${BASE_URL}/alertas`).then(r => r.json())
+        fetch(`${BASE_URL}/comentariosSoporte`).then(r => r.json())
       ]);
       return {
         activitiesCount: tareas.length,
         zonesCount: zonas.length,
-        alertsCount: alertas.length
+        alertsCount: comentarios.filter(c => c.estado === 'pendiente').length
       };
     } catch (error) {
       console.error('Error in getStats:', error);
