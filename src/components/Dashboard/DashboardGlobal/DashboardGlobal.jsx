@@ -79,25 +79,34 @@ const RiskRadar = () => {
   return <ReactECharts option={option} style={{ height: '300px', width: '100%' }} />;
 };
 
-const DashboardGlobal = ({ collapsed }) => {
+const DashboardGlobal = ({ collapsed, onViewChange }) => {
   const [expandedRow, setExpandedRow] = useState(null);
   const [presupuesto, setPresupuesto] = useState({ ejecutado: 0, asignado: 50000000 });
+  const [lineasDeAccion, setLineasDeAccion] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const fetchPresupuesto = async () => {
+    const fetchData = async () => {
       try {
         const dashData = await dashboardService.getFullDashboardData();
-        if (dashData && dashData.stats) {
-          setPresupuesto({
-            ejecutado: dashData.stats.inversionTotal || 0,
-            asignado: dashData.stats.presupuestoAsignado || 50000000
-          });
+        if (dashData) {
+          if (dashData.stats) {
+            setPresupuesto({
+              ejecutado: dashData.stats.inversionTotal || 0,
+              asignado: dashData.stats.presupuestoAsignado || 50000000
+            });
+          }
+          if (dashData.lineas) {
+            setLineasDeAccion(dashData.lineas);
+          }
         }
       } catch (e) {
-        console.error("Error al obtener presupuesto", e);
+        console.error("Error al obtener datos del dashboard", e);
+      } finally {
+        setLoading(false);
       }
     };
-    fetchPresupuesto();
+    fetchData();
   }, []);
 
   const handleExportExcel = () => {
@@ -109,49 +118,10 @@ const DashboardGlobal = ({ collapsed }) => {
       { label: 'Progreso %', key: 'progreso' }
     ];
 
-    // Flatten responsables array for CSV
-    const exportData = lineasDeAccion.map(l => ({
-      ...l,
-      responsables: l.responsables.join(' | ')
-    }));
+      responsables: Array.isArray(l.responsables) && l.responsables.length > 0 ? l.responsables.join(' | ') : (l.institucionLider || 'No asignado')
 
     exportToCSV(exportData, `Indicadores_SembremosSeguridad_${new Date().toLocaleDateString()}`, columns);
   };
-
-  const lineasDeAccion = [
-    {
-      id: 1,
-      titulo: 'Consumo de drogas',
-      problematica: 'Incremento en el consumo de sustancias psicoactivas en centros educativos y parques.',
-      indicador: 'Reducción del 15% en reportes de consumo en zonas intervenidas.',
-      responsables: ['Ministerio de Salud', 'IAFA', 'Fuerza Pública'],
-      progreso: 65,
-    },
-    {
-      id: 2,
-      titulo: 'Venta de drogas',
-      problematica: 'Proliferación de focos de comercialización (búnkeres) en barrios residenciales.',
-      indicador: 'Aumento en un 20% de incautaciones y desarticulación de puntos de venta.',
-      responsables: ['O.I.J.', 'Fuerza Pública', 'Ministerio Público'],
-      progreso: 40,
-    },
-    {
-      id: 3,
-      titulo: 'Personas en situación de calle',
-      problematica: 'Alta concentración de personas sin hogar con problemas de salud mental y adicciones en el casco urbano.',
-      indicador: 'Número de personas reubicadas en albergues o insertadas en programas de atención institucional.',
-      responsables: ['PANI', 'IMAS', 'Municipalidad', 'Cruz Roja'],
-      progreso: 30,
-    },
-    {
-      id: 4,
-      titulo: 'Falta de inversión social',
-      problematica: 'Baja presencia de programas deportivos, culturales y educativos de prevención en comunidades vulnerables.',
-      indicador: 'Número de proyectos de infraestructura social y programas recreativos ejecutados.',
-      responsables: ['ICODER', 'Ministerio de Cultura', 'IMAS', 'DINADECO'],
-      progreso: 15,
-    }
-  ];
 
   const impactosDistrito = [
     { nombre: 'Barranca', impacto: 85, color: '#ef4444', casos: 124, tendencia: 'up' },
@@ -165,6 +135,9 @@ const DashboardGlobal = ({ collapsed }) => {
     { id: 2, nombre: 'Barrio El Carmen', riesgo: 'Medio', hallazgo: 'Falta alumbrado' },
     { id: 3, nombre: 'Calle Lucrecia', riesgo: 'Crítico', hallazgo: 'Búnker detectado' }
   ];
+
+  // Solo mostramos las primeras 4 líneas en el dashboard principal
+  const top4Lineas = lineasDeAccion.slice(0, 4);
 
   return (
     <div className={`dashboard-global ${collapsed ? 'sidebar-collapsed' : ''}`}>
@@ -242,16 +215,39 @@ const DashboardGlobal = ({ collapsed }) => {
             
             {/* Cuadro 1: Avance Estratégico (Líneas de Acción con Despliegue) */}
             <section className="dashboard-card-v4">
-              <div className="card-v4-header">
-                <TrendingUp size={20} className="header-icon" />
-                <h3>Avance Estratégico Cantonal</h3>
+              <div className="card-v4-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <TrendingUp size={20} className="header-icon" />
+                  <h3>Avance Estratégico Cantonal</h3>
+                </div>
+                <button 
+                  onClick={() => onViewChange('lineas-accion')}
+                  style={{
+                    background: '#f1f5f9',
+                    border: '1px solid #e2e8f0',
+                    padding: '4px 10px',
+                    borderRadius: '6px',
+                    fontSize: '0.75rem',
+                    fontWeight: '700',
+                    color: '#002f6c',
+                    cursor: 'pointer',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '4px'
+                  }}
+                >
+                  <LayoutGrid size={12} /> Ver todas
+                </button>
               </div>
               <div className="lineas-cascade-container">
-                {lineasDeAccion.map((linea) => (
-                  <div 
-                    key={linea.id} 
-                    className={`linea-bar-item ${expandedRow === linea.id ? 'is-expanded' : ''}`}
-                  >
+                {loading ? (
+                  <div style={{ padding: '2rem', textAlign: 'center', color: '#64748b' }}>Cargando líneas estratégicas...</div>
+                ) : top4Lineas.length > 0 ? (
+                  top4Lineas.map((linea) => (
+                    <div 
+                      key={linea.id} 
+                      className={`linea-bar-item ${expandedRow === linea.id ? 'is-expanded' : ''}`}
+                    >
                     <div 
                       className="linea-bar-header-click" 
                       onClick={() => setExpandedRow(expandedRow === linea.id ? null : linea.id)}
@@ -287,15 +283,22 @@ const DashboardGlobal = ({ collapsed }) => {
                         <div className="sidebar-detail-block" style={{ marginTop: '1rem' }}>
                           <label style={{ display: 'block', fontSize: '0.6rem', textTransform: 'uppercase', color: '#64748b', fontWeight: '900', marginBottom: '4px' }}>Responsables</label>
                           <div className="sidebar-tags-mini" style={{ display: 'flex', flexWrap: 'wrap', gap: '4px', marginTop: '4px' }}>
-                            {linea.responsables.map((r, i) => (
-                              <span key={i} className="mini-tag" style={{ background: '#eff6ff', color: '#1e3a8a', fontSize: '0.65rem', fontWeight: '700', padding: '2px 8px', borderRadius: '4px', border: '1px solid #dbeafe' }}>{r}</span>
-                            ))}
+                            {Array.isArray(linea.responsables) ? (
+                              linea.responsables.map((r, i) => (
+                                <span key={i} className="mini-tag" style={{ background: '#eff6ff', color: '#1e3a8a', fontSize: '0.65rem', fontWeight: '700', padding: '2px 8px', borderRadius: '4px', border: '1px solid #dbeafe' }}>{r}</span>
+                              ))
+                            ) : (
+                              <span className="mini-tag" style={{ background: '#eff6ff', color: '#1e3a8a', fontSize: '0.65rem', fontWeight: '700', padding: '2px 8px', borderRadius: '4px', border: '1px solid #dbeafe' }}>{linea.institucionLider || 'Sin asignar'}</span>
+                            )}
                           </div>
                         </div>
                       </div>
                     )}
                   </div>
-                ))}
+                  ))
+                ) : (
+                  <div style={{ padding: '2rem', textAlign: 'center', color: '#64748b' }}>No hay líneas de acción registradas.</div>
+                )}
               </div>
             </section>
 

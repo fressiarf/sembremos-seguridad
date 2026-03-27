@@ -7,10 +7,10 @@ import '../AdminInstitucion.css';
 import '../AdminInstitucion.css';
 
 const LINEAS_ACCION_INFO = [
-  { id: 'linea-1', numero: 1, nombre: 'Consumo de drogas' },
-  { id: 'linea-2', numero: 2, nombre: 'Violencia intrafamiliar y de género' },
-  { id: 'linea-3', numero: 3, nombre: 'Personas en sit. de calle' },
-  { id: 'linea-4', numero: 4, nombre: 'Falta de inversión social' },
+  { id: 'LA-001', numero: 1, nombre: 'Revitalización de Espacios Públicos' },
+  { id: 'LA-002', numero: 2, nombre: 'Seguridad e Inteligencia' },
+  { id: 'LA-003', numero: 3, nombre: 'Prevención del Consumo de Drogas' },
+  { id: 'LA-004', numero: 4, nombre: 'Atención a Personas en Calle' },
 ];
 
 const GestionTareas = () => {
@@ -54,7 +54,7 @@ const GestionTareas = () => {
   const loadData = async () => {
     try {
       const [tareasData, responsablesData] = await Promise.all([
-        adminInstitucionService.getTareas(),
+        adminInstitucionService.getTareas({ institucionId: user?.id }),
         adminInstitucionService.getResponsables(),
       ]);
       setTareasRaw(tareasData.filter(t => t.estado !== 'Completado'));
@@ -170,7 +170,7 @@ const GestionTareas = () => {
 
       <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
         {LINEAS_ACCION_INFO.map(linea => {
-          const tareasLinea = tareas.filter(t => t.lineaId === linea.id);
+          const tareasLinea = tareas.filter(t => t.lineaAccionId === linea.id);
           const isExpanded = lineasExpandidas[linea.id];
 
           return (

@@ -51,14 +51,16 @@ const SidebarAdmin = ({ collapsed = false, onToggle, activeView, onViewChange })
     {
       label: 'PRINCIPAL',
       items: [
-        { id: 'dashboard',   label: 'Dashboard global',      icon: LayoutDashboard, path: '/dashboard' },
-        { id: 'actividades', label: 'Actividad oficiales',   icon: Activity,  path: '/actividades', badge: stats.activitiesCount },
+        { id: 'dashboard',   label: 'Resumen Ejecutivo',     icon: LayoutDashboard, path: '/dashboard' },
+        { id: 'lineas-accion', label: 'Líneas de Acción',    icon: LayoutGrid, path: '/lineas-accion' },
+        { id: 'matriz-seguimiento', label: 'Matriz de Seguimiento', icon: FileText, path: '/matriz-seguimiento' },
+        { id: 'reportes-resultados', label: 'Reportes de Resultados', icon: Activity, path: '/reportes-resultados' },
       ],
     },
     {
       label: 'GESTIÓN',
       items: [
-        { id: 'matrices',    label: 'Todas las matrices',    icon: FileText,    path: '/matrices' },
+        { id: 'actividades', label: 'Gestión de Tareas', icon: Activity, path: '/actividades', badge: stats.activitiesCount },
         { id: 'zonas',       label: 'Zonas críticas',        icon: MapPin,      path: '/zonas',    badge: stats.zonesCount },
         { id: 'alertas',     label: 'Soporte y Comentarios',  icon: MessageCircle, path: '/alertas',  badge: stats.alertsCount },
       ],
