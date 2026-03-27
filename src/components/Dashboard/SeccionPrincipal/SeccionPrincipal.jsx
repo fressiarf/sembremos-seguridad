@@ -7,7 +7,7 @@ import GestionUsuarios from '../GestionUsuarios/GestionUsuarios';
 import PerfilUsuario from '../PerfilUsuario/PerfilUsuario';
 import MatrizSeguimiento from '../MatrizSeguimiento/MatrizSeguimiento';
 import DashboardInstitucion from '../../DashboardInstitucion/DashboardInstitucion';
-import MapaRiesgos from '../MapaRiesgos/MapaRiesgos';
+import MapaRiesgos from '../MapaDistribucion/MapaDistribucion';
 import ZonasCriticas from '../ZonasCriticas/ZonasCriticas';
 import { useLogin } from '../../../context/LoginContext';
 import { useToast } from '../../../context/ToastContext';
