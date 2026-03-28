@@ -379,8 +379,14 @@ export const adminInstitucionService = {
   },
 
   getLineasAccion: async () => {
-    await delay(100);
-    return [...LINEAS_ACCION];
+    try {
+      const response = await fetch('http://localhost:5000/lineasAccion');
+      if (!response.ok) throw new Error('Error fetching líneas');
+      return await response.json();
+    } catch (error) {
+      console.error('Error fetching líneas:', error);
+      return [];
+    }
   },
 
   getDashboardData: async (institucionId) => {
@@ -440,11 +446,15 @@ export const adminInstitucionService = {
       const hoy = new Date();
       const urgentes = tareas
         .filter(t => !tareasEnriquecidas.find(te => te.id === t.id)?.isCompletada)
-        .map(t => ({
-          ...t,
-          diasRestantes: Math.ceil((new Date(t.fechaLimite) - hoy) / (1000 * 60 * 60 * 24)),
-        }))
-        .filter(t => t.diasRestantes <= 30 || t.prioridad === 'alta')
+        .map(t => {
+          const dRestantes = t.fechaLimite ? Math.ceil((new Date(t.fechaLimite) - hoy) / (1000 * 60 * 60 * 24)) : NaN;
+          return {
+            ...t,
+            diasRestantes: dRestantes,
+            prioridad: t.prioridad || 'media'
+          };
+        })
+        .filter(t => isNaN(t.diasRestantes) || t.diasRestantes <= 30 || t.prioridad === 'alta')
         .sort((a, b) => a.diasRestantes - b.diasRestantes)
         .slice(0, 5);
 

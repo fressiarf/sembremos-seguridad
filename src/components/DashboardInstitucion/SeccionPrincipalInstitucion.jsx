@@ -2,9 +2,9 @@ import React, { useState, useEffect } from 'react';
 import ListaMisTareas from './MainDashboardInstitucion/ListaMisTareas';
 import HistorialContainer from './Historial/HistorialContainer';
 import PerfilUsuario from '../Dashboard/PerfilUsuario/PerfilUsuario';
-import Calendario from '../Calendario/Calendario';
+import Calendario from '../Shared/Calendario/Calendario';
 import ReportesRechazadosEditor from './MainDashboardInstitucion/ReportesRechazadosEditor';
-import { institucionService } from '../../services/oficialService';
+import { editoresService } from '../../services/editoresService';
 import { useToast } from '../../context/ToastContext';
 import { useLogin } from '../../context/LoginContext';
 import { CheckCircle, Clock, Activity, DollarSign, MessageCircle, Bot, Bell, X } from 'lucide-react';
@@ -50,7 +50,7 @@ const SeccionPrincipalInstitucion = ({ activeView = 'dashboard', collapsed, setC
     if (!user?.id) return;
     try {
       setLoading(true);
-      const data = await institucionService.getFullDashboardData(user.id);
+      const data = await editoresService.getFullDashboardData(user.id);
       if (data) {
         setTareas(data.tareas);
         setEstadisticas(data.estadisticas);
@@ -206,7 +206,7 @@ const SeccionPrincipalInstitucion = ({ activeView = 'dashboard', collapsed, setC
       <TopbarInstitucion 
         usuario={user}
         seccion={getSeccionLabel()}
-        rol={user?.rol === 'editor' ? 'AUDITOR / EDITOR' : 'ENLACE INSTITUCIONAL'}
+        rol={user?.rol === 'adminInstitucion' ? 'COORD. INSTITUCIONAL' : 'EDITOR'}
       >
         <div style={{ display: 'flex', gap: '1rem', alignItems: 'center', marginLeft: '1rem' }}>
           <button 

@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import mockData from '../../db.json';
+
+const API_URL = 'http://localhost:5000/usuarios';
 
 const LoginContext = createContext();
 
@@ -23,7 +24,7 @@ export const LoginProvider = ({ children }) => {
 
   const [user, setUser] = useState(null); // Estado para el usuario logueado
 
-  const validateAll = () => {
+  const validateAll = async () => {
     const newErrors = {
       usuario: '',
       password: ''
@@ -70,7 +71,7 @@ export const LoginProvider = ({ children }) => {
     // 3. Validación de formato general y presencia (Genérica)
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     const isFormatInvalid = !formData.usuario || !emailRegex.test(formData.usuario) || 
-                            !formData.password || formData.password.length < 8;
+                            !formData.password || formData.password.length < 6;
 
     if (isFormatInvalid) {
       newErrors.usuario = genericError;
@@ -79,10 +80,25 @@ export const LoginProvider = ({ children }) => {
       return false;
     }
 
-    // 2. Verificación contra la base de datos
-    const usuarioEncontrado = mockData.usuarios.find(
-      (u) => u.usuario === formData.usuario && u.password === formData.password
-    );
+    // 2. Verificación contra la base de datos (fetch dinámico de la API)
+    let usuarioEncontrado = null;
+    try {
+      const response = await fetch(API_URL);
+      if (!response.ok) throw new Error('Error de red');
+      const usuarios = await response.json();
+      
+      const usuarioNormalized = formData.usuario.toLowerCase().trim();
+      
+      usuarioEncontrado = usuarios.find(
+        (u) => u.usuario.toLowerCase().trim() === usuarioNormalized && u.password === formData.password
+      );
+    } catch (error) {
+      console.error('Error al verificar credenciales:', error);
+      newErrors.usuario = genericError;
+      newErrors.password = genericError;
+      setErrors(newErrors);
+      return false;
+    }
 
     if (!usuarioEncontrado) {
       newErrors.usuario = genericError;

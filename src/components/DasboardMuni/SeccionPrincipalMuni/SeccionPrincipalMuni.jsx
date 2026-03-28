@@ -1,20 +1,33 @@
-import React from 'react';
-import DashboardAdminInst from './Vistas/DashboardAdminInst';
-import GestionTareas from './Vistas/GestionTareas';
-import RevisionReportes from './Vistas/RevisionReportes';
-import HistorialReportes from './Vistas/HistorialReportes';
-import Calendario from '../Shared/Calendario/Calendario';
-import GestionFuncionarios from './Vistas/GestionFuncionarios';
-import PerfilUsuario from '../Dashboard/PerfilUsuario/PerfilUsuario';
-import EstadisticasInstitucion from './Vistas/EstadisticasInstitucion';
-import TopbarInstitucion from '../DashboardInstitucion/Navegacion/TopbarInstitucion';
-import { useLogin } from '../../context/LoginContext';
-import { useState, useEffect, useRef } from 'react';
-import { Bot, Bell, X } from 'lucide-react';
-import ChatBotWindow from '../Shared/ChatBot/ChatBotWindow';
-import NotificacionAdmin from '../Dashboard/NotificacionesAdmin/NotificacionAdmin';
+import React, { useState, useEffect, useRef } from 'react';
+import ResumenComunitario from '../ResumenComunitario/ResumenComunitario';
+import ActividadesPreventivas from '../ActividadesPreventivas/ActividadesPreventivas';
+import LineasAccionMuni from '../LineasAccionMuni/LineasAccionMuni';
+import ReportesComunitarios from '../ReportesComunitarios/ReportesComunitarios';
+import HistorialMuni from '../HistorialMuni/HistorialMuni';
+import EstadisticasMuni from '../EstadisticasMuni/EstadisticasMuni';
+import AccesoRestringido from '../AccesoRestringido/AccesoRestringido';
+import Calendario from '../../Shared/Calendario/Calendario';
+import PerfilUsuario from '../../Dashboard/PerfilUsuario/PerfilUsuario';
+import SoporteInstitucional from '../../Dashboard/SoporteInstitucional/SoporteInstitucional';
+import TopbarInstitucion from '../../DashboardInstitucion/TopbarInstitucion';
+import { useLogin } from '../../../context/LoginContext';
+import { Bot, Bell } from 'lucide-react';
+import ChatBotWindow from '../../Shared/ChatBot/ChatBotWindow';
+import NotificacionAdmin from '../../Dashboard/NotificacionesAdmin/NotificacionAdmin';
 
-const SeccionPrincipalAdminInstitucion = ({ activeView = 'dashboard', collapsed, setCollapsed }) => {
+const VIEW_LABELS = {
+  dashboard: 'Resumen Comunitario',
+  actividades: 'Actividades Preventivas',
+  lineas: 'Líneas de Acción',
+  reportes: 'Reportes Comunitarios',
+  historial: 'Historial de Actividades',
+  alertas: 'Soporte y Comentarios',
+  estadisticas: 'Estadísticas de Impacto',
+  calendario: 'Calendario',
+  perfil: 'Mi Perfil',
+};
+
+const SeccionPrincipalMuni = ({ activeView = 'dashboard', collapsed, setCollapsed, onViewChange }) => {
   const { user } = useLogin();
   const [showTopbarNotifs, setShowTopbarNotifs] = useState(false);
   const [showChatBot, setShowChatBot] = useState(false);
@@ -23,7 +36,6 @@ const SeccionPrincipalAdminInstitucion = ({ activeView = 'dashboard', collapsed,
   const toggleDrawer = () => setShowTopbarNotifs(prev => !prev);
   const toggleChatBot = () => setShowChatBot(prev => !prev);
 
-  // Efecto para manejar la exclusividad y el colapso del sidebar
   useEffect(() => {
     if (showTopbarNotifs) {
       setShowChatBot(false);
@@ -38,65 +50,61 @@ const SeccionPrincipalAdminInstitucion = ({ activeView = 'dashboard', collapsed,
     }
   }, [showChatBot, setCollapsed]);
 
-  const getSeccionLabel = () => {
-    const labels = {
-      dashboard: 'Dashboard',
-      tareas: 'Gestión de Tareas',
-      usuarios: 'Gestión de Funcionarios',
-      reportes: 'Revisión de Reportes',
-      historial: 'Historial de Reportes',
-      calendario: 'Calendario',
-      estadisticas: 'Estadísticas',
-      perfil: 'Mi Perfil',
-    };
-    return labels[activeView] || 'Dashboard';
-  };
-
   const renderView = () => {
     switch (activeView) {
       case 'dashboard':
-        return <DashboardAdminInst />;
-      case 'tareas':
-        return <GestionTareas />;
-      case 'usuarios':
-        return <GestionFuncionarios />;
+        return <ResumenComunitario />;
+      case 'actividades':
+        return <ActividadesPreventivas />;
+      case 'lineas':
+        return <LineasAccionMuni />;
       case 'reportes':
-        return <RevisionReportes />;
+        return <ReportesComunitarios />;
       case 'historial':
-        return <HistorialReportes />;
+        return <HistorialMuni />;
+      case 'estadisticas':
+        return <EstadisticasMuni />;
       case 'calendario':
         return (
           <div style={{ padding: '1rem 2rem' }}>
-             <Calendario />
+            <Calendario />
           </div>
         );
-      case 'estadisticas':
-        return <EstadisticasInstitucion />;
+      case 'alertas':
+        return (
+          <div style={{ padding: '2rem 2.5rem' }}>
+            <SoporteInstitucional />
+          </div>
+        );
       case 'perfil':
         return (
           <div style={{ padding: '2rem 2.5rem' }}>
             <PerfilUsuario />
           </div>
         );
+      // ── Vistas restringidas (Seguridad/Delitos) ──
+      case 'delitos':
+      case 'mapa':
+      case 'zonas':
+      case 'distribucion':
+        return <AccesoRestringido onGoBack={() => onViewChange && onViewChange('dashboard')} />;
       default:
-        return <DashboardAdminInst />;
+        return <ResumenComunitario />;
     }
   };
 
   return (
     <>
       <TopbarInstitucion
-        usuario={user}
-        seccion={getSeccionLabel()}
-        subtitulo="Portal Admin Institución"
-        rol={`ADMIN · ${user?.institucion || 'INSTITUCIÓN'}`}
+        portalTitle={VIEW_LABELS[activeView] || activeView}
+        badgeText="MUNICIPALIDAD"
       >
         <div style={{ display: 'flex', gap: '1rem', alignItems: 'center', marginLeft: '1rem' }}>
-          <button 
+          <button
             onClick={toggleChatBot}
             style={{
-              background: showChatBot ? '#002f6c' : 'transparent', 
-              border: '1px solid #e2e8f0', 
+              background: showChatBot ? '#002f6c' : 'transparent',
+              border: '1px solid #e2e8f0',
               cursor: 'pointer', padding: '8px',
               display: 'flex', alignItems: 'center', justifyContent: 'center',
               borderRadius: '50%', transition: 'all 0.2s',
@@ -107,11 +115,11 @@ const SeccionPrincipalAdminInstitucion = ({ activeView = 'dashboard', collapsed,
           </button>
 
           <div ref={notifRef} style={{ position: 'relative' }}>
-            <button 
+            <button
               onClick={toggleDrawer}
               style={{
-                background: showTopbarNotifs ? '#002f6c' : 'transparent', 
-                border: '1px solid #e2e8f0', 
+                background: showTopbarNotifs ? '#002f6c' : 'transparent',
+                border: '1px solid #e2e8f0',
                 cursor: 'pointer', padding: '8px',
                 display: 'flex', alignItems: 'center', justifyContent: 'center',
                 borderRadius: '50%', transition: 'all 0.2s',
@@ -137,9 +145,10 @@ const SeccionPrincipalAdminInstitucion = ({ activeView = 'dashboard', collapsed,
           <ChatBotWindow onClose={() => setShowChatBot(false)} user={user} />
         </>
       )}
+
       {renderView()}
     </>
   );
 };
 
-export default SeccionPrincipalAdminInstitucion;
+export default SeccionPrincipalMuni;

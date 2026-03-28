@@ -216,15 +216,18 @@ export const dashboardService = {
    */
   getStats: async () => {
     try {
-      const [tareas, zonas, comentarios] = await Promise.all([
-        fetch(`${BASE_URL}/tareas`).then(r => r.json()),
-        fetch(`${BASE_URL}/zonas`).then(r => r.json()),
-        fetch(`${BASE_URL}/comentariosSoporte`).then(r => r.json())
+      const [tareasRes, zonasRes, comentariosRes] = await Promise.all([
+        fetch(`${BASE_URL}/tareas`),
+        fetch(`${BASE_URL}/zonas`),
+        fetch(`${BASE_URL}/comentariosSoporte`).catch(() => null)
       ]);
+      const tareas = tareasRes?.ok ? await tareasRes.json() : [];
+      const zonas = zonasRes?.ok ? await zonasRes.json() : [];
+      const comentarios = comentariosRes?.ok ? await comentariosRes.json() : [];
       return {
         activitiesCount: tareas.length,
         zonesCount: zonas.length,
-        alertsCount: comentarios.filter(c => c.estado === 'pendiente').length
+        alertsCount: Array.isArray(comentarios) ? comentarios.filter(c => c.estado === 'pendiente').length : 0
       };
     } catch (error) {
       console.error('Error in getStats:', error);
@@ -257,6 +260,54 @@ export const dashboardService = {
       return await response.json();
     } catch (error) {
       console.error('Error in postComentarioSoporte:', error);
+      throw error;
+    }
+  },
+
+  /**
+   * Obtiene todos los eventos del calendario
+   */
+  getEventos: async () => {
+    try {
+      const response = await fetch(`${BASE_URL}/eventos`);
+      if (!response.ok) throw new Error('Error fetching eventos');
+      return await response.json();
+    } catch (error) {
+      console.error('Error fetching eventos:', error);
+      return [];
+    }
+  },
+
+  /**
+   * Crea un nuevo evento en el calendario
+   */
+  createEvento: async (eventoData) => {
+    try {
+      const response = await fetch(`${BASE_URL}/eventos`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(eventoData)
+      });
+      if (!response.ok) throw new Error('Error creating evento');
+      return await response.json();
+    } catch (error) {
+      console.error('Error in createEvento:', error);
+      throw error;
+    }
+  },
+
+  /**
+   * Elimina un evento del calendario
+   */
+  deleteEvento: async (eventoId) => {
+    try {
+      const response = await fetch(`${BASE_URL}/eventos/${eventoId}`, {
+        method: 'DELETE'
+      });
+      if (!response.ok) throw new Error('Error deleting evento');
+      return true;
+    } catch (error) {
+      console.error('Error in deleteEvento:', error);
       throw error;
     }
   }

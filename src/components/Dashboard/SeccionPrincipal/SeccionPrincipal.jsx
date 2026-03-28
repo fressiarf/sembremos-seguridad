@@ -10,8 +10,8 @@ import MapaRiesgos from '../MapaDistribucion/MapaDistribucion';
 import ZonasCriticas from '../ZonasCriticas/ZonasCriticas';
 import { useLogin } from '../../../context/LoginContext';
 import { useToast } from '../../../context/ToastContext';
-import { Download, FileText, Bell, MessageSquare, Bot, X, Send, User } from 'lucide-react';
-import Calendario from '../../Calendario/Calendario';
+import { Download, FileText, Bell, Bot } from 'lucide-react';
+import Calendario from '../../Shared/Calendario/Calendario';
 import NotificacionAdmin from '../NotificacionesAdmin/NotificacionAdmin';
 import HistorialReportes from '../../AdminInstitucion/Vistas/HistorialReportes';
 import ChatBotWindow from '../../Shared/ChatBot/ChatBotWindow';
@@ -21,6 +21,15 @@ import EstadisticasGlobal from '../Estadisticas/EstadisticasGlobal';
 import LineasAccionView from '../LineasAccion/LineasAccionView';
 import MatrizSeguimiento from '../LineasAccion/MatrizSeguimiento';
 import ReportesResultados from '../LineasAccion/ReportesResultados';
+import { ROLES } from '../../../constants/roles';
+
+// Helper inline
+const getBadgeText = (rol) => {
+  if (rol === ROLES.SUPER_ADMIN) return 'FUERZA PÚBLICA';
+  if (rol === ROLES.SUB_ADMIN) return 'MUNICIPALIDAD';
+  if (rol === ROLES.ADMIN_INSTITUCION) return 'COORD. INSTITUCIONAL';
+  return 'EDITOR';
+};
 
 // Mapeo de vistas a nombres de sección para el TopbarInstitucion
 const VIEW_LABELS = {
@@ -99,11 +108,17 @@ const SeccionPrincipal = ({ collapsed, setCollapsed, activeView, onViewChange })
     showToast('Generando Ficha de Rendición de Cuentas...', 'info');
   };
 
+  const knownViews = [
+    'dashboard', 'actividades', 'usuarios', 'perfil', 'matriz-seguimiento', 
+    'reportes-resultados', 'lineas-accion', 'mapa', 'zonas', 'calendario', 
+    'reportes', 'historial', 'configuracion', 'alertas', 'estadisticas', 'lineas'
+  ];
+
   return (
     <main className={`main-content ${collapsed ? 'main-content--collapsed' : ''}`}>
       <TopbarInstitucion
         portalTitle={VIEW_LABELS[activeView] || activeView}
-        badgeText={user?.rol === 'institucion' ? 'INSTITUCIÓN' : 'ADMINISTRADOR'}
+        badgeText={getBadgeText(user?.rol)}
       >
         <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
           
@@ -215,8 +230,7 @@ const SeccionPrincipal = ({ collapsed, setCollapsed, activeView, onViewChange })
 
 
       {/* Placeholder para otras vistas no mapeadas */}
-      {!['dashboard', 'actividades', 'usuarios', 'perfil', 'matriz-seguimiento', 'reportes-resultados', 'lineas-accion', 'mapa', 'zonas', 'calendario', 'reportes', 'historial', 'configuracion', 'alertas'].includes(activeView) && (
-      {!['dashboard', 'actividades', 'usuarios', 'perfil', 'matrices', 'mapa', 'zonas', 'calendario', 'reportes', 'historial', 'lineas', 'alertas', 'estadisticas'].includes(activeView) && (
+      {!knownViews.includes(activeView) && (
         <div style={{ padding: '2rem', color: '#7a9cc4' }}>
           <h2>Vista en desarrollo: {activeView}</h2>
           <p>Esta sección se implementará próximamente.</p>

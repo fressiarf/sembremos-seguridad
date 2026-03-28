@@ -113,7 +113,7 @@ const SidebarAdmin = ({ collapsed = false, onToggle, activeView, onViewChange })
         <div className="sidebar-admin__role">
           <span className="sidebar-admin__role-dot" />
           <span className="sidebar-admin__role-label">
-            {user?.rol === 'admin' ? 'Administrador' : 'Oficial'}
+            {user?.rol === 'admin' ? 'Fuerza Pública' : 'Editor'}
           </span>
         </div>
       )}
@@ -195,7 +195,7 @@ const SidebarAdmin = ({ collapsed = false, onToggle, activeView, onViewChange })
                 {user?.rol === 'admin' ? 'Administrador global' : (user?.nombre || "C. Araya")}
               </span>
               <span className="sidebar-admin__profile-role">
-                {user?.rol === 'admin' ? 'Sembremos Seguridad' : 'Oficial Institucional'}
+                {user?.rol === 'admin' ? 'Administrador' : 'Oficial'}
               </span>
             </div>
           )}
