@@ -4,7 +4,7 @@ import { useLogin } from "../../../context/LoginContext";
 import UserBrand from "../../../components/Shared/Navegacion/UserBrand";
 import {
   ChevronLeft, ChevronDown, LayoutDashboard, ClipboardList,
-  FileText, Clock, Calendar, LogOut, BarChart3, MessageCircle
+  FileText, Clock, Calendar, LogOut, BarChart3, MessageCircle, FileBarChart
 } from "lucide-react";
 
 const SidebarMuni = ({ collapsed = false, onToggle, activeView, onViewChange }) => {
@@ -28,6 +28,7 @@ const SidebarMuni = ({ collapsed = false, onToggle, activeView, onViewChange }) 
       label: 'SEGUIMIENTO',
       items: [
         { id: 'reportes',     label: 'Reportes Comunitarios',     icon: FileText },
+        { id: 'consolidado',  label: 'Consolidado Trimestral',     icon: FileBarChart },
         { id: 'historial',    label: 'Historial de Actividades',  icon: Clock },
         { id: 'alertas',      label: 'Soporte y Comentarios',     icon: MessageCircle },
       ],

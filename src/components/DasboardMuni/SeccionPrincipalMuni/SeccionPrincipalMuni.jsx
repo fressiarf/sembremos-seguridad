@@ -6,6 +6,7 @@ import ReportesComunitarios from '../ReportesComunitarios/ReportesComunitarios';
 import HistorialMuni from '../HistorialMuni/HistorialMuni';
 import EstadisticasMuni from '../EstadisticasMuni/EstadisticasMuni';
 import AccesoRestringido from '../AccesoRestringido/AccesoRestringido';
+import ConsolidadoTrimestral from '../ConsolidadoTrimestral/ConsolidadoTrimestral';
 import Calendario from '../../Shared/Calendario/Calendario';
 import PerfilUsuario from '../../Dashboard/PerfilUsuario/PerfilUsuario';
 import SoporteInstitucional from '../../Dashboard/SoporteInstitucional/SoporteInstitucional';
@@ -20,6 +21,7 @@ const VIEW_LABELS = {
   actividades: 'Actividades Preventivas',
   lineas: 'Líneas de Acción',
   reportes: 'Reportes Comunitarios',
+  consolidado: 'Consolidado Trimestral',
   historial: 'Historial de Actividades',
   alertas: 'Soporte y Comentarios',
   estadisticas: 'Estadísticas de Impacto',
@@ -62,6 +64,8 @@ const SeccionPrincipalMuni = ({ activeView = 'dashboard', collapsed, setCollapse
         return <ReportesComunitarios />;
       case 'historial':
         return <HistorialMuni />;
+      case 'consolidado':
+        return <ConsolidadoTrimestral />;
       case 'estadisticas':
         return <EstadisticasMuni />;
       case 'calendario':

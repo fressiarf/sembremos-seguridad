@@ -17,6 +17,7 @@ import HistorialReportes from '../../AdminInstitucion/Vistas/HistorialReportes';
 import ChatBotWindow from '../../Shared/ChatBot/ChatBotWindow';
 import SoporteInstitucional from '../SoporteInstitucional/SoporteInstitucional';
 import EstadisticasGlobal from '../Estadisticas/EstadisticasGlobal';
+import ConsolidadoTrimestral from '../../DasboardMuni/ConsolidadoTrimestral/ConsolidadoTrimestral';
 
 import LineasAccionView from '../LineasAccion/LineasAccionView';
 import MatrizSeguimiento from '../LineasAccion/MatrizSeguimiento';
@@ -42,6 +43,7 @@ const VIEW_LABELS = {
   zonas: 'Zonas Críticas',
   alertas: 'Soporte y Comentarios',
   mapa: 'Mapa de Riesgos',
+  consolidado: 'Consolidado Trimestral',
   estadisticas: 'Estadísticas',
   calendario: 'Calendario de Operaciones',
   reportes: 'Reportes INL/MSP',
@@ -111,7 +113,8 @@ const SeccionPrincipal = ({ collapsed, setCollapsed, activeView, onViewChange })
   const knownViews = [
     'dashboard', 'actividades', 'usuarios', 'perfil', 'matriz-seguimiento', 
     'reportes-resultados', 'lineas-accion', 'mapa', 'zonas', 'calendario', 
-    'reportes', 'historial', 'configuracion', 'alertas', 'estadisticas', 'lineas'
+    'reportes', 'historial', 'configuracion', 'alertas', 'estadisticas', 'lineas',
+    'consolidado'
   ];
 
   return (
@@ -224,6 +227,7 @@ const SeccionPrincipal = ({ collapsed, setCollapsed, activeView, onViewChange })
       {activeView === 'calendario' && <Calendario />}
       {activeView === 'alertas' && <SoporteInstitucional />}
       {activeView === 'estadisticas' && <EstadisticasGlobal />}
+      {activeView === 'consolidado' && <ConsolidadoTrimestral />}
       {(activeView === 'reportes' || activeView === 'historial') && (
         <HistorialReportes isGlobal={true} />
       )}
