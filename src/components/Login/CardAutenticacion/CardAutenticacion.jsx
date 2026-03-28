@@ -23,6 +23,8 @@ const CardAutenticacion = ({ children }) => {
       setTimeout(() => {
         if (user.rol === 'admin') {
           navigate('/dashboard');
+        } else if (user.rol === 'municipalidad') {
+          navigate('/dasboardMuni');
         } else if (user.rol === 'adminInstitucion') {
           navigate('/dashboardAdminInstitucion');
         } else if (user.rol === 'institucion' || user.rol === 'oficial' || user.rol === 'editor') {
