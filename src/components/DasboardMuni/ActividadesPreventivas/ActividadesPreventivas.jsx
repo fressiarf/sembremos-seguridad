@@ -4,8 +4,9 @@ import { useToast } from '../../../context/ToastContext';
 import TooltipMuni from '../TooltipMuni/TooltipMuni';
 import {
   CheckCircle, Clock, Activity, MapPin, Filter, Search,
-  Calendar as CalIcon, DollarSign, ChevronDown, ChevronUp
+  Calendar as CalIcon, DollarSign, ChevronDown, ChevronUp, Plus
 } from 'lucide-react';
+import FormActividadMuni from './FormActividadMuni';
 import './ActividadesPreventivas.css';
 
 const ActividadesPreventivas = () => {
@@ -14,21 +15,34 @@ const ActividadesPreventivas = () => {
   const [filter, setFilter] = useState('Todas');
   const [searchTerm, setSearchTerm] = useState('');
   const [expandedId, setExpandedId] = useState(null);
+  const [isFormOpen, setIsFormOpen] = useState(false);
   const { showToast } = useToast();
 
+  const fetchData = async () => {
+    try {
+      const data = await muniService.getTareasPreventivas();
+      setTareas(data);
+    } catch (e) {
+      showToast('Error al cargar actividades', 'error');
+    } finally {
+      setLoading(false);
+    }
+  };
+
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const data = await muniService.getTareasPreventivas();
-        setTareas(data);
-      } catch (e) {
-        showToast('Error al cargar actividades', 'error');
-      } finally {
-        setLoading(false);
-      }
-    };
     fetchData();
   }, []);
+
+  const handleSaveActividad = async (nuevaTarea) => {
+    try {
+      await muniService.crearActividad(nuevaTarea);
+      showToast('Actividad agregada exitosamente', 'success');
+      setIsFormOpen(false);
+      fetchData(); // Recargar la lista
+    } catch (error) {
+      showToast('Error al agregar actividad', 'error');
+    }
+  };
 
   const formatColones = (amount) => {
     if (!amount || amount === 0) return '₡0';
@@ -81,7 +95,7 @@ const ActividadesPreventivas = () => {
             {f}
           </button>
         ))}
-        
+
         {/* Filtro de Delitos (Oculto/Restringido) */}
         <div style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
           <button
@@ -99,30 +113,42 @@ const ActividadesPreventivas = () => {
           >
             Delitos
           </button>
-          <TooltipMuni 
-            text="La visualización de incidencia delictiva operativa es competencia exclusiva de la Fuerza Pública (Líder Técnico)." 
-            position="top" 
-            maxWidth={260} 
+          <TooltipMuni
+            text="La visualización de incidencia delictiva operativa es competencia exclusiva de la Fuerza Pública (Líder Técnico)."
+            position="top"
+            maxWidth={260}
           />
         </div>
 
-        <div style={{ marginLeft: 'auto', position: 'relative' }}>
-          <Search size={16} style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: '#94a3b8' }} />
-          <input
-            type="text"
-            placeholder="Buscar actividad..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
+        <div style={{ marginLeft: 'auto', display: 'flex', gap: '12px', alignItems: 'center' }}>
+          <div style={{ position: 'relative' }}>
+            <Search size={16} style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: '#94a3b8' }} />
+            <input
+              type="text"
+              placeholder="Buscar actividad..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              style={{
+                padding: '8px 12px 8px 36px',
+                border: '1px solid #e2e8f0',
+                borderRadius: '8px',
+                fontSize: '0.82rem',
+                outline: 'none',
+                width: '180px',
+                fontFamily: 'Inter, sans-serif',
+              }}
+            />
+          </div>
+          <button
+            onClick={() => setIsFormOpen(true)}
             style={{
-              padding: '8px 12px 8px 36px',
-              border: '1px solid #e2e8f0',
-              borderRadius: '8px',
-              fontSize: '0.82rem',
-              outline: 'none',
-              width: '220px',
-              fontFamily: 'Inter, sans-serif',
+              padding: '8px 16px', borderRadius: '8px', border: 'none', background: '#0d9488',
+              color: '#fff', fontSize: '0.82rem', fontWeight: 700, cursor: 'pointer',
+              display: 'flex', alignItems: 'center', gap: '6px', fontFamily: 'Inter, sans-serif'
             }}
-          />
+          >
+            <Plus size={16} /> Nueva Actividad
+          </button>
         </div>
       </div>
 
@@ -213,6 +239,13 @@ const ActividadesPreventivas = () => {
           );
         })
       )}
+
+      {/* Modal para agregar actividad */}
+      <FormActividadMuni
+        isOpen={isFormOpen}
+        onClose={() => setIsFormOpen(false)}
+        onSave={handleSaveActividad}
+      />
     </div>
   );
 };

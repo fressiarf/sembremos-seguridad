@@ -1,12 +1,12 @@
 const BASE_URL = 'http://localhost:5000';
 
-export const institucionService = {
+export const editoresService = {
   /**
    * Obtiene las líneas de acción que tienen tareas asignadas a la institución
    */
   getLineasDeInstitucion: async (institucionId) => {
     try {
-      const tareas = await institucionService.getTareasDeInstitucion(institucionId);
+      const tareas = await editoresService.getTareasDeInstitucion(institucionId);
       const lineaIds = [...new Set(tareas.map(t => t.lineaAccionId))];
       const resLineas = await fetch(`${BASE_URL}/lineasAccion`);
       const allLineas = await resLineas.json();
@@ -138,7 +138,7 @@ export const institucionService = {
    */
   getEstadisticas: async (institucionId) => {
     try {
-      const tareas = await institucionService.getTareasDeInstitucion(institucionId);
+      const tareas = await editoresService.getTareasDeInstitucion(institucionId);
       const completadas = tareas.filter(t => t.completada);
       const pendientes = tareas.filter(t => !t.completada);
       const inversionTotal = completadas.reduce((sum, t) => sum + (t.inversionColones || 0), 0);
@@ -163,7 +163,7 @@ export const institucionService = {
   getFullDashboardData: async (institucionId) => {
     try {
       const [tareas, reportesRes] = await Promise.all([
-        institucionService.getTareasDeInstitucion(institucionId),
+        editoresService.getTareasDeInstitucion(institucionId),
         fetch(`${BASE_URL}/reportes`)
       ]);
       const reportes = await reportesRes.json();
