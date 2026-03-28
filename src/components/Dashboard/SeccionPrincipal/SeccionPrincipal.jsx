@@ -11,7 +11,7 @@ import ZonasCriticas from '../ZonasCriticas/ZonasCriticas';
 import { useLogin } from '../../../context/LoginContext';
 import { useToast } from '../../../context/ToastContext';
 import { Download, FileText, Bell, Bot } from 'lucide-react';
-import Calendario from '../../Calendario/Calendario';
+import Calendario from '../../Shared/Calendario/Calendario';
 import NotificacionAdmin from '../NotificacionesAdmin/NotificacionAdmin';
 import HistorialReportes from '../../AdminInstitucion/Vistas/HistorialReportes';
 import ChatBotWindow from '../../Shared/ChatBot/ChatBotWindow';
@@ -28,7 +28,7 @@ const getBadgeText = (rol) => {
   if (rol === ROLES.SUPER_ADMIN) return 'FUERZA PÚBLICA';
   if (rol === ROLES.SUB_ADMIN) return 'MUNICIPALIDAD';
   if (rol === ROLES.ADMIN_INSTITUCION) return 'COORD. INSTITUCIONAL';
-  return 'EDITOR INSTITUCIONAL';
+  return 'EDITOR';
 };
 
 // Mapeo de vistas a nombres de sección para el TopbarInstitucion

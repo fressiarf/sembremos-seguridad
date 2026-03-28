@@ -3,7 +3,7 @@ import DashboardAdminInst from './Vistas/DashboardAdminInst';
 import GestionTareas from './Vistas/GestionTareas';
 import RevisionReportes from './Vistas/RevisionReportes';
 import HistorialReportes from './Vistas/HistorialReportes';
-import Calendario from '../Calendario/Calendario';
+import Calendario from '../Shared/Calendario/Calendario';
 import GestionFuncionarios from './Vistas/GestionFuncionarios';
 import PerfilUsuario from '../Dashboard/PerfilUsuario/PerfilUsuario';
 import EstadisticasInstitucion from './Vistas/EstadisticasInstitucion';

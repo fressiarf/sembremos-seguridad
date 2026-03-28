@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import ListaMisTareas from './MainDashboardInstitucion/ListaMisTareas';
 import HistorialContainer from './Historial/HistorialContainer';
 import PerfilUsuario from '../Dashboard/PerfilUsuario/PerfilUsuario';
-import Calendario from '../Calendario/Calendario';
+import Calendario from '../Shared/Calendario/Calendario';
 import ReportesRechazadosEditor from './MainDashboardInstitucion/ReportesRechazadosEditor';
 import { editoresService } from '../../services/editoresService';
 import { useToast } from '../../context/ToastContext';
@@ -206,7 +206,7 @@ const SeccionPrincipalInstitucion = ({ activeView = 'dashboard', collapsed, setC
       <TopbarInstitucion 
         usuario={user}
         seccion={getSeccionLabel()}
-        rol={user?.rol === 'editor' ? 'EDITOR (FUNCIONARIO)' : (user?.rol === 'adminInstitucion' ? 'ADMIN INSTITUCIONAL' : 'ENLACE INSTITUCIONAL')}
+        rol={user?.rol === 'adminInstitucion' ? 'COORD. INSTITUCIONAL' : 'EDITOR'}
       >
         <div style={{ display: 'flex', gap: '1rem', alignItems: 'center', marginLeft: '1rem' }}>
           <button 

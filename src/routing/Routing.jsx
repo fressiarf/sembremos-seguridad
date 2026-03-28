@@ -18,7 +18,7 @@ const Routing = () => {
                 {/*  Rutas Privadas */}
                 <Route path="/dashboard" element={<PrivateRoutes allowedRoles={[ROLES.SUPER_ADMIN]}><Dashboard /></PrivateRoutes>} />
                 <Route path="/dasboardMuni" element={<PrivateRoutes allowedRoles={[ROLES.SUB_ADMIN]}><DasboardMuni /></PrivateRoutes>} />
-                <Route path="/dashboardEditores" element={<PrivateRoutes allowedRoles={['institucion', ROLES.EDITOR]}><DashboardEditores /></PrivateRoutes>} />
+                <Route path="/dashboardEditores" element={<PrivateRoutes allowedRoles={['institucion', 'editor', 'oficial', ROLES.EDITOR]}><DashboardEditores /></PrivateRoutes>} />
                 <Route path="/dashboardAdminInstitucion" element={<PrivateRoutes allowedRoles={[ROLES.ADMIN_INSTITUCION]}><DashboardAdminInstitucion /></PrivateRoutes>} />
             </Routes>
         </Router>

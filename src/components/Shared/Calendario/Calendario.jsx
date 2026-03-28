@@ -1,9 +1,9 @@
 import React, { useState, useEffect, useRef } from 'react';
 import './Calendario.css';
 import { ChevronLeft, ChevronRight, Clock, Tag, Trash2, Users, Search } from 'lucide-react';
-import { useToast } from '../../context/ToastContext';
-import { useLogin } from '../../context/LoginContext';
-import { dashboardService } from '../../services/dashboardService';
+import { useToast } from '../../../context/ToastContext';
+import { useLogin } from '../../../context/LoginContext';
+import { dashboardService } from '../../../services/dashboardService';
 import emailjs from '@emailjs/browser';
 
 const CATEGORIAS = {
