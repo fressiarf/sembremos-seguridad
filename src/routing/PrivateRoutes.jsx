@@ -10,7 +10,11 @@ const PrivateRoutes = ({ children, allowedRoles = [] }) => {
   // Validar rol si se especifican roles permitidos
   if (allowedRoles.length > 0) {
     const user = JSON.parse(estaAutenticado);
-    if (!allowedRoles.includes(user?.rol)) {
+    const userRol = user?.rol?.toLowerCase()?.trim();
+    const rolesNormalizados = allowedRoles.map(r => String(r).toLowerCase().trim());
+    
+    if (!userRol || !rolesNormalizados.includes(userRol)) {
+      console.warn(`Access Denied: User role [${userRol}] not in allowed roles [${rolesNormalizados.join(', ')}]`);
       return <Navigate to="/" replace />;
     }
   }

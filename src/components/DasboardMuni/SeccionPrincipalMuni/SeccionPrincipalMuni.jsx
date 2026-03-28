@@ -6,7 +6,7 @@ import ReportesComunitarios from '../ReportesComunitarios/ReportesComunitarios';
 import HistorialMuni from '../HistorialMuni/HistorialMuni';
 import EstadisticasMuni from '../EstadisticasMuni/EstadisticasMuni';
 import AccesoRestringido from '../AccesoRestringido/AccesoRestringido';
-import Calendario from '../../Calendario/Calendario';
+import Calendario from '../../Shared/Calendario/Calendario';
 import PerfilUsuario from '../../Dashboard/PerfilUsuario/PerfilUsuario';
 import SoporteInstitucional from '../../Dashboard/SoporteInstitucional/SoporteInstitucional';
 import TopbarInstitucion from '../../DashboardInstitucion/TopbarInstitucion';

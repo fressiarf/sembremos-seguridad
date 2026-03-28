@@ -65,6 +65,41 @@ export const userService = {
       console.error('Error creating user:', error);
       throw error;
     }
+  },
+
+  // Registrar acciones de seguridad
+  logSecurityAction: async (logData) => {
+    try {
+      await fetch('http://localhost:5000/logs_seguridad', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          ...logData,
+          timestamp: new Date().toISOString()
+        }),
+      });
+    } catch (error) {
+      console.error('Error logging security action:', error);
+    }
+  },
+
+  // Generar notificación para el administrador institucional
+  notifyAdminInstitucion: async (institucion, mensaje) => {
+    try {
+      await fetch('http://localhost:5000/notificaciones_admin', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          institucion,
+          mensaje,
+          leida: false,
+          tipo: 'seguridad',
+          timestamp: new Date().toISOString()
+        }),
+      });
+    } catch (error) {
+      console.error('Error notifying admin:', error);
+    }
   }
 };
 
