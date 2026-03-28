@@ -3,7 +3,7 @@ import '../../Dashboard/SidebarAdmin/SidebarAdmin.css';
 import { dashboardService } from '../../../services/dashboardService';
 import { useLogin } from "../../../context/LoginContext";
 import UserBrand from "../../Shared/Navegacion/UserBrand";
-import { ChevronLeft, ChevronDown, LayoutGrid, Activity, Clock, LogOut, User, MapPin, Shield, Bell, BellRing, TriangleAlert, FileText, Settings, Calendar, LayoutDashboard, MessageCircle } from "lucide-react";
+import { ChevronLeft, ChevronDown, LayoutGrid, Activity, Clock, LogOut, User, MapPin, Shield, Bell, BellRing, TriangleAlert, FileText, Settings, Calendar, LayoutDashboard, MessageCircle, FileBarChart } from "lucide-react";
 
 
 // Navigation link items should be consistent, but for now we'll keep the admin structure
@@ -69,6 +69,7 @@ const SidebarAdmin = ({ collapsed = false, onToggle, activeView, onViewChange })
       label: 'ANÁLISIS',
       items: [
         { id: 'mapa',        label: 'Distribución policial', icon: MapPin,       path: '/mapa' },
+        { id: 'consolidado', label: 'Consolidado Trimestral', icon: FileBarChart, path: '/consolidado' },
         { id: 'historial',   label: 'Historial',             icon: Clock,     path: '/historial' },
         { id: 'estadisticas',label: 'Estadísticas',          icon: Activity,     path: '/estadisticas' },
         { id: 'calendario',  label: 'Calendario',            icon: Calendar,  path: '/calendario' },
