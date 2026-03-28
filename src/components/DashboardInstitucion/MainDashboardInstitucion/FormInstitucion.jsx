@@ -1,11 +1,11 @@
 import React, { useState, useRef } from 'react';
 import './FormInstitucion.css';
-import { institucionService } from '../../../services/oficialService';
+import { editoresService } from '../../../services/editoresService';
 import { useToast } from '../../../context/ToastContext';
 import { useLogin } from '../../../context/LoginContext';
 import { 
   ClipboardList, Users, DollarSign, Upload, MessageSquare, 
-  ChevronDown, X, FileImage, Send, MapPin, LayoutGrid, Calendar
+  ChevronDown, X, FileImage, Send, MapPin, LayoutGrid, Calendar, Activity
 } from 'lucide-react';
 
 const TIPOS_ACTIVIDAD = [
@@ -170,10 +170,10 @@ const FormInstitucion = ({ tarea, onComplete, initialReporte = null }) => {
       };
 
       if (initialReporte) {
-        await institucionService.editarReporteRechazado(initialReporte.id, payload);
+        await editoresService.editarReporteRechazado(initialReporte.id, payload);
         showToast('¡Reporte corregido y enviado! ✓', 'success');
       } else {
-        await institucionService.completarTarea(tarea.id, payload);
+        await editoresService.completarTarea(tarea.id, payload);
         showToast('¡Reporte generado exitosamente! ✓', 'success');
       }
       

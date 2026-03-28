@@ -114,5 +114,37 @@ export const muniService = {
       console.error('Error en muniService.getReportesComunitarios:', error);
       return [];
     }
+  },
+
+  crearActividad: async (tareaData) => {
+    try {
+      const resp = await fetch(`${BASE_URL}/tareas`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(tareaData)
+      });
+      return await resp.json();
+    } catch (error) {
+      console.error('Error en muniService.crearActividad:', error);
+      throw error;
+    }
+  },
+
+  actualizarActividad: async (id, tareaData) => {
+    try {
+      const resp = await fetch(`${BASE_URL}/tareas/${id}`, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(tareaData)
+      });
+      return await resp.json();
+    } catch (error) {
+      console.error('Error en muniService.actualizarActividad:', error);
+      throw error;
+    }
   }
 };

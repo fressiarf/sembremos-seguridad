@@ -21,6 +21,15 @@ import EstadisticasGlobal from '../Estadisticas/EstadisticasGlobal';
 import LineasAccionView from '../LineasAccion/LineasAccionView';
 import MatrizSeguimiento from '../LineasAccion/MatrizSeguimiento';
 import ReportesResultados from '../LineasAccion/ReportesResultados';
+import { ROLES } from '../../../constants/roles';
+
+// Helper inline
+const getBadgeText = (rol) => {
+  if (rol === ROLES.SUPER_ADMIN) return 'FUERZA PÚBLICA';
+  if (rol === ROLES.SUB_ADMIN) return 'MUNICIPALIDAD';
+  if (rol === ROLES.ADMIN_INSTITUCION) return 'COORD. INSTITUCIONAL';
+  return 'EDITOR INSTITUCIONAL';
+};
 
 // Mapeo de vistas a nombres de sección para el TopbarInstitucion
 const VIEW_LABELS = {
@@ -109,7 +118,7 @@ const SeccionPrincipal = ({ collapsed, setCollapsed, activeView, onViewChange })
     <main className={`main-content ${collapsed ? 'main-content--collapsed' : ''}`}>
       <TopbarInstitucion
         portalTitle={VIEW_LABELS[activeView] || activeView}
-        badgeText={user?.rol === 'institucion' ? 'INSTITUCIÓN' : 'ADMINISTRADOR'}
+        badgeText={getBadgeText(user?.rol)}
       >
         <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
           

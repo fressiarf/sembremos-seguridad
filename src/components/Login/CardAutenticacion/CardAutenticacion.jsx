@@ -3,6 +3,7 @@ import { useNavigate, Link } from 'react-router-dom';
 import { useLogin } from '../../../context/LoginContext';
 import './CardAutenticacion.css';
 import { ShieldAlert, CheckCircle2 } from 'lucide-react';
+import { ROLES } from '../../../constants/roles';
 
 const CardAutenticacion = ({ children }) => {
   const navigate = useNavigate();
@@ -21,13 +22,13 @@ const CardAutenticacion = ({ children }) => {
       
       // Delay navigation to show success message
       setTimeout(() => {
-        if (user.rol === 'admin') {
+        if (user.rol === ROLES.SUPER_ADMIN) {
           navigate('/dashboard');
-        } else if (user.rol === 'municipalidad') {
+        } else if (user.rol === ROLES.SUB_ADMIN) {
           navigate('/dasboardMuni');
-        } else if (user.rol === 'adminInstitucion') {
+        } else if (user.rol === ROLES.ADMIN_INSTITUCION) {
           navigate('/dashboardAdminInstitucion');
-        } else if (user.rol === 'institucion' || user.rol === 'oficial' || user.rol === 'editor') {
+        } else if (user.rol === 'institucion' || user.rol === ROLES.EDITOR) {
           navigate('/dashboardEditores');
         } else {
           navigate('/dashboardEditores');
