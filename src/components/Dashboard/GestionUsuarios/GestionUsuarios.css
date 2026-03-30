@@ -195,11 +195,17 @@
 }
 
 .role-badge {
-  padding: 2px 8px;
-  border-radius: 4px;
-  font-size: 0.65rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 4px 10px;
+  border-radius: 6px;
+  font-size: 0.68rem;
   font-weight: 800;
   border-width: 1.5px;
+  border-style: solid;
+  transition: all 0.2s ease;
+  white-space: nowrap;
 }
 
 .role-badge--admin {

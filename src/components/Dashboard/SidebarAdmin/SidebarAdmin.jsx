@@ -209,9 +209,11 @@ const SidebarAdmin = ({ collapsed = false, onToggle, activeView, onViewChange })
 
           {!collapsed && (
             <div className="sidebar-admin__profile-info">
-              <span className="sidebar-admin__profile-name">{user?.nombre || "C. Araya"}</span>
+              <span className="sidebar-admin__profile-name">
+                {user?.rol === 'admin' ? 'Administrador global' : (user?.nombre || "C. Araya")}
+              </span>
               <span className="sidebar-admin__profile-role">
-                {user?.rol === 'admin' ? 'Fuerza Pública' : 'Editor'}
+                {user?.rol === 'admin' ? 'Administrador' : 'Oficial'}
               </span>
             </div>
           )}

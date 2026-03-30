@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { dashboardService } from '../../../services/dashboardService';
-import { Users, ClipboardList, Clock } from 'lucide-react';
+import { Users, ClipboardList, Clock, Plus } from 'lucide-react';
 import './zonas.css';
 
 const PinIcon = () => (
@@ -148,7 +148,7 @@ function ZonasCriticas() {
               Administrador
            </div>
            <button className="btn-nueva">
-              + Nueva línea
+              <Plus size={16} /> Nueva línea
            </button>
         </div>
       </div>

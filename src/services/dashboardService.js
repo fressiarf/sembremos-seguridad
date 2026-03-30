@@ -216,15 +216,18 @@ export const dashboardService = {
    */
   getStats: async () => {
     try {
-      const [tareas, zonas, comentarios] = await Promise.all([
-        fetch(`${BASE_URL}/tareas`).then(r => r.json()),
-        fetch(`${BASE_URL}/zonas`).then(r => r.json()),
-        fetch(`${BASE_URL}/comentariosSoporte`).then(r => r.json())
+      const [tareasRes, zonasRes, comentariosRes] = await Promise.all([
+        fetch(`${BASE_URL}/tareas`),
+        fetch(`${BASE_URL}/zonas`),
+        fetch(`${BASE_URL}/comentariosSoporte`).catch(() => null)
       ]);
+      const tareas = tareasRes?.ok ? await tareasRes.json() : [];
+      const zonas = zonasRes?.ok ? await zonasRes.json() : [];
+      const comentarios = comentariosRes?.ok ? await comentariosRes.json() : [];
       return {
         activitiesCount: tareas.length,
         zonesCount: zonas.length,
-        alertsCount: comentarios.filter(c => c.estado === 'pendiente').length
+        alertsCount: Array.isArray(comentarios) ? comentarios.filter(c => c.estado === 'pendiente').length : 0
       };
     } catch (error) {
       console.error('Error in getStats:', error);
