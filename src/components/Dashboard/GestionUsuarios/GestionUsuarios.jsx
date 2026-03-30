@@ -112,49 +112,40 @@ const GestionUsuarios = () => {
 
   const handleCreateUser = async (e) => {
     e.preventDefault();
+    
+    // Validación de campos según el rol
     if (newUser.rol === 'admin') {
       if (!newUser.nombre || !newUser.usuario || !newUser.password || !newUser.cedula) {
         showToast('Completa todos los campos del Administrador', 'warning');
         return;
       }
+      // Validación de Cédula (numérica y longitud para admin)
+      if (!/^\d+$/.test(newUser.cedula)) {
+        showToast('La cédula debe contener solo números', 'warning');
+        return;
+      }
+      if (newUser.cedula.length < 9) {
+        showToast('La cédula debe tener al menos 9 dígitos', 'warning');
+        return;
+      }
     } else {
+      // Validaciones para adminInstitucion
       if (!newUser.institucion || !newUser.usuario || !newUser.password) {
         showToast('Selecciona la Institución y completa los datos de acceso para la misma', 'warning');
         return;
       }
-    
-    // Básicos
-    if (!newUser.nombre || !newUser.cedula || !newUser.usuario || !newUser.password) {
-      showToast('Por favor completa todos los campos', 'warning');
-      return;
     }
 
-    // Validación de Cédula (numérica)
-    if (!/^\d+$/.test(newUser.cedula)) {
-      showToast('La cédula debe contener solo números', 'warning');
-      return;
-    }
-    
-    if (newUser.cedula.length < 9) {
-      showToast('La cédula debe tener al menos 9 dígitos', 'warning');
-      return;
-    }
-
-    // Validación de Email
+    // Validación General de Email
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(newUser.usuario)) {
       showToast('Por favor ingresa un correo electrónico válido', 'warning');
       return;
     }
 
-    // Validación de Contraseña
+    // Validación General de Contraseña
     if (newUser.password.length < 6) {
       showToast('La contraseña debe tener al menos 6 caracteres', 'warning');
-      return;
-    }
-
-    if (newUser.rol === 'adminInstitucion' && !newUser.institucion) {
-      showToast('Selecciona una institución para el admin institucional', 'warning');
       return;
     }
 
@@ -356,34 +347,6 @@ const GestionUsuarios = () => {
                         ))}
                       </select>
                     </div>
-                  <label>Nombre Completo</label>
-                  <div className="input-with-icon">
-                    <UserIcon size={16} />
-                    <input 
-                      type="text" 
-                      placeholder="Ej: Juan Pérez" 
-                      value={newUser.nombre}
-                      onChange={e => {
-                        const val = e.target.value.replace(/[^a-zA-ZáéíóúÁÉÍÓÚñÑ ]/g, '');
-                        setNewUser({...newUser, nombre: val});
-                      }}
-                    />
-                  </div>
-                </div>
-                <div className="form-group">
-                  <label>Número de Cédula</label>
-                  <div className="input-with-icon">
-                    <Fingerprint size={16} />
-                    <input 
-                      type="text" 
-                      placeholder="Ej: 102340567" 
-                      maxLength={12}
-                      value={newUser.cedula}
-                      onChange={e => {
-                        const val = e.target.value.replace(/\D/g, ''); // Solo números
-                        setNewUser({...newUser, cedula: val});
-                      }}
-                    />
                   </div>
                 )}
 

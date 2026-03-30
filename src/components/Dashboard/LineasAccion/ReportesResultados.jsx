@@ -38,8 +38,8 @@ const ReportesResultados = () => {
   return (
     <div className="reportes-resultados-container">
       <div className="reportes-header" style={{ marginBottom: '2rem' }}>
-        <h1 style={{ fontSize: '1.8rem', fontWeight: '800', color: '#1e3a8a' }}>Resultados Obtenidos</h1>
-        <p style={{ color: '#64748b' }}>Consolidado institucional de actividades de cumplimiento y métricas de impacto.</p>
+        <h1 style={{ fontSize: '1.8rem', fontWeight: '800', color: '#ffffff' }}>Resultados Obtenidos</h1>
+        <p style={{ color: '#cbd5e1' }}>Consolidado institucional de actividades de cumplimiento y métricas de impacto.</p>
       </div>
 
       <div className="reportes-card">

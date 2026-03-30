@@ -215,8 +215,7 @@ const SeccionPrincipal = ({ collapsed, setCollapsed, activeView, onViewChange })
 
 
       {/* Placeholder para otras vistas no mapeadas */}
-      {!['dashboard', 'actividades', 'usuarios', 'perfil', 'matriz-seguimiento', 'reportes-resultados', 'lineas-accion', 'mapa', 'zonas', 'calendario', 'reportes', 'historial', 'configuracion', 'alertas'].includes(activeView) && (
-      {!['dashboard', 'actividades', 'usuarios', 'perfil', 'matrices', 'mapa', 'zonas', 'calendario', 'reportes', 'historial', 'lineas', 'alertas', 'estadisticas'].includes(activeView) && (
+      {!['dashboard', 'actividades', 'usuarios', 'perfil', 'matriz-seguimiento', 'reportes-resultados', 'lineas-accion', 'mapa', 'zonas', 'calendario', 'reportes', 'historial', 'configuracion', 'alertas', 'estadisticas', 'lineas', 'matrices'].includes(activeView) && (
         <div style={{ padding: '2rem', color: '#7a9cc4' }}>
           <h2>Vista en desarrollo: {activeView}</h2>
           <p>Esta sección se implementará próximamente.</p>

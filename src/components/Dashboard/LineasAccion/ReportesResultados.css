@@ -1,6 +1,5 @@
 .reportes-resultados-container {
   padding: 2rem;
-  background: #fdfdfd;
   min-height: calc(100vh - 64px);
   animation: slideInUp 0.4s ease-out;
 }
