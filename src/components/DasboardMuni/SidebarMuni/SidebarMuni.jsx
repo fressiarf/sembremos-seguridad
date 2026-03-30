@@ -6,6 +6,7 @@ import {
   ChevronLeft, ChevronDown, LayoutDashboard, ClipboardList,
   FileText, Clock, Calendar, LogOut, BarChart3, MessageCircle, FileBarChart
 } from "lucide-react";
+import Swal from 'sweetalert2';
 
 const SidebarMuni = ({ collapsed = false, onToggle, activeView, onViewChange }) => {
   const { user, logout } = useLogin();
@@ -19,31 +20,48 @@ const SidebarMuni = ({ collapsed = false, onToggle, activeView, onViewChange }) 
     {
       label: 'PRINCIPAL',
       items: [
-        { id: 'dashboard',     label: 'Resumen Comunitario',       icon: LayoutDashboard },
-        { id: 'actividades',   label: 'Actividades Preventivas',   icon: ClipboardList },
-        { id: 'lineas',        label: 'Líneas de Acción',          icon: FileText },
+        { id: 'dashboard', label: 'Resumen Comunitario', icon: LayoutDashboard },
+        { id: 'actividades', label: 'Actividades Preventivas', icon: ClipboardList },
+        { id: 'lineas', label: 'Líneas de Acción', icon: FileText },
       ],
     },
     {
       label: 'SEGUIMIENTO',
       items: [
-        { id: 'reportes',     label: 'Reportes Comunitarios',     icon: FileText },
-        { id: 'consolidado',  label: 'Consolidado Trimestral',     icon: FileBarChart },
-        { id: 'historial',    label: 'Historial de Actividades',  icon: Clock },
-        { id: 'alertas',      label: 'Soporte y Comentarios',     icon: MessageCircle },
+        { id: 'reportes', label: 'Reportes Comunitarios', icon: FileText },
+        { id: 'consolidado', label: 'Consolidado Trimestral', icon: FileBarChart },
+        { id: 'historial', label: 'Historial de Actividades', icon: Clock },
+        { id: 'alertas', label: 'Soporte y Comentarios', icon: MessageCircle },
       ],
     },
     {
       label: 'ANÁLISIS',
       items: [
-        { id: 'estadisticas', label: 'Estadísticas de Impacto',   icon: BarChart3 },
-        { id: 'calendario',   label: 'Calendario',                icon: Calendar },
+        { id: 'estadisticas', label: 'Estadísticas de Impacto', icon: BarChart3 },
+        { id: 'calendario', label: 'Calendario', icon: Calendar },
       ],
     },
   ];
 
   const toggleSection = (label) => {
     setOpenSections(prev => ({ ...prev, [label]: !prev[label] }));
+  };
+
+  const handleLogout = () => {
+    Swal.fire({
+      title: '¿Cerrar sesión?',
+      text: '¿Seguro que desea salir de su cuenta?',
+      icon: 'question',
+      showCancelButton: true,
+      confirmButtonColor: '#3085d6',
+      cancelButtonColor: '#d33',
+      confirmButtonText: 'Sí, cerrar sesión',
+      cancelButtonText: 'Cancelar'
+    }).then((result) => {
+      if (result.isConfirmed) {
+        logout();
+      }
+    });
   };
 
   return (
@@ -122,7 +140,7 @@ const SidebarMuni = ({ collapsed = false, onToggle, activeView, onViewChange }) 
         >
           <div className="sidebar-admin__avatar">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>
+              <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" /><circle cx="12" cy="7" r="4" />
             </svg>
           </div>
           {!collapsed && (
@@ -134,7 +152,7 @@ const SidebarMuni = ({ collapsed = false, onToggle, activeView, onViewChange }) 
             </div>
           )}
         </div>
-        <button type="button" className="sidebar-admin__logout" onClick={logout} title="Cerrar sesión" id="btn-logout-muni">
+        <button type="button" className="sidebar-admin__logout" onClick={handleLogout} title="Cerrar sesión" id="btn-logout-muni">
           <LogOut size={18} />
           {!collapsed && <span>Cerrar sesión</span>}
         </button>

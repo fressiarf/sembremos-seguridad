@@ -13,15 +13,17 @@
 }
 
 .lineas-view-header h1 {
-  color: #002f6c;
+  color: #ffffff;
   font-size: 1.75rem;
   font-weight: 800;
   margin-bottom: 0.25rem;
+  text-shadow: 0 2px 8px rgba(0,0,0,0.3);
 }
 
 .lineas-view-header p {
-  color: #64748b;
+  color: rgba(255, 255, 255, 0.7);
   font-size: 0.95rem;
+  text-shadow: 0 1px 4px rgba(0,0,0,0.2);
 }
 
 .header-controls {

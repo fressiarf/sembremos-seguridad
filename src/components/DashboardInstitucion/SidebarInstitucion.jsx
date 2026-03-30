@@ -3,6 +3,7 @@ import '../Dashboard/SidebarAdmin/SidebarAdmin.css';
 import { useLogin } from '../../context/LoginContext';
 import UserBrand from '../Shared/Navegacion/UserBrand';
 import { ChevronLeft, LayoutDashboard, FileText, Send, LogOut, Building2, MessageCircle } from 'lucide-react';
+import Swal from 'sweetalert2';
 
 const SidebarInstitucion = ({ collapsed = false, onToggle, activeView, onViewChange }) => {
   const { logout, user } = useLogin();
@@ -14,18 +15,34 @@ const SidebarInstitucion = ({ collapsed = false, onToggle, activeView, onViewCha
     { id: 'reportes', label: 'Historial de Reportes', icon: Send },
     { id: 'alertas', label: 'Soporte y Comentarios', icon: MessageCircle },
   ];
+  const handleLogout = () => {
+    Swal.fire({
+      title: '¿Cerrar sesión?',
+      text: '¿Seguro que desea salir de su cuenta?',
+      icon: 'question',
+      showCancelButton: true,
+      confirmButtonColor: '#3085d6',
+      cancelButtonColor: '#d33',
+      confirmButtonText: 'Sí, cerrar sesión',
+      cancelButtonText: 'Cancelar'
+    }).then((result) => {
+      if (result.isConfirmed) {
+        logout();
+      }
+    });
+  };
 
   return (
     <aside className={`sidebar-admin ${collapsed ? 'sidebar-admin--collapsed' : ''}`}>
       <div className="sidebar-admin__header">
         <UserBrand collapsed={collapsed} />
         <button className="sidebar-admin__toggle" onClick={onToggle} title={collapsed ? 'Expandir' : 'Colapsar'}>
-          <ChevronLeft 
-            size={18} 
+          <ChevronLeft
+            size={18}
             strokeWidth={2.5}
-            style={{ 
-              transform: collapsed ? 'rotate(180deg)' : 'rotate(0deg)', 
-              transition: 'transform 0.4s ease' 
+            style={{
+              transform: collapsed ? 'rotate(180deg)' : 'rotate(0deg)',
+              transition: 'transform 0.4s ease'
             }}
           />
         </button>
@@ -44,7 +61,7 @@ const SidebarInstitucion = ({ collapsed = false, onToggle, activeView, onViewCha
             {navItems.map(item => {
               const IconComp = item.icon;
               const isActive = activeView === item.id || (activeView === undefined && item.id === 'dashboard');
-              
+
               return (
                 <li key={item.id}>
                   <button
@@ -79,7 +96,7 @@ const SidebarInstitucion = ({ collapsed = false, onToggle, activeView, onViewCha
           )}
         </div>
 
-        <button className="sidebar-admin__logout" onClick={logout} title="Cerrar sesión">
+        <button className="sidebar-admin__logout" onClick={handleLogout} title="Cerrar sesión">
           <LogOut size={18} />
           {!collapsed && <span>Cerrar sesión</span>}
         </button>

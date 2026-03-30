@@ -118,7 +118,13 @@ const DashboardGlobal = ({ collapsed, onViewChange }) => {
       { label: 'Progreso %', key: 'progreso' }
     ];
 
-      responsables: Array.isArray(l.responsables) && l.responsables.length > 0 ? l.responsables.join(' | ') : (l.institucionLider || 'No asignado')
+    const exportData = lineasDeAccion.map(l => ({
+      titulo: l.titulo,
+      problematica: l.problematica,
+      indicador: l.indicador || '',
+      responsables: Array.isArray(l.responsables) && l.responsables.length > 0 ? l.responsables.join(' | ') : (l.institucionLider || 'No asignado'),
+      progreso: l.progreso
+    }));
 
     exportToCSV(exportData, `Indicadores_SembremosSeguridad_${new Date().toLocaleDateString()}`, columns);
   };
@@ -182,13 +188,13 @@ const DashboardGlobal = ({ collapsed, onViewChange }) => {
                </div>
              </div>
              <div className="stat-card-mini progress-main-card">
-               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+               <span className="mini-lbl">Ejecución P.</span>
+               <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
                  <div className="mini-icon red"><DollarSign size={16} /></div>
                  <span className="mini-val" style={{ fontSize: '0.9rem', color: '#0b2240' }}>
                    ₡{presupuesto.ejecutado ? presupuesto.ejecutado.toLocaleString('es-CR') : '0'} / ₡{presupuesto.asignado.toLocaleString('es-CR')}
                  </span>
                </div>
-               <span className="mini-lbl" style={{ marginTop: '4px', display: 'block' }}>Ejecución P.</span>
                <div className="main-prog-group" style={{ marginTop: '6px' }}>
                  <span className="main-prog-val">{Math.round((presupuesto.ejecutado / presupuesto.asignado) * 100)}%</span>
                  <div className="main-prog-bar">

@@ -248,7 +248,7 @@ const ActividadOficiales = () => {
         </div>
       )}
 
-  // ── Modal Crear Tarea ──
+      {/* ── Modal Crear Tarea ── */}
   {showTareaForm && (
     <div className="assign-modal-overlay">
       <div className="assign-modal">

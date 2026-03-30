@@ -373,9 +373,23 @@ const getResponsable = (id) => RESPONSABLES.find(r => r.id === id) || null;
 // ══════════════════════════════════════════════════════════════
 export const adminInstitucionService = {
 
-  getResponsables: async () => {
-    await delay(100);
-    return [...RESPONSABLES];
+  getResponsables: async (institucionNombre) => {
+    try {
+      const res = await fetch('http://localhost:5000/usuarios');
+      const usuarios = await res.json();
+      
+      // Si no hay filtro, devolvemos los mock por compatibilidad (aunque lo ideal es filtrar)
+      if (!institucionNombre) return [...RESPONSABLES];
+      
+      // Filtrar por rol 'institucion' (oficiales) y que coincida la institución
+      return usuarios.filter(u => 
+        (u.rol === 'institucion' || u.rol === 'editor') && 
+        u.institucion === institucionNombre
+      );
+    } catch (e) {
+      console.error("Error fetching responsables:", e);
+      return [];
+    }
   },
 
   getLineasAccion: async () => {
@@ -512,8 +526,16 @@ export const adminInstitucionService = {
   },
 
   asignarResponsable: async (tareaId, responsableIds) => {
-    // Left simple for patch
-    return { success: false, error: 'Implement PUT manually in future' };
+    try {
+      const response = await fetch(`http://localhost:5000/tareas/${tareaId}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ responsableIds })
+      });
+      return { success: response.ok };
+    } catch (e) {
+      return { success: false };
+    }
   },
 
   getReportesPendientes: async (institucionId) => {

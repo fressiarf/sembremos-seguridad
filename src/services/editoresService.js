@@ -4,9 +4,9 @@ export const editoresService = {
   /**
    * Obtiene las líneas de acción que tienen tareas asignadas a la institución
    */
-  getLineasDeInstitucion: async (institucionId) => {
+  getLineasDeInstitucion: async (userId) => {
     try {
-      const tareas = await editoresService.getTareasDeInstitucion(institucionId);
+      const tareas = await editoresService.getTareasDeInstitucion(userId);
       const lineaIds = [...new Set(tareas.map(t => t.lineaAccionId))];
       const resLineas = await fetch(`${BASE_URL}/lineasAccion`);
       const allLineas = await resLineas.json();
@@ -20,11 +20,18 @@ export const editoresService = {
   /**
    * Obtiene TODAS las tareas asignadas a la institución
    */
-  getTareasDeInstitucion: async (institucionId) => {
+  getTareasDeInstitucion: async (userId, institucionId) => {
     try {
-      const response = await fetch(`${BASE_URL}/tareas?institucionId=${institucionId}`);
+      const response = await fetch(`${BASE_URL}/tareas`);
       if (!response.ok) throw new Error('Error fetching tareas');
-      return await response.json();
+      const allTareas = await response.json();
+      
+      // Filtramos las tareas donde el usuario es responsable (individual o en grupo)
+      // O si queremos ver todas las de la institución (opcional, pero el requerimiento pide "mis tareas")
+      return allTareas.filter(t => 
+        String(t.responsableId) === String(userId) || 
+        (t.responsableIds && Array.isArray(t.responsableIds) && t.responsableIds.map(String).includes(String(userId)))
+      );
     } catch (error) {
       console.error('Error in getTareasDeInstitucion:', error);
       return [];
@@ -136,9 +143,9 @@ export const editoresService = {
   /**
    * Calcula estadísticas de la institución
    */
-  getEstadisticas: async (institucionId) => {
+  getEstadisticas: async (userId) => {
     try {
-      const tareas = await editoresService.getTareasDeInstitucion(institucionId);
+      const tareas = await editoresService.getTareasDeInstitucion(userId);
       const completadas = tareas.filter(t => t.completada);
       const pendientes = tareas.filter(t => !t.completada);
       const inversionTotal = completadas.reduce((sum, t) => sum + (t.inversionColones || 0), 0);
@@ -160,10 +167,10 @@ export const editoresService = {
   /**
    * Obtiene todos los datos del dashboard de la institución
    */
-  getFullDashboardData: async (institucionId) => {
+  getFullDashboardData: async (userId) => {
     try {
       const [tareas, reportesRes] = await Promise.all([
-        editoresService.getTareasDeInstitucion(institucionId),
+        editoresService.getTareasDeInstitucion(userId),
         fetch(`${BASE_URL}/reportes`)
       ]);
       const reportes = await reportesRes.json();
