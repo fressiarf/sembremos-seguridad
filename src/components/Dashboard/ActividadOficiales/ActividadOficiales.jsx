@@ -32,6 +32,7 @@ const ActividadOficiales = () => {
     canton: 'Puntarenas', 
     problematica: '', 
     titulo: '',
+    objetivo: '',
     indicador: '',
     meta: '',
     plazo: 'Anual',
@@ -78,7 +79,7 @@ const ActividadOficiales = () => {
 
   const handleCreateLinea = async (e) => {
     e.preventDefault();
-    if (!newLinea.problematica || !newLinea.titulo || !newLinea.indicador || !newLinea.meta) {
+    if (!newLinea.problematica || !newLinea.titulo || !newLinea.indicador || !newLinea.meta || !newLinea.objetivo) {
       showToast('Completa los campos obligatorios (*)', 'warning');
       return;
     }
@@ -92,7 +93,7 @@ const ActividadOficiales = () => {
       showToast('Línea de acción creada ✓', 'success');
       setShowLineaForm(false);
       setNewLinea({ 
-        canton: 'Puntarenas', problematica: '', titulo: '',
+        canton: 'Puntarenas', problematica: '', titulo: '', objetivo: '',
         indicador: '', meta: '', plazo: 'Anual', institucionesLideres: []
       });
       loadData();
@@ -180,11 +181,11 @@ const ActividadOficiales = () => {
               <div className="form-row-grid">
                 <div className="form-group">
                   <label>Problemática Priorizada *</label>
-                  <input type="text" placeholder="Ej: CONSUMO DE DROGAS Y ALCOHOL" value={newLinea.problematica} onChange={e => setNewLinea({...newLinea, problematica: e.target.value})} />
+                  <input type="text" placeholder="Ej: CONSUMO DE DROGAS Y ALCOHOL" value={newLinea.problematica} onChange={e => setNewLinea({...newLinea, problematica: e.target.value})} required />
                 </div>
                 <div className="form-group">
-                  <label>Cantón / Territorio</label>
-                  <select value={newLinea.canton} onChange={e => setNewLinea({...newLinea, canton: e.target.value})}>
+                  <label>Cantón / Territorio *</label>
+                  <select value={newLinea.canton} onChange={e => setNewLinea({...newLinea, canton: e.target.value})} required>
                     <option value="Puntarenas">Puntarenas</option>
                   </select>
                 </div>
@@ -192,17 +193,22 @@ const ActividadOficiales = () => {
 
               <div className="form-group">
                 <label>Nombre de la Línea de Acción (Estrategia Macro) *</label>
-                <textarea placeholder="Descripción del objetivo general o línea de acción estratégica..." value={newLinea.titulo} onChange={e => setNewLinea({...newLinea, titulo: e.target.value})} rows="2" />
+                <input type="text" placeholder="Ej: Programa de Intervención en Centros Educativos" value={newLinea.titulo} onChange={e => setNewLinea({...newLinea, titulo: e.target.value})} required />
+              </div>
+
+              <div className="form-group">
+                <label>Objetivo Estratégico *</label>
+                <textarea placeholder="Describe el objetivo principal que se busca alcanzar con esta línea de acción..." value={newLinea.objetivo} onChange={e => setNewLinea({...newLinea, objetivo: e.target.value})} rows="2" required />
               </div>
 
               <div className="form-row-grid">
                 <div className="form-group">
                   <label>Indicador de la Estrategia *</label>
-                  <input type="text" placeholder="Ej: Variación de incidentes delictivos" value={newLinea.indicador} onChange={e => setNewLinea({...newLinea, indicador: e.target.value})} />
+                  <input type="text" placeholder="Ej: Variación de incidentes delictivos" value={newLinea.indicador} onChange={e => setNewLinea({...newLinea, indicador: e.target.value})} required />
                 </div>
                 <div className="form-group">
                   <label>Meta Global *</label>
-                  <input type="text" placeholder="Ej: Reducir 15% los incidentes en el cantón" value={newLinea.meta} onChange={e => setNewLinea({...newLinea, meta: e.target.value})} />
+                  <input type="text" placeholder="Ej: Reducir 15% los incidentes en el cantón" value={newLinea.meta} onChange={e => setNewLinea({...newLinea, meta: e.target.value})} required />
                 </div>
               </div>
 
@@ -318,14 +324,14 @@ const ActividadOficiales = () => {
             </div>
             <div className="form-group">
               <label>Presupuesto Estimado / Inversión (₡) *</label>
-              <input type="number" placeholder="Ej: 5000000" value={newTarea.presupuestoEstimado} onChange={e => setNewTarea({...newTarea, presupuestoEstimado: parseInt(e.target.value) || 0})} />
+              <input type="number" placeholder="Ej: 5000000" value={newTarea.presupuestoEstimado} onChange={e => setNewTarea({...newTarea, presupuestoEstimado: parseInt(e.target.value) || 0})} required />
             </div>
           </div>
 
           <div className="form-row-grid">
             <div className="form-group">
               <label>Prioridad *</label>
-              <select value={newTarea.prioridad} onChange={e => setNewTarea({...newTarea, prioridad: e.target.value})}>
+              <select value={newTarea.prioridad} onChange={e => setNewTarea({...newTarea, prioridad: e.target.value})} required>
                 <option value="baja">Baja</option>
                 <option value="media">Media</option>
                 <option value="alta">Alta / Crítica</option>
@@ -333,13 +339,18 @@ const ActividadOficiales = () => {
             </div>
             <div className="form-group">
               <label>Fecha Límite de Entrega *</label>
-              <input type="date" value={newTarea.fechaLimite} onChange={e => setNewTarea({...newTarea, fechaLimite: e.target.value})} />
+              <input type="date" value={newTarea.fechaLimite} onChange={e => setNewTarea({...newTarea, fechaLimite: e.target.value})} required />
             </div>
           </div>
 
           <div className="form-group" style={{ marginBottom: '1.5rem' }}>
             <label>Título / Nombre de la Tarea *</label>
-            <input type="text" placeholder="Ej: Construcción de red de cámaras, o Talleres en Colegios..." value={newTarea.titulo} onChange={e => setNewTarea({...newTarea, titulo: e.target.value})} />
+            <input type="text" placeholder="Ej: Construcción de red de cámaras, o Talleres en Colegios..." value={newTarea.titulo} onChange={e => setNewTarea({...newTarea, titulo: e.target.value})} required />
+          </div>
+
+          <div className="form-group" style={{ marginBottom: '1.5rem' }}>
+            <label>Indicador de Evaluación (Tarea) *</label>
+            <input type="text" placeholder="Ej: Cantidad de operativos, % de avance físico..." value={newTarea.indicador} onChange={e => setNewTarea({...newTarea, indicador: e.target.value})} required />
           </div>
 
           <div className="form-group" style={{ marginBottom: '1.2rem', padding: '12px', background: '#f8fafc', borderRadius: '8px', border: '1px solid #e2e8f0' }}>

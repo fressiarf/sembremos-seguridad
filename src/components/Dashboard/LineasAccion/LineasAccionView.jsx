@@ -1,6 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { dashboardService } from '../../../services/dashboardService';
-import { TrendingUp, ChevronDown, ChevronUp, Search, Filter, Info, Users, BarChart3 } from 'lucide-react';
+import { TrendingUp, ChevronDown, ChevronUp, Search, Info, Users, BarChart3, FileText, FileSpreadsheet, Activity } from 'lucide-react';
+import jsPDF from 'jspdf';
+import autoTable from 'jspdf-autotable';
+import * as XLSX from 'xlsx';
 import './LineasAccionView.css';
 
 const LineasAccionView = ({ onViewChange }) => {
@@ -34,6 +37,87 @@ const LineasAccionView = ({ onViewChange }) => {
     setExpandedId(expandedId === id ? null : id);
   };
 
+  const exportPDF = () => {
+    const doc = jsPDF('l', 'mm', 'a4');
+    doc.setFontSize(20);
+    doc.setTextColor(11, 34, 64);
+    doc.text('Líneas de Acción Estratégicas', 14, 20);
+    
+    doc.setFontSize(10);
+    doc.setTextColor(100);
+    doc.text(`Programa Sembremos Seguridad | Cantón: Puntarenas | Fecha: ${new Date().toLocaleDateString()}`, 14, 28);
+
+    const tableData = filteredLineas.map(l => [
+      l.no || '-',
+      l.titulo || '-',
+      l.problematica || '-',
+      `${l.progreso}%`,
+      Array.isArray(l.responsables) ? l.responsables.join(', ') : (l.responsables || l.institucionLider || '-')
+    ]);
+
+    autoTable(doc, {
+      startY: 35,
+      head: [['No.', 'Título', 'Problemática', 'Progreso', 'Responsables']],
+      body: tableData,
+      headStyles: { fillColor: [11, 34, 64], textColor: [255, 255, 255], fontStyle: 'bold' },
+      styles: { fontSize: 8, cellPadding: 3 },
+      columnStyles: { 0: { cellWidth: 12 } },
+      margin: { top: 35 }
+    });
+
+    doc.save(`Lineas_Accion_Puntarenas_${new Date().getTime()}.pdf`);
+  };
+
+  const exportExcel = () => {
+    const data = [];
+    filteredLineas.forEach(l => {
+      const baseRow = {
+        'No.': l.no,
+        'Cantón': l.canton,
+        'Título Línea de Acción': l.titulo,
+        'Problemática Priorizada': l.problematica,
+        'Objetivo General': l.objetivo || 'Sin objetivo definido',
+        'Indicador Meta': l.indicador || l.metaIndicador || '-',
+        'Progreso Línea (%)': l.progreso,
+        'Inversión Total Línea (₡)': l.inversionLinea || 0,
+        'Responsables Institucionales': Array.isArray(l.responsables) ? l.responsables.join(', ') : (l.responsables || l.institucionLider || '-')
+      };
+
+      if (!l.tareas || l.tareas.length === 0) {
+        data.push({
+          ...baseRow,
+          'Tarea/Acción Específica': 'Sin tareas asignadas en esta línea',
+          'Institución Ejecutora': '-',
+          'Frecuencia': '-',
+          'Trimestre': '-',
+          'Progreso Tarea (%)': 0,
+          'Estado de Tarea': '-',
+          'Beneficiados (Logro)': '-',
+          'Inversión Tarea (₡)': 0
+        });
+      } else {
+        l.tareas.forEach(t => {
+          data.push({
+            ...baseRow,
+            'Tarea/Acción Específica': t.titulo,
+            'Institución Ejecutora': t.institucionNombre || 'Sin asignar',
+            'Frecuencia': t.frecuencia || '-',
+            'Trimestre': t.trimestre || '-',
+            'Progreso Tarea (%)': t.progresoReal || 0,
+            'Estado de Tarea': t.estado || (t.completada ? 'Cerrada' : 'En Ejecución'),
+            'Beneficiados (Logro)': t.avanceAcumulado || 0,
+            'Inversión Tarea (₡)': t.inversionColones || 0
+          });
+        });
+      }
+    });
+
+    const ws = XLSX.utils.json_to_sheet(data);
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, 'Líneas y Tareas');
+    XLSX.writeFile(wb, `Lineas_Estrategicas_SembremosSeguridad_${new Date().getTime()}.xlsx`);
+  };
+
   if (loading) {
     return (
       <div className="lineas-view-loading">
@@ -61,16 +145,18 @@ const LineasAccionView = ({ onViewChange }) => {
               onChange={(e) => setSearchTerm(e.target.value)}
             />
           </div>
-          <div className="stats-badge">
-            <TrendingUp size={16} />
-            <span>{lineas.length} Líneas Activas</span>
-          </div>
+          <button className="btn-export-v4 pdf" onClick={exportPDF} style={{ background: '#ef4444', color: 'white', border: 'none', padding: '8px 12px', borderRadius: '6px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '6px' }}>
+            <FileText size={16} /> PDF
+          </button>
+          <button className="btn-export-v4 excel" onClick={exportExcel} style={{ background: '#10b981', color: 'white', border: 'none', padding: '8px 12px', borderRadius: '6px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '6px' }}>
+            <FileSpreadsheet size={16} /> Excel
+          </button>
           <button 
             className="btn-create-linea" 
             onClick={() => onViewChange('actividades')}
           >
             <TrendingUp size={16} />
-            Crear Nueva Línea
+            Crear Nueva
           </button>
         </div>
       </header>
@@ -119,7 +205,12 @@ const LineasAccionView = ({ onViewChange }) => {
                       <h4><Info size={14} /> Problemática Detectada</h4>
                       <p>{linea.problematica}</p>
                     </div>
-                    
+
+                    <div className="detail-section">
+                      <h4><TrendingUp size={14} /> Objetivo Estratégico</h4>
+                      <p>{linea.objetivo || 'Sin objetivo definido'}</p>
+                    </div>
+
                     <div className="detail-section">
                       <h4><Users size={14} /> Instituciones Responsables</h4>
                       <div className="responsables-tags">
@@ -146,6 +237,32 @@ const LineasAccionView = ({ onViewChange }) => {
                       <span>Inversión: ₡{linea.inversionLinea?.toLocaleString() || 0}</span>
                     </div>
                   </div>
+
+                  {linea.tareas && linea.tareas.length > 0 && (
+                    <div className="linea-tasks-list" style={{ marginTop: '1.5rem', background: '#f8fafc', padding: '1rem', borderRadius: '8px', border: '1px solid #e2e8f0' }}>
+                      <h4 style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#0f172a', marginBottom: '1rem', fontSize: '0.9rem' }}>
+                        <Activity size={16} /> Tareas Asignadas a esta Línea
+                      </h4>
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+                        {linea.tareas.map(t => (
+                          <div key={t.id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: 'white', padding: '0.75rem', borderRadius: '6px', border: '1px solid #cbd5e1' }}>
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                              <span style={{ fontWeight: '600', color: '#1e293b', fontSize: '0.85rem' }}>{t.titulo}</span>
+                              <span style={{ fontSize: '0.75rem', color: '#64748b' }}>Institución: {t.institucionNombre || 'Sin asignar'}</span>
+                            </div>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+                              <span style={{ fontSize: '0.8rem', fontWeight: 'bold', color: t.completada ? '#10b981' : '#f59e0b' }}>
+                                {t.progresoReal || 0}%
+                              </span>
+                              <span style={{ fontSize: '0.7rem', padding: '4px 8px', borderRadius: '12px', background: t.completada ? '#dcfce7' : '#fef3c7', color: t.completada ? '#166534' : '#92400e' }}>
+                                {t.estado || (t.completada ? 'Cerrada' : 'Ejecución')}
+                              </span>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
                 </div>
               )}
             </div>

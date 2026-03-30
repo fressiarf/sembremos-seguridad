@@ -4,7 +4,6 @@ import HistorialContainer from './Historial/HistorialContainer';
 import PerfilUsuario from '../Dashboard/PerfilUsuario/PerfilUsuario';
 import Calendario from '../Shared/Calendario/Calendario';
 import ReportesRechazadosEditor from './MainDashboardInstitucion/ReportesRechazadosEditor';
-import EditorInformeTrimestral from './InformesTrimestrales/EditorInformeTrimestral';
 import { editoresService } from '../../services/editoresService';
 import { useToast } from '../../context/ToastContext';
 import { useLogin } from '../../context/LoginContext';
@@ -81,8 +80,7 @@ const SeccionPrincipalInstitucion = ({ activeView = 'dashboard', collapsed, setC
       calendario: 'Calendario',
       alertas: 'Soporte y Comentarios',
       perfil: 'Mi Perfil',
-      rechazados: 'Devoluciones',
-      informeTrimestral: 'Informe Trimestral'
+      rechazados: 'Devoluciones'
     };
     return labels[activeView] || 'Dashboard';
   };
@@ -123,15 +121,10 @@ const SeccionPrincipalInstitucion = ({ activeView = 'dashboard', collapsed, setC
       );
     }
 
-    // ── Vista Informe Trimestral ──
-    if (activeView === 'informeTrimestral') {
-      return <EditorInformeTrimestral />;
-    }
-
     // ── Vista Soporte y Comentarios ──
     if (activeView === 'alertas') {
       return (
-        <div style={{ padding: '2rem 2.5rem' }}>
+        <div style={{ padding: '0 2.5rem 2.5rem' }}>
           <SoporteInstitucional />
         </div>
       );

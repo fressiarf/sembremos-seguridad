@@ -652,31 +652,52 @@ export const adminInstitucionService = {
 
   getHistorial: async (filtros = {}) => {
     try {
-      const [resReq, tareasReq, usersReq] = await Promise.all([
+      const [resReq, tareasReq, usersReq, lineasReq] = await Promise.all([
         fetch('http://localhost:5000/reportes'),
         fetch('http://localhost:5000/tareas'),
-        fetch('http://localhost:5000/usuarios')
+        fetch('http://localhost:5000/usuarios'),
+        fetch('http://localhost:5000/lineasAccion')
       ]);
       const reportes = await resReq.json();
       const tareas = await tareasReq.json();
       const usuarios = await usersReq.json();
+      const lineasAccion = lineasReq.ok ? await lineasReq.json() : [];
       
       let misReportes = reportes.filter(r => tareas.some(t => String(t.id) === String(r.tareaId)));
       
-      let resultado = misReportes.map(r => ({
-        ...r,
-        tarea: tareas.find(t => String(t.id) === String(r.tareaId)) || {},
-        responsable: usuarios.find(u => String(u.id) === String(r.responsableId)) || {}
-      }));
+      let resultado = misReportes.map(r => {
+        const tarea = tareas.find(t => String(t.id) === String(r.tareaId)) || {};
+        // Enriquecer la tarea con datos de la línea de acción si no los tiene
+        if (tarea.lineaAccionId && !tarea.lineaNumero) {
+          const linea = lineasAccion.find(l => String(l.id) === String(tarea.lineaAccionId));
+          if (linea) {
+            tarea.lineaNumero = linea.no || linea.numero;
+            tarea.lineaNombre = linea.titulo || linea.nombre || linea.problematica;
+          }
+        }
+        return {
+          ...r,
+          tarea,
+          responsable: usuarios.find(u => String(u.id) === String(r.responsableId)) || {}
+        };
+      });
 
       // Filtros base
       if (filtros.estado && filtros.estado !== 'Todos') resultado = resultado.filter(r => r.estado === filtros.estado);
       if (filtros.responsableId && filtros.responsableId !== 'Todos') resultado = resultado.filter(r => String(r.responsableId) === String(filtros.responsableId));
       if (filtros.institucionId && filtros.institucionId !== 'Todos') {
         const targetId = String(filtros.institucionId);
-        resultado = resultado.filter(r => String(r.tarea?.institucionId) === targetId);
+        resultado = resultado.filter(r => {
+          if (!r.tarea) return false;
+          // Verificar tanto institucionId como el array institucionesIds
+          const matchId = String(r.tarea.institucionId) === targetId;
+          const matchArray = r.tarea.institucionesIds && 
+                           Array.isArray(r.tarea.institucionesIds) && 
+                           r.tarea.institucionesIds.map(String).includes(targetId);
+          return matchId || matchArray;
+        });
       }
-      if (filtros.lineaId && filtros.lineaId !== 'Todos') resultado = resultado.filter(r => r.tarea?.lineaAccionId === filtros.lineaId);
+      if (filtros.lineaId && filtros.lineaId !== 'Todos') resultado = resultado.filter(r => String(r.tarea?.lineaAccionId) === String(filtros.lineaId));
       
       // Filtro de Búsqueda
       if (filtros.busqueda) {

@@ -6,7 +6,8 @@ import { dashboardService } from '../../services/dashboardService';
 import CardLineaAccion from './CardLineaAccion';
 import ModuloDelegacion from './ModuloDelegacion';
 import CargaEvidencia from './CargaEvidencia';
-import { Building2, FileText, Download, Building } from 'lucide-react';
+import { Building2, FileText, Download, Building, FileSpreadsheet } from 'lucide-react';
+import * as XLSX from 'xlsx';
 
 const DashboardInstitucion = () => {
   const { user } = useLogin();
@@ -62,13 +63,63 @@ const DashboardInstitucion = () => {
   }, [institucion]);
 
   const filteredData = data.filter(item => {
-    const text = `${item.lineaAccion} ${item.id} ${item.problematica}`.toLowerCase();
+    const text = `${item.titulo} ${item.id} ${item.problematica}`.toLowerCase();
     const matchesSearch = text.includes(searchTerm.toLowerCase());
     const matchesFilter = filterStatus === 'Todos' || item.estado === filterStatus;
     // Si queremos filtrar estricto por institucion, lo agregaríamos aquí. 
     // Por ahora omitido para que se vea data (ya que la DB de db.json quizás no mapea exactamente)
     return matchesSearch && matchesFilter;
   });
+
+  const exportExcel = () => {
+    if (filteredData.length === 0) {
+      showToast('No hay datos para exportar', 'warning');
+      return;
+    }
+
+    const exportData = [];
+    filteredData.forEach(l => {
+      if (l.tareas && l.tareas.length > 0) {
+        l.tareas.forEach(t => {
+          exportData.push({
+            'Problemática': l.problematica,
+            'Línea de Acción': l.titulo,
+            'Tarea Estratégica Asignada': t.titulo,
+            'Prioridad': t.prioridad || 'Media',
+            'Estado': t.estado || (t.completada ? 'Cerrada' : 'En Ejecución'),
+            'Indicador': t.indicador || '-',
+            'Presupuesto Oficial (₡)': t.presupuestoEstimado || 0,
+            'Inversión Usada (₡)': t.inversionColones || 0,
+            'Fecha Límite': t.fechaLimite || '-',
+            'Consideraciones': t.consideraciones || '-'
+          });
+        });
+      } else {
+        exportData.push({
+          'Problemática': l.problematica,
+          'Línea de Acción': l.titulo,
+          'Tarea Estratégica Asignada': 'Sin tareas bajo tu responsabilidad',
+          'Prioridad': '-',
+          'Estado': '-',
+          'Indicador': '-',
+          'Presupuesto Oficial (₡)': 0,
+          'Inversión Usada (₡)': 0,
+          'Fecha Límite': '-',
+          'Consideraciones': '-'
+        });
+      }
+    });
+
+    try {
+      const ws = XLSX.utils.json_to_sheet(exportData);
+      const wb = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(wb, ws, 'Plan de Trabajo');
+      XLSX.writeFile(wb, `Plan_Trabajo_${institucion.replace(/\s+/g, '_')}_${new Date().getTime()}.xlsx`);
+      showToast('Plan de trabajo exportado ✓', 'success');
+    } catch (e) {
+      showToast('Error al exportar Excel', 'error');
+    }
+  };
 
   if (loading) {
     return <div style={{ padding: '3rem', color: '#64748b' }}>Cargando Panel Operativo...</div>;
@@ -122,6 +173,26 @@ const DashboardInstitucion = () => {
             <option value="En ejecución">En proceso</option>
             <option value="Pendiente">Retrasadas / Pendientes</option>
           </select>
+          <button 
+            onClick={exportExcel}
+            style={{
+              padding: '0.6rem 1rem',
+              backgroundColor: '#10b981',
+              color: 'white',
+              border: 'none',
+              borderRadius: '8px',
+              fontWeight: '600',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '8px',
+              cursor: 'pointer',
+              marginLeft: 'auto'
+            }}
+            title="Exportar Plan de Trabajo a Excel"
+          >
+            <FileSpreadsheet size={16} />
+            Exportar Bitácora Institucional
+          </button>
         </div>
 
         {/* Cards Grid */}

@@ -209,19 +209,19 @@ const FormInstitucion = ({ tarea, onComplete, initialReporte = null }) => {
             <div className="fr-row-2">
               <div>
                 <label className="fr-label">Tipo de Actividad <span className="required">*</span></label>
-                <select className="fr-select" value={formData.tipoActividad} onChange={e => updateField('tipoActividad', e.target.value)}>
+                <select className="fr-select" value={formData.tipoActividad} onChange={e => updateField('tipoActividad', e.target.value)} required>
                   <option value="">Seleccionar...</option>
                   {TIPOS_ACTIVIDAD.map(tipo => <option key={tipo} value={tipo}>{tipo}</option>)}
                 </select>
               </div>
               <div>
                 <label className="fr-label">Fecha del Avance <span className="required">*</span></label>
-                <input type="date" className="fr-input" value={formData.fechaRealizacion} onChange={e => updateField('fechaRealizacion', e.target.value)} />
+                <input type="date" className="fr-input" value={formData.fechaRealizacion} onChange={e => updateField('fechaRealizacion', e.target.value)} required />
               </div>
             </div>
             <div style={{ marginTop: '1rem' }}>
               <label className="fr-label">Descripción Detallada del Avance <span className="required">*</span></label>
-              <textarea className="fr-textarea" placeholder="¿Qué se hizo en este periodo?" value={formData.descripcion} onChange={e => updateField('descripcion', e.target.value)} rows="3" />
+              <textarea className="fr-textarea" placeholder="¿Qué se hizo en este periodo?" value={formData.descripcion} onChange={e => updateField('descripcion', e.target.value)} rows="3" required />
             </div>
           </div>
         )}
@@ -244,14 +244,15 @@ const FormInstitucion = ({ tarea, onComplete, initialReporte = null }) => {
                     type="number" 
                     className="fr-input" 
                     placeholder="0" 
+                    min="0"
                     style={{ fontSize: '1.2rem', fontWeight: 800, width: '120px', textAlign: 'center' }}
                     value={formData.cantidadImpacto || ''} 
                     onChange={e => {
                       const val = parseInt(e.target.value) || 0;
                       updateField('cantidadImpacto', val);
-                      // Sincronizar con campos específicos por retrocompatibilidad
                       if (tipoTarea === 3) updateField('numeroPatrullajes', val);
                     }} 
+                    required 
                   />
                   <div>
                     <div style={{ fontSize: '0.85rem', color: '#64748b' }}>
@@ -378,8 +379,8 @@ const FormInstitucion = ({ tarea, onComplete, initialReporte = null }) => {
           <div className="form-section-body">
             <div className="fr-row-2">
               <div>
-                <label className="fr-label">Inversión del Avance (₡)</label>
-                <input type="number" className="fr-input" value={formData.inversionColones} onChange={e => updateField('inversionColones', e.target.value)} />
+                <label className="fr-label">Inversión del Avance (₡) <span className="required">*</span></label>
+                <input type="number" min="0" className="fr-input" value={formData.inversionColones} onChange={e => updateField('inversionColones', e.target.value)} required />
               </div>
               <div>
                 <label className="fr-label">Detalle de Gasto / Recursos</label>

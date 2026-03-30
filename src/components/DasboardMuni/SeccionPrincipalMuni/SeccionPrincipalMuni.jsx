@@ -76,7 +76,7 @@ const SeccionPrincipalMuni = ({ activeView = 'dashboard', collapsed, setCollapse
         );
       case 'alertas':
         return (
-          <div style={{ padding: '2rem 2.5rem' }}>
+          <div style={{ padding: '0 2.5rem 2.5rem' }}>
             <SoporteInstitucional />
           </div>
         );

@@ -81,7 +81,7 @@ const RiskRadar = () => {
 
 const DashboardGlobal = ({ collapsed, onViewChange }) => {
   const [expandedRow, setExpandedRow] = useState(null);
-  const [presupuesto, setPresupuesto] = useState({ ejecutado: 0, asignado: 50000000 });
+  const [presupuesto, setPresupuesto] = useState({ ejecutado: 0, asignado: 50000000, cumplimiento: 0 });
   const [lineasDeAccion, setLineasDeAccion] = useState([]);
   const [loading, setLoading] = useState(true);
 
@@ -93,7 +93,8 @@ const DashboardGlobal = ({ collapsed, onViewChange }) => {
           if (dashData.stats) {
             setPresupuesto({
               ejecutado: dashData.stats.inversionTotal || 0,
-              asignado: dashData.stats.presupuestoAsignado || 50000000
+              asignado: dashData.stats.presupuestoAsignado || 50000000,
+              cumplimiento: dashData.stats.cumplimiento || 0
             });
           }
           if (dashData.lineas) {
@@ -122,31 +123,18 @@ const DashboardGlobal = ({ collapsed, onViewChange }) => {
       titulo: l.titulo,
       problematica: l.problematica,
       indicador: l.indicador || '',
-      responsables: Array.isArray(l.responsables) && l.responsables.length > 0 ? l.responsables.join(' | ') : (l.institucionLider || 'No asignado'),
-      progreso: l.progreso
+      responsables: Array.isArray(l.responsables) ? l.responsables.join(' | ') : (l.institucionLider || 'No asignado'),
+      progreso: `${l.progreso}%`
     }));
 
     exportToCSV(exportData, `Indicadores_SembremosSeguridad_${new Date().toLocaleDateString()}`, columns);
   };
 
-  const impactosDistrito = [
-    { nombre: 'Barranca', impacto: 85, color: '#ef4444', casos: 124, tendencia: 'up' },
-    { nombre: 'El Roble', impacto: 62, color: '#3b82f6', casos: 89, tendencia: 'down' },
-    { nombre: 'Chacarita', impacto: 45, color: '#f59e0b', casos: 67, tendencia: 'stable' },
-    { nombre: 'Puntarenas Centro', impacto: 30, color: '#10b981', casos: 42, tendencia: 'down' }
-  ];
-
-  const zonasCriticas = [
-    { id: 1, nombre: 'Parque Victoria', riesgo: 'Alto', hallazgo: 'Venta activa' },
-    { id: 2, nombre: 'Barrio El Carmen', riesgo: 'Medio', hallazgo: 'Falta alumbrado' },
-    { id: 3, nombre: 'Calle Lucrecia', riesgo: 'Crítico', hallazgo: 'Búnker detectado' }
-  ];
-
-  // Solo mostramos las primeras 4 líneas en el dashboard principal
   const top4Lineas = lineasDeAccion.slice(0, 4);
 
   return (
-    <div className={`dashboard-global ${collapsed ? 'sidebar-collapsed' : ''}`}>
+    <div className={`dashboard-global ${collapsed ? 'dashboard-global--collapsed' : ''}`}>
+      
       {/* ── Header Banner ── */}
       <header className="dashboard-global__banner">
         <div className="banner-content">
@@ -154,29 +142,6 @@ const DashboardGlobal = ({ collapsed, onViewChange }) => {
             <div className="banner-badge">SISTEMA INTEGRAL DE MONITOREO</div>
             <h1>Dashboard Global Estratégico</h1>
             <p>Observatorio Sembremos Seguridad · Cantón Puntarenas (Periodo 2025)</p>
-            <div className="banner-actions" style={{ marginTop: '1rem' }}>
-              <button 
-                className="btn-export-excel-v4" 
-                onClick={handleExportExcel}
-                style={{
-                  background: 'rgba(255,255,255,0.1)',
-                  backdropFilter: 'blur(10px)',
-                  border: '1px solid rgba(255,255,255,0.2)',
-                  color: 'white',
-                  padding: '8px 16px',
-                  borderRadius: '12px',
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '8px',
-                  cursor: 'pointer',
-                  fontSize: '0.85rem',
-                  fontWeight: '700',
-                  transition: 'all 0.3s ease'
-                }}
-              >
-                <Download size={16} /> Exportar Indicadores
-              </button>
-            </div>
           </div>
 
           <div className="dashboard-top-stats-grid">
@@ -205,8 +170,8 @@ const DashboardGlobal = ({ collapsed, onViewChange }) => {
              <div className="stat-card-mini progress-main-card">
                <span className="mini-lbl">Progreso Cantonal</span>
                <div className="main-prog-group">
-                 <span className="main-prog-val">37.5%</span>
-                 <div className="main-prog-bar"><div className="fill" style={{width:'37.5%'}}></div></div>
+                 <span className="main-prog-val">{presupuesto.cumplimiento}%</span>
+                 <div className="main-prog-bar"><div className="fill" style={{width:`${presupuesto.cumplimiento}%`}}></div></div>
                </div>
              </div>
           </div>
@@ -214,10 +179,10 @@ const DashboardGlobal = ({ collapsed, onViewChange }) => {
       </header>
 
       <div className="dashboard-global-body">
-        <div className="dashboard-main-grid-layout">
+        <div className="dashboard-main-grid-layout" style={{ display: 'block' }}>
           
-          {/* ── Intelligence Quad Center (2x2) ── */}
-          <main className="intelligence-grid">
+          {/* ── Intelligence Duo Center (1x2 Full Width) ── */}
+          <main className="intelligence-grid" style={{ gridTemplateColumns: '1fr', gap: '2rem' }}>
             
             {/* Cuadro 1: Avance Estratégico (Líneas de Acción con Despliegue) */}
             <section className="dashboard-card-v4">
@@ -226,24 +191,45 @@ const DashboardGlobal = ({ collapsed, onViewChange }) => {
                   <TrendingUp size={20} className="header-icon" />
                   <h3>Avance Estratégico Cantonal</h3>
                 </div>
-                <button 
-                  onClick={() => onViewChange('lineas-accion')}
-                  style={{
-                    background: '#f1f5f9',
-                    border: '1px solid #e2e8f0',
-                    padding: '4px 10px',
-                    borderRadius: '6px',
-                    fontSize: '0.75rem',
-                    fontWeight: '700',
-                    color: '#002f6c',
-                    cursor: 'pointer',
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '4px'
-                  }}
-                >
-                  <LayoutGrid size={12} /> Ver todas
-                </button>
+                <div style={{ display: 'flex', gap: '8px' }}>
+                  <button 
+                    className="btn-export-excel" 
+                    onClick={handleExportExcel}
+                    style={{
+                      background: '#ecfdf5',
+                      border: '1px solid #10b981',
+                      padding: '4px 10px',
+                      borderRadius: '6px',
+                      fontSize: '0.75rem',
+                      fontWeight: '700',
+                      color: '#047857',
+                      cursor: 'pointer',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '4px'
+                    }}
+                  >
+                    <Download size={12} /> Excel
+                  </button>
+                  <button 
+                    onClick={() => onViewChange('lineas-accion')}
+                    style={{
+                      background: '#f1f5f9',
+                      border: '1px solid #e2e8f0',
+                      padding: '4px 10px',
+                      borderRadius: '6px',
+                      fontSize: '0.75rem',
+                      fontWeight: '700',
+                      color: '#002f6c',
+                      cursor: 'pointer',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '4px'
+                    }}
+                  >
+                    <LayoutGrid size={12} /> Ver todas
+                  </button>
+                </div>
               </div>
               <div className="lineas-cascade-container">
                 {loading ? (
@@ -308,19 +294,8 @@ const DashboardGlobal = ({ collapsed, onViewChange }) => {
               </div>
             </section>
 
-            {/* Cuadro 2: Perfil Dimensional (Radar) */}
-            <section className="dashboard-card-v4">
-              <div className="card-v4-header">
-                <Activity size={20} className="header-icon" />
-                <h3>Análisis Dimensional</h3>
-              </div>
-              <div className="radar-content" style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%' }}>
-                <RiskRadar />
-              </div>
-            </section>
-
-            {/* Cuadro 3: Soporte & Comunicación */}
-            <section className="dashboard-card-v4">
+            {/* Cuadro 2: Soporte & Comunicación */}
+            <section className="dashboard-card-v4 dashboard-card-v4--support">
               <div className="card-v4-header">
                 <MessageSquare size={20} className="header-icon" />
                 <h3>Centro de Comunicación de Soporte</h3>
@@ -345,29 +320,7 @@ const DashboardGlobal = ({ collapsed, onViewChange }) => {
               </div>
             </section>
 
-            {/* Cuadro 4: Impacto Territorial */}
-            <section className="dashboard-card-v4">
-              <div className="card-v4-header">
-                <BarChart3 size={20} className="header-icon" />
-                <h3>Impacto Territorial por Distrito</h3>
-              </div>
-              <div className="impact-distritos-list">
-                {impactosDistrito.map((d, i) => (
-                  <div key={i} className="distrito-impact-item">
-                    <div className="distrito-info">
-                      <span className="distrito-name">{d.nombre}</span>
-                      <span className="distrito-casos">{d.casos} Incidencias</span>
-                    </div>
-                    <div className="impact-bar-wrapper">
-                      <div className="impact-bar-track">
-                        <div className="impact-bar-fill" style={{ width: `${d.impacto}%`, backgroundColor: d.color }}></div>
-                      </div>
-                      <span className="impact-pct">{d.impacto}%</span>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </section>
+
 
           </main>
         </div>

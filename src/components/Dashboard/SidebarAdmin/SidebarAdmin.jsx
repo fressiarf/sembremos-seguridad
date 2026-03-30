@@ -21,7 +21,7 @@ import Swal from 'sweetalert2';
 const SidebarAdmin = ({ collapsed = false, onToggle, activeView, onViewChange }) => {
   const { user, logout } = useLogin();
   const [openSections, setOpenSections] = useState({
-    PRINCIPAL: true, GESTIÓN: true, ANÁLISIS: true, ADMINISTRACIÓN: true,
+    'GESTIÓN ESTRATÉGICA': true, HERRAMIENTAS: true,
   });
 
   const [stats, setStats] = useState({
@@ -50,37 +50,22 @@ const SidebarAdmin = ({ collapsed = false, onToggle, activeView, onViewChange })
   // ── Secciones de navegación dinámicas ──
   const navSections = [
     {
-      label: 'PRINCIPAL',
+      label: 'GESTIÓN ESTRATÉGICA',
       items: [
         { id: 'dashboard', label: 'Resumen Ejecutivo', icon: LayoutDashboard, path: '/dashboard' },
-        { id: 'lineas-accion', label: 'Líneas de Acción', icon: LayoutGrid, path: '/lineas-accion' },
-        { id: 'matriz-seguimiento', label: 'Matriz de Seguimiento', icon: FileText, path: '/matriz-seguimiento' },
-        { id: 'reportes-resultados', label: 'Reportes de Resultados', icon: Activity, path: '/reportes-resultados' },
-      ],
-    },
-    {
-      label: 'GESTIÓN',
-      items: [
-        { id: 'actividades', label: 'Gestión de Tareas', icon: Activity, path: '/actividades', badge: stats.activitiesCount },
-        { id: 'zonas', label: 'Zonas críticas', icon: MapPin, path: '/zonas', badge: stats.zonesCount },
-        { id: 'alertas', label: 'Soporte y Comentarios', icon: MessageCircle, path: '/alertas', badge: stats.alertsCount },
-      ],
-    },
-    {
-      label: 'ANÁLISIS',
-      items: [
-        { id: 'mapa', label: 'Distribución policial', icon: MapPin, path: '/mapa' },
-        { id: 'consolidado', label: 'Consolidado Trimestral', icon: FileBarChart, path: '/consolidado' },
+        { id: 'lineas-accion', label: 'Líneas y Tareas', icon: LayoutGrid, path: '/lineas-accion' },
+        { id: 'reportes-resultados', label: 'Reportes Activos', icon: Activity, path: '/reportes-resultados' },
         { id: 'historial', label: 'Historial', icon: Clock, path: '/historial' },
-        { id: 'estadisticas', label: 'Estadísticas', icon: Activity, path: '/estadisticas' },
-        { id: 'calendario', label: 'Calendario', icon: Calendar, path: '/calendario' },
+        { id: 'matriz-seguimiento', label: 'Matriz Completa', icon: FileText, path: '/matriz-seguimiento' },
       ],
     },
     {
-      label: 'ADMINISTRACIÓN',
+      label: 'HERRAMIENTAS',
       items: [
-        { id: 'usuarios', label: 'Gestión de usuarios', icon: User, path: '/usuarios', badge: stats.solicitudesCount },
-        { id: 'reportes', label: 'Reportes INL/MSP', icon: FileText, path: '/reportes' },
+        { id: 'mapa', label: 'Distribución Policial', icon: MapPin, path: '/mapa' },
+        { id: 'estadisticas', label: 'Estadísticas', icon: Activity, path: '/estadisticas' },
+        { id: 'usuarios', label: 'Gestión de Usuarios', icon: User, path: '/usuarios', badge: stats.solicitudesCount },
+        { id: 'alertas', label: 'Soporte', icon: MessageCircle, path: '/alertas', badge: stats.alertsCount },
       ],
     },
   ];

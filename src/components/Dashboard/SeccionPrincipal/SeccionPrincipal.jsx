@@ -35,22 +35,15 @@ const getBadgeText = (rol) => {
 // Mapeo de vistas a nombres de sección para el TopbarInstitucion
 const VIEW_LABELS = {
   dashboard: 'Resumen Ejecutivo',
-  actividades: 'Gestión de Tareas',
-  usuarios: 'Gestión de Usuarios',
-  perfil: 'Mi Perfil',
-  'matriz-seguimiento': 'Matriz de Seguimiento',
-  'reportes-resultados': 'Reportes de Resultados',
-  zonas: 'Zonas Críticas',
-  alertas: 'Soporte y Comentarios',
-  mapa: 'Mapa de Riesgos',
-  consolidado: 'Consolidado Trimestral',
+  'lineas-accion': 'Líneas y Tareas',
+  'reportes-resultados': 'Reportes Activos',
+  historial: 'Historial',
+  'matriz-seguimiento': 'Matriz Completa',
+  mapa: 'Distribución Policial',
   estadisticas: 'Estadísticas',
-  calendario: 'Calendario de Operaciones',
-  reportes: 'Reportes INL/MSP',
-  historial: 'Historial de Reportes',
-  configuracion: 'Configuración',
-  'lineas-accion': 'Líneas de Acción',
-  lineas: 'Mis Tareas / Líneas de Acción',
+  usuarios: 'Gestión de Usuarios',
+  alertas: 'Soporte',
+  perfil: 'Mi Perfil'
 };
 
 const SeccionPrincipal = ({ collapsed, setCollapsed, activeView, onViewChange }) => {
@@ -111,10 +104,8 @@ const SeccionPrincipal = ({ collapsed, setCollapsed, activeView, onViewChange })
   };
 
   const knownViews = [
-    'dashboard', 'actividades', 'usuarios', 'perfil', 'matriz-seguimiento', 
-    'reportes-resultados', 'lineas-accion', 'mapa', 'zonas', 'calendario', 
-    'reportes', 'historial', 'configuracion', 'alertas', 'estadisticas', 'lineas',
-    'consolidado'
+    'dashboard', 'usuarios', 'perfil', 'matriz-seguimiento', 
+    'reportes-resultados', 'lineas-accion', 'historial', 'alertas', 'estadisticas', 'mapa'
   ];
 
   return (
