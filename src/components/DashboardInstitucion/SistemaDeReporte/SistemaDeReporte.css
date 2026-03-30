@@ -1,0 +1,250 @@
+/* ═══════════════════════════════════════════════════ */
+/*  SISTEMA DE REPORTE — Cards y Formularios          */
+/* ═══════════════════════════════════════════════════ */
+
+/* ─── Reportes Card (Contenedor principal) ─── */
+.ReportesCard {
+  background: var(--white);
+  border: 1px solid var(--gray-border);
+  border-radius: 8px;
+  padding: 1.5rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+}
+
+.ReportesCardHeader {
+  margin-bottom: 1.25rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid var(--gray-border);
+}
+
+.ReportesCardHeader h3 {
+  margin: 0 0 0.25rem;
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--text-dark);
+}
+
+.ReportesCardHeader p {
+  margin: 0;
+  font-size: 0.82rem;
+  color: var(--gray-text);
+}
+
+.ReportesCardBody {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+/* ─── Reporte Item ─── */
+.ReporteItem {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.85rem 1rem;
+  background: var(--gray-bg);
+  border: 1px solid var(--gray-border);
+  border-radius: 6px;
+  transition: border-color 0.2s ease;
+}
+
+.ReporteItem:hover {
+  border-color: var(--navy-blue-light);
+}
+
+.ReporteItemInfo span {
+  display: block;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text-dark);
+}
+
+.ReporteItemInfo p {
+  margin: 2px 0 0;
+  font-size: 0.75rem;
+  color: var(--gray-text);
+}
+
+.ReporteItemActions {
+  display: flex;
+  gap: 0.5rem;
+}
+
+/* ─── Botón Export ─── */
+.BtnExport {
+  padding: 6px 14px;
+  background: var(--gray-bg);
+  border: 1px solid var(--gray-border);
+  border-radius: 5px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--text-dark);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-family: inherit;
+}
+
+.BtnExport:hover {
+  background: var(--navy-blue);
+  color: var(--white);
+  border-color: var(--navy-blue);
+}
+
+/* ─── Filtro Jurisdicción ─── */
+.FiltroJurisdiccion {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.FiltroJurisdiccion label {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--text-dark);
+  white-space: nowrap;
+}
+
+.FiltroJurisdiccion select {
+  flex: 1;
+  padding: 0.5rem 0.75rem;
+  border: 1px solid var(--gray-border);
+  border-radius: 5px;
+  font-size: 0.82rem;
+  color: var(--text-dark);
+  background: var(--gray-bg);
+  font-family: inherit;
+  cursor: pointer;
+  transition: border-color 0.2s ease;
+}
+
+.FiltroJurisdiccion select:focus {
+  outline: none;
+  border-color: var(--navy-blue);
+  box-shadow: 0 0 0 3px var(--focus-ring);
+}
+
+/* ─── Estado Carga Reporte ─── */
+.EstadoCarga {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.EstadoCarga.listo {
+  background: #dcfce7;
+  color: #15803d;
+}
+
+.EstadoCarga.cargando {
+  background: #fef3c7;
+  color: #92400e;
+}
+
+.EstadoCargaDot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+}
+
+.EstadoCargaDot.listo { background: #22c55e; }
+.EstadoCargaDot.cargando { background: #f59e0b; animation: pulse 1.5s infinite; }
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.4; }
+}
+
+/* ─── Selector Estado Línea ─── */
+.SelectorEstadoLinea {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.SelectorEstadoLinea label {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--text-dark);
+}
+
+.SelectorEstadoLinea select {
+  padding: 0.55rem 0.75rem;
+  border: 1px solid var(--gray-border);
+  border-radius: 5px;
+  font-size: 0.85rem;
+  color: var(--text-dark);
+  background: var(--gray-bg);
+  font-family: inherit;
+  transition: border-color 0.2s ease;
+}
+
+.SelectorEstadoLinea select:focus {
+  outline: none;
+  border-color: var(--navy-blue);
+  box-shadow: 0 0 0 3px var(--focus-ring);
+}
+
+/* ─── Input Evidencia ─── */
+.InputEvidencia {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.InputEvidencia label {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--text-dark);
+}
+
+.InputEvidencia input[type="file"] {
+  padding: 0.5rem;
+  border: 2px dashed var(--gray-border);
+  border-radius: 6px;
+  background: var(--gray-bg);
+  font-size: 0.82rem;
+  color: var(--gray-text);
+  cursor: pointer;
+  transition: border-color 0.2s ease;
+}
+
+.InputEvidencia input[type="file"]:hover {
+  border-color: var(--navy-blue-light);
+}
+
+/* ─── TextArea Bitácora ─── */
+.TextAreaBitacora {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.TextAreaBitacora label {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--text-dark);
+}
+
+.TextAreaBitacora textarea {
+  padding: 0.65rem 0.75rem;
+  border: 1px solid var(--gray-border);
+  border-radius: 5px;
+  font-size: 0.85rem;
+  color: var(--text-dark);
+  background: var(--gray-bg);
+  font-family: inherit;
+  resize: vertical;
+  min-height: 80px;
+  transition: border-color 0.2s ease;
+}
+
+.TextAreaBitacora textarea:focus {
+  outline: none;
+  border-color: var(--navy-blue);
+  box-shadow: 0 0 0 3px var(--focus-ring);
+  background: var(--white);
+}

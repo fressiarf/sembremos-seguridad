@@ -1,0 +1,421 @@
+.zonas-criticas-container {
+    padding: 30px;
+    color: #fff;
+    font-family: inherit;
+    height: 100%;
+}
+
+.zonas-criticas-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 30px;
+}
+
+.zonas-page-title {
+    font-size: 24px;
+    font-weight: 700;
+    margin: 0 0 8px 0;
+}
+
+.zonas-page-subtitle {
+    font-size: 14px;
+    color: #9ca3af;
+    margin: 0;
+}
+
+.zonas-header-actions {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+}
+
+.admin-badge {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(8px);
+    border-radius: 100px;
+    padding: 8px 18px;
+    font-size: 13px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: #fff;
+    font-weight: 500;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    white-space: nowrap;
+}
+
+.admin-badge-dot {
+    width: 8px;
+    height: 8px;
+    background-color: #3b82f6;
+    border-radius: 50%;
+    box-shadow: 0 0 10px #3b82f6;
+}
+
+.btn-nueva {
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    backdrop-filter: blur(8px);
+    color: #fff;
+    padding: 8px 20px;
+    border-radius: 12px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    white-space: nowrap;
+}
+
+.btn-nueva:hover {
+    background: rgba(255, 255, 255, 0.15);
+    border-color: rgba(255, 255, 255, 0.3);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+}
+
+.zonas-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(420px, 1fr));
+    gap: 16px;
+}
+
+.zona-card {
+    background-color: #ffffff;  /* Antes: #262626 */
+    border-radius: 12px;
+    overflow: hidden;
+    position: relative;
+    border: 1px solid #e5e7eb;  /* Antes: #3f3f46 */
+    display: flex;
+    flex-direction: row;
+}
+
+.zona-card-image {
+    width: 30%;
+    height: auto;
+    min-height: 100%;
+    background-size: cover;
+    background-position: center;
+    position: relative;
+}
+
+.zona-card-overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to right, rgba(255, 255, 255, 0) 20%, rgba(255, 255, 255, 1) 90%);
+}
+
+.zona-card-content {
+    width: 70%;
+    margin-top: 0;
+    padding: 14px 18px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    position: relative;
+    z-index: 2;
+}
+
+/* --- Separador Cantonal --- */
+.cantonal-section {
+    margin-top: 40px;
+}
+
+.cantonal-separator {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 24px;
+}
+
+.cantonal-label {
+    text-transform: uppercase;
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    color: #9ca3af;
+    white-space: nowrap;
+}
+
+.cantonal-line {
+    flex-grow: 1;
+    border: none;
+    border-top: 1px solid #3f3f46;
+    margin: 0;
+}
+
+/* Cantonal - Sin imagen, centrada y con borde sutil */
+.zona-card-cantonal {
+    background-color: #f8fafc; /* Fondo ligeramente azulado claro, para diferenciar */
+    border: 1px solid #3b82f6;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+}
+
+.zona-card-cantonal .zona-card-content {
+    width: 100%;
+    text-align: center;
+    align-items: center;
+    padding: 24px 32px;
+}
+
+.zona-card-cantonal .zona-title-row {
+    justify-content: center;
+    gap: 16px;
+    width: 100%;
+}
+
+.zona-card-cantonal .zona-progress-bg {
+    max-width: 400px;
+    margin: 0 auto 16px auto;
+}
+
+.zona-card-cantonal .zona-stats {
+    width: 100%;
+    max-width: 400px;
+    margin: 0 auto;
+}
+
+@media (max-width: 768px) {
+    .zona-card {
+        flex-direction: column;
+    }
+    .zona-card-image {
+        width: 100%;
+        height: 180px;
+        min-height: 180px;
+    }
+    .zona-card-overlay {
+        background: linear-gradient(to bottom, rgba(255, 255, 255, 0) 30%, rgba(255, 255, 255, 1) 100%);
+    }
+    .zona-card-content {
+        width: 100%;
+        margin-top: -20px;
+        padding: 0 24px 24px 24px;
+    }
+}
+
+.zona-title-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+}
+
+.zona-title {
+    display: flex;
+    align-items: center;
+}
+
+.zona-title h3 {
+    margin: 0;
+    font-size: 16px;
+    font-weight: 600;
+    color: #111827; /* Texto negro/oscuro */
+}
+
+.zona-percentage {
+    font-weight: 700;
+    font-size: 14px;
+}
+
+.zona-progress-bg {
+    background-color: #e5e7eb;
+    height: 4px;
+    border-radius: 2px;
+    margin-bottom: 12px;
+    overflow: hidden;
+    width: 100%;
+}
+
+.zona-progress-fill {
+    height: 100%;
+    border-radius: 3px;
+}
+
+.zona-stats {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    width: 100%;
+}
+
+.zona-stat-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.stat-label {
+    color: #6b7280;
+    font-size: 12px;
+}
+
+.stat-value {
+    font-size: 12px;
+    font-weight: 700;
+    color: #111827;
+}
+
+.zona-divider {
+    border: none;
+    border-top: 1px solid #e5e7eb; /* Línea separadora clara */
+    margin: 4px 0;
+}
+
+.beneficiarios-value {
+    font-size: 16px;
+    font-weight: 800 !important;
+}
+
+.zona-icon {
+    flex-shrink: 0;
+    margin-right: 8px;
+}
+
+.zona-icon-pin {
+    stroke: #ef4444;
+}
+
+.zona-icon-globe {
+    stroke: #0ea5e9;
+}
+
+.completadas-value {
+    color: #22c55e !important;
+}
+
+/* Configuracion Dinamica Extraida del JSX */
+
+/* Barranca – Río Barranca, zona verde a orillas del río */
+.zona-img-barranca {
+    background-image: url('/zona-barranca.jpg');
+    background-position: center 40%;
+}
+
+.zona-color-barranca {
+    color: #22c55e;
+}
+
+.zona-fill-barranca {
+    background-color: #22c55e;
+}
+
+/* Chacarita – Vista costera de Puntarenas */
+.zona-img-chacarita {
+    background-image: url('/zona-chacarita.jpg');
+    background-position: center 30%;
+}
+
+.zona-color-chacarita {
+    color: #f59e0b;
+}
+
+.zona-fill-chacarita {
+    background-color: #f59e0b;
+}
+
+/* El Roble – Zona comercial, avenida principal */
+.zona-img-el-roble {
+    background-image: url('/zona-el-roble.jpg');
+    background-position: center 50%;
+}
+
+.zona-color-el-roble {
+    color: #3b82f6;
+}
+
+.zona-fill-el-roble {
+    background-color: #3b82f6;
+}
+
+/* Cantonal – Bandera de Puntarenas */
+.zona-img-cantonal {
+    background-image: url('/zona-cantonal.jpg');
+    background-position: center center;
+    background-size: cover;
+}
+
+.zona-color-cantonal {
+    color: #22c55e;
+}
+
+.zona-fill-cantonal {
+    background-color: #22c55e;
+}
+
+/* Fallback genérico */
+.zona-img-default {
+    background-image: url('/zona-cantonal.jpg');
+    background-position: center 50%;
+}
+
+.zona-color-default {
+    color: #22c55e;
+}
+
+.zona-fill-default {
+    background-color: #22c55e;
+}
+
+/* ── Cantonal Metrics Slim ── */
+.cantonal-metrics-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 16px;
+    margin-top: 10px;
+}
+
+.cantonal-metric-card {
+    background: #ffffff;
+    border-radius: 14px;
+    padding: 12px 20px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    border: 1px solid #e5e7eb;
+    box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);
+    transition: all 0.3s ease;
+}
+
+.cantonal-metric-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1);
+}
+
+.metric-icon-box {
+    width: 40px;
+    height: 40px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.cantonal-metric-card.green .metric-icon-box { background: #dcfce7; color: #166534; }
+.cantonal-metric-card.blue .metric-icon-box { background: #eff6ff; color: #1e40af; }
+.cantonal-metric-card.orange .metric-icon-box { background: #fff7ed; color: #9a3412; }
+
+.metric-info {
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+}
+
+.metric-number {
+    font-size: 20px;
+    font-weight: 800;
+    color: #111827;
+}
+
+.metric-label {
+    font-size: 11px;
+    color: #6b7280;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}

@@ -1,0 +1,428 @@
+.matriz-seguimiento-v2 {
+  padding: 2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  height: 100%;
+  animation: fadeIn 0.4s ease-out;
+}
+
+.matriz-loading {
+  padding: 4rem;
+  text-align: center;
+  color: #64748b;
+  font-weight: 500;
+}
+
+/* Header */
+.matriz-v2-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+}
+
+.header-titles h1 {
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: #ffffff;
+  margin: 0;
+  text-shadow: 0 2px 4px rgba(0,0,0,0.2);
+}
+
+.header-titles p {
+  color: rgba(255,255,255,0.8);
+  font-size: 0.9rem;
+  margin: 6px 0 0;
+  font-weight: 500;
+}
+
+.header-actions {
+  display: flex;
+  gap: 12px;
+}
+
+.header-actions button {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 16px;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border: none;
+}
+
+.btn-primary {
+  background: #3b82f6;
+  color: #fff;
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+}
+
+.btn-primary:hover {
+  background: #2563eb;
+  transform: translateY(-1px);
+}
+
+.btn-secondary {
+  background: #ffffff;
+  color: #0f172a;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.btn-secondary:hover {
+  background: #f8fafc;
+  transform: translateY(-1px);
+}
+
+/* Toolbar Toolbar */
+.matriz-v2-toolbar {
+  display: flex;
+  gap: 16px;
+  background: #ffffff;
+  padding: 1rem;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.03);
+  border: 1px solid #e2e8f0;
+}
+
+.search-box {
+  flex: 1;
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.search-box svg {
+  position: absolute;
+  left: 14px;
+}
+
+.search-box input {
+  width: 100%;
+  padding: 10px 14px 10px 42px;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  color: #1e293b;
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+.search-box input:focus {
+  border-color: #3b82f6;
+}
+
+.filter-box {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  padding-left: 1rem;
+  border-left: 1px solid #e2e8f0;
+}
+
+.filter-box select {
+  padding: 10px 32px 10px 12px;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  font-size: 0.85rem;
+  color: #334155;
+  background-color: #fff;
+  appearance: none;
+  background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 10px center;
+  background-size: 16px;
+  cursor: pointer;
+}
+
+/* Excel Style Table */
+.excel-table-container {
+  background: #ffffff;
+  border-radius: 16px;
+  border: 1px solid #e2e8f0;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.05);
+  overflow: auto;
+  max-height: calc(100vh - 250px); /* Ocupar el espacio restante con scroll interno */
+}
+
+/* Scrollbar styling for table */
+.excel-table-container::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+.excel-table-container::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 8px;
+}
+.excel-table-container::-webkit-scrollbar-track {
+  background: #f1f5f9;
+}
+
+.excel-table {
+  width: 100%;
+  min-width: 1300px;
+  border-collapse: collapse;
+  font-size: 0.85rem;
+  table-layout: fixed;
+}
+
+/* Anchos de columnas fijos */
+.excel-table th, .excel-table td {
+  padding: 12px 14px;
+  border-right: 1px solid #e2e8f0;
+  border-bottom: 1px solid #e2e8f0;
+  vertical-align: top;
+}
+.excel-table th:last-child, .excel-table td:last-child {
+  border-right: none;
+}
+
+.excel-table th {
+  background: #f8fafc;
+
+  padding: 1rem 1.5rem;
+  text-align: left;
+  font-weight: 800;
+  color: #4b5563; /* Gris más oscuro para labels */
+  text-transform: uppercase;
+  font-size: 0.72rem;
+  letter-spacing: 0.05em;
+  border-bottom: 2px solid #e2e8f0;
+}
+
+/* Definición de anchos */
+.excel-table th:nth-child(1) { width: 70px; } /* ID */
+.excel-table th:nth-child(2) { width: 220px; } /* Acción Estratégica */
+.excel-table th:nth-child(3) { width: 180px; } /* Indicador */
+.excel-table th:nth-child(4) { width: 220px; } /* Consideraciones */
+.excel-table th:nth-child(5) { width: 140px; } /* Meta */
+.excel-table th:nth-child(6) { width: 100px; } /* Plazo */
+.excel-table th:nth-child(7) { width: 180px; } /* Responsables */
+.excel-table th:nth-child(8) { width: 250px; } /* Evidencia */
+
+/* Group Row (Línea de Acción) */
+.group-row td {
+  background: #e0f2fe; /* Azul clarito oficial */
+  padding: 10px 14px;
+  border-bottom: 2px solid #bae6fd;
+}
+
+.group-content {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 0.85rem;
+}
+
+
+.col-no {
+  width: 40px;
+  color: var(--inst-text-muted);
+}
+
+.col-prob {
+  min-width: 180px;
+}
+
+.col-prob strong {
+  display: block;
+  font-size: 0.95rem;
+  color: #0f172a; /* Casi negro */
+  font-weight: 800;
+}
+
+.item-id-tag {
+  display: inline-block;
+  margin-top: 4px;
+  font-size: 0.65rem;
+  font-weight: 700;
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.prob-label, .linea-label {
+  color: #0369a1;
+  font-weight: 800;
+}
+
+.prob-text, .linea-text {
+  color: #0f172a;
+  font-weight: 600;
+}
+
+.separator {
+  color: #7dd3fc;
+  font-weight: 300;
+}
+
+/* Data Rows */
+.data-row:hover td {
+  background: #f8fafc;
+}
+
+.text-wrap {
+  word-wrap: break-word;
+  white-space: normal;
+  color: #334155;
+  line-height: 1.4;
+}
+
+.id-tag {
+  background: #f1f5f9;
+  color: #475569;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+}
+
+.badge-plazo {
+  display: inline-block;
+  background: #fef3c7;
+  color: #92400e;
+  padding: 3px 8px;
+  border-radius: 4px;
+  margin-right: 8px;
+  vertical-align: middle;
+}
+
+.col-accion {
+  max-width: 300px;
+}
+
+.action-title-main {
+  font-weight: 800;
+  color: #0f172a; /* Más oscuro */
+  font-size: 1rem;
+  line-height: 1.2;
+}
+
+.action-desc-sub {
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.resp-lider {
+  color: #0f172a;
+  font-size: 0.8rem;
+  margin-bottom: 4px;
+}
+
+.resp-co {
+  color: #64748b;
+  font-size: 0.75rem;
+}
+
+/* Evidencias Cell - Inline Editing */
+.cell-evidencia {
+  background: #fefce8; /* Un sutil fondo amarillo para sugerir edición */
+  cursor: pointer;
+  position: relative;
+  transition: background 0.2s;
+}
+
+.cell-evidencia:hover {
+  background: #fef9c3;
+}
+
+.view-mode {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  min-height: 40px;
+}
+
+.evidencia-text {
+  color: #334155;
+  font-size: 0.8rem;
+  line-height: 1.4;
+  white-space: pre-wrap;
+}
+
+.evidencia-empty {
+  color: #94a3b8;
+  font-size: 0.8rem;
+  font-style: italic;
+}
+
+.edit-icon {
+  color: #94a3b8;
+  opacity: 0;
+  transition: opacity 0.2s;
+  flex-shrink: 0;
+  margin-left: 8px;
+}
+
+.cell-evidencia:hover .edit-icon {
+  opacity: 1;
+  color: #eab308;
+}
+
+/* Inline Edit Form */
+.edit-mode {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.edit-mode textarea {
+  width: 100%;
+  resize: vertical;
+  padding: 8px;
+  border: 1px solid #eab308;
+  border-radius: 6px;
+  font-size: 0.8rem;
+  font-family: inherit;
+  color: #1e293b;
+  outline: none;
+  background: #fff;
+  box-shadow: 0 0 0 3px rgba(234, 179, 8, 0.1);
+}
+
+.edit-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+.btn-cancel, .btn-save {
+  padding: 4px 10px;
+  border-radius: 4px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  cursor: pointer;
+  border: none;
+}
+
+.btn-cancel {
+  background: transparent;
+  color: #64748b;
+}
+
+.btn-cancel:hover {
+  background: #f1f5f9;
+  color: #334155;
+}
+
+.btn-save {
+  background: #eab308;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.btn-save:hover {
+  background: #ca8a04;
+}
+
+.empty-row, .empty-subrow {
+  text-align: center;
+  padding: 2rem !important;
+  color: #94a3b8;
+  font-style: italic;
+}
