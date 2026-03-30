@@ -185,7 +185,13 @@ const RevisionReportes = () => {
                               Indicador a cumplir: {reporte.indicador}
                             </div>
                           </div>
-                          <div style={{ textAlign: 'right', minWidth: '140px' }}>
+                          <div style={{ textAlign: 'right', minWidth: '160px' }}>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '6px', justifyContent: 'flex-end', marginBottom: '4px' }}>
+                              <Building size={14} color="#3b82f6" />
+                              <span style={{ fontWeight: 800, color: '#2563eb', fontSize: '0.82rem', textTransform: 'uppercase' }}>
+                                {reporte.responsable?.institucion || user?.institucion}
+                              </span>
+                            </div>
                             <div style={{ display: 'flex', alignItems: 'center', gap: '6px', justifyContent: 'flex-end', marginBottom: '4px' }}>
                               <Users size={14} color="#64748b" />
                               <span style={{ fontWeight: 700, color: '#0b2240', fontSize: '0.85rem' }}>
@@ -421,7 +427,7 @@ const RevisionReportes = () => {
                               <button
                                 className="admin-inst-btn admin-inst-btn--rechazar"
                                 onClick={() => handleRechazar(reporte.id)}
-                                disabled={!modalRechazo.observacion.trim()}
+                                disabled={!modalRechazo.observacion?.trim()}
                               >
                                 Confirmar Rechazo
                               </button>

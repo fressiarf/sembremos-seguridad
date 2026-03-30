@@ -198,8 +198,37 @@ const GestionUsuarios = () => {
   if (loading) return <div style={{ color: '#7a9cc4', padding: '2rem' }}>Cargando usuarios...</div>;
 
   return (
-    <div className="gestion-usuarios">
-      <section className="gestion-usuarios__filters" style={{ marginTop: '0' }}>
+    <div className="gestion-usuarios" style={{ padding: '2rem 2.5rem', fontFamily: 'Inter, sans-serif' }}>
+      <div style={{ marginBottom: '2.5rem' }}>
+        <span style={{ 
+          display: 'inline-block',
+          padding: '6px 16px',
+          borderRadius: '20px',
+          backgroundColor: 'rgba(255, 255, 255, 0.1)',
+          color: '#e2e8f0',
+          fontSize: '0.75rem',
+          fontWeight: '700',
+          letterSpacing: '1px',
+          marginBottom: '1rem',
+          border: '1px solid rgba(255,255,255,0.2)'
+        }}>CONTROL DE ACCESO</span>
+        <h1 style={{ 
+          fontSize: '2.5rem', 
+          fontWeight: 800, 
+          color: 'white', 
+          margin: '0 0 8px 0',
+          letterSpacing: '-0.5px',
+          textShadow: '0 2px 10px rgba(0,0,0,0.3)'
+        }}>Gestión de Instituciones</h1>
+        <p style={{ 
+          fontSize: '1rem', 
+          color: '#94a3b8', 
+          margin: 0,
+          fontWeight: 500
+        }}>Administración de identidades, roles y accesos corporativos</p>
+      </div>
+
+      <section className="gestion-usuarios__filters" style={{ marginTop: '0', borderRadius: '16px', border: 'none', background: 'rgba(255,255,255,0.03)', backdropFilter: 'blur(10px)', border: '1px solid rgba(255,255,255,0.1)' }}>
         <div className="search-wrapper">
           <div className="search-icon">
             <Search size={18} />
@@ -463,13 +492,14 @@ const GestionUsuarios = () => {
                     {getRolLabel(u.rol)}
                   </span>
                 </td>
-                <td style={{ textAlign: 'right' }}>
+                 <td style={{ textAlign: 'right', paddingRight: '24px' }}>
                   {currentUser.rol === 'admin' && u.id !== currentUser.id ? (
                     <button 
                       className="btn-change-role"
                       onClick={() => handleToggleRole(u.id, u.rol)}
                       disabled={updatingId === u.id}
                       title={`Cambiar a ${u.rol === 'admin' ? 'Admin Institución' : 'Administrador Global'}`}
+                      style={{ marginLeft: 'auto' }}
                     >
                       <UserCog size={16} />
                       {updatingId === u.id ? 'Actualizando...' : (u.rol === 'admin' ? 'Pasar a Institución' : 'Hacer Admin Global')}

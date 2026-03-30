@@ -2,13 +2,13 @@ import React from 'react';
 import DashboardAdminInst from './Vistas/DashboardAdminInst';
 import GestionTareas from './Vistas/GestionTareas';
 import RevisionReportes from './Vistas/RevisionReportes';
-import RevisionInformesTrimestral from './Vistas/RevisionInformesTrimestral';
 import HistorialReportes from './Vistas/HistorialReportes';
 import Calendario from '../Shared/Calendario/Calendario';
 import GestionFuncionarios from './Vistas/GestionFuncionarios';
 import PerfilUsuario from '../Dashboard/PerfilUsuario/PerfilUsuario';
 import EstadisticasInstitucion from './Vistas/EstadisticasInstitucion';
 import TopbarInstitucion from '../DashboardInstitucion/Navegacion/TopbarInstitucion';
+import SoporteInstitucional from '../Dashboard/SoporteInstitucional/SoporteInstitucional';
 import { useLogin } from '../../context/LoginContext';
 import { useState, useEffect, useRef } from 'react';
 import { Bot, Bell, X } from 'lucide-react';
@@ -44,11 +44,11 @@ const SeccionPrincipalAdminInstitucion = ({ activeView = 'dashboard', collapsed,
       dashboard: 'Dashboard',
       tareas: 'Gestión de Tareas',
       usuarios: 'Gestión de Funcionarios',
-      reportes: 'Revisión de Reportes',
-      informesTrimestral: 'Informes Trimestrales',
-      historial: 'Historial de Reportes',
+      reportes: 'Revisión y Autorización',
+      historial: 'Historial Institucional',
       calendario: 'Calendario',
       estadisticas: 'Estadísticas',
+      alertas: 'Soporte y Comentarios',
       perfil: 'Mi Perfil',
     };
     return labels[activeView] || 'Dashboard';
@@ -64,14 +64,18 @@ const SeccionPrincipalAdminInstitucion = ({ activeView = 'dashboard', collapsed,
         return <GestionFuncionarios />;
       case 'reportes':
         return <RevisionReportes />;
-      case 'informesTrimestral':
-        return <RevisionInformesTrimestral />;
       case 'historial':
         return <HistorialReportes />;
       case 'calendario':
         return (
           <div style={{ padding: '1rem 2rem' }}>
              <Calendario />
+          </div>
+        );
+      case 'alertas':
+        return (
+          <div style={{ padding: '0 2.5rem 2.5rem' }}>
+            <SoporteInstitucional />
           </div>
         );
       case 'estadisticas':

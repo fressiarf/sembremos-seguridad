@@ -26,7 +26,7 @@
 
 .zonas-header-actions {
     display: flex;
-    gap: 16px;
+    justify-content: flex-end;
     align-items: center;
 }
 
@@ -81,7 +81,7 @@
 
 .zonas-grid {
     display: grid;
-    grid-template-columns: 1fr;
+    grid-template-columns: repeat(auto-fit, minmax(420px, 1fr));
     gap: 16px;
 }
 
@@ -113,7 +113,7 @@
 .zona-card-content {
     width: 70%;
     margin-top: 0;
-    padding: 20px 24px;
+    padding: 14px 18px;
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -224,10 +224,10 @@
 }
 
 .zona-progress-bg {
-    background-color: #e5e7eb; /* Fondo de la barra cambiado a gris claro */
-    height: 6px;
-    border-radius: 3px;
-    margin-bottom: 16px;
+    background-color: #e5e7eb;
+    height: 4px;
+    border-radius: 2px;
+    margin-bottom: 12px;
     overflow: hidden;
     width: 100%;
 }
@@ -240,7 +240,7 @@
 .zona-stats {
     display: flex;
     flex-direction: column;
-    gap: 12px;
+    gap: 6px;
     width: 100%;
 }
 
@@ -251,14 +251,14 @@
 }
 
 .stat-label {
-    color: #6b7280; /* Texto de etiquetas gris medio/oscuro */
-    font-size: 13px;
+    color: #6b7280;
+    font-size: 12px;
 }
 
 .stat-value {
-    font-size: 13px;
-    font-weight: 600;
-    color: #111827; /* Valor en texto oscuro */
+    font-size: 12px;
+    font-weight: 700;
+    color: #111827;
 }
 
 .zona-divider {
@@ -268,8 +268,8 @@
 }
 
 .beneficiarios-value {
-    font-size: 18px;
-    font-weight: 700 !important;
+    font-size: 16px;
+    font-weight: 800 !important;
 }
 
 .zona-icon {
@@ -302,7 +302,6 @@
 }
 
 .zona-fill-barranca {
-    width: 78%;
     background-color: #22c55e;
 }
 
@@ -317,7 +316,6 @@
 }
 
 .zona-fill-chacarita {
-    width: 62%;
     background-color: #f59e0b;
 }
 
@@ -332,7 +330,6 @@
 }
 
 .zona-fill-el-roble {
-    width: 55%;
     background-color: #3b82f6;
 }
 
@@ -348,7 +345,6 @@
 }
 
 .zona-fill-cantonal {
-    width: 71%;
     background-color: #22c55e;
 }
 
@@ -363,6 +359,63 @@
 }
 
 .zona-fill-default {
-    width: 71%;
     background-color: #22c55e;
+}
+
+/* ── Cantonal Metrics Slim ── */
+.cantonal-metrics-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 16px;
+    margin-top: 10px;
+}
+
+.cantonal-metric-card {
+    background: #ffffff;
+    border-radius: 14px;
+    padding: 12px 20px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    border: 1px solid #e5e7eb;
+    box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);
+    transition: all 0.3s ease;
+}
+
+.cantonal-metric-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1);
+}
+
+.metric-icon-box {
+    width: 40px;
+    height: 40px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.cantonal-metric-card.green .metric-icon-box { background: #dcfce7; color: #166534; }
+.cantonal-metric-card.blue .metric-icon-box { background: #eff6ff; color: #1e40af; }
+.cantonal-metric-card.orange .metric-icon-box { background: #fff7ed; color: #9a3412; }
+
+.metric-info {
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+}
+
+.metric-number {
+    font-size: 20px;
+    font-weight: 800;
+    color: #111827;
+}
+
+.metric-label {
+    font-size: 11px;
+    color: #6b7280;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
 }

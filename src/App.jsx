@@ -7,7 +7,6 @@ function App() {
   return (
     <LoginProvider>
       <ToastProvider>
-        <TricolorBar isFixed={true} />
         <Routing />
       </ToastProvider>
     </LoginProvider>

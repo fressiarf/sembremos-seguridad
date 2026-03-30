@@ -4,7 +4,7 @@ import { useLogin } from "../../../context/LoginContext";
 import UserBrand from "../../Shared/Navegacion/UserBrand";
 import {
   ChevronLeft, ChevronDown, LayoutDashboard, ClipboardList,
-  FileSearch, Clock, Calendar, LogOut, Users, BarChart3, FileBarChart
+  FileSearch, Clock, Calendar, LogOut, Users, BarChart3, FileBarChart, MessageCircle
 } from "lucide-react";
 import Swal from 'sweetalert2';
 
@@ -30,7 +30,6 @@ const SidebarAdminInstitucion = ({ collapsed = false, onToggle, activeView, onVi
       label: 'SUPERVISIÓN',
       items: [
         { id: 'reportes', label: 'Revisión de Reportes', icon: FileSearch },
-        { id: 'informesTrimestral', label: 'Informes Trimestrales', icon: FileBarChart },
         { id: 'historial', label: 'Historial de Reportes', icon: Clock },
       ],
     },
@@ -44,6 +43,7 @@ const SidebarAdminInstitucion = ({ collapsed = false, onToggle, activeView, onVi
       label: 'PLANIFICACIÓN',
       items: [
         { id: 'calendario', label: 'Calendario', icon: Calendar },
+        { id: 'alertas', label: 'Soporte y Comentarios', icon: MessageCircle },
       ],
     },
   ];

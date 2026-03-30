@@ -264,6 +264,34 @@ export const dashboardService = {
     }
   },
 
+  updateComentarioSoporte: async (id, updateData) => {
+    try {
+      const response = await fetch(`${BASE_URL}/comentariosSoporte/${id}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(updateData)
+      });
+      if (!response.ok) throw new Error('Error actualizando comentario');
+      return await response.json();
+    } catch (error) {
+      console.error('Error in updateComentarioSoporte:', error);
+      throw error;
+    }
+  },
+
+  deleteComentarioSoporte: async (id) => {
+    try {
+      const response = await fetch(`${BASE_URL}/comentariosSoporte/${id}`, {
+        method: 'DELETE'
+      });
+      if (!response.ok) throw new Error('Error eliminando comentario');
+      return true;
+    } catch (error) {
+      console.error('Error in deleteComentarioSoporte:', error);
+      throw error;
+    }
+  },
+
   /**
    * Obtiene todos los eventos del calendario
    */

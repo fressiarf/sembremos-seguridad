@@ -20,6 +20,7 @@ const ProfileSettings = () => {
         nombre: '',
         usuario: '',
         telefono: '',
+        cedula: '',
         password: '',
         confirmPassword: ''
     });
@@ -43,6 +44,7 @@ const ProfileSettings = () => {
                         nombre: uData.nombre || '',
                         usuario: uData.usuario || '',
                         telefono: uData.telefono || '8888-0000',
+                        cedula: uData.cedula || '',
                         password: '', // No cargar password actual por seguridad
                         confirmPassword: ''
                     });
@@ -117,20 +119,31 @@ const ProfileSettings = () => {
                     nombre: formData.nombre,
                     usuario: formData.usuario,
                     telefono: formData.telefono,
-                    password: formData.password
+                    cedula: formData.cedula,
                 };
+                
+                // Solo adjuntar si tiene contenido
+                if (formData.password) {
+                    payload.password = formData.password;
+                }
+
                 await userService.updateUser(currentUser.id, payload);
                 await userService.logSecurityAction({
                     userId: currentUser.id,
                     usuario: currentUser.usuario,
                     rol: currentUser.rol,
                     accion: 'ACTUALIZACION_PERFIL',
-                    detalles: `Actualización completa por ${currentUser.nombre}`
+                    detalles: `Actualización completa por ${currentUser.nombre}${formData.password ? ' (con cambio de clave)' : ''}`
                 });
                 showToast('Perfil actualizado correctamente', 'success');
             } else if (isEditor) {
                 if (!windowStatus.active) {
                     showToast('No tiene una ventana de cambio autorizada', 'error');
+                    return;
+                }
+
+                if (!formData.password) {
+                    showToast('Debe ingresar la nueva contraseña', 'warning');
                     return;
                 }
 
@@ -158,17 +171,37 @@ const ProfileSettings = () => {
     if (loading) return <div className="profile-loading">Sincronizando seguridad...</div>;
 
     return (
-        <div className="profile-settings-overlay">
-            <div className="profile-settings-card">
-                <header className="profile-settings-header">
-                    <div className="profile-header-info">
-                        <Shield className="shield-icon" size={24} />
-                        <div>
-                            <h1>Configuración de Perfil</h1>
-                            <p>Gestión de identidad y seguridad / RBAC</p>
-                        </div>
-                    </div>
-                </header>
+        <div className="profile-settings-container" style={{ padding: '2rem 2.5rem', fontFamily: 'Inter, sans-serif' }}>
+            <div style={{ marginBottom: '2.5rem' }}>
+                <span style={{ 
+                    display: 'inline-block',
+                    padding: '6px 16px',
+                    borderRadius: '20px',
+                    backgroundColor: 'rgba(255, 255, 255, 0.1)',
+                    color: '#e2e8f0',
+                    fontSize: '0.75rem',
+                    fontWeight: '700',
+                    letterSpacing: '1px',
+                    marginBottom: '1rem',
+                    border: '1px solid rgba(255,255,255,0.2)'
+                }}>IDENTIDAD Y SEGURIDAD</span>
+                <h1 style={{ 
+                    fontSize: '2.5rem', 
+                    fontWeight: 800, 
+                    color: 'white', 
+                    margin: '0 0 8px 0',
+                    letterSpacing: '-0.5px',
+                    textShadow: '0 2px 10px rgba(0,0,0,0.3)'
+                }}>Configuración de Perfil</h1>
+                <p style={{ 
+                    fontSize: '1rem', 
+                    color: '#94a3b8', 
+                    margin: 0,
+                    fontWeight: 500
+                }}>Gestión de identidad, accesos corporativos y RBAC</p>
+            </div>
+
+            <div className="profile-settings-card" style={{ marginTop: '0' }}>
 
                 <form className="profile-settings-form" onSubmit={handleSave}>
                     <div className="form-sections-grid">
@@ -177,8 +210,15 @@ const ProfileSettings = () => {
                         <section className="form-section">
                             <h3><User size={18} /> Datos de Identidad</h3>
                             <div className="input-group">
-                                <label><IdCard size={14} /> Cédula de Identidad (Bloqueado por Sistema)</label>
-                                <input type="text" value={user?.cedula || ''} disabled className="input-readonly" />
+                                <label><IdCard size={14} /> Cédula de Identidad</label>
+                                <input 
+                                    type="text" 
+                                    name="cedula"
+                                    value={formData.cedula} 
+                                    onChange={handleChange}
+                                    disabled={isEditor} 
+                                    className={isEditor ? 'input-readonly' : ''} 
+                                />
                             </div>
 
                             <div className="input-group">
@@ -251,14 +291,13 @@ const ProfileSettings = () => {
                                         </div>
                                     )}
                                     <div className="input-group highlight-pass">
-                                        <label><Lock size={14} /> Nueva Contraseña</label>
+                                        <label><Lock size={14} /> Nueva Contraseña (Opcional)</label>
                                         <input
                                             type="password"
                                             name="password"
                                             value={formData.password}
                                             onChange={handleChange}
                                             placeholder="••••••••"
-                                            required
                                         />
                                     </div>
 
@@ -270,7 +309,6 @@ const ProfileSettings = () => {
                                             value={formData.confirmPassword}
                                             onChange={handleChange}
                                             placeholder="••••••••"
-                                            required
                                         />
                                     </div>
                                 </>

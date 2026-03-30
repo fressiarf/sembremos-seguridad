@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { AlertCircle, ChevronDown, ChevronUp, Clock, FileText, CheckCircle, Activity } from 'lucide-react';
+import { AlertCircle, ChevronDown, ChevronUp, Clock, FileText, CheckCircle, Activity, MapPin, Users } from 'lucide-react';
 
 const CardLineaAccion = ({ linea, children }) => {
   const [expanded, setExpanded] = useState(false);
@@ -25,7 +25,15 @@ const CardLineaAccion = ({ linea, children }) => {
             </span>
             <span className="badge-id">ID: {linea.id}</span>
           </div>
-          <h2 className="card-inst-title">{linea.lineaAccion}</h2>
+          <h2 className="card-inst-title">{linea.titulo}</h2>
+          <div className="card-inst-metadata-row">
+            <span className="metadata-item">
+              <MapPin size={12} /> {linea.canton || 'Lugar no especificado'}
+            </span>
+            <span className="metadata-item">
+              <Users size={12} /> {linea.totalTareas || 0} tareas locales
+            </span>
+          </div>
           <p className="card-inst-subtitle">Problemática: {linea.problematica}</p>
         </div>
 
