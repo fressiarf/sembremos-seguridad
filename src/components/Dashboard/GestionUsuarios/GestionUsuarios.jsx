@@ -2,8 +2,9 @@ import React, { useState, useEffect } from 'react';
 import './GestionUsuarios.css';
 import { userService } from '../../../services/userService';
 import { useToast } from '../../../context/ToastContext';
-import { Search, UserCog, Shield, UserPlus, X, Key, Mail, Fingerprint, User as UserIcon, Building2 } from 'lucide-react';
+import { Search, UserCog, Shield, UserPlus, X, Key, Mail, Fingerprint, User as UserIcon, Building2, Trash2 } from 'lucide-react';
 import { useLogin } from '../../../context/LoginContext';
+import Swal from 'sweetalert2';
 
 const INSTITUCIONES = [
   'PANI', 'IMAS', 'CCSS', 'MEP', 'IAFA',
@@ -49,8 +50,8 @@ const GestionUsuarios = () => {
     showToast('Solicitud removida de la lista', 'info');
   };
 
+  // Reseteo desde solicitud pendiente (flujo SoporteAcceso)
   const handleResetPassword = async (sol) => {
-    // 1. Buscar el usuario correspondiente al correo de la solicitud
     const foundUser = users.find(u => u.usuario.toLowerCase() === sol.correo.toLowerCase());
     
     if (!foundUser) {
@@ -58,21 +59,128 @@ const GestionUsuarios = () => {
       return;
     }
 
-    // 2. Definir una contraseña temporal
-    const tempPassword = `Sembremos.${Math.floor(Math.random() * 9000 + 1000)}`;
+    const result = await Swal.fire({
+      title: '¿Restablecer contraseña?',
+      html: `Se generará una clave temporal para <strong>${foundUser.nombre}</strong>.<br/>
+             <span style="color:#94a3b8;font-size:0.9rem">${foundUser.usuario}</span>`,
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#3b82f6',
+      cancelButtonColor: '#64748b',
+      confirmButtonText: 'Sí, restablecer',
+      cancelButtonText: 'Cancelar',
+      background: '#1e293b',
+      color: '#e2e8f0',
+    });
+
+    if (!result.isConfirmed) return;
 
     try {
-      // 3. Actualizar en la base de datos
-      await userService.updateUser(foundUser.id, { password: tempPassword });
-      
-      // 4. Notificar éxito y quitar de la lista
-      showToast(`Contraseña restablecida exitosamente para ${foundUser.nombre}. Nueva clave: ${tempPassword}`, 'success', 8000);
+      const tempPassword = await userService.resetUserPassword(foundUser.id);
+      showToast(`✅ Clave restablecida para ${foundUser.nombre}: ${tempPassword}`, 'success', 8000);
       handleDeleteSolicitud(sol.id);
-      
-      // Actualizar la lista local de usuarios (opcional, pero útil si se muestra la clave en otro sitio)
       setUsers(prev => prev.map(u => u.id === foundUser.id ? { ...u, password: tempPassword } : u));
     } catch (error) {
       showToast('Error técnico al intentar restablecer la contraseña', 'error');
+    }
+  };
+
+  // Reseteo directo desde la tabla (sin solicitud previa)
+  const handleDirectReset = async (targetUser) => {
+    if (targetUser.id === currentUser.id) {
+      showToast('No puedes restablecer tu propia contraseña desde aquí. Usa tu perfil.', 'warning');
+      return;
+    }
+
+    const result = await Swal.fire({
+      title: '¿Resetear contraseña?',
+      html: `Se generará una <strong>clave temporal</strong> para:<br/>
+             <strong style="color:#60a5fa">${targetUser.nombre}</strong><br/>
+             <span style="color:#94a3b8;font-size:0.85rem">${targetUser.usuario}</span>`,
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#3b82f6',
+      cancelButtonColor: '#64748b',
+      confirmButtonText: 'Generar clave temporal',
+      cancelButtonText: 'Cancelar',
+      background: '#1e293b',
+      color: '#e2e8f0',
+    });
+
+    if (!result.isConfirmed) return;
+
+    setUpdatingId(targetUser.id);
+    try {
+      const tempPassword = await userService.resetUserPassword(targetUser.id);
+      await userService.logSecurityAction({
+        userId: currentUser.id,
+        usuario: currentUser.usuario,
+        accion: 'RESET_PASSWORD_ADMIN',
+        detalles: `Admin [${currentUser.nombre}] reseteó la clave de [${targetUser.nombre}]`
+      });
+
+      await Swal.fire({
+        title: '✅ Contraseña restablecida',
+        html: `Nueva clave temporal para <strong>${targetUser.nombre}</strong>:<br/>
+               <div style="background:#0f172a;padding:12px 20px;border-radius:8px;margin-top:12px;
+               font-family:monospace;font-size:1.3rem;letter-spacing:2px;color:#60a5fa;
+               border:1px solid #1e40af">${tempPassword}</div>
+               <p style="font-size:0.8rem;color:#94a3b8;margin-top:8px">Comunique esta clave al usuario de forma segura.</p>`,
+        icon: 'success',
+        confirmButtonColor: '#3b82f6',
+        confirmButtonText: 'Entendido',
+        background: '#1e293b',
+        color: '#e2e8f0',
+      });
+      setUsers(prev => prev.map(u => u.id === targetUser.id ? { ...u, password: tempPassword } : u));
+    } catch (error) {
+      showToast('Error al restablecer la contraseña', 'error');
+    } finally {
+      setUpdatingId(null);
+    }
+  };
+
+  // Eliminación de usuario con confirmación
+  const handleDeleteUser = async (targetUser) => {
+    if (targetUser.id === currentUser.id) {
+      showToast('No puedes eliminar tu propia cuenta.', 'error');
+      return;
+    }
+
+    const result = await Swal.fire({
+      title: '¿Eliminar usuario?',
+      html: `Esta acción <strong>no se puede deshacer</strong>.<br/>
+             Se eliminará permanentemente a:<br/>
+             <strong style="color:#f87171">${targetUser.nombre}</strong><br/>
+             <span style="color:#94a3b8;font-size:0.85rem">${targetUser.usuario}</span>`,
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#ef4444',
+      cancelButtonColor: '#64748b',
+      confirmButtonText: 'Sí, eliminar',
+      cancelButtonText: 'Cancelar',
+      background: '#1e293b',
+      color: '#e2e8f0',
+      focusCancel: true,
+    });
+
+    if (!result.isConfirmed) return;
+
+    setUpdatingId(targetUser.id);
+    try {
+      await userService.deleteUser(targetUser.id);
+      await userService.logSecurityAction({
+        userId: currentUser.id,
+        usuario: currentUser.usuario,
+        accion: 'DELETE_USER',
+        detalles: `Admin [${currentUser.nombre}] eliminó al usuario [${targetUser.nombre}] (${targetUser.usuario})`
+      });
+      setUsers(prev => prev.filter(u => u.id !== targetUser.id));
+      showToast(`Usuario ${targetUser.nombre} eliminado exitosamente.`, 'success');
+    } catch (error) {
+      showToast('Error al eliminar el usuario', 'error');
+    } finally {
+      setUpdatingId(null);
     }
   };
 
@@ -124,13 +232,11 @@ const GestionUsuarios = () => {
       }
     }
     
-    // Básicos
     if (!newUser.nombre || !newUser.cedula || !newUser.usuario || !newUser.password) {
       showToast('Por favor completa todos los campos', 'warning');
       return;
     }
 
-    // Validación de Cédula (numérica)
     if (!/^\d+$/.test(newUser.cedula)) {
       showToast('La cédula debe contener solo números', 'warning');
       return;
@@ -141,14 +247,12 @@ const GestionUsuarios = () => {
       return;
     }
 
-    // Validación de Email
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(newUser.usuario)) {
       showToast('Por favor ingresa un correo electrónico válido', 'warning');
       return;
     }
 
-    // Validación de Contraseña
     if (newUser.password.length < 6) {
       showToast('La contraseña debe tener al menos 6 caracteres', 'warning');
       return;
@@ -411,7 +515,7 @@ const GestionUsuarios = () => {
                           maxLength={12}
                           value={newUser.cedula}
                           onChange={e => {
-                            const val = e.target.value.replace(/\D/g, ''); // Solo números
+                            const val = e.target.value.replace(/\D/g, '');
                             setNewUser({...newUser, cedula: val});
                           }}
                         />
@@ -492,18 +596,38 @@ const GestionUsuarios = () => {
                     {getRolLabel(u.rol)}
                   </span>
                 </td>
-                 <td style={{ textAlign: 'right', paddingRight: '24px' }}>
+                <td style={{ textAlign: 'right', paddingRight: '24px' }}>
                   {currentUser.rol === 'admin' && u.id !== currentUser.id ? (
-                    <button 
-                      className="btn-change-role"
-                      onClick={() => handleToggleRole(u.id, u.rol)}
-                      disabled={updatingId === u.id}
-                      title={`Cambiar a ${u.rol === 'admin' ? 'Admin Institución' : 'Administrador Global'}`}
-                      style={{ marginLeft: 'auto' }}
-                    >
-                      <UserCog size={16} />
-                      {updatingId === u.id ? 'Actualizando...' : (u.rol === 'admin' ? 'Pasar a Institución' : 'Hacer Admin Global')}
-                    </button>
+                    <div className="acciones-cell">
+                      {/* Cambiar rol */}
+                      <button 
+                        className="btn-change-role"
+                        onClick={() => handleToggleRole(u.id, u.rol)}
+                        disabled={updatingId === u.id}
+                        title={`Cambiar a ${u.rol === 'admin' ? 'Admin Institución' : 'Administrador Global'}`}
+                      >
+                        <UserCog size={16} />
+                        {updatingId === u.id ? 'Actualizando...' : (u.rol === 'admin' ? 'A Institución' : 'A Admin Global')}
+                      </button>
+                      {/* Resetear contraseña */}
+                      <button
+                        className="btn-reset-pwd"
+                        onClick={() => handleDirectReset(u)}
+                        disabled={updatingId === u.id}
+                        title="Resetear contraseña"
+                      >
+                        <Key size={16} />
+                      </button>
+                      {/* Eliminar usuario */}
+                      <button
+                        className="btn-delete-user"
+                        onClick={() => handleDeleteUser(u)}
+                        disabled={updatingId === u.id}
+                        title="Eliminar usuario"
+                      >
+                        <Trash2 size={14} />
+                      </button>
+                    </div>
                   ) : u.id === currentUser.id ? (
                     <span style={{ fontSize: '0.8rem', color: '#94a3b8', fontStyle: 'italic' }}>Tú</span>
                   ) : (
