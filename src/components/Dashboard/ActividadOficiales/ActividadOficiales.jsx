@@ -323,8 +323,8 @@ const ActividadOficiales = () => {
               </select>
             </div>
             <div className="form-group">
-              <label>Presupuesto Estimado / Inversión (₡) *</label>
-              <input type="number" placeholder="Ej: 5000000" value={newTarea.presupuestoEstimado} onChange={e => setNewTarea({...newTarea, presupuestoEstimado: parseInt(e.target.value) || 0})} required />
+              <label>Presupuesto Estimado / Inversión (₡)</label>
+              <input type="number" placeholder="Ej: 5000000" value={newTarea.presupuestoEstimado} onChange={e => setNewTarea({...newTarea, presupuestoEstimado: parseInt(e.target.value) || 0})} />
             </div>
           </div>
 

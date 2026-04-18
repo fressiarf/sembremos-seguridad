@@ -67,7 +67,14 @@ export const dashboardService = {
         }
 
         const metaNum = parseInt(tarea.meta) || 1;
-        const porcentaje = tarea.tipo === 2 ? avanceAcumulado : Math.min(Math.round((avanceAcumulado / metaNum) * 100), 100);
+        // Normalizamos el porcentaje para que nunca exceda el 100% (según requerimiento de validación de objetivos)
+        const porcentaje = Math.min(
+          Math.max(
+            tarea.tipo === 2 ? avanceAcumulado : Math.round((avanceAcumulado / metaNum) * 100),
+            0
+          ),
+          100
+        );
 
         return {
           ...tarea,
