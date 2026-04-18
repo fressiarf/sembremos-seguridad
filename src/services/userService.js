@@ -67,6 +67,37 @@ export const userService = {
     }
   },
 
+  // Eliminar un usuario
+  deleteUser: async (userId) => {
+    try {
+      const response = await fetch(`${API_URL}/${userId}`, {
+        method: 'DELETE',
+      });
+      if (!response.ok) throw new Error('Error al eliminar usuario');
+      return true;
+    } catch (error) {
+      console.error('Error deleting user:', error);
+      throw error;
+    }
+  },
+
+  // Restablecer contraseña: genera clave temporal y la persiste
+  resetUserPassword: async (userId) => {
+    const tempPassword = `Sembremos.${Math.floor(Math.random() * 9000 + 1000)}`;
+    try {
+      const response = await fetch(`${API_URL}/${userId}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ password: tempPassword }),
+      });
+      if (!response.ok) throw new Error('Error al restablecer contraseña');
+      return tempPassword;
+    } catch (error) {
+      console.error('Error resetting password:', error);
+      throw error;
+    }
+  },
+
   // Registrar acciones de seguridad
   logSecurityAction: async (logData) => {
     try {
@@ -102,4 +133,3 @@ export const userService = {
     }
   }
 };
-

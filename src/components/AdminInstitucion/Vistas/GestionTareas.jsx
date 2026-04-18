@@ -50,7 +50,6 @@ const GestionTareas = () => {
       const [tareasData, responsablesData, lineasData] = await Promise.all([
         adminInstitucionService.getTareas({ institucionId: user?.id }),
         adminInstitucionService.getResponsables(),
-        adminInstitucionService.getLineasAccion(),
       ]);
       setTareasRaw(tareasData.filter(t => t.estado !== 'Completado'));
       setResponsables(responsablesData);
@@ -62,7 +61,9 @@ const GestionTareas = () => {
     }
   };
 
-  useEffect(() => { loadData(); }, []);
+  useEffect(() => { 
+    if (user) loadData(); 
+  }, [user]);
 
   useEffect(() => {
     let filtradas = [...tareasRaw];

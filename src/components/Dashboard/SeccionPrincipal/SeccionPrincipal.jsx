@@ -40,17 +40,16 @@ const VIEW_LABELS = {
   perfil: 'Mi Perfil',
   'matriz-seguimiento': 'Matriz de Seguimiento',
   'reportes-resultados': 'Reportes de Resultados',
+  'lineas-accion': 'Líneas y Tareas',
+  historial: 'Historial',
   zonas: 'Zonas Críticas',
   alertas: 'Soporte y Comentarios',
   mapa: 'Mapa de Riesgos',
   consolidado: 'Consolidado Trimestral',
   estadisticas: 'Estadísticas',
-  calendario: 'Calendario de Operaciones',
-  reportes: 'Reportes INL/MSP',
-  historial: 'Historial de Reportes',
-  configuracion: 'Configuración',
-  'lineas-accion': 'Líneas de Acción',
-  lineas: 'Mis Tareas / Líneas de Acción',
+  usuarios: 'Gestión de Usuarios',
+  alertas: 'Soporte',
+  perfil: 'Mi Perfil'
 };
 
 const SeccionPrincipal = ({ collapsed, setCollapsed, activeView, onViewChange }) => {

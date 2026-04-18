@@ -1,10 +1,16 @@
 import React, { useState, useEffect } from 'react';
+import heroImg from '../../../assets/hero.png';
+import { Search, Activity, FileDown, FileSpreadsheet, FileText } from 'lucide-react';
 import { dashboardService } from '../../../services/dashboardService';
+import jsPDF from 'jspdf';
+import autoTable from 'jspdf-autotable';
+import * as XLSX from 'xlsx';
 import './MatrizSeguimiento.css';
 
 const MatrizSeguimiento = () => {
   const [lineas, setLineas] = useState([]);
   const [tareas, setTareas] = useState([]);
+  const [reportes, setReportes] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   const [expandedId, setExpandedId] = useState(null);
@@ -15,6 +21,7 @@ const MatrizSeguimiento = () => {
         const data = await dashboardService.getFullDashboardData();
         setLineas(data.lineasEnriquecidas || []);
         setTareas(data.tareas || []);
+        setReportes(data.reportes || []);
         setLoading(false);
       } catch (error) {
         console.error("Error fetching matriz data:", error);
@@ -34,120 +41,241 @@ const MatrizSeguimiento = () => {
     setExpandedId(expandedId === id ? null : id);
   };
 
-  if (loading) return <div className="matriz-container">Cargando matriz estratégica...</div>;
+  const exportPDF = () => {
+    const doc = jsPDF('l', 'mm', 'a4');
+    doc.setFontSize(20);
+    doc.setTextColor(11, 34, 64);
+    doc.text('Matriz de Seguimiento Estratégico', 14, 20);
+    
+    doc.setFontSize(10);
+    doc.setTextColor(100);
+    doc.text(`Programa Sembremos Seguridad | Cantón: Puntarenas | Fecha: ${new Date().toLocaleDateString()}`, 14, 28);
+
+    const tableData = lineas.map(l => [
+      l.no || '-',
+      l.canton || '-',
+      l.problematica || '-',
+      l.titulo || '-',
+      l.objetivo || '-'
+    ]);
+
+    autoTable(doc, {
+      startY: 35,
+      head: [['No.', 'Cantón', 'Factores Priorizados', 'Línea de Acción', 'Objetivo']],
+      body: tableData,
+      headStyles: { fillColor: [11, 34, 64], textColor: [255, 255, 255], fontStyle: 'bold' },
+      styles: { fontSize: 8, cellPadding: 3 },
+      columnStyles: { 0: { cellWidth: 12 }, 4: { cellWidth: 60 } },
+      margin: { top: 35 }
+    });
+
+    doc.save(`Matriz_Seguimiento_Puntarenas_${new Date().getTime()}.pdf`);
+  };
+
+  const exportExcel = () => {
+    const data = [];
+    lineas.forEach(l => {
+      const lineTareas = tareas.filter(t => t.lineaAccionId === l.id);
+      
+      const baseRowL = {
+        'No.': l.no,
+        'Cantón': l.canton,
+        'Factores Priorizados': l.problematica,
+        'Líneas de Acción Recomendadas': l.titulo,
+        'Objetivo General': l.objetivo
+      };
+
+      if (lineTareas.length === 0) {
+        data.push({
+          ...baseRowL,
+          'Acciones Estratégicas Específicas': 'Sin registrar',
+          'Metas e Indicadores': l.indicador || l.metaIndicador || '-',
+          'Consideraciones Técnicas': '-',
+          'Instituciones Corresponsables y Directas': Array.isArray(l.responsables) ? l.responsables.join(', ') : (l.responsables || l.institucionLider || '-'),
+          'Progreso (%)': 0
+        });
+      } else {
+        lineTareas.forEach(t => {
+          data.push({
+            ...baseRowL,
+            'Acciones Estratégicas Específicas': t.titulo,
+            'Metas e Indicadores': `Meta: ${t.meta || '-'} / Indicador: ${t.indicador || '-'}`,
+            'Consideraciones Técnicas': t.consideraciones || '-',
+            'Instituciones Corresponsables y Directas': t.institucionNombre || 'Sin asignar',
+            'Progreso (%)': t.progresoReal || 0
+          });
+        });
+      }
+    });
+
+    const ws = XLSX.utils.json_to_sheet(data);
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, 'Matriz Oficial MSP');
+    XLSX.writeFile(wb, `Matriz_SembremosSeguridad_Oficial_${new Date().getTime()}.xlsx`);
+  };
+
+  if (loading) return <div className="matriz-loading">Cargando matriz estratégica...</div>;
 
   return (
-    <div className="matriz-container">
-      <div className="matriz-header">
-        <h1>Matriz de Seguimiento Estratégico</h1>
-        <div className="search-box">
-          <input 
-            type="text" 
-            placeholder="Buscar por línea, objetivo o problemática..." 
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            style={{ padding: '0.75rem 1.5rem', borderRadius: '12px', border: '1px solid #e2e8f0', width: '400px', boxShadow: '0 2px 4px rgba(0,0,0,0.05)' }}
-          />
+    <div 
+      className="matriz-view-wrapper" 
+      style={{ 
+        background: `linear-gradient(rgba(11, 34, 64, 0.85), rgba(11, 34, 64, 0.85)), url('/bg-institucional.png')`,
+        backgroundAttachment: 'fixed',
+        backgroundSize: 'cover',
+        backgroundPosition: 'center'
+      }}
+    >
+      <div className="matriz-hero-banner">
+        <div className="matriz-hero-content">
+          <div className="banner-badge">MATRIZ DE CONTROL ESTRATÉGICO</div>
+          <h1>Matriz de Seguimiento Estratégico</h1>
+          <p>Consolidado de Indicadores y Avances · Cantón Puntarenas (Periodo 2025)</p>
+          
+          <div className="matriz-search-container">
+            <div className="matriz-search-wrapper">
+              <Search size={20} className="search-icon" />
+              <input 
+                type="text" 
+                placeholder="Filtrar por línea de acción, objetivo o problemática priorizada..." 
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+              />
+            </div>
+          </div>
         </div>
       </div>
 
-      <div className="matriz-card">
-        <div className="matriz-table-wrapper">
-          <table className="matriz-table">
-            <thead>
-              <tr>
-                <th className="col-no">No.</th>
-                <th className="col-canton">Cantón</th>
-                <th className="col-problematica">Factores Priorizados</th>
-                <th className="col-titulo">Línea de Acción</th>
-                <th className="col-objetivo">Objetivo</th>
-                <th className="col-meta">Meta / Indicador</th>
-                <th className="col-responsables">Responsables</th>
-              </tr>
-            </thead>
-            <tbody>
-              {filteredLineas.map((linea) => (
-                <React.Fragment key={linea.id}>
-                  <tr onClick={() => toggleExpand(linea.id)}>
-                    <td className="col-no">{linea.no}</td>
-                    <td className="col-canton">{linea.canton}</td>
-                    <td className="col-problematica">{linea.problematica}</td>
-                    <td className="col-titulo">
-                      {linea.titulo}
-                      <div className="tag-plazo">{linea.plazo || 'Anual'}</div>
-                    </td>
-                    <td className="col-objetivo">{linea.objetivo || 'Sin objetivo definido'}</td>
-                    <td className="col-meta">
-                      <div className="tag-meta">{linea.meta}</div>
-                      <div style={{ fontSize: '0.7rem', color: '#64748b', marginTop: '4px' }}>{linea.indicador}</div>
-                    </td>
-                    <td className="col-responsables">
-                      <div className="responsables-list">
-                        {Array.isArray(linea.responsables) ? (
-                          linea.responsables.map((r, i) => (
-                            <span key={i} className="mini-tag" style={{ background: '#f1f5f9', padding: '2px 6px', borderRadius: '4px', fontSize: '0.7rem' }}>{r}</span>
-                          ))
-                        ) : (
-                          <span className="mini-tag">{linea.institucionLider || 'Múltiples'}</span>
-                        )}
-                        {linea.corresponsables && (
-                          <div style={{ fontSize: '0.65rem', color: '#94a3b8', marginTop: '4px' }}>
-                            <strong>Co-gestores:</strong> {linea.corresponsables.join(', ')}
-                          </div>
-                        )}
-                      </div>
-                    </td>
-                  </tr>
-                  
-                  {expandedId === linea.id && (
-                    <tr className="planificacion-row">
-                      <td colSpan="7">
-                        <div className="planificacion-content">
-                          <h3 style={{ fontSize: '1rem', fontWeight: '700', color: '#1e3a8a', marginBottom: '1rem' }}>
-                            PLANIFICACIÓN 2025: Detalle de Acciones Estratégicas
-                          </h3>
-                          <table className="planificacion-table">
-                            <thead>
-                              <tr>
-                                <th>Acción Estratégica</th>
-                                <th>Indicador</th>
-                                <th>Consideraciones</th>
-                                <th>Meta</th>
-                                <th>Líder</th>
-                                <th>Progreso</th>
-                              </tr>
-                            </thead>
-                            <tbody>
-                              {tareas.filter(t => t.lineaAccionId === linea.id).map(tarea => (
-                                <tr key={tarea.id}>
-                                  <td style={{ fontWeight: '600' }}>{tarea.titulo}</td>
-                                  <td>{tarea.indicador}</td>
-                                  <td style={{ whiteSpace: 'pre-line' }}>{tarea.consideraciones}</td>
-                                  <td><span className="tag-meta">{tarea.meta}</span></td>
-                                  <td>{tarea.institucionNombre}</td>
-                                  <td style={{ textAlign: 'center' }}>
-                                    <div style={{ width: '100%', background: '#e2e8f0', height: '8px', borderRadius: '4px', position: 'relative' }}>
-                                      <div style={{ width: `${tarea.completada ? 100 : (tarea.metaValor ? (Math.random() * 50 + 20) : 0)}%`, background: '#3b82f6', height: '100%', borderRadius: '4px' }}></div>
-                                    </div>
-                                    <span style={{ fontSize: '0.65rem' }}>{tarea.completada ? 'Cerrada' : 'En ejecución'}</span>
-                                  </td>
-                                </tr>
-                              ))}
-                              {tareas.filter(t => t.lineaAccionId === linea.id).length === 0 && (
-                                <tr>
-                                  <td colSpan="6" style={{ textAlign: 'center', padding: '2rem', color: '#94a3b8' }}>No hay acciones estratégicas registradas para esta línea.</td>
-                                </tr>
-                              )}
-                            </tbody>
-                          </table>
+      <div className="matriz-container-custom">
+        <div className="matriz-toolbar-v4">
+          <div className="toolbar-info">
+            <Activity size={18} className="icon-pulse" />
+            <span>Resumen Estratégico del Plan de Acción</span>
+          </div>
+          <div className="toolbar-actions">
+             <button className="btn-export-v4 pdf" onClick={exportPDF} title="Generar ficher PDF Institucional">
+                <FileText size={18} />
+                <span>Exportar PDF</span>
+             </button>
+             <button className="btn-export-v4 excel" onClick={exportExcel} title="Exportar datos a hoja de cálculo">
+                <FileSpreadsheet size={18} />
+                <span>Hoja de Cálculo</span>
+             </button>
+          </div>
+        </div>
+
+        <div className="matriz-card-v4">
+          <div className="matriz-table-scroll">
+            <table className="matriz-table-premium">
+              <thead>
+                <tr>
+                  <th className="col-no">No.</th>
+                  <th className="col-canton">Cantón</th>
+                  <th className="col-problematica">Factores Priorizados</th>
+                  <th className="col-titulo">Línea de Acción</th>
+                  <th className="col-objetivo">Objetivo</th>
+                  <th className="col-meta">Meta / Indicador</th>
+                  <th className="col-responsables">Responsables</th>
+                </tr>
+              </thead>
+              <tbody>
+                {filteredLineas.map((linea) => (
+                  <React.Fragment key={linea.id}>
+                    <tr onClick={() => toggleExpand(linea.id)} className={expandedId === linea.id ? 'row-expanded' : ''}>
+                      <td className="col-no">{linea.no}</td>
+                      <td className="col-canton">{linea.canton}</td>
+                      <td className="col-problematica">{linea.problematica}</td>
+                      <td className="col-titulo">
+                        <div className="linea-title-main">{linea.titulo}</div>
+                        <div className="tag-plazo">{linea.plazo || 'Anual'}</div>
+                      </td>
+                      <td className="col-objetivo">{linea.objetivo || 'Sin objetivo definido'}</td>
+                      <td className="col-meta">
+                        <div className="tag-meta-v2">{linea.meta}</div>
+                        <div className="indicador-label">{linea.indicador}</div>
+                      </td>
+                      <td className="col-responsables">
+                        <div className="responsables-flex">
+                          {Array.isArray(linea.responsables) ? (
+                            linea.responsables.map((r, i) => (
+                              <span key={i} className="resp-pill">{r}</span>
+                            ))
+                          ) : (
+                            <span className="resp-pill">{linea.institucionLider || 'Institución'}</span>
+                          )}
+                          {linea.corresponsables && (
+                            <div className="corresp-label">
+                              <strong>Co-gestores:</strong> {linea.corresponsables.join(', ')}
+                            </div>
+                          )}
                         </div>
                       </td>
                     </tr>
-                  )}
-                </React.Fragment>
-              ))}
-            </tbody>
-          </table>
+                    
+                    {expandedId === linea.id && (
+                      <tr className="planificacion-details-row">
+                        <td colSpan="7">
+                          <div className="planificacion-box">
+                            <div className="plan-header">
+                              <Activity size={18} />
+                              <h3>PLANIFICACIÓN OPERATIVA 2025: Acciones Estratégicas Detalladas</h3>
+                            </div>
+                            <div className="plan-table-container">
+                              <table className="plan-table-nested">
+                                <thead>
+                                  <tr>
+                                    <th>Acción Estratégica</th>
+                                    <th>Indicador de Avance</th>
+                                    <th>Meta y Logro (Beneficiados)</th>
+                                    <th>Inversión (₡)</th>
+                                    <th>Líder</th>
+                                    <th style={{ width: '130px' }}>Progreso y Estado</th>
+                                  </tr>
+                                </thead>
+                                <tbody>
+                                  {tareas.filter(t => t.lineaAccionId === linea.id).map(tarea => (
+                                    <tr key={tarea.id}>
+                                      <td className="cell-bold">{tarea.titulo}</td>
+                                      <td>{tarea.indicador}</td>
+                                      <td>
+                                        <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                                          <span className="meta-tag-blue" style={{ background: '#eff6ff', color: '#1e40af' }}>Meta: {tarea.meta}</span>
+                                          <span className="meta-tag-green" style={{ background: '#f0fdf4', color: '#166534', fontSize:'0.75rem', fontWeight:'600', padding:'2px 6px', borderRadius:'4px', display:'inline-block' }}>Logro Acum.: {tarea.avanceAcumulado || 0}</span>
+                                        </div>
+                                      </td>
+                                      <td style={{ fontWeight: '600', color: '#0f172a' }}>
+                                        {tarea.inversionColones ? `₡${tarea.inversionColones.toLocaleString('es-CR')}` : '₡0'}
+                                      </td>
+                                      <td className="cell-inst">{tarea.institucionNombre || 'N/A'}</td>
+                                      <td>
+                                        <div className="progress-group-mini">
+                                          <div className="progress-bar-tiny">
+                                            <div className="fill" style={{ width: `${tarea.progresoReal || 0}%`, backgroundColor: tarea.progresoReal >= 100 ? '#22c55e' : '#3b82f6' }}></div>
+                                          </div>
+                                          <span className="progress-text" style={{ fontSize: '0.7rem', fontWeight: 'bold' }}>
+                                            {tarea.progresoReal || 0}% - {tarea.estado || (tarea.completada ? 'Cerrada' : 'En Ejecución')}
+                                          </span>
+                                        </div>
+                                      </td>
+                                    </tr>
+                                  ))}
+                                  {tareas.filter(t => t.lineaAccionId === linea.id).length === 0 && (
+                                    <tr>
+                                      <td colSpan="6" className="empty-subtable">Sin acciones estratégicas vinculadas actualmente.</td>
+                                    </tr>
+                                  )}
+                                </tbody>
+                              </table>
+                            </div>
+                          </div>
+                        </td>
+                      </tr>
+                    )}
+                  </React.Fragment>
+                ))}
+              </tbody>
+            </table>
+          </div>
         </div>
       </div>
     </div>

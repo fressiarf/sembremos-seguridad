@@ -431,17 +431,6 @@
   border-bottom: 1px solid var(--gray-border);
 }
 
-/* Tri-color Institutional Border (Bandera CR Style) */
-.TopbarInstitucion::before {
-  content: "";
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 5px;
-  background: var(--bandera-cr);
-}
-
 .TopbarIzquierda {
   display: flex;
   align-items: center;

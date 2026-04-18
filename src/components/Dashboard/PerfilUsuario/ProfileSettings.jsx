@@ -1,14 +1,14 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useLogin } from '../../../context/LoginContext';
 import { useToast } from '../../../context/ToastContext';
 import { userService } from '../../../services/userService';
 import { securityService } from '../../../services/securityService';
 import { ROLES } from '../../../constants/roles';
-import { Shield, User, Mail, Smartphone, Lock, Building, IdCard, Save, History, Bell, Key, Timer, AlertTriangle } from 'lucide-react';
+import { Shield, User, Mail, Smartphone, Lock, Building, IdCard, Save, History, Bell, Key, Timer, Camera, Upload, Trash2 } from 'lucide-react';
 import './ProfileSettings.css';
 
 const ProfileSettings = () => {
-    const { user: currentUser } = useLogin();
+    const { user: currentUser, updateSessionUser } = useLogin();
     const { showToast } = useToast();
 
     const [loading, setLoading] = useState(true);
@@ -16,10 +16,15 @@ const ProfileSettings = () => {
     const [user, setUser] = useState(null);
     const [windowStatus, setWindowStatus] = useState({ active: false, reason: '', expiresAt: null, reqId: null });
     const [timeLeft, setTimeLeft] = useState(null);
+    const [photoPreview, setPhotoPreview] = useState(null);
+    const [photoFile, setPhotoFile] = useState(null);
+    const photoInputRef = useRef(null);
+
     const [formData, setFormData] = useState({
         nombre: '',
         usuario: '',
         telefono: '',
+        cedula: '',
         password: '',
         confirmPassword: ''
     });
@@ -43,9 +48,14 @@ const ProfileSettings = () => {
                         nombre: uData.nombre || '',
                         usuario: uData.usuario || '',
                         telefono: uData.telefono || '8888-0000',
-                        password: '', // No cargar password actual por seguridad
+                        cedula: uData.cedula || '',
+                        password: '',
                         confirmPassword: ''
                     });
+                    // Cargar foto guardada
+                    if (uData.foto) {
+                        setPhotoPreview(uData.foto);
+                    }
 
                     // Si es Editor, verificar ventana de aprobación
                     if (uData.rol === ROLES.EDITOR) {
@@ -102,6 +112,43 @@ const ProfileSettings = () => {
         setFormData(prev => ({ ...prev, [name]: value }));
     };
 
+    // Manejo de selección de foto
+    const handlePhotoSelect = (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+
+        const allowedTypes = ['image/jpeg', 'image/png', 'image/webp', 'image/gif'];
+        if (!allowedTypes.includes(file.type)) {
+            showToast('Solo se permiten imágenes JPG, PNG, WEBP o GIF', 'error');
+            return;
+        }
+
+        if (file.size > 2 * 1024 * 1024) {
+            showToast('La imagen no puede superar los 2 MB', 'warning');
+            return;
+        }
+
+        const reader = new FileReader();
+        reader.onloadend = () => {
+            setPhotoPreview(reader.result);
+            setPhotoFile(reader.result); // base64 para guardar
+        };
+        reader.readAsDataURL(file);
+    };
+
+    // Eliminar foto
+    const handleRemovePhoto = () => {
+        setPhotoPreview(null);
+        setPhotoFile(''); // string vacío = eliminar en DB
+        if (photoInputRef.current) photoInputRef.current.value = '';
+    };
+
+    // Obtener iniciales para avatar por defecto
+    const getInitials = (nombre) => {
+        if (!nombre) return '?';
+        return nombre.split(' ').map(n => n[0]).join('').slice(0, 2).toUpperCase();
+    };
+
     const handleSave = async (e) => {
         e.preventDefault();
 
@@ -117,20 +164,42 @@ const ProfileSettings = () => {
                     nombre: formData.nombre,
                     usuario: formData.usuario,
                     telefono: formData.telefono,
-                    password: formData.password
+                    cedula: formData.cedula,
                 };
-                await userService.updateUser(currentUser.id, payload);
+
+                if (formData.password) {
+                    payload.password = formData.password;
+                }
+
+                // Incluir foto solo si cambió
+                if (photoFile !== null) {
+                    payload.foto = photoFile;
+                }
+
+                const updatedUser = await userService.updateUser(currentUser.id, payload);
+
+                // Sincronizar sessionStorage con los datos nuevos
+                if (typeof updateSessionUser === 'function') {
+                    updateSessionUser({ ...currentUser, ...payload });
+                }
+
                 await userService.logSecurityAction({
                     userId: currentUser.id,
                     usuario: currentUser.usuario,
                     rol: currentUser.rol,
                     accion: 'ACTUALIZACION_PERFIL',
-                    detalles: `Actualización completa por ${currentUser.nombre}`
+                    detalles: `Actualización completa por ${currentUser.nombre}${formData.password ? ' (con cambio de clave)' : ''}${photoFile !== null ? ' (con foto de perfil)' : ''}`
                 });
                 showToast('Perfil actualizado correctamente', 'success');
+                setPhotoFile(null); // reset: ya no hay cambio pendiente
             } else if (isEditor) {
                 if (!windowStatus.active) {
                     showToast('No tiene una ventana de cambio autorizada', 'error');
+                    return;
+                }
+
+                if (!formData.password) {
+                    showToast('Debe ingresar la nueva contraseña', 'warning');
                     return;
                 }
 
@@ -149,7 +218,8 @@ const ProfileSettings = () => {
                 }
             }
         } catch (error) {
-            showToast('Hubo un error al procesar el cambio', 'error');
+            console.error(error);
+            showToast(`Hubo un error: ${error.message}`, 'error');
         } finally {
             setSaving(false);
         }
@@ -158,27 +228,117 @@ const ProfileSettings = () => {
     if (loading) return <div className="profile-loading">Sincronizando seguridad...</div>;
 
     return (
-        <div className="profile-settings-overlay">
-            <div className="profile-settings-card">
-                <header className="profile-settings-header">
-                    <div className="profile-header-info">
-                        <Shield className="shield-icon" size={24} />
-                        <div>
-                            <h1>Configuración de Perfil</h1>
-                            <p>Gestión de identidad y seguridad / RBAC</p>
-                        </div>
-                    </div>
-                </header>
+        <div className="profile-settings-container" style={{ padding: '2rem 2.5rem', fontFamily: 'Inter, sans-serif' }}>
+            <div style={{ marginBottom: '2.5rem' }}>
+                <span style={{ 
+                    display: 'inline-block',
+                    padding: '6px 16px',
+                    borderRadius: '20px',
+                    backgroundColor: 'rgba(255, 255, 255, 0.1)',
+                    color: '#e2e8f0',
+                    fontSize: '0.75rem',
+                    fontWeight: '700',
+                    letterSpacing: '1px',
+                    marginBottom: '1rem',
+                    border: '1px solid rgba(255,255,255,0.2)'
+                }}>IDENTIDAD Y SEGURIDAD</span>
+                <h1 style={{ 
+                    fontSize: '2.5rem', 
+                    fontWeight: 800, 
+                    color: 'white', 
+                    margin: '0 0 8px 0',
+                    letterSpacing: '-0.5px',
+                    textShadow: '0 2px 10px rgba(0,0,0,0.3)'
+                }}>Configuración de Perfil</h1>
+                <p style={{ 
+                    fontSize: '1rem', 
+                    color: '#94a3b8', 
+                    margin: 0,
+                    fontWeight: 500
+                }}>Gestión de identidad, accesos corporativos y RBAC</p>
+            </div>
 
+            <div className="profile-settings-card" style={{ marginTop: '0' }}>
                 <form className="profile-settings-form" onSubmit={handleSave}>
                     <div className="form-sections-grid">
 
-                        {/* SECCIÓN DATOS PERSONALES */}
+                        {/* ── SECCIÓN FOTO DE PERFIL ── */}
+                        {isManagement && (
+                            <section className="form-section form-section--photo">
+                                <h3><Camera size={18} /> Foto de Perfil</h3>
+                                <div className="photo-upload-area">
+                                    {/* Avatar / Preview */}
+                                    <div className="photo-avatar-wrapper">
+                                        {photoPreview ? (
+                                            <img
+                                                src={photoPreview}
+                                                alt="Foto de perfil"
+                                                className="photo-avatar-img"
+                                            />
+                                        ) : (
+                                            <div className="photo-avatar-initials">
+                                                {getInitials(formData.nombre || user?.nombre)}
+                                            </div>
+                                        )}
+                                        {/* Badge de cámara superpuesto */}
+                                        <button
+                                            type="button"
+                                            className="photo-camera-badge"
+                                            onClick={() => photoInputRef.current?.click()}
+                                            title="Cambiar foto"
+                                        >
+                                            <Camera size={14} />
+                                        </button>
+                                    </div>
+
+                                    {/* Botones de acción */}
+                                    <div className="photo-actions">
+                                        <button
+                                            type="button"
+                                            className="btn-upload-photo"
+                                            onClick={() => photoInputRef.current?.click()}
+                                        >
+                                            <Upload size={15} />
+                                            {photoPreview ? 'Cambiar imagen' : 'Subir foto'}
+                                        </button>
+                                        {photoPreview && (
+                                            <button
+                                                type="button"
+                                                className="btn-remove-photo"
+                                                onClick={handleRemovePhoto}
+                                            >
+                                                <Trash2 size={15} />
+                                                Eliminar
+                                            </button>
+                                        )}
+                                        <p className="photo-hint">JPG, PNG o WEBP · Máx. 2 MB</p>
+                                    </div>
+
+                                    {/* Input oculto */}
+                                    <input
+                                        ref={photoInputRef}
+                                        type="file"
+                                        accept="image/jpeg,image/png,image/webp,image/gif"
+                                        style={{ display: 'none' }}
+                                        onChange={handlePhotoSelect}
+                                    />
+                                </div>
+                            </section>
+                        )}
+
+                        {/* ── SECCIÓN DATOS PERSONALES ── */}
                         <section className="form-section">
                             <h3><User size={18} /> Datos de Identidad</h3>
                             <div className="input-group">
-                                <label><IdCard size={14} /> Cédula de Identidad (Bloqueado por Sistema)</label>
-                                <input type="text" value={user?.cedula || ''} disabled className="input-readonly" />
+                                <label><IdCard size={14} /> Cédula de Identidad</label>
+                                <input 
+                                    type="text" 
+                                    name="cedula"
+                                    value={formData.cedula} 
+                                    onChange={handleChange}
+                                    disabled={isEditor} 
+                                    className={isEditor ? 'input-readonly' : ''} 
+                                />
                             </div>
 
                             <div className="input-group">
@@ -188,7 +348,7 @@ const ProfileSettings = () => {
                                     name="nombre"
                                     value={formData.nombre}
                                     onChange={handleChange}
-                                    disabled={isEditor} // Regla: Editor no edita nombre
+                                    disabled={isEditor}
                                     className={isEditor ? 'input-readonly' : ''}
                                 />
                             </div>
@@ -199,7 +359,7 @@ const ProfileSettings = () => {
                             </div>
                         </section>
 
-                        {/* SECCIÓN CONTACTO Y ACCESO */}
+                        {/* ── SECCIÓN CONTACTO Y SEGURIDAD ── */}
                         <section className="form-section">
                             <h3><Mail size={18} /> Contacto y Seguridad</h3>
                             <div className="input-group">
@@ -209,7 +369,7 @@ const ProfileSettings = () => {
                                     name="usuario"
                                     value={formData.usuario}
                                     onChange={handleChange}
-                                    disabled={isEditor} // Regla: Editor no edita correo
+                                    disabled={isEditor}
                                     className={isEditor ? 'input-readonly' : ''}
                                 />
                             </div>
@@ -221,7 +381,7 @@ const ProfileSettings = () => {
                                     name="telefono"
                                     value={formData.telefono}
                                     onChange={handleChange}
-                                    disabled={isEditor} // Regla: Editor no edita teléfono
+                                    disabled={isEditor}
                                     className={isEditor ? 'input-readonly' : ''}
                                 />
                             </div>
@@ -251,14 +411,13 @@ const ProfileSettings = () => {
                                         </div>
                                     )}
                                     <div className="input-group highlight-pass">
-                                        <label><Lock size={14} /> Nueva Contraseña</label>
+                                        <label><Lock size={14} /> Nueva Contraseña (Opcional)</label>
                                         <input
                                             type="password"
                                             name="password"
                                             value={formData.password}
                                             onChange={handleChange}
                                             placeholder="••••••••"
-                                            required
                                         />
                                     </div>
 
@@ -270,7 +429,6 @@ const ProfileSettings = () => {
                                             value={formData.confirmPassword}
                                             onChange={handleChange}
                                             placeholder="••••••••"
-                                            required
                                         />
                                     </div>
                                 </>

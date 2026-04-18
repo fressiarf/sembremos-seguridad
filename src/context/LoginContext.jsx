@@ -130,6 +130,13 @@ export const LoginProvider = ({ children }) => {
     window.location.replace('/');
   };
 
+  // Actualizar datos del usuario en sesión sin necesidad de re-login
+  const updateSessionUser = (updatedData) => {
+    const merged = { ...user, ...updatedData };
+    setUser(merged);
+    sessionStorage.setItem('currentUser', JSON.stringify(merged));
+  };
+
   const value = {
     formData,
     setFormData,
@@ -137,7 +144,8 @@ export const LoginProvider = ({ children }) => {
     setErrors,
     validateAll,
     logout,
-    user
+    user,
+    updateSessionUser
   };
 
   return (

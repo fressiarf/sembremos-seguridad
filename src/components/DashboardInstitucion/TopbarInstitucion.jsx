@@ -1,4 +1,5 @@
 import React from 'react';
+import TricolorBar from '../Shared/TricolorBar/TricolorBar';
 import mspLogo from '../../assets/Msp_logo-removebg-preview.png';
 import inlLogo from '../../assets/inl-logo-acronym-vertical-navy-removebg-preview.png';
 // Asumimos que esta captura es el logo de Sembremos Seguridad por el historial del proyecto
@@ -12,13 +13,13 @@ const TopbarInstitucion = ({ children, portalTitle = 'PORTAL INSTITUCIONAL DE GE
       boxShadow: '0 2px 10px rgba(0,0,0,0.05)',
       fontFamily: "'Inter', sans-serif"
     }}>
-      {/* La línea tricolor superior ahora se maneja globalmente desde App.jsx */}
+      <TricolorBar />
       <div style={{
-        padding: '1.5rem 2.5rem',
+        padding: '1.25rem 2.5rem',
         display: 'flex',
         justifyContent: 'space-between',
         alignItems: 'center',
-        marginTop: '6px' // Espacio para la bandera
+        marginTop: '0' 
       }}>
         {/* Lado izquierdo: Logos y Textos */}
         <div style={{ display: 'flex', alignItems: 'center', gap: '2rem' }}>

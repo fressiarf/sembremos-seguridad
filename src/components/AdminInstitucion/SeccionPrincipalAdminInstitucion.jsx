@@ -9,6 +9,7 @@ import GestionFuncionarios from './Vistas/GestionFuncionarios';
 import PerfilUsuario from '../Dashboard/PerfilUsuario/PerfilUsuario';
 import EstadisticasInstitucion from './Vistas/EstadisticasInstitucion';
 import TopbarInstitucion from '../DashboardInstitucion/Navegacion/TopbarInstitucion';
+import SoporteInstitucional from '../Dashboard/SoporteInstitucional/SoporteInstitucional';
 import { useLogin } from '../../context/LoginContext';
 import { useState, useEffect, useRef } from 'react';
 import { Bot, Bell, X } from 'lucide-react';
@@ -49,6 +50,7 @@ const SeccionPrincipalAdminInstitucion = ({ activeView = 'dashboard', collapsed,
       historial: 'Historial de Reportes',
       calendario: 'Calendario',
       estadisticas: 'Estadísticas',
+      alertas: 'Soporte y Comentarios',
       perfil: 'Mi Perfil',
     };
     return labels[activeView] || 'Dashboard';
@@ -72,6 +74,12 @@ const SeccionPrincipalAdminInstitucion = ({ activeView = 'dashboard', collapsed,
         return (
           <div style={{ padding: '1rem 2rem' }}>
              <Calendario />
+          </div>
+        );
+      case 'alertas':
+        return (
+          <div style={{ padding: '0 2.5rem 2.5rem' }}>
+            <SoporteInstitucional />
           </div>
         );
       case 'estadisticas':
