@@ -35,11 +35,17 @@ const getBadgeText = (rol) => {
 // Mapeo de vistas a nombres de sección para el TopbarInstitucion
 const VIEW_LABELS = {
   dashboard: 'Resumen Ejecutivo',
+  actividades: 'Gestión de Tareas',
+  usuarios: 'Gestión de Usuarios',
+  perfil: 'Mi Perfil',
+  'matriz-seguimiento': 'Matriz de Seguimiento',
+  'reportes-resultados': 'Reportes de Resultados',
   'lineas-accion': 'Líneas y Tareas',
-  'reportes-resultados': 'Reportes Activos',
   historial: 'Historial',
-  'matriz-seguimiento': 'Matriz Completa',
-  mapa: 'Distribución Policial',
+  zonas: 'Zonas Críticas',
+  alertas: 'Soporte y Comentarios',
+  mapa: 'Mapa de Riesgos',
+  consolidado: 'Consolidado Trimestral',
   estadisticas: 'Estadísticas',
   usuarios: 'Gestión de Usuarios',
   alertas: 'Soporte',
@@ -104,8 +110,10 @@ const SeccionPrincipal = ({ collapsed, setCollapsed, activeView, onViewChange })
   };
 
   const knownViews = [
-    'dashboard', 'usuarios', 'perfil', 'matriz-seguimiento', 
-    'reportes-resultados', 'lineas-accion', 'historial', 'alertas', 'estadisticas', 'mapa'
+    'dashboard', 'actividades', 'usuarios', 'perfil', 'matriz-seguimiento', 
+    'reportes-resultados', 'lineas-accion', 'mapa', 'zonas', 'calendario', 
+    'reportes', 'historial', 'configuracion', 'alertas', 'estadisticas', 'lineas',
+    'consolidado'
   ];
 
   return (

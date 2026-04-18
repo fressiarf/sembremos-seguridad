@@ -323,8 +323,8 @@ const ActividadOficiales = () => {
               </select>
             </div>
             <div className="form-group">
-              <label>Presupuesto Estimado / Inversión (₡) *</label>
-              <input type="number" placeholder="Ej: 5000000" value={newTarea.presupuestoEstimado} onChange={e => setNewTarea({...newTarea, presupuestoEstimado: parseInt(e.target.value) || 0})} required />
+              <label>Presupuesto Estimado / Inversión (₡)</label>
+              <input type="number" placeholder="Ej: 5000000" value={newTarea.presupuestoEstimado} onChange={e => setNewTarea({...newTarea, presupuestoEstimado: parseInt(e.target.value) || 0})} />
             </div>
           </div>
 
@@ -340,6 +340,21 @@ const ActividadOficiales = () => {
             <div className="form-group">
               <label>Fecha Límite de Entrega *</label>
               <input type="date" value={newTarea.fechaLimite} onChange={e => setNewTarea({...newTarea, fechaLimite: e.target.value})} required />
+            </div>
+          </div>
+
+          <div className="form-row-grid">
+            <div className="form-group">
+              <label>Prioridad *</label>
+              <select value={newTarea.prioridad} onChange={e => setNewTarea({...newTarea, prioridad: e.target.value})}>
+                <option value="baja">Baja</option>
+                <option value="media">Media</option>
+                <option value="alta">Alta / Crítica</option>
+              </select>
+            </div>
+            <div className="form-group">
+              <label>Fecha Límite de Entrega *</label>
+              <input type="date" value={newTarea.fechaLimite} onChange={e => setNewTarea({...newTarea, fechaLimite: e.target.value})} />
             </div>
           </div>
 

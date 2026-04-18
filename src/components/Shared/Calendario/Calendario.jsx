@@ -7,9 +7,10 @@ import { dashboardService } from '../../../services/dashboardService';
 import emailjs from '@emailjs/browser';
 
 const CATEGORIAS = {
-    'Operativos': '#ef4444',
-    'Reuniones': '#3b82f6',
-    'Seguimiento de Matriz': '#22c55e'
+    'Operativa': '#ef4444', // Rojo
+    'Preventiva': '#22c55e', // Verde
+    'Gestión': '#f59e0b',     // Ámbar
+    'Reunión': '#3b82f6',     // Azul
 };
 
 const INSTITUCIONES = [
@@ -33,7 +34,7 @@ const Calendario = () => {
         titulo: '', 
         inicio: '', 
         fin: '', 
-        categoria: 'Operativos',
+        categoria: 'Operativa',
         participantes: [] 
     });
     const [editandoId, setEditandoId] = useState(null);
@@ -194,7 +195,7 @@ const Calendario = () => {
                 return;
             }
             setDiaSeleccionado(fechaString);
-            setNuevoEvento({ titulo: '', inicio: '', fin: '', categoria: 'Operativos', participantes: [user?.institucion].filter(Boolean) });
+            setNuevoEvento({ titulo: '', inicio: '', fin: '', categoria: 'Operativa', participantes: [user?.institucion].filter(Boolean) });
             setEditandoId(null);
         }
         setMostrarModal(true);
@@ -202,7 +203,7 @@ const Calendario = () => {
 
     const cerrarModal = () => {
         setMostrarModal(false);
-        setNuevoEvento({ titulo: '', inicio: '', fin: '', categoria: 'Operativos', participantes: [] });
+        setNuevoEvento({ titulo: '', inicio: '', fin: '', categoria: 'Operativa', participantes: [] });
         setEditandoId(null);
     };
 

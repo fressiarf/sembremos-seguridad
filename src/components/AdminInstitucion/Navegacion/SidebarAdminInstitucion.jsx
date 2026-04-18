@@ -29,8 +29,9 @@ const SidebarAdminInstitucion = ({ collapsed = false, onToggle, activeView, onVi
     {
       label: 'SUPERVISIÓN',
       items: [
-        { id: 'reportes', label: 'Revisión de Reportes', icon: FileSearch },
-        { id: 'historial', label: 'Historial de Reportes', icon: Clock },
+        { id: 'reportes',   label: 'Revisión de Reportes', icon: FileSearch },
+        { id: 'informesTrimestral', label: 'Informes Trimestrales', icon: FileBarChart },
+        { id: 'historial',  label: 'Historial de Reportes', icon: Clock },
       ],
     },
     {

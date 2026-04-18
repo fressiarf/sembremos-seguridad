@@ -23,10 +23,11 @@ const SidebarInstitucion = ({ collapsed = false, onToggle, activeView, onViewCha
     {
       label: 'GESTIÓN',
       items: [
-        { id: 'rechazados', label: 'Devoluciones', icon: AlertCircle },
-        { id: 'historial', label: 'Historial de Reportes', icon: Clock },
-        { id: 'calendario', label: 'Calendario de Tareas', icon: Calendar },
-        { id: 'alertas', label: 'Soporte y Comentarios', icon: MessageCircle },
+        { id: 'informeTrimestral', label: 'Informe Trimestral', icon: FileBarChart },
+        { id: 'rechazados',  label: 'Devoluciones',           icon: AlertCircle },
+        { id: 'historial',   label: 'Historial de Reportes',  icon: Clock },
+        { id: 'calendario',  label: 'Calendario de Tareas',   icon: Calendar },
+        { id: 'alertas',     label: 'Soporte y Comentarios',  icon: MessageCircle },
       ],
     },
   ];
