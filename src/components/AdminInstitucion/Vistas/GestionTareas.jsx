@@ -4,14 +4,8 @@ import { useToast } from '../../../context/ToastContext';
 import { useLogin } from '../../../context/LoginContext';
 import { Activity, Users, Target, MapPin, Calendar, CheckSquare, Search, ChevronDown, ChevronUp, Filter } from 'lucide-react';
 import '../AdminInstitucion.css';
-import '../AdminInstitucion.css';
 
-const LINEAS_ACCION_INFO = [
-  { id: 'LA-001', numero: 1, nombre: 'Revitalización de Espacios Públicos' },
-  { id: 'LA-002', numero: 2, nombre: 'Seguridad e Inteligencia' },
-  { id: 'LA-003', numero: 3, nombre: 'Prevención del Consumo de Drogas' },
-  { id: 'LA-004', numero: 4, nombre: 'Atención a Personas en Calle' },
-];
+// No hardcoded LINEAS_ACCION_INFO here anymore
 
 const GestionTareas = () => {
   const { user } = useLogin();
@@ -53,12 +47,14 @@ const GestionTareas = () => {
 
   const loadData = async () => {
     try {
-      const [tareasData, responsablesData] = await Promise.all([
+      const [tareasData, responsablesData, lineasData] = await Promise.all([
         adminInstitucionService.getTareas({ institucionId: user?.id }),
         adminInstitucionService.getResponsables(),
+        adminInstitucionService.getLineasAccion(),
       ]);
       setTareasRaw(tareasData.filter(t => t.estado !== 'Completado'));
       setResponsables(responsablesData);
+      setLineasAccion(lineasData);
     } catch (e) {
       showToast('Error al cargar tareas', 'error');
     } finally {
@@ -169,8 +165,9 @@ const GestionTareas = () => {
       </div>
 
       <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-        {LINEAS_ACCION_INFO.map(linea => {
+        {lineasAccion.map(linea => {
           const tareasLinea = tareas.filter(t => t.lineaAccionId === linea.id);
+          if (tareasLinea.length === 0) return null; // Solo mostrar líneas que tienen tareas asignadas para esta institución
           const isExpanded = lineasExpandidas[linea.id];
 
           return (
@@ -194,7 +191,7 @@ const GestionTareas = () => {
                   </div>
                   <div>
                     <h3 style={{ margin: 0, fontSize: '1.05rem', color: '#0f172a', fontWeight: 700 }}>
-                      Línea #{linea.numero} — {linea.nombre}
+                      Línea #{linea.no || linea.numero || linea.id} — {linea.titulo || linea.nombre}
                     </h3>
                     <p style={{ margin: '4px 0 0', fontSize: '0.8rem', color: '#64748b' }}>
                       {tareasLinea.length} tareas pendientes de asignación o en progreso

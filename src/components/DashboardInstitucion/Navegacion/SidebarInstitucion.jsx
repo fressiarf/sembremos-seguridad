@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import '../../Dashboard/SidebarAdmin/SidebarAdmin.css';
 import { useLogin } from "../../../context/LoginContext";
 import UserBrand from "../../Shared/Navegacion/UserBrand";
-import { ChevronLeft, ChevronDown, LayoutDashboard, Activity, Clock, LogOut, User, MapPin, Calendar, AlertCircle, MessageCircle } from "lucide-react";
+import { ChevronLeft, ChevronDown, LayoutDashboard, Activity, Clock, LogOut, User, MapPin, Calendar, AlertCircle, MessageCircle, FileBarChart } from "lucide-react";
 
 const SidebarInstitucion = ({ collapsed = false, onToggle, activeView, onViewChange }) => {
   const { user, logout } = useLogin();
@@ -22,6 +22,7 @@ const SidebarInstitucion = ({ collapsed = false, onToggle, activeView, onViewCha
     {
       label: 'GESTIÓN',
       items: [
+        { id: 'informeTrimestral', label: 'Informe Trimestral', icon: FileBarChart },
         { id: 'rechazados',  label: 'Devoluciones',           icon: AlertCircle },
         { id: 'historial',   label: 'Historial de Reportes',  icon: Clock },
         { id: 'calendario',  label: 'Calendario de Tareas',   icon: Calendar },
@@ -58,7 +59,7 @@ const SidebarInstitucion = ({ collapsed = false, onToggle, activeView, onViewCha
         <div className="sidebar-admin__role">
           <span className="sidebar-admin__role-dot" />
           <span className="sidebar-admin__role-label">
-            {user?.rol === 'admin' ? 'Administrador' : 'Institución'}
+            {user?.rol === 'admin' ? 'Fuerza Pública' : (user?.rol === 'adminInstitucion' ? 'Coordinador Institucional' : 'Editor')}
           </span>
         </div>
       )}
@@ -133,7 +134,7 @@ const SidebarInstitucion = ({ collapsed = false, onToggle, activeView, onViewCha
             <div className="sidebar-admin__profile-info">
               <span className="sidebar-admin__profile-name">{user?.nombre || "Juan Vargas"}</span>
               <span className="sidebar-admin__profile-role">
-                {user?.rol === 'oficial' ? 'Oficial' : 'Administrador'}
+                {user?.rol === 'editor' ? 'Editor' : (user?.rol === 'adminInstitucion' ? 'Coordinador Institucional' : 'Fuerza Pública')}
               </span>
             </div>
           )}

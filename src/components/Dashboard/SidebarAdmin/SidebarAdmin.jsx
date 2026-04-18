@@ -3,7 +3,7 @@ import '../../Dashboard/SidebarAdmin/SidebarAdmin.css';
 import { dashboardService } from '../../../services/dashboardService';
 import { useLogin } from "../../../context/LoginContext";
 import UserBrand from "../../Shared/Navegacion/UserBrand";
-import { ChevronLeft, ChevronDown, LayoutGrid, Activity, Clock, LogOut, User, MapPin, Shield, Bell, BellRing, TriangleAlert, FileText, Settings, Calendar, LayoutDashboard, MessageCircle } from "lucide-react";
+import { ChevronLeft, ChevronDown, LayoutGrid, Activity, Clock, LogOut, User, MapPin, Shield, Bell, BellRing, TriangleAlert, FileText, Settings, Calendar, LayoutDashboard, MessageCircle, FileBarChart } from "lucide-react";
 
 
 // Navigation link items should be consistent, but for now we'll keep the admin structure
@@ -69,6 +69,7 @@ const SidebarAdmin = ({ collapsed = false, onToggle, activeView, onViewChange })
       label: 'ANÁLISIS',
       items: [
         { id: 'mapa',        label: 'Distribución policial', icon: MapPin,       path: '/mapa' },
+        { id: 'consolidado', label: 'Consolidado Trimestral', icon: FileBarChart, path: '/consolidado' },
         { id: 'historial',   label: 'Historial',             icon: Clock,     path: '/historial' },
         { id: 'estadisticas',label: 'Estadísticas',          icon: Activity,     path: '/estadisticas' },
         { id: 'calendario',  label: 'Calendario',            icon: Calendar,  path: '/calendario' },
@@ -113,7 +114,7 @@ const SidebarAdmin = ({ collapsed = false, onToggle, activeView, onViewChange })
         <div className="sidebar-admin__role">
           <span className="sidebar-admin__role-dot" />
           <span className="sidebar-admin__role-label">
-            {user?.rol === 'admin' ? 'Administrador' : 'Oficial'}
+            {user?.rol === 'admin' ? 'Fuerza Pública' : 'Editor'}
           </span>
         </div>
       )}
@@ -195,7 +196,7 @@ const SidebarAdmin = ({ collapsed = false, onToggle, activeView, onViewChange })
                 {user?.rol === 'admin' ? 'Administrador global' : (user?.nombre || "C. Araya")}
               </span>
               <span className="sidebar-admin__profile-role">
-                {user?.rol === 'admin' ? 'Sembremos Seguridad' : 'Oficial Institucional'}
+                {user?.rol === 'admin' ? 'Administrador' : 'Oficial'}
               </span>
             </div>
           )}
