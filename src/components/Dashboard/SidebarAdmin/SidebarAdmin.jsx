@@ -62,10 +62,26 @@ const SidebarAdmin = ({ collapsed = false, onToggle, activeView, onViewChange })
     {
       label: 'HERRAMIENTAS',
       items: [
-        { id: 'mapa', label: 'Distribución Policial', icon: MapPin, path: '/mapa' },
-        { id: 'estadisticas', label: 'Estadísticas', icon: Activity, path: '/estadisticas' },
-        { id: 'usuarios', label: 'Gestión de Usuarios', icon: User, path: '/usuarios', badge: stats.solicitudesCount },
-        { id: 'alertas', label: 'Soporte', icon: MessageCircle, path: '/alertas', badge: stats.alertsCount },
+        { id: 'actividades', label: 'Gestión de Tareas', icon: Activity, path: '/actividades', badge: stats.activitiesCount },
+        { id: 'zonas',       label: 'Zonas críticas',        icon: MapPin,      path: '/zonas',    badge: stats.zonesCount },
+        { id: 'alertas',     label: 'Soporte y Comentarios',  icon: MessageCircle, path: '/alertas',  badge: stats.alertsCount },
+      ],
+    },
+    {
+      label: 'ANÁLISIS',
+      items: [
+        { id: 'mapa',        label: 'Distribución policial', icon: MapPin,       path: '/mapa' },
+        { id: 'consolidado', label: 'Consolidado Trimestral', icon: FileBarChart, path: '/consolidado' },
+        { id: 'historial',   label: 'Historial',             icon: Clock,     path: '/historial' },
+        { id: 'estadisticas',label: 'Estadísticas',          icon: Activity,     path: '/estadisticas' },
+        { id: 'calendario',  label: 'Calendario',            icon: Calendar,  path: '/calendario' },
+      ],
+    },
+    {
+      label: 'ADMINISTRACIÓN',
+      items: [
+        { id: 'usuarios',    label: 'Gestión de usuarios',   icon: User,     path: '/usuarios', badge: stats.solicitudesCount },
+        { id: 'reportes',    label: 'Reportes INL/MSP',      icon: FileText,    path: '/reportes' },
       ],
     },
   ];

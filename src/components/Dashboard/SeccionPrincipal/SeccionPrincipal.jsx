@@ -35,15 +35,18 @@ const getBadgeText = (rol) => {
 // Mapeo de vistas a nombres de sección para el TopbarInstitucion
 const VIEW_LABELS = {
   dashboard: 'Resumen Ejecutivo',
-  'lineas-accion': 'Líneas y Tareas',
-  'reportes-resultados': 'Reportes Activos',
-  historial: 'Historial',
-  'matriz-seguimiento': 'Matriz Completa',
-  mapa: 'Distribución Policial',
-  estadisticas: 'Estadísticas',
+  actividades: 'Gestión de Tareas',
   usuarios: 'Gestión de Usuarios',
-  alertas: 'Soporte',
-  perfil: 'Mi Perfil'
+  perfil: 'Mi Perfil',
+  'matriz-seguimiento': 'Matriz de Seguimiento',
+  'reportes-resultados': 'Reportes de Resultados',
+  'lineas-accion': 'Líneas y Tareas',
+  historial: 'Historial',
+  zonas: 'Zonas Críticas',
+  alertas: 'Soporte y Comentarios',
+  mapa: 'Mapa de Riesgos',
+  consolidado: 'Consolidado Trimestral',
+  estadisticas: 'Estadísticas'
 };
 
 const SeccionPrincipal = ({ collapsed, setCollapsed, activeView, onViewChange }) => {
@@ -104,8 +107,10 @@ const SeccionPrincipal = ({ collapsed, setCollapsed, activeView, onViewChange })
   };
 
   const knownViews = [
-    'dashboard', 'usuarios', 'perfil', 'matriz-seguimiento', 
-    'reportes-resultados', 'lineas-accion', 'historial', 'alertas', 'estadisticas', 'mapa'
+    'dashboard', 'actividades', 'usuarios', 'perfil', 'matriz-seguimiento', 
+    'reportes-resultados', 'lineas-accion', 'mapa', 'zonas', 'calendario', 
+    'reportes', 'historial', 'configuracion', 'alertas', 'estadisticas', 'lineas',
+    'consolidado'
   ];
 
   return (
@@ -205,7 +210,7 @@ const SeccionPrincipal = ({ collapsed, setCollapsed, activeView, onViewChange })
       )}
 
       {activeView === 'dashboard' && (
-        user?.rol === 'institucion' ? <DashboardInstitucion /> : <DashboardGlobal collapsed={collapsed} onViewChange={onViewChange} />
+        user?.rol === ROLES.EDITOR ? <DashboardInstitucion /> : <DashboardGlobal collapsed={collapsed} onViewChange={onViewChange} />
       )}
       {activeView === 'actividades' && <ActividadOficiales />}
       {activeView === 'usuarios' && <GestionUsuarios />}

@@ -379,8 +379,8 @@ const FormInstitucion = ({ tarea, onComplete, initialReporte = null }) => {
           <div className="form-section-body">
             <div className="fr-row-2">
               <div>
-                <label className="fr-label">Inversión del Avance (₡) <span className="required">*</span></label>
-                <input type="number" min="0" className="fr-input" value={formData.inversionColones} onChange={e => updateField('inversionColones', e.target.value)} required />
+                <label className="fr-label">Inversión del Avance (₡)</label>
+                <input type="number" min="0" className="fr-input" value={formData.inversionColones} onChange={e => updateField('inversionColones', e.target.value)} />
               </div>
               <div>
                 <label className="fr-label">Detalle de Gasto / Recursos</label>

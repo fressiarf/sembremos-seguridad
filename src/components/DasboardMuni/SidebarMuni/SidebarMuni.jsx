@@ -28,10 +28,10 @@ const SidebarMuni = ({ collapsed = false, onToggle, activeView, onViewChange }) 
     {
       label: 'SEGUIMIENTO',
       items: [
-        { id: 'reportes', label: 'Reportes Comunitarios', icon: FileText },
-        { id: 'consolidado', label: 'Consolidado Trimestral', icon: FileBarChart },
-        { id: 'historial', label: 'Historial de Actividades', icon: Clock },
-        { id: 'alertas', label: 'Soporte y Comentarios', icon: MessageCircle },
+        { id: 'reportes',     label: 'Reportes Comunitarios',     icon: FileText },
+        { id: 'consolidado',  label: 'Consolidado Trimestral',     icon: FileBarChart },
+        { id: 'historial',    label: 'Historial de Actividades',  icon: Clock },
+        { id: 'alertas',      label: 'Soporte y Comentarios',     icon: MessageCircle },
       ],
     },
     {

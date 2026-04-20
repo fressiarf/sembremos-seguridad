@@ -206,3 +206,214 @@
         white-space: normal;
     }
 }
+
+/* ── Foto de Perfil ── */
+.form-section--photo {
+    grid-column: 1 / -1; /* ocupa todo el ancho */
+}
+
+.photo-upload-area {
+    display: flex;
+    align-items: center;
+    gap: 2rem;
+    background: #f8fafc;
+    border: 1.5px dashed #cbd5e1;
+    border-radius: 16px;
+    padding: 1.5rem 2rem;
+    transition: border-color 0.2s;
+}
+
+.photo-upload-area:hover {
+    border-color: #2563eb;
+}
+
+/* Contenedor del avatar */
+.photo-avatar-wrapper {
+    position: relative;
+    flex-shrink: 0;
+}
+
+/* Imagen de perfil */
+.photo-avatar-img {
+    width: 88px;
+    height: 88px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 3px solid #2563eb;
+    box-shadow: 0 4px 16px rgba(37, 99, 235, 0.2);
+}
+
+/* Avatar con iniciales (fallback) */
+.photo-avatar-initials {
+    width: 88px;
+    height: 88px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #1e3a8a, #3b82f6);
+    color: white;
+    font-size: 1.8rem;
+    font-weight: 800;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 3px solid #2563eb;
+    box-shadow: 0 4px 16px rgba(37, 99, 235, 0.2);
+    letter-spacing: 1px;
+    user-select: none;
+}
+
+/* Badge de cámara sobre el avatar */
+.photo-camera-badge {
+    position: absolute;
+    bottom: 2px;
+    right: 2px;
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    background: #2563eb;
+    border: 2px solid #fff;
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: background 0.2s, transform 0.2s;
+}
+
+.photo-camera-badge:hover {
+    background: #1d4ed8;
+    transform: scale(1.1);
+}
+
+/* Acciones de foto */
+.photo-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.btn-upload-photo {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 9px 18px;
+    background: #2563eb;
+    color: white;
+    border: none;
+    border-radius: 10px;
+    font-size: 0.85rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s;
+    width: fit-content;
+}
+
+.btn-upload-photo:hover {
+    background: #1d4ed8;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+}
+
+.btn-remove-photo {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 16px;
+    background: transparent;
+    color: #ef4444;
+    border: 1px solid rgba(239, 68, 68, 0.35);
+    border-radius: 10px;
+    font-size: 0.82rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s;
+    width: fit-content;
+}
+
+.btn-remove-photo:hover {
+    background: #fef2f2;
+    border-color: #ef4444;
+}
+
+.photo-hint {
+    font-size: 0.75rem;
+    color: #94a3b8;
+    margin: 0;
+}
+
+/* Responsive foto */
+@media (max-width: 600px) {
+    .photo-upload-area {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 1rem;
+    }
+}
+
+/* ── Ventana de aprobación ── */
+.profile-loading {
+    color: #7a9cc4;
+    padding: 2rem;
+    font-family: Inter, sans-serif;
+}
+
+.window-timer {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: #f0fdf4;
+    border: 1px solid #86efac;
+    color: #15803d;
+    padding: 8px 14px;
+    border-radius: 8px;
+    font-size: 0.82rem;
+    font-weight: 600;
+    margin-bottom: 1rem;
+}
+
+.timer-count {
+    font-weight: 800;
+    color: #15803d;
+}
+
+.btn-request-window {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 20px;
+    background: #f59e0b;
+    color: white;
+    border: none;
+    border-radius: 10px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s;
+    margin-top: 1rem;
+}
+
+.btn-request-window:hover:not(:disabled) {
+    background: #d97706;
+    transform: translateY(-1px);
+}
+
+.btn-request-window:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.window-notice {
+    text-align: center;
+    padding: 1rem 0;
+    color: #92400e;
+}
+
+.window-notice h4 {
+    margin: 0.5rem 0 0.3rem;
+    font-size: 0.95rem;
+    font-weight: 700;
+}
+
+.window-notice p {
+    margin: 0;
+    font-size: 0.82rem;
+    color: #b45309;
+}

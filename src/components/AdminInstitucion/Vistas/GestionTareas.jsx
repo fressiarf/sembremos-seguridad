@@ -49,8 +49,7 @@ const GestionTareas = () => {
     try {
       const [tareasData, responsablesData, lineasData] = await Promise.all([
         adminInstitucionService.getTareas({ institucionId: user?.id }),
-        adminInstitucionService.getResponsables(user?.institucion),
-        adminInstitucionService.getLineasAccion(),
+        adminInstitucionService.getResponsables(),
       ]);
       setTareasRaw(tareasData.filter(t => t.estado !== 'Completado'));
       setResponsables(responsablesData);

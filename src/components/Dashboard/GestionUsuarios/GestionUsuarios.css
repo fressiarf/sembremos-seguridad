@@ -123,9 +123,10 @@
 /* ── Tabla de Usuarios (Estilo 'Línea de Acción') ── */
 .usuarios-table-container {
   background: var(--white);
-  border: 1px solid #000;
-  border-radius: 0;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
   overflow: hidden;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05); /* Sombra sutil para darle profundidad */
 }
 
 .usuarios-table {
@@ -136,7 +137,7 @@
 .usuarios-table th {
   background: var(--navy-blue);
   color: white;
-  padding: 20px 44px;
+  padding: 18px 24px;
   font-size: 0.75rem;
   font-weight: 800;
   text-transform: uppercase;
@@ -146,7 +147,7 @@
 }
 
 .usuarios-table td {
-  padding: 24px 44px;
+  padding: 18px 24px;
   border-bottom: 1px solid #000;
   color: #334155;
   font-size: 0.85rem;
@@ -633,4 +634,70 @@
   color: white;
   border-color: #ef4444;
   transform: scale(1.1);
+}
+
+/* ── Celda de Acciones (tabla principal) ── */
+.acciones-cell {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  justify-content: flex-end;
+}
+
+/* Botón: Resetear contraseña */
+.btn-reset-pwd {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  border: 1px solid rgba(59, 130, 246, 0.35);
+  background: rgba(59, 130, 246, 0.08);
+  color: #3b82f6;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  flex-shrink: 0;
+}
+
+.btn-reset-pwd:hover:not(:disabled) {
+  background: #3b82f6;
+  color: #fff;
+  border-color: #3b82f6;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+}
+
+.btn-reset-pwd:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+/* Botón: Eliminar usuario */
+.btn-delete-user {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  background: rgba(239, 68, 68, 0.07);
+  color: #ef4444;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  flex-shrink: 0;
+}
+
+.btn-delete-user:hover:not(:disabled) {
+  background: #ef4444;
+  color: #fff;
+  border-color: #ef4444;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(239, 68, 68, 0.35);
+}
+
+.btn-delete-user:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
 }
