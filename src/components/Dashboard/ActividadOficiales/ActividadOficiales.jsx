@@ -32,6 +32,7 @@ const ActividadOficiales = () => {
     canton: 'Puntarenas', 
     problematica: '', 
     titulo: '',
+    objetivo: '',
     indicador: '',
     meta: '',
     plazo: 'Anual',
@@ -43,7 +44,8 @@ const ActividadOficiales = () => {
     plazo: 'Anual', institucionesIds: [], corresponsable: '',
     provincia: '', canton: '', distrito: '',
     tipo: 1, presupuestoEstimado: '', detalleMeta: '',
-    seguimientoTipo: 'numerico', hitos: []
+    seguimientoTipo: 'numerico', hitos: [],
+    prioridad: 'media', fechaLimite: ''
   });
 
   const [mostrarTodasInstituciones, setMostrarTodasInstituciones] = useState(false);
@@ -77,7 +79,7 @@ const ActividadOficiales = () => {
 
   const handleCreateLinea = async (e) => {
     e.preventDefault();
-    if (!newLinea.problematica || !newLinea.titulo || !newLinea.indicador || !newLinea.meta) {
+    if (!newLinea.problematica || !newLinea.titulo || !newLinea.indicador || !newLinea.meta || !newLinea.objetivo) {
       showToast('Completa los campos obligatorios (*)', 'warning');
       return;
     }
@@ -91,7 +93,7 @@ const ActividadOficiales = () => {
       showToast('Línea de acción creada ✓', 'success');
       setShowLineaForm(false);
       setNewLinea({ 
-        canton: 'Puntarenas', problematica: '', titulo: '',
+        canton: 'Puntarenas', problematica: '', titulo: '', objetivo: '',
         indicador: '', meta: '', plazo: 'Anual', institucionesLideres: []
       });
       loadData();
@@ -123,7 +125,8 @@ const ActividadOficiales = () => {
         plazo: 'Anual', institucionesIds: [], corresponsable: '', 
         provincia: '', canton: '', distrito: '', 
         tipo: 1, presupuestoEstimado: '', detalleMeta: '',
-        seguimientoTipo: 'numerico', hitos: []
+        seguimientoTipo: 'numerico', hitos: [],
+        prioridad: 'media', fechaLimite: ''
       });
       setMostrarTodasInstituciones(false);
       loadData();
@@ -168,8 +171,8 @@ const ActividadOficiales = () => {
 
       {/* ── Modal Crear Línea ── */}
       {showLineaForm && (
-        <div className="assign-modal-overlay" style={{ zIndex: 1000, position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '1rem' }}>
-          <div className="assign-modal" style={{ maxWidth: '600px', width: '100%', maxHeight: '90vh', overflowY: 'auto', backgroundColor: '#fff', borderRadius: '8px', padding: '2rem', boxShadow: '0 4px 6px rgba(0,0,0,0.1)' }}>
+        <div className="assign-modal-overlay">
+          <div className="assign-modal">
             <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '1.5rem' }}>
               <h3 style={{ margin: 0, color: '#0b2240' }}>Nueva Línea de Acción</h3>
               <button onClick={() => setShowLineaForm(false)} style={{ background: 'none', border: 'none', cursor: 'pointer' }}><X size={20} /></button>
@@ -178,11 +181,11 @@ const ActividadOficiales = () => {
               <div className="form-row-grid">
                 <div className="form-group">
                   <label>Problemática Priorizada *</label>
-                  <input type="text" placeholder="Ej: CONSUMO DE DROGAS Y ALCOHOL" value={newLinea.problematica} onChange={e => setNewLinea({...newLinea, problematica: e.target.value})} />
+                  <input type="text" placeholder="Ej: CONSUMO DE DROGAS Y ALCOHOL" value={newLinea.problematica} onChange={e => setNewLinea({...newLinea, problematica: e.target.value})} required />
                 </div>
                 <div className="form-group">
-                  <label>Cantón / Territorio</label>
-                  <select value={newLinea.canton} onChange={e => setNewLinea({...newLinea, canton: e.target.value})}>
+                  <label>Cantón / Territorio *</label>
+                  <select value={newLinea.canton} onChange={e => setNewLinea({...newLinea, canton: e.target.value})} required>
                     <option value="Puntarenas">Puntarenas</option>
                   </select>
                 </div>
@@ -190,17 +193,22 @@ const ActividadOficiales = () => {
 
               <div className="form-group">
                 <label>Nombre de la Línea de Acción (Estrategia Macro) *</label>
-                <textarea placeholder="Descripción del objetivo general o línea de acción estratégica..." value={newLinea.titulo} onChange={e => setNewLinea({...newLinea, titulo: e.target.value})} rows="2" />
+                <input type="text" placeholder="Ej: Programa de Intervención en Centros Educativos" value={newLinea.titulo} onChange={e => setNewLinea({...newLinea, titulo: e.target.value})} required />
+              </div>
+
+              <div className="form-group">
+                <label>Objetivo Estratégico *</label>
+                <textarea placeholder="Describe el objetivo principal que se busca alcanzar con esta línea de acción..." value={newLinea.objetivo} onChange={e => setNewLinea({...newLinea, objetivo: e.target.value})} rows="2" required />
               </div>
 
               <div className="form-row-grid">
                 <div className="form-group">
                   <label>Indicador de la Estrategia *</label>
-                  <input type="text" placeholder="Ej: Variación de incidentes delictivos" value={newLinea.indicador} onChange={e => setNewLinea({...newLinea, indicador: e.target.value})} />
+                  <input type="text" placeholder="Ej: Variación de incidentes delictivos" value={newLinea.indicador} onChange={e => setNewLinea({...newLinea, indicador: e.target.value})} required />
                 </div>
                 <div className="form-group">
                   <label>Meta Global *</label>
-                  <input type="text" placeholder="Ej: Reducir 15% los incidentes en el cantón" value={newLinea.meta} onChange={e => setNewLinea({...newLinea, meta: e.target.value})} />
+                  <input type="text" placeholder="Ej: Reducir 15% los incidentes en el cantón" value={newLinea.meta} onChange={e => setNewLinea({...newLinea, meta: e.target.value})} required />
                 </div>
               </div>
 
@@ -239,17 +247,17 @@ const ActividadOficiales = () => {
               </div>
               <div className="modal-actions">
                 <button type="button" onClick={() => setShowLineaForm(false)} className="btn-cancel">Cancelar</button>
-                <button type="submit" className="btn-assign-submit">Crear Línea</button>
+                <button type="submit" className="btn-assign-submit">Guardar Línea de Acción</button>
               </div>
             </form>
           </div>
         </div>
       )}
 
-  // ── Modal Crear Tarea ──
+      {/* ── Modal Crear Tarea ── */}
   {showTareaForm && (
-    <div className="assign-modal-overlay" style={{ zIndex: 1000, position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '1rem' }}>
-      <div className="assign-modal" style={{ maxWidth: '600px', width: '100%', maxHeight: '90vh', overflowY: 'auto', backgroundColor: '#fff', borderRadius: '8px', padding: '2rem', boxShadow: '0 4px 6px rgba(0,0,0,0.1)' }}>
+    <div className="assign-modal-overlay">
+      <div className="assign-modal">
         <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '1.5rem' }}>
           <h3 style={{ margin: 0, color: '#0b2240' }}>Asignar Tarea a Institución</h3>
           <button onClick={() => setShowTareaForm(false)} style={{ background: 'none', border: 'none', cursor: 'pointer' }}><X size={20} /></button>
@@ -316,13 +324,33 @@ const ActividadOficiales = () => {
             </div>
             <div className="form-group">
               <label>Presupuesto Estimado / Inversión (₡) *</label>
-              <input type="number" placeholder="Ej: 5000000" value={newTarea.presupuestoEstimado} onChange={e => setNewTarea({...newTarea, presupuestoEstimado: parseInt(e.target.value) || 0})} />
+              <input type="number" placeholder="Ej: 5000000" value={newTarea.presupuestoEstimado} onChange={e => setNewTarea({...newTarea, presupuestoEstimado: parseInt(e.target.value) || 0})} required />
+            </div>
+          </div>
+
+          <div className="form-row-grid">
+            <div className="form-group">
+              <label>Prioridad *</label>
+              <select value={newTarea.prioridad} onChange={e => setNewTarea({...newTarea, prioridad: e.target.value})} required>
+                <option value="baja">Baja</option>
+                <option value="media">Media</option>
+                <option value="alta">Alta / Crítica</option>
+              </select>
+            </div>
+            <div className="form-group">
+              <label>Fecha Límite de Entrega *</label>
+              <input type="date" value={newTarea.fechaLimite} onChange={e => setNewTarea({...newTarea, fechaLimite: e.target.value})} required />
             </div>
           </div>
 
           <div className="form-group" style={{ marginBottom: '1.5rem' }}>
             <label>Título / Nombre de la Tarea *</label>
-            <input type="text" placeholder="Ej: Construcción de red de cámaras, o Talleres en Colegios..." value={newTarea.titulo} onChange={e => setNewTarea({...newTarea, titulo: e.target.value})} />
+            <input type="text" placeholder="Ej: Construcción de red de cámaras, o Talleres en Colegios..." value={newTarea.titulo} onChange={e => setNewTarea({...newTarea, titulo: e.target.value})} required />
+          </div>
+
+          <div className="form-group" style={{ marginBottom: '1.5rem' }}>
+            <label>Indicador de Evaluación (Tarea) *</label>
+            <input type="text" placeholder="Ej: Cantidad de operativos, % de avance físico..." value={newTarea.indicador} onChange={e => setNewTarea({...newTarea, indicador: e.target.value})} required />
           </div>
 
           <div className="form-group" style={{ marginBottom: '1.2rem', padding: '12px', background: '#f8fafc', borderRadius: '8px', border: '1px solid #e2e8f0' }}>
@@ -533,7 +561,7 @@ const ActividadOficiales = () => {
           </div>
           <div className="modal-actions">
             <button type="button" onClick={() => setShowTareaForm(false)} className="btn-cancel">Cancelar</button>
-            <button type="submit" className="btn-assign-submit">Asignar Tarea</button>
+            <button type="submit" className="btn-assign-submit">Guardar Tarea</button>
           </div>
         </form>
       </div>

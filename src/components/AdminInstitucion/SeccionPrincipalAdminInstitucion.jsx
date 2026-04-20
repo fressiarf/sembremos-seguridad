@@ -3,11 +3,12 @@ import DashboardAdminInst from './Vistas/DashboardAdminInst';
 import GestionTareas from './Vistas/GestionTareas';
 import RevisionReportes from './Vistas/RevisionReportes';
 import HistorialReportes from './Vistas/HistorialReportes';
-import CalendarioAdminInst from './Vistas/CalendarioAdminInst';
+import Calendario from '../Shared/Calendario/Calendario';
 import GestionFuncionarios from './Vistas/GestionFuncionarios';
 import PerfilUsuario from '../Dashboard/PerfilUsuario/PerfilUsuario';
 import EstadisticasInstitucion from './Vistas/EstadisticasInstitucion';
 import TopbarInstitucion from '../DashboardInstitucion/Navegacion/TopbarInstitucion';
+import SoporteInstitucional from '../Dashboard/SoporteInstitucional/SoporteInstitucional';
 import { useLogin } from '../../context/LoginContext';
 import { useState, useEffect, useRef } from 'react';
 import { Bot, Bell, X } from 'lucide-react';
@@ -43,10 +44,11 @@ const SeccionPrincipalAdminInstitucion = ({ activeView = 'dashboard', collapsed,
       dashboard: 'Dashboard',
       tareas: 'Gestión de Tareas',
       usuarios: 'Gestión de Funcionarios',
-      reportes: 'Revisión de Reportes',
-      historial: 'Historial de Reportes',
+      reportes: 'Revisión y Autorización',
+      historial: 'Historial Institucional',
       calendario: 'Calendario',
       estadisticas: 'Estadísticas',
+      alertas: 'Soporte y Comentarios',
       perfil: 'Mi Perfil',
     };
     return labels[activeView] || 'Dashboard';
@@ -65,7 +67,17 @@ const SeccionPrincipalAdminInstitucion = ({ activeView = 'dashboard', collapsed,
       case 'historial':
         return <HistorialReportes />;
       case 'calendario':
-        return <CalendarioAdminInst />;
+        return (
+          <div style={{ padding: '1rem 2rem' }}>
+             <Calendario />
+          </div>
+        );
+      case 'alertas':
+        return (
+          <div style={{ padding: '0 2.5rem 2.5rem' }}>
+            <SoporteInstitucional />
+          </div>
+        );
       case 'estadisticas':
         return <EstadisticasInstitucion />;
       case 'perfil':

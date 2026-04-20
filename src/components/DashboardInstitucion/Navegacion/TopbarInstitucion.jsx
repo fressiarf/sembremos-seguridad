@@ -1,11 +1,13 @@
 import React from 'react';
+import TricolorBar from '../../Shared/TricolorBar/TricolorBar';
 import logoMsp from '../../../assets/Msp_logo-removebg-preview.png';
 import logoInl from '../../../assets/inl-logo-acronym-vertical-navy-removebg-preview.png';
 import logoSembremos from '../../../assets/Captura_de_pantalla_2026-03-15_191337-removebg-preview.png';
 
-const TopbarInstitucion = ({ children, usuario, seccion, subtitulo, rol }) => {
+const TopbarInstitucion = ({ usuario, seccion, subtitulo, rol, children }) => {
   return (
-    <header className="TopbarInstitucion" style={{ marginTop: '6px' }}>
+    <header className="TopbarInstitucion">
+      <TricolorBar />
       <div className="TopbarIzquierda">
         <div className="TopbarLogosInstitucionales">
           <img src={logoMsp} alt="MSP" className="TopbarLogo" />

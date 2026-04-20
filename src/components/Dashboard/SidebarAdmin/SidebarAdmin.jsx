@@ -3,7 +3,8 @@ import '../../Dashboard/SidebarAdmin/SidebarAdmin.css';
 import { dashboardService } from '../../../services/dashboardService';
 import { useLogin } from "../../../context/LoginContext";
 import UserBrand from "../../Shared/Navegacion/UserBrand";
-import { ChevronLeft, ChevronDown, LayoutGrid, Activity, Clock, LogOut, User, MapPin, Shield, Bell, BellRing, TriangleAlert, FileText, Settings, Calendar, LayoutDashboard, MessageCircle } from "lucide-react";
+import { ChevronLeft, ChevronDown, LayoutGrid, Activity, Clock, LogOut, User, MapPin, Shield, Bell, BellRing, TriangleAlert, FileText, Settings, Calendar, LayoutDashboard, MessageCircle, FileBarChart } from "lucide-react";
+import Swal from 'sweetalert2';
 
 
 // Navigation link items should be consistent, but for now we'll keep the admin structure
@@ -20,7 +21,7 @@ import { ChevronLeft, ChevronDown, LayoutGrid, Activity, Clock, LogOut, User, Ma
 const SidebarAdmin = ({ collapsed = false, onToggle, activeView, onViewChange }) => {
   const { user, logout } = useLogin();
   const [openSections, setOpenSections] = useState({
-    PRINCIPAL: true, GESTIÓN: true, ANÁLISIS: true, ADMINISTRACIÓN: true,
+    'GESTIÓN ESTRATÉGICA': true, HERRAMIENTAS: true,
   });
 
   const [stats, setStats] = useState({
@@ -40,7 +41,7 @@ const SidebarAdmin = ({ collapsed = false, onToggle, activeView, onViewChange })
       });
     };
     fetchStats();
-    
+
     // Opcional: Polling cada 30 segundos si se desea tiempo real
     const interval = setInterval(fetchStats, 30000);
     return () => clearInterval(interval);
@@ -49,36 +50,22 @@ const SidebarAdmin = ({ collapsed = false, onToggle, activeView, onViewChange })
   // ── Secciones de navegación dinámicas ──
   const navSections = [
     {
-      label: 'PRINCIPAL',
+      label: 'GESTIÓN ESTRATÉGICA',
       items: [
-        { id: 'dashboard',   label: 'Resumen Ejecutivo',     icon: LayoutDashboard, path: '/dashboard' },
-        { id: 'lineas-accion', label: 'Líneas de Acción',    icon: LayoutGrid, path: '/lineas-accion' },
-        { id: 'matriz-seguimiento', label: 'Matriz de Seguimiento', icon: FileText, path: '/matriz-seguimiento' },
-        { id: 'reportes-resultados', label: 'Reportes de Resultados', icon: Activity, path: '/reportes-resultados' },
+        { id: 'dashboard', label: 'Resumen Ejecutivo', icon: LayoutDashboard, path: '/dashboard' },
+        { id: 'lineas-accion', label: 'Líneas y Tareas', icon: LayoutGrid, path: '/lineas-accion' },
+        { id: 'reportes-resultados', label: 'Reportes Activos', icon: Activity, path: '/reportes-resultados' },
+        { id: 'historial', label: 'Historial', icon: Clock, path: '/historial' },
+        { id: 'matriz-seguimiento', label: 'Matriz Completa', icon: FileText, path: '/matriz-seguimiento' },
       ],
     },
     {
-      label: 'GESTIÓN',
+      label: 'HERRAMIENTAS',
       items: [
-        { id: 'actividades', label: 'Gestión de Tareas', icon: Activity, path: '/actividades', badge: stats.activitiesCount },
-        { id: 'zonas',       label: 'Zonas críticas',        icon: MapPin,      path: '/zonas',    badge: stats.zonesCount },
-        { id: 'alertas',     label: 'Soporte y Comentarios',  icon: MessageCircle, path: '/alertas',  badge: stats.alertsCount },
-      ],
-    },
-    {
-      label: 'ANÁLISIS',
-      items: [
-        { id: 'mapa',        label: 'Distribución policial', icon: MapPin,       path: '/mapa' },
-        { id: 'historial',   label: 'Historial',             icon: Clock,     path: '/historial' },
-        { id: 'estadisticas',label: 'Estadísticas',          icon: Activity,     path: '/estadisticas' },
-        { id: 'calendario',  label: 'Calendario',            icon: Calendar,  path: '/calendario' },
-      ],
-    },
-    {
-      label: 'ADMINISTRACIÓN',
-      items: [
-        { id: 'usuarios',    label: 'Gestión de usuarios',   icon: User,     path: '/usuarios', badge: stats.solicitudesCount },
-        { id: 'reportes',    label: 'Reportes INL/MSP',      icon: FileText,    path: '/reportes' },
+        { id: 'mapa', label: 'Distribución Policial', icon: MapPin, path: '/mapa' },
+        { id: 'estadisticas', label: 'Estadísticas', icon: Activity, path: '/estadisticas' },
+        { id: 'usuarios', label: 'Gestión de Usuarios', icon: User, path: '/usuarios', badge: stats.solicitudesCount },
+        { id: 'alertas', label: 'Soporte', icon: MessageCircle, path: '/alertas', badge: stats.alertsCount },
       ],
     },
   ];
@@ -87,6 +74,22 @@ const SidebarAdmin = ({ collapsed = false, onToggle, activeView, onViewChange })
     setOpenSections(prev => ({ ...prev, [label]: !prev[label] }));
   };
 
+  const handleLogout = () => {
+    Swal.fire({
+      title: '¿Cerrar sesión?',
+      text: '¿Seguro que desea salir de su cuenta?',
+      icon: 'question',
+      showCancelButton: true,
+      confirmButtonColor: '#3085d6',
+      cancelButtonColor: '#d33',
+      confirmButtonText: 'Sí, cerrar sesión',
+      cancelButtonText: 'Cancelar'
+    }).then((result) => {
+      if (result.isConfirmed) {
+        logout();
+      }
+    });
+  };
 
   return (
     <aside className={`sidebar-admin ${collapsed ? 'sidebar-admin--collapsed' : ''}`}>
@@ -96,12 +99,12 @@ const SidebarAdmin = ({ collapsed = false, onToggle, activeView, onViewChange })
         <UserBrand collapsed={collapsed} />
 
         <button className="sidebar-admin__toggle" onClick={onToggle} title={collapsed ? 'Expandir' : 'Colapsar'}>
-          <ChevronLeft 
-            size={18} 
+          <ChevronLeft
+            size={18}
             strokeWidth={2.5}
-            style={{ 
-              transform: collapsed ? 'rotate(180deg)' : 'rotate(0deg)', 
-              transition: 'transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275)' 
+            style={{
+              transform: collapsed ? 'rotate(180deg)' : 'rotate(0deg)',
+              transition: 'transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275)'
             }}
           />
         </button>
@@ -113,7 +116,7 @@ const SidebarAdmin = ({ collapsed = false, onToggle, activeView, onViewChange })
         <div className="sidebar-admin__role">
           <span className="sidebar-admin__role-dot" />
           <span className="sidebar-admin__role-label">
-            {user?.rol === 'admin' ? 'Administrador' : 'Oficial'}
+            {user?.rol === 'admin' ? 'Fuerza Pública' : 'Editor'}
           </span>
         </div>
       )}
@@ -132,7 +135,7 @@ const SidebarAdmin = ({ collapsed = false, onToggle, activeView, onViewChange })
               >
                 <span>{section.label}</span>
                 <span className="sidebar-admin__section-chevron">
-                   <ChevronDown size={14} style={{ transform: openSections[section.label] ? 'rotate(0deg)' : 'rotate(-90deg)', transition: 'transform 0.25s ease' }} />
+                  <ChevronDown size={14} style={{ transform: openSections[section.label] ? 'rotate(0deg)' : 'rotate(-90deg)', transition: 'transform 0.25s ease' }} />
                 </span>
               </button>
             )}
@@ -178,20 +181,22 @@ const SidebarAdmin = ({ collapsed = false, onToggle, activeView, onViewChange })
 
       {/* ── Footer: perfil + cerrar sesión ── */}
       <div className="sidebar-admin__footer">
-        <div 
+        <div
           className={`sidebar-admin__profile ${activeView === 'perfil' ? 'sidebar-admin__profile--active' : ''}`}
           onClick={() => onViewChange('perfil')}
           title="Ver mi perfil"
         >
           <div className="sidebar-admin__avatar">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-               <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>
+              <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" /><circle cx="12" cy="7" r="4" />
             </svg>
           </div>
 
           {!collapsed && (
             <div className="sidebar-admin__profile-info">
-              <span className="sidebar-admin__profile-name">{user?.nombre || "C. Araya"}</span>
+              <span className="sidebar-admin__profile-name">
+                {user?.rol === 'admin' ? 'Administrador global' : (user?.nombre || "C. Araya")}
+              </span>
               <span className="sidebar-admin__profile-role">
                 {user?.rol === 'admin' ? 'Administrador' : 'Oficial'}
               </span>
@@ -200,7 +205,7 @@ const SidebarAdmin = ({ collapsed = false, onToggle, activeView, onViewChange })
         </div>
 
 
-        <button className="sidebar-admin__logout" onClick={logout} title="Cerrar sesión" id="btn-logout">
+        <button className="sidebar-admin__logout" onClick={handleLogout} title="Cerrar sesión" id="btn-logout">
           <LogOut size={18} />
           {!collapsed && <span>Cerrar sesión</span>}
         </button>

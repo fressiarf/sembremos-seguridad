@@ -4,8 +4,9 @@ import { useLogin } from "../../../context/LoginContext";
 import UserBrand from "../../Shared/Navegacion/UserBrand";
 import {
   ChevronLeft, ChevronDown, LayoutDashboard, ClipboardList,
-  FileSearch, Clock, Calendar, LogOut, Users, BarChart3
+  FileSearch, Clock, Calendar, LogOut, Users, BarChart3, FileBarChart, MessageCircle
 } from "lucide-react";
+import Swal from 'sweetalert2';
 
 const SidebarAdminInstitucion = ({ collapsed = false, onToggle, activeView, onViewChange }) => {
   const { user, logout } = useLogin();
@@ -20,16 +21,16 @@ const SidebarAdminInstitucion = ({ collapsed = false, onToggle, activeView, onVi
     {
       label: 'OPERATIVO',
       items: [
-        { id: 'dashboard',  label: 'Dashboard',            icon: LayoutDashboard },
-        { id: 'tareas',     label: 'Gestión de Tareas',    icon: ClipboardList },
-        { id: 'usuarios',   label: 'Gestión de Funcionarios', icon: Users },
+        { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
+        { id: 'tareas', label: 'Gestión de Tareas', icon: ClipboardList },
+        { id: 'usuarios', label: 'Gestión de Funcionarios', icon: Users },
       ],
     },
     {
       label: 'SUPERVISIÓN',
       items: [
-        { id: 'reportes',   label: 'Revisión de Reportes', icon: FileSearch },
-        { id: 'historial',  label: 'Historial de Reportes', icon: Clock },
+        { id: 'reportes', label: 'Revisión de Reportes', icon: FileSearch },
+        { id: 'historial', label: 'Historial de Reportes', icon: Clock },
       ],
     },
     {
@@ -41,13 +42,31 @@ const SidebarAdminInstitucion = ({ collapsed = false, onToggle, activeView, onVi
     {
       label: 'PLANIFICACIÓN',
       items: [
-        { id: 'calendario', label: 'Calendario',           icon: Calendar },
+        { id: 'calendario', label: 'Calendario', icon: Calendar },
+        { id: 'alertas', label: 'Soporte y Comentarios', icon: MessageCircle },
       ],
     },
   ];
 
   const toggleSection = (label) => {
     setOpenSections(prev => ({ ...prev, [label]: !prev[label] }));
+  };
+
+  const handleLogout = () => {
+    Swal.fire({
+      title: '¿Cerrar sesión?',
+      text: '¿Seguro que desea salir de su cuenta?',
+      icon: 'question',
+      showCancelButton: true,
+      confirmButtonColor: '#3085d6',
+      cancelButtonColor: '#d33',
+      confirmButtonText: 'Sí, cerrar sesión',
+      cancelButtonText: 'Cancelar'
+    }).then((result) => {
+      if (result.isConfirmed) {
+        logout();
+      }
+    });
   };
 
   return (
@@ -131,7 +150,7 @@ const SidebarAdminInstitucion = ({ collapsed = false, onToggle, activeView, onVi
         >
           <div className="sidebar-admin__avatar">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>
+              <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" /><circle cx="12" cy="7" r="4" />
             </svg>
           </div>
           {!collapsed && (
@@ -143,7 +162,7 @@ const SidebarAdminInstitucion = ({ collapsed = false, onToggle, activeView, onVi
             </div>
           )}
         </div>
-        <button type="button" className="sidebar-admin__logout" onClick={logout} title="Cerrar sesión" id="btn-logout">
+        <button type="button" className="sidebar-admin__logout" onClick={handleLogout} title="Cerrar sesión" id="btn-logout">
           <LogOut size={18} />
           {!collapsed && <span>Cerrar sesión</span>}
         </button>

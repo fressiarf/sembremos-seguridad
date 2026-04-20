@@ -33,10 +33,12 @@ sembremos-seguridad/
 ├── src/
 │   ├── assets/           # Imágenes y recursos globales
 │   ├── components/       # Componentes organizados por módulos (Login, Dashboard, etc.)
+│   ├── constants/        # Constantes y configuraciones fijas del proyecto
 │   ├── context/          # Proveedores de contexto para el estado global
 │   ├── pages/            # Vistas principales de la aplicación
 │   ├── routing/          # Configuración de rutas y protección de acceso
 │   ├── services/         # Lógica de comunicación con la API
+│   ├── utils/            # Funciones utilitarias (ej. exportación a CSV, formateos)
 │   ├── App.jsx           # Componente raíz
 │   └── main.jsx          # Punto de entrada de la aplicación
 ├── db.json               # Base de datos simulada para el backend

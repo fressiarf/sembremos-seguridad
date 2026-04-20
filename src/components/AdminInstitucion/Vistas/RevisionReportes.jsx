@@ -5,20 +5,14 @@ import { useLogin } from '../../../context/LoginContext';
 import { 
   Clock, CheckCircle, XCircle, Search, 
   Filter, FileText, Activity, AlertCircle, Edit, MessageSquare, ChevronDown,
-  FileSearch, ChevronUp, Save, Image as ImageIcon, Edit3, MapPin, Calendar
+  FileSearch, ChevronUp, Save, Image as ImageIcon, Edit3, MapPin, Calendar, Users, Target
 } from 'lucide-react';
 import '../AdminInstitucion.css';
-
-const LINEAS_ACCION_INFO = [
-  { id: 'linea-1', numero: 1, nombre: 'Consumo de drogas' },
-  { id: 'linea-2', numero: 2, nombre: 'Violencia intrafamiliar y de género' },
-  { id: 'linea-3', numero: 3, nombre: 'Personas en sit. de calle' },
-  { id: 'linea-4', numero: 4, nombre: 'Falta de inversión social' },
-];
 
 const RevisionReportes = () => {
   const { user } = useLogin();
   const [reportes, setReportes] = useState([]);
+  const [lineasAccion, setLineasAccion] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   const [filtroLinea, setFiltroLinea] = useState('Todas');
@@ -36,10 +30,14 @@ const RevisionReportes = () => {
     if (!user?.id) return;
     try {
       setLoading(true);
-      const data = await adminInstitucionService.getReportesPendientes(user.id);
-      setReportes(data);
+      const [reportesData, lineasData] = await Promise.all([
+        adminInstitucionService.getReportesPendientes(user.id),
+        adminInstitucionService.getLineasAccion()
+      ]);
+      setReportes(reportesData);
+      setLineasAccion(lineasData);
     } catch (e) {
-      showToast('Error al cargar reportes', 'error');
+      showToast('Error al cargar datos', 'error');
     } finally {
       setLoading(false);
     }
@@ -118,8 +116,9 @@ const RevisionReportes = () => {
       </div>
 
       <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-        {LINEAS_ACCION_INFO.map(linea => {
-          const reportesLinea = reportes.filter(r => r.tarea?.lineaId === linea.id);
+        {lineasAccion.map(linea => {
+          const reportesLinea = reportes.filter(r => (r.tarea?.lineaId || r.tarea?.lineaAccionId) === linea.id);
+          if (reportesLinea.length === 0) return null;
           const isExpanded = lineasExpandidas[linea.id];
 
           return (
@@ -143,7 +142,7 @@ const RevisionReportes = () => {
                   </div>
                   <div>
                     <h3 style={{ margin: 0, fontSize: '1.05rem', color: '#0f172a', fontWeight: 700 }}>
-                      Línea #{linea.numero} — {linea.nombre}
+                      Línea #{linea.no || linea.numero || linea.id} — {linea.titulo || linea.nombre}
                     </h3>
                     <p style={{ margin: '4px 0 0', fontSize: '0.8rem', color: '#64748b' }}>
                       {reportesLinea.length} reportes pendientes
@@ -186,7 +185,13 @@ const RevisionReportes = () => {
                               Indicador a cumplir: {reporte.indicador}
                             </div>
                           </div>
-                          <div style={{ textAlign: 'right', minWidth: '140px' }}>
+                          <div style={{ textAlign: 'right', minWidth: '160px' }}>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '6px', justifyContent: 'flex-end', marginBottom: '4px' }}>
+                              <Building size={14} color="#3b82f6" />
+                              <span style={{ fontWeight: 800, color: '#2563eb', fontSize: '0.82rem', textTransform: 'uppercase' }}>
+                                {reporte.responsable?.institucion || user?.institucion}
+                              </span>
+                            </div>
                             <div style={{ display: 'flex', alignItems: 'center', gap: '6px', justifyContent: 'flex-end', marginBottom: '4px' }}>
                               <Users size={14} color="#64748b" />
                               <span style={{ fontWeight: 700, color: '#0b2240', fontSize: '0.85rem' }}>
@@ -422,7 +427,7 @@ const RevisionReportes = () => {
                               <button
                                 className="admin-inst-btn admin-inst-btn--rechazar"
                                 onClick={() => handleRechazar(reporte.id)}
-                                disabled={!observacion.trim()}
+                                disabled={!modalRechazo.observacion?.trim()}
                               >
                                 Confirmar Rechazo
                               </button>

@@ -1,0 +1,208 @@
+.profile-settings-overlay {
+    padding: 2rem;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    animation: fadeIn 0.4s ease-out;
+}
+
+.profile-settings-card {
+    background: #ffffff;
+    border-radius: 12px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+    overflow: hidden;
+    width: 100%;
+    max-width: 880px;
+}
+
+.profile-settings-header {
+    background: linear-gradient(135deg, #0f172a 0%, #1e40af 100%);
+    padding: 1.5rem 2rem;
+    color: white;
+    position: relative;
+    overflow: hidden;
+}
+
+.profile-header-info {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+}
+
+.profile-header-info h1 {
+    font-size: 1.5rem;
+    margin: 0;
+    font-weight: 700;
+}
+
+.profile-header-info p {
+    margin: 0.2rem 0 0;
+    opacity: 0.8;
+    font-size: 0.9rem;
+}
+
+.shield-icon {
+    background: rgba(255, 255, 255, 0.2);
+    padding: 0.8rem;
+    border-radius: 10px;
+}
+
+.profile-settings-form {
+    padding: 1.5rem 2rem;
+}
+
+.form-sections-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2rem;
+}
+
+.form-section h3 {
+    font-size: 1.1rem;
+    color: #1e3a8a;
+    margin-bottom: 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+    padding-bottom: 0.6rem;
+    position: relative;
+}
+
+.form-section h3::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 40px;
+    height: 4px;
+    background: #2563eb;
+    border-radius: 2px;
+}
+
+.input-group {
+    margin-bottom: 1rem;
+    display: grid;
+    grid-template-columns: 160px 1fr; /* Aumentado de 130px a 160px */
+    align-items: center;
+    gap: 1rem;
+}
+
+.input-group label {
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: #4a5568;
+    display: flex;
+    align-items: center;
+    gap: 10px; /* Aumentado de 6px a 10px para evitar choque con icono */
+    white-space: nowrap;
+}
+
+.input-group input {
+    padding: 0.6rem 0.8rem;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    font-size: 0.9rem;
+    transition: all 0.3s;
+    background: #f8fafc;
+    color: #1e293b;
+    width: 100%;
+}
+
+.input-group input:focus {
+    outline: none;
+    background: #ffffff;
+    border-color: #2563eb;
+    box-shadow: 0 4px 12px rgba(37, 99, 235, 0.1);
+}
+
+.input-readonly {
+    background: #f1f5f9 !important;
+    color: #94a3b8 !important;
+    cursor: not-allowed;
+}
+
+.highlight-pass {
+    background: linear-gradient(to right, #f0f7ff, #ffffff);
+    padding: 1.2rem;
+    border-radius: 12px;
+    border: 1px solid #dbeafe;
+    margin-top: 1rem;
+}
+
+.profile-security-footer {
+    margin-top: 2rem;
+    padding: 2rem;
+    background: #f8fafc;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.security-notice {
+    display: flex;
+    align-items: center;
+    gap: 0.7rem;
+    color: #718096;
+    font-size: 0.85rem;
+}
+
+.btn-save-profile {
+    background: #2563eb;
+    color: white;
+    padding: 1rem 2.5rem;
+    border-radius: 12px;
+    border: none;
+    font-weight: 700;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+    transition: all 0.3s;
+}
+
+.btn-save-profile:hover:not(:disabled) {
+    background: #1e40af;
+    transform: translateY(-2px);
+}
+
+.btn-save-profile:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.approval-window-required {
+    background: #fffbef;
+    border: 1px dashed #f59e0b;
+    padding: 1rem;
+    border-radius: 8px;
+    text-align: center;
+}
+
+.window-status-badge {
+    background: #fef3c7;
+    color: #92400e;
+    padding: 0.2rem 0.6rem;
+    border-radius: 4px;
+    font-size: 0.7rem;
+    font-weight: 700;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+@media (max-width: 850px) {
+    .form-sections-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .input-group {
+        grid-template-columns: 1fr;
+        gap: 0.4rem;
+    }
+    
+    .input-group label {
+        white-space: normal;
+    }
+}

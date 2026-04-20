@@ -6,18 +6,29 @@ function NotificacionAdmin({ variant = 'fullpage' }) {
     const [eventos, setEventos] = useState([]);
     const [filtroCategoria, setFiltroCategoria] = useState('Todos');
 
+    const [notificaciones, setNotificaciones] = useState([]);
+
     useEffect(() => {
-        const cargarEventos = () => {
+        const cargarDatos = async () => {
+            // 1. Cargar eventos de localStorage (existente)
             const guardados = localStorage.getItem('sembremos_seguridad_eventos');
-            if (guardados) {
-                setEventos(JSON.parse(guardados));
+            const evs = guardados ? JSON.parse(guardados) : [];
+            setEventos(evs);
+
+            // 2. Cargar notificaciones de seguridad del servidor
+            try {
+                const res = await fetch('http://localhost:5000/notificaciones_admin');
+                if (res.ok) {
+                    const data = await res.ok ? await res.json() : [];
+                    setNotificaciones(data);
+                }
+            } catch (error) {
+                console.error('Error fetching server notifications:', error);
             }
         };
 
-        cargarEventos();
-
-        // Escuchar cambios en localStorage o simular actualización
-        const interval = setInterval(cargarEventos, 3000);
+        cargarDatos();
+        const interval = setInterval(cargarDatos, 5000);
         return () => clearInterval(interval);
     }, []);
 
@@ -36,6 +47,7 @@ function NotificacionAdmin({ variant = 'fullpage' }) {
             case 'Operativos': return '#ef4444';
             case 'Reuniones': return '#3b82f6';
             case 'Seguimiento de Matriz': return '#22c55e';
+            case 'Seguridad': return '#f59e0b';
             default: return '#64748b';
         }
     };
@@ -45,11 +57,25 @@ function NotificacionAdmin({ variant = 'fullpage' }) {
         return getColorCategoria(cat);
     };
 
-    const categorias = ['Todos', 'Operativos', 'Reuniones', 'Seguimiento de Matriz'];
+    const categorias = ['Todos', 'Operativos', 'Reuniones', 'Seguimiento de Matriz', 'Seguridad'];
 
-    const eventosFiltrados = eventosOrdenados.filter(ev => 
+    const hoyDate = new Date();
+    const hoyStrNormalized = hoyDate.toISOString().split('T')[0];
+
+    const alertsServer = notificaciones.map(n => ({
+        id: `srv-${n.id}`,
+        titulo: n.mensaje,
+        categoria: 'Seguridad',
+        fecha: n.timestamp.split('T')[0],
+        inicio: n.timestamp.split('T')[1].substring(0, 5),
+        isServer: true
+    }));
+
+    const todosLosEventos = [...eventosOrdenados, ...alertsServer];
+
+    const eventosFiltrados = todosLosEventos.filter(ev => 
        filtroCategoria === 'Todos' || ev.categoria === filtroCategoria
-    );
+    ).sort((a,b) => new Date(b.fecha + 'T' + b.inicio) - new Date(a.fecha + 'T' + a.inicio));
 
     const drawerStyles = variant === 'drawer' ? {} : {};
 
@@ -96,60 +122,34 @@ function NotificacionAdmin({ variant = 'fullpage' }) {
                     </div>
                 ) : (
                     <div className="admin-notif-list">
-                        {/* Sección Hoy */}
-                        {eventosFiltrados.some(e => e.fecha === hoyStr) && (
-                            <div className="admin-notif-section-label">HOY — {hoyStr}</div>
-                        )}
-                        {eventosFiltrados.filter(e => e.fecha === hoyStr).map((ev) => (
-                            <div key={ev.id} className="admin-notif-card admin-notif-today">
+                        {eventosFiltrados.map((ev) => (
+                            <div key={ev.id} className={`admin-notif-card ${ev.fecha === hoyStrNormalized ? 'admin-notif-today' : ''} ${ev.categoria === 'Seguridad' ? 'security-alert' : ''}`}>
                                 <div
                                     className="admin-notif-color-bar"
                                     style={{ backgroundColor: getColorCategoria(ev.categoria) }}
                                 />
                                 <div className="admin-notif-info">
-                                    <h4 className="admin-notif-event-title">{ev.titulo}</h4>
-                                    <div className="admin-notif-details">
-                                        <span className="admin-notif-time">
-                                            <Clock size={14} />
-                                            {ev.inicio} - {ev.fin}
-                                        </span>
+                                    <div className="admin-notif-top">
+                                        <h4 className="admin-notif-event-title">{ev.titulo}</h4>
+                                        {ev.categoria === 'Seguridad' && <AlertCircle size={16} color="#f59e0b" />}
                                     </div>
-                                    <span
-                                        className="admin-notif-category"
-                                        style={{ color: getColorCategoria(ev.categoria), backgroundColor: `${getColorCategoria(ev.categoria)}22` }}
-                                    >
-                                        {ev.categoria}
-                                    </span>
-                                </div>
-                                <AlertCircle size={20} className="admin-notif-alert-icon" color="#ef4444" />
-                            </div>
-                        ))}
-
-                        {/* Sección Próximos */}
-                        {eventosFiltrados.some(e => e.fecha !== hoyStr) && (
-                            <div className="admin-notif-section-label">PRÓXIMOS</div>
-                        )}
-                        {eventosFiltrados.filter(e => e.fecha !== hoyStr).map((ev) => (
-                            <div key={ev.id} className="admin-notif-card">
-                                <div
-                                    className="admin-notif-color-bar"
-                                    style={{ backgroundColor: getColorCategoria(ev.categoria) }}
-                                />
-                                <div className="admin-notif-info">
-                                    <h4 className="admin-notif-event-title">{ev.titulo}</h4>
                                     <div className="admin-notif-details">
                                         <span className="admin-notif-date">
-                                            <CalendarIcon size={14} />
-                                            {ev.fecha}
+                                            <CalendarIcon size={12} />
+                                            {ev.fecha === hoyStrNormalized ? 'Hoy' : ev.fecha}
                                         </span>
                                         <span className="admin-notif-time">
-                                            <Clock size={14} />
+                                            <Clock size={12} />
                                             {ev.inicio}
                                         </span>
                                     </div>
                                     <span
                                         className="admin-notif-category"
-                                        style={{ color: getColorCategoria(ev.categoria), backgroundColor: `${getColorCategoria(ev.categoria)}22` }}
+                                        style={{ 
+                                            color: getColorCategoria(ev.categoria), 
+                                            backgroundColor: `${getColorCategoria(ev.categoria)}15`,
+                                            border: `1px solid ${getColorCategoria(ev.categoria)}40`
+                                        }}
                                     >
                                         {ev.categoria}
                                     </span>

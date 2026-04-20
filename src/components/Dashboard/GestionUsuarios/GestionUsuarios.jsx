@@ -135,6 +135,12 @@ const GestionUsuarios = () => {
         return;
       }
     }
+    
+    // Básicos
+    if (!newUser.nombre || !newUser.cedula || !newUser.usuario || !newUser.password) {
+      showToast('Por favor completa todos los campos', 'warning');
+      return;
+    }
 
     // Validación General de Email
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -188,8 +194,37 @@ const GestionUsuarios = () => {
   if (loading) return <div style={{ color: '#7a9cc4', padding: '2rem' }}>Cargando usuarios...</div>;
 
   return (
-    <div className="gestion-usuarios">
-      <section className="gestion-usuarios__filters" style={{ marginTop: '0' }}>
+    <div className="gestion-usuarios" style={{ padding: '2rem 2.5rem', fontFamily: 'Inter, sans-serif' }}>
+      <div style={{ marginBottom: '2.5rem' }}>
+        <span style={{ 
+          display: 'inline-block',
+          padding: '6px 16px',
+          borderRadius: '20px',
+          backgroundColor: 'rgba(255, 255, 255, 0.1)',
+          color: '#e2e8f0',
+          fontSize: '0.75rem',
+          fontWeight: '700',
+          letterSpacing: '1px',
+          marginBottom: '1rem',
+          border: '1px solid rgba(255,255,255,0.2)'
+        }}>CONTROL DE ACCESO</span>
+        <h1 style={{ 
+          fontSize: '2.5rem', 
+          fontWeight: 800, 
+          color: 'white', 
+          margin: '0 0 8px 0',
+          letterSpacing: '-0.5px',
+          textShadow: '0 2px 10px rgba(0,0,0,0.3)'
+        }}>Gestión de Instituciones</h1>
+        <p style={{ 
+          fontSize: '1rem', 
+          color: '#94a3b8', 
+          margin: 0,
+          fontWeight: 500
+        }}>Administración de identidades, roles y accesos corporativos</p>
+      </div>
+
+      <section className="gestion-usuarios__filters" style={{ marginTop: '0', borderRadius: '16px', border: 'none', background: 'rgba(255,255,255,0.03)', backdropFilter: 'blur(10px)', border: '1px solid rgba(255,255,255,0.1)' }}>
         <div className="search-wrapper">
           <div className="search-icon">
             <Search size={18} />
@@ -331,23 +366,54 @@ const GestionUsuarios = () => {
                 )}
 
                 {newUser.rol === 'adminInstitucion' && (
-                  <div className="form-group">
-                    <label>Institución a Registrar *</label>
-                    <div className="input-with-icon">
-                      <Building2 size={16} />
-                      <select 
-                        value={newUser.institucion}
-                        onChange={e => setNewUser({...newUser, institucion: e.target.value, nombre: e.target.value})}
-                        className="modal-select"
-                        style={{ paddingLeft: '40px' }}
-                      >
-                        <option value="">Seleccionar institución...</option>
-                        {INSTITUCIONES.map(inst => (
-                          <option key={inst} value={inst}>{inst}</option>
-                        ))}
-                      </select>
+                  <>
+                    <div className="form-group">
+                      <label>Institución a Registrar *</label>
+                      <div className="input-with-icon">
+                        <Building2 size={16} />
+                        <select 
+                          value={newUser.institucion}
+                          onChange={e => setNewUser({...newUser, institucion: e.target.value, nombre: e.target.value})}
+                          className="modal-select"
+                          style={{ paddingLeft: '40px' }}
+                        >
+                          <option value="">Seleccionar institución...</option>
+                          {INSTITUCIONES.map(inst => (
+                            <option key={inst} value={inst}>{inst}</option>
+                          ))}
+                        </select>
+                      </div>
+                      <label>Nombre Completo</label>
+                      <div className="input-with-icon">
+                        <UserIcon size={16} />
+                        <input 
+                          type="text" 
+                          placeholder="Ej: Juan Pérez" 
+                          value={newUser.nombre}
+                          onChange={e => {
+                            const val = e.target.value.replace(/[^a-zA-ZáéíóúÁÉÍÓÚñÑ ]/g, '');
+                            setNewUser({...newUser, nombre: val});
+                          }}
+                        />
+                      </div>
                     </div>
-                  </div>
+                    <div className="form-group">
+                      <label>Número de Cédula</label>
+                      <div className="input-with-icon">
+                        <Fingerprint size={16} />
+                        <input 
+                          type="text" 
+                          placeholder="Ej: 102340567" 
+                          maxLength={12}
+                          value={newUser.cedula}
+                          onChange={e => {
+                            const val = e.target.value.replace(/\D/g, ''); // Solo números
+                            setNewUser({...newUser, cedula: val});
+                          }}
+                        />
+                      </div>
+                    </div>
+                  </>
                 )}
 
                 <div className="form-group">
@@ -422,13 +488,14 @@ const GestionUsuarios = () => {
                     {getRolLabel(u.rol)}
                   </span>
                 </td>
-                <td style={{ textAlign: 'right' }}>
+                 <td style={{ textAlign: 'right', paddingRight: '24px' }}>
                   {currentUser.rol === 'admin' && u.id !== currentUser.id ? (
                     <button 
                       className="btn-change-role"
                       onClick={() => handleToggleRole(u.id, u.rol)}
                       disabled={updatingId === u.id}
                       title={`Cambiar a ${u.rol === 'admin' ? 'Admin Institución' : 'Administrador Global'}`}
+                      style={{ marginLeft: 'auto' }}
                     >
                       <UserCog size={16} />
                       {updatingId === u.id ? 'Actualizando...' : (u.rol === 'admin' ? 'Pasar a Institución' : 'Hacer Admin Global')}

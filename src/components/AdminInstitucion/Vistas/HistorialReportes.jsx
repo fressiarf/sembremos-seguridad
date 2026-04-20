@@ -47,11 +47,19 @@ const HistorialReportes = ({ isGlobal = false }) => {
   };
 
   useEffect(() => {
+    // Carga inmediata al montar o al cambiar filtros que no sean búsqueda
+    loadData();
+  }, [filtros.rango, filtros.estado, filtros.institucionId, user?.id]);
+
+  useEffect(() => {
+    // Solo debouncing para la búsqueda de texto
+    if (!filtros.busqueda) return;
+    
     const delayDebounceFn = setTimeout(() => {
       loadData();
-    }, 300);
+    }, 400);
     return () => clearTimeout(delayDebounceFn);
-  }, [filtros.busqueda, filtros.rango, filtros.estado, filtros.institucionId, user?.id]);
+  }, [filtros.busqueda]);
 
   const getEstadoColor = (estado) => {
     if (estado === 'aprobado') return '#22c55e';
@@ -158,12 +166,18 @@ const HistorialReportes = ({ isGlobal = false }) => {
                     <p className="reporte-desc">{reporte.descripcion}</p>
                     
                     <div className="metrics-summary">
-                      <div className="metric-pill">
-                        <Users size={12} /> <span>{reporte.beneficiados} beneficiados</span>
+                      <div className="metric-pill pill--place">
+                        <MapPin size={12} /> <span>{reporte.tarea?.zona || reporte.lugar || 'Ubicación no especificada'}</span>
+                      </div>
+                      <div className="metric-pill pill--dept">
+                        <Building size={12} /> <span>{reporte.responsable?.institucion || 'Sede Central'}</span>
+                      </div>
+                      <div className="metric-pill pill--people">
+                        <Users size={12} /> <span>{reporte.beneficiados || 0} personas</span>
                       </div>
                       {reporte.inversionColones > 0 && (
                         <div className="metric-pill pill--money">
-                          <DollarSign size={12} /> <span>₡{reporte.inversionColones.toLocaleString()}</span>
+                          <DollarSign size={12} /> <span>₡{Number(reporte.inversionColones).toLocaleString()}</span>
                         </div>
                       )}
                       {reporte.tipoActividad && (
@@ -290,21 +304,23 @@ const HistorialReportes = ({ isGlobal = false }) => {
           max-width: 180px;
         }
         .filter-select-wrapper select:focus { outline: none; }
+        .filter-select-wrapper select option { background: #0b2240; color: #fff; }
 
         .timeline-wrapper { position: relative; padding-left: 20px; }
         .timeline-main { position: relative; display: flex; flex-direction: column; gap: 2.5rem; }
         .timeline-line {
           position: absolute;
-          left: 10px;
+          left: 100px;
           top: 0;
           bottom: 0;
           width: 2px;
           background: linear-gradient(to bottom, #3b82f6, rgba(59,130,246,0.1));
+          z-index: 1;
         }
         
         .timeline-item {
           display: flex;
-          gap: 2rem;
+          gap: 3.5rem;
           position: relative;
           animation: slideInUp 0.5s ease backwards;
         }
@@ -315,25 +331,27 @@ const HistorialReportes = ({ isGlobal = false }) => {
         
         .timeline-dot {
           position: absolute;
-          left: -17px;
-          width: 24px;
-          height: 24px;
+          left: 100px;
+          transform: translateX(-50%);
+          width: 28px;
+          height: 28px;
           border-radius: 50%;
           display: flex;
           align-items: center;
           justify-content: center;
           color: #fff;
-          z-index: 2;
+          z-index: 3;
           box-shadow: 0 0 15px rgba(0,0,0,0.2);
-          border: 3px solid #0b2240;
+          margin-top: 4px;
         }
         
         .timeline-date {
           display: flex;
           flex-direction: column;
           align-items: flex-end;
-          min-width: 60px;
-          padding-top: 4px;
+          min-width: 80px;
+          padding-top: 8px;
+          z-index: 2;
         }
         .date-day { font-weight: 800; font-size: 0.9rem; color: #fff; }
         .date-year { font-size: 0.7rem; color: #94a3b8; font-weight: 600; }
@@ -381,8 +399,11 @@ const HistorialReportes = ({ isGlobal = false }) => {
           font-weight: 600;
           color: #475569;
         }
-        .pill--money { background: #f0fdf4; color: #166534; }
-        .pill--type { background: #f5f3ff; color: #5b21b6; }
+        .pill--money { background: #f0fdf4; color: #166534; border: 1px solid #dcfce7; }
+        .pill--type { background: #f5f3ff; color: #5b21b6; border: 1px solid #ddd6fe; }
+        .pill--place { background: #fff7ed; color: #9a3412; border: 1px solid #ffedd5; }
+        .pill--dept { background: #eff6ff; color: #1e40af; border: 1px solid #dbeafe; }
+        .pill--people { background: #f0f9ff; color: #0369a1; border: 1px solid #e0f2fe; }
         
         .evidence-preview {
           background: #f8fafc;

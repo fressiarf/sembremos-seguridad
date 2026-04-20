@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { dashboardService } from '../../../services/dashboardService';
-import { Users, ClipboardList, Clock } from 'lucide-react';
+import { Users, ClipboardList, Clock, Plus } from 'lucide-react';
 import './zonas.css';
 
 const PinIcon = () => (
@@ -29,57 +29,16 @@ function ZonasCriticas() {
       .catch(err => console.error("Error fetching zonas", err));
   }, []);
 
-  const visualConfig = {
-    "Barranca": {
-      classNameModifier: "barranca",
-      percentageText: "78%",
-      lineas: 8,
-      completadas: 4,
-      retrasadas: 1,
-      beneficiarios: 420,
-      iconType: "pin"
-    },
-    "Chacarita": {
-      classNameModifier: "chacarita",
-      percentageText: "62%",
-      lineas: 7,
-      completadas: 3,
-      retrasadas: 1,
-      beneficiarios: 380,
-      iconType: "pin"
-    },
-    "El Roble": {
-      classNameModifier: "el-roble",
-      percentageText: "55%",
-      lineas: 6,
-      completadas: 2,
-      retrasadas: 1,
-      beneficiarios: 260,
-      iconType: "pin"
-    },
-    "Cantonal": {
-      classNameModifier: "cantonal",
-      percentageText: "71%",
-      lineas: 6,
-      completadas: 1,
-      retrasadas: 0,
-      beneficiarios: 180,
-      iconType: "globe"
-    }
-  };
-
-  const defaultConf = {
-    classNameModifier: "default",
-    percentageText: "71%",
-    lineas: 6,
-    completadas: 1,
-    retrasadas: 0,
-    beneficiarios: 180,
-    iconType: "globe"
-  };
-
   const renderZonaCard = (zona) => {
-    const conf = visualConfig[zona.nombre] || defaultConf;
+    const conf = {
+      classNameModifier: zona.tag || 'default',
+      percentageText: `${zona.avance || 0}%`,
+      lineas: zona.lineas || 0,
+      completadas: zona.completadas || 0,
+      retrasadas: zona.retrasadas || 0,
+      beneficiarios: zona.beneficiarios || 0,
+      iconType: zona.icon || 'pin'
+    };
     return (
       <div key={zona.id} className={`zona-card ${zona.nombre === 'Cantonal' ? 'zona-card-cantonal' : ''}`}>
         
@@ -99,7 +58,10 @@ function ZonasCriticas() {
           </div>
           
           <div className="zona-progress-bg">
-              <div className={`zona-progress-fill zona-fill-${conf.classNameModifier}`}></div>
+              <div 
+                className={`zona-progress-fill zona-fill-${conf.classNameModifier}`}
+                style={{ width: conf.percentageText }}
+              ></div>
           </div>
 
           <div className="zona-stats">
@@ -147,9 +109,6 @@ function ZonasCriticas() {
               <span className="admin-badge-dot"></span>
               Administrador
            </div>
-           <button className="btn-nueva">
-              + Nueva línea
-           </button>
         </div>
       </div>
       
