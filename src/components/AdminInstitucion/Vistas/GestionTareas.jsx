@@ -50,10 +50,11 @@ const GestionTareas = () => {
       const [tareasData, responsablesData, lineasData] = await Promise.all([
         adminInstitucionService.getTareas({ institucionId: user?.id }),
         adminInstitucionService.getResponsables(),
+        adminInstitucionService.getLineasAccion(),
       ]);
       setTareasRaw(tareasData.filter(t => t.estado !== 'Completado'));
-      setResponsables(responsablesData);
-      setLineasAccion(lineasData);
+      setResponsables(responsablesData || []);
+      setLineasAccion(lineasData || []);
     } catch (e) {
       showToast('Error al cargar tareas', 'error');
     } finally {
@@ -166,7 +167,7 @@ const GestionTareas = () => {
       </div>
 
       <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-        {lineasAccion.map(linea => {
+        {lineasAccion?.map(linea => {
           const tareasLinea = tareas.filter(t => t.lineaAccionId === linea.id);
           if (tareasLinea.length === 0) return null; // Solo mostrar líneas que tienen tareas asignadas para esta institución
           const isExpanded = lineasExpandidas[linea.id];

@@ -8,6 +8,7 @@ import Calendario from '../Shared/Calendario/Calendario';
 import GestionFuncionarios from './Vistas/GestionFuncionarios';
 import PerfilUsuario from '../Dashboard/PerfilUsuario/PerfilUsuario';
 import EstadisticasInstitucion from './Vistas/EstadisticasInstitucion';
+import DashboardAvances from '../Dashboard/DashboardAvances/DashboardAvances';
 import TopbarInstitucion from '../DashboardInstitucion/Navegacion/TopbarInstitucion';
 import SoporteInstitucional from '../Dashboard/SoporteInstitucional/SoporteInstitucional';
 import { useLogin } from '../../context/LoginContext';
@@ -50,6 +51,7 @@ const SeccionPrincipalAdminInstitucion = ({ activeView = 'dashboard', collapsed,
       historial: 'Historial de Reportes',
       calendario: 'Calendario',
       estadisticas: 'Estadísticas',
+      avances: 'Dashboard de Avances',
       alertas: 'Soporte y Comentarios',
       perfil: 'Mi Perfil',
     };
@@ -84,6 +86,8 @@ const SeccionPrincipalAdminInstitucion = ({ activeView = 'dashboard', collapsed,
         );
       case 'estadisticas':
         return <EstadisticasInstitucion />;
+      case 'avances':
+        return <DashboardAvances scope="institucion" />;
       case 'perfil':
         return (
           <div style={{ padding: '2rem 2.5rem' }}>

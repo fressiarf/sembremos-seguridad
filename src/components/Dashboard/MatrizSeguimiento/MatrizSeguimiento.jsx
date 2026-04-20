@@ -60,7 +60,7 @@ const MatrizSeguimiento = () => {
 
     const columns = [
       { label: 'No.', key: 'no' },
-      { label: 'Problemática', key: 'problematica' },
+      { label: 'Nombre de Línea Estratégica', key: 'problematica' },
       { label: 'Línea de Acción', key: 'lineaAccion' },
       { label: 'ID Tarea', key: 'tareaId' },
       { label: 'Acción Estratégica', key: 'tareaTitulo' },
@@ -135,7 +135,7 @@ const MatrizSeguimiento = () => {
           <Search size={18} color="#64748b" />
           <input 
             type="text" 
-            placeholder="Buscar por problemática, institución, indicador..." 
+            placeholder="Buscar por línea de acción, institución, indicador..." 
             value={searchTerm} 
             onChange={e => setSearchTerm(e.target.value)} 
           />
@@ -160,7 +160,7 @@ const MatrizSeguimiento = () => {
           <thead>
             <tr>
               <th>No.</th>
-              <th>Problemática</th>
+              <th>Nombre de Línea Estratégica</th>
               <th>Línea de Acción</th>
               <th>Indicador / Meta</th>
               <th>Responsables</th>

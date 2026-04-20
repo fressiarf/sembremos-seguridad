@@ -6,6 +6,7 @@ import Calendario from '../Shared/Calendario/Calendario';
 import ReportesRechazadosEditor from './MainDashboardInstitucion/ReportesRechazadosEditor';
 import EditorInformeTrimestral from './InformesTrimestrales/EditorInformeTrimestral';
 import { editoresService } from '../../services/editoresService';
+import DashboardAvances from '../Dashboard/DashboardAvances/DashboardAvances';
 import { useToast } from '../../context/ToastContext';
 import { useLogin } from '../../context/LoginContext';
 import { CheckCircle, Clock, Activity, DollarSign, MessageCircle, Bot, Bell, X } from 'lucide-react';
@@ -82,7 +83,8 @@ const SeccionPrincipalInstitucion = ({ activeView = 'dashboard', collapsed, setC
       alertas: 'Soporte y Comentarios',
       perfil: 'Mi Perfil',
       rechazados: 'Devoluciones',
-      informeTrimestral: 'Informe Trimestral'
+      informeTrimestral: 'Informe Trimestral',
+      avances: 'Dashboard de Avances'
     };
     return labels[activeView] || 'Dashboard';
   };
@@ -135,6 +137,11 @@ const SeccionPrincipalInstitucion = ({ activeView = 'dashboard', collapsed, setC
           <SoporteInstitucional />
         </div>
       );
+    }
+
+    // ── Vista Dashboard de Avances ──
+    if (activeView === 'avances') {
+      return <DashboardAvances scope="editor" />;
     }
 
     // ── Vista Dashboard (Solo Resumen / Estadísticas) ──

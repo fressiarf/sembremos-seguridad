@@ -180,7 +180,7 @@ const ActividadOficiales = () => {
             <form onSubmit={handleCreateLinea}>
               <div className="form-row-grid">
                 <div className="form-group">
-                  <label>Problemática Priorizada *</label>
+                  <label>Nombre de Línea Estratégica *</label>
                   <input type="text" placeholder="Ej: CONSUMO DE DROGAS Y ALCOHOL" value={newLinea.problematica} onChange={e => setNewLinea({...newLinea, problematica: e.target.value})} required />
                 </div>
                 <div className="form-group">

@@ -113,7 +113,7 @@ const DashboardGlobal = ({ collapsed, onViewChange }) => {
   const handleExportExcel = () => {
     const columns = [
       { label: 'Título', key: 'titulo' },
-      { label: 'Problemática', key: 'problematica' },
+      { label: 'Línea de Acción', key: 'problematica' },
       { label: 'Indicador', key: 'indicador' },
       { label: 'Responsables', key: 'responsables' },
       { label: 'Progreso %', key: 'progreso' }
@@ -269,7 +269,7 @@ const DashboardGlobal = ({ collapsed, onViewChange }) => {
                     {expandedRow === linea.id && (
                       <div className="linea-bar-content-mini" style={{ marginTop: '1rem', paddingTop: '1rem', borderTop: '1px solid #f1f5f9' }}>
                         <div className="sidebar-detail-block">
-                          <label style={{ display: 'block', fontSize: '0.6rem', textTransform: 'uppercase', color: '#64748b', fontWeight: '900', marginBottom: '4px' }}>Problemática</label>
+                          <label style={{ display: 'block', fontSize: '0.6rem', textTransform: 'uppercase', color: '#64748b', fontWeight: '900', marginBottom: '4px' }}>Línea de Acción</label>
                           <p style={{ margin: 0, fontSize: '0.8rem', color: '#1e293b', lineHeight: '1.4', fontWeight: '500' }}>{linea.problematica}</p>
                         </div>
                         <div className="sidebar-detail-block" style={{ marginTop: '1rem' }}>

@@ -82,7 +82,7 @@ const DashboardInstitucion = () => {
       if (l.tareas && l.tareas.length > 0) {
         l.tareas.forEach(t => {
           exportData.push({
-            'Problemática': l.problematica,
+            'Nombre de Línea Estratégica': l.problematica,
             'Línea de Acción': l.titulo,
             'Tarea Estratégica Asignada': t.titulo,
             'Prioridad': t.prioridad || 'Media',
@@ -96,7 +96,7 @@ const DashboardInstitucion = () => {
         });
       } else {
         exportData.push({
-          'Problemática': l.problematica,
+          'Nombre de Línea Estratégica': l.problematica,
           'Línea de Acción': l.titulo,
           'Tarea Estratégica Asignada': 'Sin tareas bajo tu responsabilidad',
           'Prioridad': '-',

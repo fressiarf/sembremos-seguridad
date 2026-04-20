@@ -61,7 +61,7 @@ const MatrizSeguimiento = () => {
 
     autoTable(doc, {
       startY: 35,
-      head: [['No.', 'Cantón', 'Factores Priorizados', 'Línea de Acción', 'Objetivo']],
+      head: [['No.', 'Cantón', 'Nombre de Línea Estratégica', 'Línea de Acción', 'Objetivo']],
       body: tableData,
       headStyles: { fillColor: [11, 34, 64], textColor: [255, 255, 255], fontStyle: 'bold' },
       styles: { fontSize: 8, cellPadding: 3 },
@@ -80,7 +80,7 @@ const MatrizSeguimiento = () => {
       const baseRowL = {
         'No.': l.no,
         'Cantón': l.canton,
-        'Factores Priorizados': l.problematica,
+        'Nombre de Línea Estratégica': l.problematica,
         'Líneas de Acción Recomendadas': l.titulo,
         'Objetivo General': l.objetivo
       };
@@ -137,7 +137,7 @@ const MatrizSeguimiento = () => {
               <Search size={20} className="search-icon" />
               <input 
                 type="text" 
-                placeholder="Filtrar por línea de acción, objetivo o problemática priorizada..." 
+                placeholder="Filtrar por línea de acción, objetivo o línea estratégica..." 
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
               />
@@ -171,7 +171,7 @@ const MatrizSeguimiento = () => {
                 <tr>
                   <th className="col-no">No.</th>
                   <th className="col-canton">Cantón</th>
-                  <th className="col-problematica">Factores Priorizados</th>
+                  <th className="col-problematica">Nombre de Línea Estratégica</th>
                   <th className="col-titulo">Línea de Acción</th>
                   <th className="col-objetivo">Objetivo</th>
                   <th className="col-meta">Meta / Indicador</th>

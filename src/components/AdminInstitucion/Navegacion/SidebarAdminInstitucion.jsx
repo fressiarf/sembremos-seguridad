@@ -38,6 +38,7 @@ const SidebarAdminInstitucion = ({ collapsed = false, onToggle, activeView, onVi
       label: 'ANÁLISIS',
       items: [
         { id: 'estadisticas', label: 'Estadísticas', icon: BarChart3 },
+        { id: 'avances', label: 'Dashboard de Avances', icon: BarChart3 },
       ],
     },
     {

@@ -34,7 +34,7 @@ const CardLineaAccion = ({ linea, children }) => {
               <Users size={12} /> {linea.totalTareas || 0} tareas locales
             </span>
           </div>
-          <p className="card-inst-subtitle">Problemática: {linea.problematica}</p>
+          <p className="card-inst-subtitle">Línea de Acción: {linea.problematica}</p>
         </div>
 
         <div className="card-inst-progress-area">

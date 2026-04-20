@@ -2,7 +2,7 @@ import React from 'react';
 import '../Dashboard/SidebarAdmin/SidebarAdmin.css';
 import { useLogin } from '../../context/LoginContext';
 import UserBrand from '../Shared/Navegacion/UserBrand';
-import { ChevronLeft, LayoutDashboard, FileText, Send, LogOut, Building2, MessageCircle } from 'lucide-react';
+import { ChevronLeft, LayoutDashboard, FileText, Send, LogOut, Building2, MessageCircle, TrendingUp } from 'lucide-react';
 import Swal from 'sweetalert2';
 
 const SidebarInstitucion = ({ collapsed = false, onToggle, activeView, onViewChange }) => {
@@ -12,6 +12,7 @@ const SidebarInstitucion = ({ collapsed = false, onToggle, activeView, onViewCha
   const navItems = [
     { id: 'dashboard', label: 'Panel Institucional', icon: LayoutDashboard },
     { id: 'lineas', label: 'Mis Líneas de Acción', icon: FileText },
+    { id: 'avances', label: 'Mi Avance', icon: TrendingUp },
     { id: 'reportes', label: 'Historial de Reportes', icon: Send },
     { id: 'alertas', label: 'Soporte y Comentarios', icon: MessageCircle },
   ];

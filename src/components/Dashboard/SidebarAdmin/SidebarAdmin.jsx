@@ -3,7 +3,7 @@ import '../../Dashboard/SidebarAdmin/SidebarAdmin.css';
 import { dashboardService } from '../../../services/dashboardService';
 import { useLogin } from "../../../context/LoginContext";
 import UserBrand from "../../Shared/Navegacion/UserBrand";
-import { ChevronLeft, ChevronDown, LayoutGrid, Activity, Clock, LogOut, User, MapPin, Shield, Bell, BellRing, TriangleAlert, FileText, Settings, Calendar, LayoutDashboard, MessageCircle, FileBarChart } from "lucide-react";
+import { ChevronLeft, ChevronDown, LayoutGrid, Activity, Clock, LogOut, User, MapPin, Shield, Bell, BellRing, TriangleAlert, FileText, Settings, Calendar, LayoutDashboard, MessageCircle, FileBarChart, TrendingUp } from "lucide-react";
 import Swal from 'sweetalert2';
 
 
@@ -74,6 +74,7 @@ const SidebarAdmin = ({ collapsed = false, onToggle, activeView, onViewChange })
         { id: 'consolidado', label: 'Consolidado Trimestral', icon: FileBarChart, path: '/consolidado' },
         { id: 'historial',   label: 'Historial',             icon: Clock,     path: '/historial' },
         { id: 'estadisticas',label: 'Estadísticas',          icon: Activity,     path: '/estadisticas' },
+        { id: 'avances',     label: 'Dashboard de Avances',  icon: TrendingUp,   path: '/avances' },
         { id: 'calendario',  label: 'Calendario',            icon: Calendar,  path: '/calendario' },
       ],
     },

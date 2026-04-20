@@ -1,0 +1,528 @@
+/* ═══════════════════════════════════════════════════
+   Dashboard de Avances — Sembremos Seguridad
+   Premium reporting view with animated progress
+   ═══════════════════════════════════════════════════ */
+
+.dashboard-avances {
+  padding: 0;
+  font-family: 'Inter', 'Segoe UI', system-ui, -apple-system, sans-serif;
+  min-height: 100vh;
+  animation: fadeInAvances 0.5s ease-out;
+}
+
+@keyframes fadeInAvances {
+  from { opacity: 0; transform: translateY(12px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ── Header Banner ── */
+.avances-banner {
+  background: linear-gradient(135deg, #0b2240 0%, #002f6c 50%, #1e40af 100%);
+  padding: 2.5rem 2.5rem 2rem;
+  position: relative;
+  overflow: hidden;
+}
+
+.avances-banner::before {
+  content: '';
+  position: absolute;
+  top: -40%;
+  right: -10%;
+  width: 400px;
+  height: 400px;
+  background: radial-gradient(circle, rgba(59,130,246,0.15) 0%, transparent 70%);
+  border-radius: 50%;
+  pointer-events: none;
+}
+
+.avances-banner::after {
+  content: '';
+  position: absolute;
+  bottom: -40%;
+  left: 10%;
+  width: 300px;
+  height: 300px;
+  background: radial-gradient(circle, rgba(34,197,94,0.1) 0%, transparent 70%);
+  border-radius: 50%;
+  pointer-events: none;
+}
+
+.avances-banner .banner-badge {
+  display: inline-block;
+  background: rgba(59,130,246,0.2);
+  color: #93c5fd;
+  border: 1px solid rgba(59,130,246,0.3);
+  padding: 4px 14px;
+  border-radius: 20px;
+  font-size: 0.65rem;
+  font-weight: 800;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  margin-bottom: 10px;
+}
+
+.avances-banner h1 {
+  font-size: 1.6rem;
+  font-weight: 800;
+  color: #ffffff;
+  margin: 0 0 6px;
+  letter-spacing: -0.3px;
+}
+
+.avances-banner p {
+  color: rgba(255,255,255,0.65);
+  font-size: 0.85rem;
+  margin: 0;
+}
+
+/* ── KPIs Strip ── */
+.avances-kpi-strip {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1rem;
+  padding: 0 2.5rem;
+  margin-top: -1.5rem;
+  position: relative;
+  z-index: 2;
+}
+
+.avances-kpi-card {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 16px;
+  padding: 1.25rem 1.5rem;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.04), 0 1px 3px rgba(0,0,0,0.06);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.avances-kpi-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 30px rgba(0,0,0,0.08);
+}
+
+.avances-kpi-icon {
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.avances-kpi-icon.blue   { background: #eff6ff; color: #3b82f6; }
+.avances-kpi-icon.green  { background: #f0fdf4; color: #22c55e; }
+.avances-kpi-icon.amber  { background: #fffbeb; color: #f59e0b; }
+.avances-kpi-icon.purple { background: #faf5ff; color: #8b5cf6; }
+
+.avances-kpi-data {
+  display: flex;
+  flex-direction: column;
+}
+
+.avances-kpi-value {
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: #0b2240;
+  line-height: 1.1;
+}
+
+.avances-kpi-label {
+  font-size: 0.7rem;
+  color: #64748b;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-top: 2px;
+}
+
+/* ── Body ── */
+.avances-body {
+  padding: 2rem 2.5rem 3rem;
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+/* ── Chart Cards ── */
+.avances-charts-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.5rem;
+}
+
+.avances-chart-card {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+  transition: box-shadow 0.2s ease;
+}
+
+.avances-chart-card:hover {
+  box-shadow: 0 6px 24px rgba(0,0,0,0.06);
+}
+
+.avances-chart-card--full {
+  grid-column: 1 / -1;
+}
+
+.avances-chart-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 1.25rem 1.5rem;
+  border-bottom: 1px solid #f1f5f9;
+}
+
+.avances-chart-header .chart-icon {
+  color: #3b82f6;
+  flex-shrink: 0;
+}
+
+.avances-chart-header h3 {
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: #0f172a;
+  margin: 0;
+}
+
+.avances-chart-body {
+  padding: 1.5rem;
+}
+
+/* ── Progress Table ── */
+.avances-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.82rem;
+}
+
+.avances-table thead th {
+  text-align: left;
+  padding: 12px 16px;
+  font-size: 0.68rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  color: #64748b;
+  background: #f8fafc;
+  border-bottom: 2px solid #e2e8f0;
+}
+
+.avances-table tbody tr {
+  border-bottom: 1px solid #f1f5f9;
+  transition: background 0.15s;
+}
+
+.avances-table tbody tr:hover {
+  background: #f8fafc;
+}
+
+.avances-table tbody tr:last-child {
+  border-bottom: none;
+}
+
+.avances-table tbody td {
+  padding: 14px 16px;
+  color: #334155;
+  vertical-align: middle;
+}
+
+.avances-table .col-number {
+  font-weight: 800;
+  color: #002f6c;
+  width: 50px;
+  text-align: center;
+}
+
+.avances-table .col-linea {
+  font-weight: 600;
+  color: #0f172a;
+  max-width: 300px;
+}
+
+.avances-table .col-linea .linea-sub {
+  display: block;
+  font-size: 0.72rem;
+  color: #94a3b8;
+  font-weight: 400;
+  margin-top: 2px;
+}
+
+.avances-table .col-tasks {
+  text-align: center;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.avances-table .col-tasks .completed {
+  color: #22c55e;
+}
+
+.avances-table .col-tasks .divider {
+  color: #cbd5e1;
+  margin: 0 2px;
+}
+
+.avances-table .col-inversion {
+  font-weight: 600;
+  color: #7c3aed;
+  white-space: nowrap;
+}
+
+/* ── Progress Bar (in table) ── */
+.avances-progress-cell {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 160px;
+}
+
+.avances-progress-track {
+  flex: 1;
+  height: 8px;
+  background: #f1f5f9;
+  border-radius: 10px;
+  overflow: hidden;
+  position: relative;
+}
+
+.avances-progress-fill {
+  height: 100%;
+  border-radius: 10px;
+  transition: width 1s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+}
+
+.avances-progress-fill::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+  animation: shimmer 2s infinite;
+}
+
+@keyframes shimmer {
+  0%   { transform: translateX(-100%); }
+  100% { transform: translateX(100%); }
+}
+
+.avances-progress-pct {
+  font-size: 0.82rem;
+  font-weight: 800;
+  min-width: 42px;
+  text-align: right;
+}
+
+/* ── Expandable Row ── */
+.avances-expand-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #94a3b8;
+  padding: 4px;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+}
+
+.avances-expand-btn:hover {
+  background: #f1f5f9;
+  color: #3b82f6;
+}
+
+.avances-expand-btn.rotated svg {
+  transform: rotate(180deg);
+}
+
+.avances-expand-content {
+  background: #f8fafc;
+  border-top: 1px dashed #e2e8f0;
+  padding: 1rem 1.5rem;
+  animation: slideDown 0.3s ease-out;
+}
+
+@keyframes slideDown {
+  from { opacity: 0; max-height: 0; padding-top: 0; padding-bottom: 0; }
+  to   { opacity: 1; max-height: 500px; }
+}
+
+.avances-expand-tasks {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.avances-task-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: #ffffff;
+  padding: 10px 14px;
+  border-radius: 8px;
+  border: 1px solid #e2e8f0;
+  transition: border-color 0.2s;
+}
+
+.avances-task-row:hover {
+  border-color: #3b82f6;
+}
+
+.avances-task-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.avances-task-title {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: #1e293b;
+}
+
+.avances-task-inst {
+  font-size: 0.72rem;
+  color: #64748b;
+}
+
+.avances-task-meta {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.avances-task-pct {
+  font-size: 0.82rem;
+  font-weight: 800;
+}
+
+.avances-task-badge {
+  font-size: 0.68rem;
+  padding: 3px 10px;
+  border-radius: 20px;
+  font-weight: 700;
+}
+
+.avances-task-badge.completada {
+  background: #dcfce7;
+  color: #166534;
+}
+
+.avances-task-badge.en-proceso {
+  background: #dbeafe;
+  color: #1e40af;
+}
+
+.avances-task-badge.pendiente {
+  background: #fef3c7;
+  color: #92400e;
+}
+
+/* ── Total Avance Footer ── */
+.avances-total-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: linear-gradient(135deg, #0b2240 0%, #002f6c 100%);
+  padding: 1.25rem 1.5rem;
+  border-radius: 14px;
+  margin-top: 1rem;
+}
+
+.avances-total-label {
+  color: rgba(255,255,255,0.8);
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.avances-total-label strong {
+  color: #ffffff;
+  display: block;
+  font-size: 1rem;
+  margin-top: 2px;
+}
+
+.avances-total-right {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.avances-total-bar {
+  width: 200px;
+  height: 10px;
+  background: rgba(255,255,255,0.15);
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.avances-total-bar-fill {
+  height: 100%;
+  border-radius: 10px;
+  background: linear-gradient(90deg, #22c55e, #4ade80);
+  transition: width 1.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.avances-total-pct {
+  font-size: 1.8rem;
+  font-weight: 900;
+  color: #ffffff;
+}
+
+/* ── Zona Table styling ── */
+.avances-zona-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.avances-zona-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+/* ── Responsive ── */
+@media (max-width: 1200px) {
+  .avances-kpi-strip {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .avances-charts-row {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 768px) {
+  .avances-kpi-strip {
+    grid-template-columns: 1fr;
+    padding: 0 1.5rem;
+  }
+  .avances-body {
+    padding: 1.5rem;
+  }
+  .avances-banner {
+    padding: 2rem 1.5rem 1.5rem;
+  }
+  .avances-banner h1 {
+    font-size: 1.2rem;
+  }
+  .avances-total-footer {
+    flex-direction: column;
+    gap: 1rem;
+    text-align: center;
+  }
+  .avances-total-bar {
+    width: 100%;
+  }
+}
