@@ -19,6 +19,8 @@ import SoporteInstitucional from '../SoporteInstitucional/SoporteInstitucional';
 import EstadisticasGlobal from '../Estadisticas/EstadisticasGlobal';
 import ConsolidadoTrimestral from '../../DasboardMuni/ConsolidadoTrimestral/ConsolidadoTrimestral';
 import DashboardAvances from '../DashboardAvances/DashboardAvances';
+import MesaCIR from '../MesaCIR/MesaCIR';
+import DiagnosticoMetodologico from '../DiagnosticoMetodologico/DiagnosticoMetodologico';
 
 import LineasAccionView from '../LineasAccion/LineasAccionView';
 import MatrizSeguimiento from '../LineasAccion/MatrizSeguimiento';
@@ -42,6 +44,8 @@ const VIEW_LABELS = {
   'matriz-seguimiento': 'Matriz de Seguimiento',
   'reportes-resultados': 'Reportes de Resultados',
   'lineas-accion': 'Líneas y Tareas',
+  'mesa-cir': 'Mesa CIR Social',
+  'diagnostico': 'Diagnóstico Metodológico',
   historial: 'Historial',
   zonas: 'Zonas Críticas',
   alertas: 'Soporte y Comentarios',
@@ -224,16 +228,18 @@ const SeccionPrincipal = ({ collapsed, setCollapsed, activeView, onViewChange })
       {activeView === 'zonas' && <ZonasCriticas />}
       {activeView === 'calendario' && <Calendario />}
       {activeView === 'alertas' && <SoporteInstitucional />}
-      {activeView === 'estadisticas' && <EstadisticasGlobal />}
+      {activeView === 'estadisticas' && <EstadisticasGlobal collapsed={collapsed} onViewChange={onViewChange} />}
       {activeView === 'consolidado' && <ConsolidadoTrimestral />}
       {activeView === 'avances' && <DashboardAvances scope="global" />}
+      {activeView === 'mesa-cir' && <MesaCIR />}
+      {activeView === 'diagnostico' && <DiagnosticoMetodologico />}
       {(activeView === 'reportes' || activeView === 'historial') && (
         <HistorialReportes isGlobal={true} />
       )}
 
 
       {/* Placeholder para otras vistas no mapeadas */}
-      {!['dashboard', 'actividades', 'usuarios', 'perfil', 'matriz-seguimiento', 'reportes-resultados', 'lineas-accion', 'mapa', 'zonas', 'calendario', 'reportes', 'historial', 'configuracion', 'alertas', 'estadisticas', 'lineas', 'matrices', 'consolidado', 'avances'].includes(activeView) && (
+      {!['dashboard', 'actividades', 'usuarios', 'perfil', 'matriz-seguimiento', 'reportes-resultados', 'lineas-accion', 'mesa-cir', 'diagnostico', 'mapa', 'zonas', 'calendario', 'reportes', 'historial', 'configuracion', 'alertas', 'estadisticas', 'lineas', 'matrices', 'consolidado', 'avances'].includes(activeView) && (
         <div style={{ padding: '2rem', color: '#7a9cc4' }}>
           <h2>Vista en desarrollo: {activeView}</h2>
           <p>Esta sección se implementará próximamente.</p>

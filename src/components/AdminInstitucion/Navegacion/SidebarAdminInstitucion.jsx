@@ -4,7 +4,7 @@ import { useLogin } from "../../../context/LoginContext";
 import UserBrand from "../../Shared/Navegacion/UserBrand";
 import {
   ChevronLeft, ChevronDown, LayoutDashboard, ClipboardList,
-  FileSearch, Clock, Calendar, LogOut, Users, BarChart3, FileBarChart, MessageCircle
+  FileSearch, Clock, Calendar, LogOut, Users, BarChart3, FileBarChart, MessageCircle, PieChart, Activity, MapPin
 } from "lucide-react";
 import Swal from 'sweetalert2';
 
@@ -21,15 +21,15 @@ const SidebarAdminInstitucion = ({ collapsed = false, onToggle, activeView, onVi
     {
       label: 'OPERATIVO',
       items: [
-        { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
-        { id: 'tareas', label: 'Gestión de Tareas', icon: ClipboardList },
+        { id: 'estadisticas', label: 'Dashboard Analítico', icon: LayoutDashboard },
+        { id: 'tareas', label: 'Gestión de Tareas', icon: ClipboardList, badge: 3 },
         { id: 'usuarios', label: 'Gestión de Funcionarios', icon: Users },
       ],
     },
     {
       label: 'SUPERVISIÓN',
       items: [
-        { id: 'reportes',   label: 'Revisión de Reportes', icon: FileSearch },
+        { id: 'reportes',   label: 'Revisión de Reportes', icon: FileSearch, badge: 5 },
         { id: 'informesTrimestral', label: 'Informes Trimestrales', icon: FileBarChart },
         { id: 'historial',  label: 'Historial de Reportes', icon: Clock },
       ],
@@ -37,15 +37,16 @@ const SidebarAdminInstitucion = ({ collapsed = false, onToggle, activeView, onVi
     {
       label: 'ANÁLISIS',
       items: [
-        { id: 'estadisticas', label: 'Estadísticas', icon: BarChart3 },
+        { id: 'zonas', label: 'Zonas Críticas y Riesgo', icon: MapPin },
         { id: 'avances', label: 'Dashboard de Avances', icon: BarChart3 },
       ],
     },
     {
       label: 'PLANIFICACIÓN',
       items: [
+        { id: 'mesa-cir', label: 'Mesa CIR Social', icon: Activity },
         { id: 'calendario', label: 'Calendario', icon: Calendar },
-        { id: 'alertas', label: 'Soporte y Comentarios', icon: MessageCircle },
+        { id: 'alertas', label: 'Soporte y Comentarios', icon: MessageCircle, badge: 1 },
       ],
     },
   ];
@@ -133,6 +134,11 @@ const SidebarAdminInstitucion = ({ collapsed = false, onToggle, activeView, onVi
                       </span>
                       {!collapsed && (
                         <span className="sidebar-admin__item-label">{item.label}</span>
+                      )}
+                      {item.badge && (
+                        <span className={`sidebar-admin__badge ${collapsed ? 'sidebar-admin__badge--dot' : ''}`}>
+                          {!collapsed && item.badge}
+                        </span>
                       )}
                     </button>
                   </li>

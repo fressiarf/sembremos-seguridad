@@ -5,6 +5,8 @@ import { dashboardService } from '../../../services/dashboardService';
 import { useLogin } from '../../../context/LoginContext';
 import { Save, Edit2, Search, Filter, Download, Plus } from 'lucide-react';
 import { exportToCSV } from '../../../utils/exportUtils';
+import SkeletonLoader from '../../Shared/SkeletonLoader';
+import PageTransition from '../../Shared/PageTransition';
 
 const MatrizSeguimiento = () => {
   const { user } = useLogin();
@@ -109,10 +111,10 @@ const MatrizSeguimiento = () => {
     return lineMatches || hasMatchingTask;
   });
 
-  if (loading) return <div className="matriz-loading">Cargando datos de matriz estratégica...</div>;
+  if (loading) return <PageTransition><SkeletonLoader type="table" /></PageTransition>;
 
   return (
-    <div className="matriz-seguimiento-v2">
+    <PageTransition className="matriz-seguimiento-v2">
       <header className="matriz-v2-header">
         <div className="header-titles">
           <h1>Matriz Plan Operativo Institucional - Sembremos Seguridad</h1>
@@ -283,7 +285,7 @@ const MatrizSeguimiento = () => {
           </tbody>
         </table>
       </div>
-    </div>
+    </PageTransition>
   );
 };
 

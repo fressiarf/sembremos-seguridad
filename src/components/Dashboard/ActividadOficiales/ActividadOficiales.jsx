@@ -5,6 +5,8 @@ import { dashboardService } from '../../../services/dashboardService';
 import { userService } from '../../../services/userService';
 import { useLogin } from '../../../context/LoginContext';
 import { Users, Edit, Plus, X, ListTodo, MapPin, DollarSign, CheckCircle, Clock, ChevronDown, ChevronUp } from 'lucide-react';
+import SkeletonLoader from '../../Shared/SkeletonLoader';
+import PageTransition from '../../Shared/PageTransition';
 
 const LOCATION_DATA = {
   "Puntarenas": {
@@ -144,10 +146,10 @@ const ActividadOficiales = () => {
     opcionesInstituciones = officers.filter(o => lineaGuardada.institucionesLideres.includes(o.id));
   }
 
-  if (loading) return <div style={{ padding: '3rem', color: '#7a9cc4' }}>Cargando...</div>;
+  if (loading) return <PageTransition><SkeletonLoader type="table" /></PageTransition>;
 
   return (
-    <div className="actividad-oficiales">
+    <PageTransition className="actividad-oficiales">
       <header className="actividad-oficiales__header">
         <div className="actividad-oficiales__title-block">
           <h1>Gestión de Líneas y Tareas</h1>
@@ -679,7 +681,7 @@ const ActividadOficiales = () => {
           </div>
         )}
       </section>
-    </div>
+    </PageTransition>
   );
 };
 

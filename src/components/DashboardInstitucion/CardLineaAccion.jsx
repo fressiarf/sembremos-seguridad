@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { AlertCircle, ChevronDown, ChevronUp, Clock, FileText, CheckCircle, Activity, MapPin, Users } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
 
 const CardLineaAccion = ({ linea, children }) => {
   const [expanded, setExpanded] = useState(false);
@@ -14,7 +15,14 @@ const CardLineaAccion = ({ linea, children }) => {
   const status = getTrafficLight(linea.progreso);
 
   return (
-    <div className="card-inst">
+    <motion.div 
+      layout
+      className="card-inst"
+      initial={{ opacity: 0, y: 10 }}
+      animate={{ opacity: 1, y: 0 }}
+      whileHover={{ y: -4, boxShadow: '0 12px 40px rgba(0,0,0,0.12)' }}
+      transition={{ duration: 0.3 }}
+    >
       {/* Header Visible siempre */}
       <div className="card-inst-header">
         <div className="card-inst-title-area">
@@ -58,14 +66,21 @@ const CardLineaAccion = ({ linea, children }) => {
       </div>
 
       {/* Contenido Expandido: Módulo Delegación y Carga de Evidencia */}
-      {expanded && (
-        <div className="card-inst-body">
-          <div className="card-inst-body-grid">
-            {children}
-          </div>
-        </div>
-      )}
-    </div>
+      <AnimatePresence>
+        {expanded && (
+          <motion.div 
+            initial={{ opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: 'auto' }}
+            exit={{ opacity: 0, height: 0 }}
+            className="card-inst-body"
+          >
+            <div className="card-inst-body-grid">
+              {children}
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </motion.div>
   );
 };
 

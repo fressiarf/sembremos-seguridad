@@ -1,12 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import './NotificacionAdmin.css';
-import { Calendar as CalendarIcon, Clock, Bell, AlertCircle, CheckCircle, Settings } from 'lucide-react';
+import { Calendar as CalendarIcon, Clock, Bell, AlertCircle, AlertTriangle, CheckCircle, Settings } from 'lucide-react';
+import { alertasService } from '../../../services/alertasService';
 
 function NotificacionAdmin({ variant = 'fullpage' }) {
     const [eventos, setEventos] = useState([]);
     const [filtroCategoria, setFiltroCategoria] = useState('Todos');
-
     const [notificaciones, setNotificaciones] = useState([]);
+    const [alertasVencimiento, setAlertasVencimiento] = useState([]);
 
     useEffect(() => {
         const cargarDatos = async () => {
@@ -19,16 +20,20 @@ function NotificacionAdmin({ variant = 'fullpage' }) {
             try {
                 const res = await fetch('http://localhost:5000/notificaciones_admin');
                 if (res.ok) {
-                    const data = await res.ok ? await res.json() : [];
+                    const data = await res.json();
                     setNotificaciones(data);
                 }
             } catch (error) {
                 console.error('Error fetching server notifications:', error);
             }
+
+            // 3. Generar alertas automáticas de vencimiento
+            const alertas = await alertasService.generarAlertasVencimiento();
+            setAlertasVencimiento(alertas);
         };
 
         cargarDatos();
-        const interval = setInterval(cargarDatos, 5000);
+        const interval = setInterval(cargarDatos, 15000);
         return () => clearInterval(interval);
     }, []);
 
@@ -48,6 +53,7 @@ function NotificacionAdmin({ variant = 'fullpage' }) {
             case 'Reuniones': return '#3b82f6';
             case 'Seguimiento de Matriz': return '#22c55e';
             case 'Seguridad': return '#f59e0b';
+            case 'Vencimiento': return '#dc2626';
             default: return '#64748b';
         }
     };
@@ -57,7 +63,8 @@ function NotificacionAdmin({ variant = 'fullpage' }) {
         return getColorCategoria(cat);
     };
 
-    const categorias = ['Todos', 'Operativos', 'Reuniones', 'Seguimiento de Matriz', 'Seguridad'];
+    const categorias = ['Todos', 'Vencimiento', 'Operativos', 'Reuniones', 'Seguimiento de Matriz', 'Seguridad'];
+
 
     const hoyDate = new Date();
     const hoyStrNormalized = hoyDate.toISOString().split('T')[0];
@@ -71,7 +78,20 @@ function NotificacionAdmin({ variant = 'fullpage' }) {
         isServer: true
     }));
 
-    const todosLosEventos = [...eventosOrdenados, ...alertsServer];
+    const alertsVencimiento = alertasVencimiento.map(a => ({
+        id: a.id,
+        titulo: `${a.titulo}`,
+        subtitulo: `${a.institucion} · ${a.zona}`,
+        categoria: 'Vencimiento',
+        fecha: a.fechaLimite,
+        inicio: '00:00',
+        urgencia: a.tipo,
+        textoUrgencia: a.textoUrgencia,
+        diasRestantes: a.diasRestantes,
+        isDeadline: true
+    }));
+
+    const todosLosEventos = [...eventosOrdenados, ...alertsServer, ...alertsVencimiento];
 
     const eventosFiltrados = todosLosEventos.filter(ev => 
        filtroCategoria === 'Todos' || ev.categoria === filtroCategoria
@@ -123,7 +143,7 @@ function NotificacionAdmin({ variant = 'fullpage' }) {
                 ) : (
                     <div className="admin-notif-list">
                         {eventosFiltrados.map((ev) => (
-                            <div key={ev.id} className={`admin-notif-card ${ev.fecha === hoyStrNormalized ? 'admin-notif-today' : ''} ${ev.categoria === 'Seguridad' ? 'security-alert' : ''}`}>
+                            <div key={ev.id} className={`admin-notif-card ${ev.fecha === hoyStrNormalized ? 'admin-notif-today' : ''} ${ev.categoria === 'Seguridad' ? 'security-alert' : ''} ${ev.isDeadline && ev.urgencia === 'vencida' ? 'deadline-overdue' : ''} ${ev.isDeadline && ev.urgencia === 'proxima' ? 'deadline-soon' : ''}`}>
                                 <div
                                     className="admin-notif-color-bar"
                                     style={{ backgroundColor: getColorCategoria(ev.categoria) }}
@@ -132,16 +152,27 @@ function NotificacionAdmin({ variant = 'fullpage' }) {
                                     <div className="admin-notif-top">
                                         <h4 className="admin-notif-event-title">{ev.titulo}</h4>
                                         {ev.categoria === 'Seguridad' && <AlertCircle size={16} color="#f59e0b" />}
+                                        {ev.isDeadline && ev.urgencia === 'vencida' && <AlertTriangle size={16} color="#dc2626" />}
+                                        {ev.isDeadline && ev.urgencia === 'proxima' && <Clock size={16} color="#f59e0b" />}
                                     </div>
+                                    {ev.subtitulo && (
+                                        <p style={{ margin: '2px 0 6px', fontSize: '0.75rem', color: '#64748b', fontWeight: 500 }}>{ev.subtitulo}</p>
+                                    )}
                                     <div className="admin-notif-details">
                                         <span className="admin-notif-date">
                                             <CalendarIcon size={12} />
                                             {ev.fecha === hoyStrNormalized ? 'Hoy' : ev.fecha}
                                         </span>
-                                        <span className="admin-notif-time">
-                                            <Clock size={12} />
-                                            {ev.inicio}
-                                        </span>
+                                        {ev.isDeadline ? (
+                                            <span className={`admin-notif-urgency ${ev.urgencia}`}>
+                                                {ev.textoUrgencia}
+                                            </span>
+                                        ) : (
+                                            <span className="admin-notif-time">
+                                                <Clock size={12} />
+                                                {ev.inicio}
+                                            </span>
+                                        )}
                                     </div>
                                     <span
                                         className="admin-notif-category"

@@ -440,41 +440,43 @@ html, body, #root {
   transition: opacity var(--sb-transition);
 }
 
-/* ── Badge ── */
+/* ── Badge (Smart Indicator) ── */
 .sidebar-admin__badge {
-  min-width: 20px;
-  height: 20px;
-  padding: 0 6px;
-  background: var(--sb-badge-red);
+  min-width: 18px;
+  height: 18px;
+  padding: 0 5px;
+  background: rgba(255, 255, 255, 0.12); /* Glass effect */
   color: #fff;
-  border-radius: 10px;
-  font-size: 0.68rem;
-  font-weight: 700;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 6px; /* Squircle/Modern look */
+  font-size: 0.65rem;
+  font-weight: 600;
   display: flex;
   align-items: center;
   justify-content: center;
   line-height: 1;
-  box-shadow: 0 2px 8px rgba(239, 68, 68, 0.45);
-  animation: badge-pop 0.3s ease;
+  transition: all 0.3s ease;
+  backdrop-filter: blur(4px);
 }
 
-@keyframes badge-pop {
-  0%   { transform: scale(0.6); }
-  60%  { transform: scale(1.1); }
-  100% { transform: scale(1); }
+.sidebar-admin__item:hover .sidebar-admin__badge {
+  background: rgba(255, 255, 255, 0.2);
+  border-color: rgba(255, 255, 255, 0.3);
 }
 
-/* Badge en modo colapsado → solo un punto */
+/* Badge en modo colapsado → solo un punto sutil */
 .sidebar-admin__badge--dot {
   position: absolute;
   top: 6px;
   right: 6px;
-  width: 8px;
-  height: 8px;
-  min-width: 8px;
+  width: 6px;
+  height: 6px;
+  min-width: 6px;
   padding: 0;
   border-radius: 50%;
   font-size: 0;
+  background: #60a5fa; /* Soft Blue dot */
+  box-shadow: 0 0 8px rgba(96, 165, 250, 0.4);
 }
 
 /* ══════════════════════

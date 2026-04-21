@@ -6,6 +6,8 @@ import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
 import * as XLSX from 'xlsx';
 import './MatrizSeguimiento.css';
+import SkeletonLoader from '../../Shared/SkeletonLoader';
+import PageTransition from '../../Shared/PageTransition';
 
 const MatrizSeguimiento = () => {
   const [lineas, setLineas] = useState([]);
@@ -114,10 +116,10 @@ const MatrizSeguimiento = () => {
     XLSX.writeFile(wb, `Matriz_SembremosSeguridad_Oficial_${new Date().getTime()}.xlsx`);
   };
 
-  if (loading) return <div className="matriz-loading">Cargando matriz estratégica...</div>;
+  if (loading) return <PageTransition><SkeletonLoader type="table" /></PageTransition>;
 
   return (
-    <div 
+    <PageTransition
       className="matriz-view-wrapper" 
       style={{ 
         background: `linear-gradient(rgba(11, 34, 64, 0.85), rgba(11, 34, 64, 0.85)), url('/bg-institucional.png')`,
@@ -218,13 +220,13 @@ const MatrizSeguimiento = () => {
                           <div className="planificacion-box">
                             <div className="plan-header">
                               <Activity size={18} />
-                              <h3>PLANIFICACIÓN OPERATIVA 2025: Acciones Estratégicas Detalladas</h3>
+                              <h3>PLANIFICACIÓN OPERATIVA 2025: Tareas Estratégicas Detalladas</h3>
                             </div>
                             <div className="plan-table-container">
                               <table className="plan-table-nested">
                                 <thead>
                                   <tr>
-                                    <th>Acción Estratégica</th>
+                                    <th>Tarea Estratégica</th>
                                     <th>Indicador de Avance</th>
                                     <th>Meta y Logro (Beneficiados)</th>
                                     <th>Inversión (₡)</th>
@@ -261,7 +263,7 @@ const MatrizSeguimiento = () => {
                                   ))}
                                   {tareas.filter(t => t.lineaAccionId === linea.id).length === 0 && (
                                     <tr>
-                                      <td colSpan="6" className="empty-subtable">Sin acciones estratégicas vinculadas actualmente.</td>
+                                      <td colSpan="6" className="empty-subtable">Sin tareas estratégicas vinculadas actualmente.</td>
                                     </tr>
                                   )}
                                 </tbody>
@@ -278,7 +280,7 @@ const MatrizSeguimiento = () => {
           </div>
         </div>
       </div>
-    </div>
+    </PageTransition>
   );
 };
 

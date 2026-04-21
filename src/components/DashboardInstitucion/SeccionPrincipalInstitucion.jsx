@@ -14,6 +14,7 @@ import SoporteInstitucional from '../Dashboard/SoporteInstitucional/SoporteInsti
 import TopbarInstitucion from './Navegacion/TopbarInstitucion';
 import ChatBotWindow from '../Shared/ChatBot/ChatBotWindow';
 import NotificacionAdmin from '../Dashboard/NotificacionesAdmin/NotificacionAdmin';
+import ZonasCriticas from '../Dashboard/ZonasCriticas/ZonasCriticas';
 import { useRef } from 'react';
 
 const SeccionPrincipalInstitucion = ({ activeView = 'dashboard', collapsed, setCollapsed }) => {
@@ -75,16 +76,18 @@ const SeccionPrincipalInstitucion = ({ activeView = 'dashboard', collapsed, setC
 
   const getSeccionLabel = () => {
     const labels = {
-      dashboard: 'Dashboard Rendimiento',
-      lineas: 'Mis Tareas',
+      dashboard: 'Resumen Personal',
+      lineas: 'Hoja de Ruta Diaria',
       reportes: 'Historial',
       historial: 'Historial de Reportes',
       calendario: 'Calendario',
-      alertas: 'Soporte y Comentarios',
+      alertas: 'Soporte Directo',
       perfil: 'Mi Perfil',
-      rechazados: 'Devoluciones',
+      rechazados: 'Devoluciones y Feedback',
       informeTrimestral: 'Informe Trimestral',
-      avances: 'Dashboard de Avances'
+      avances: 'Consultor de Metas',
+      zonas: 'Mapa de Nodos',
+      documentacion: 'Documentación Operativa'
     };
     return labels[activeView] || 'Dashboard';
   };
@@ -142,6 +145,23 @@ const SeccionPrincipalInstitucion = ({ activeView = 'dashboard', collapsed, setC
     // ── Vista Dashboard de Avances ──
     if (activeView === 'avances') {
       return <DashboardAvances scope="editor" />;
+    }
+
+    // ── Vista Mapa de Nodos (Zonas Críticas) ──
+    if (activeView === 'zonas') {
+      return <ZonasCriticas />;
+    }
+
+    // ── Vista Documentación Operativa (Placeholder) ──
+    if (activeView === 'documentacion') {
+      return (
+        <div style={{ padding: '2rem 2.5rem' }}>
+          <div style={{ background: '#fff', border: '1px solid #e2e8f0', borderRadius: '12px', padding: '3rem', textAlign: 'center' }}>
+            <h2 style={{ fontSize: '1.25rem', color: '#1e293b', marginBottom: '8px' }}>Repositorio de Documentación Operativa</h2>
+            <p style={{ color: '#64748b' }}>Aquí encontrará los manuales, guías y protocolos necesarios para su despliegue en campo. (Módulo en preparación)</p>
+          </div>
+        </div>
+      );
     }
 
     // ── Vista Dashboard (Solo Resumen / Estadísticas) ──

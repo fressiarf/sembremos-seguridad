@@ -1,0 +1,107 @@
+.diagnostico-container {
+  padding: 30px;
+  color: #1e293b;
+  font-family: 'Inter', sans-serif;
+  height: 100%;
+}
+
+.diagnostico-header {
+  margin-bottom: 24px;
+}
+
+.diagnostico-title {
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: #0f172a;
+  margin: 0 0 6px 0;
+}
+
+.diagnostico-subtitle {
+  font-size: 0.95rem;
+  color: #64748b;
+  margin: 0;
+  max-width: 800px;
+}
+
+/* Grids */
+.diagnostico-grid-top {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+  margin-bottom: 24px;
+}
+
+.diagnostico-grid-bottom {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 24px;
+}
+
+@media (max-width: 1100px) {
+  .diagnostico-grid-top {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Panel Card */
+.diag-panel {
+  background: #ffffff;
+  border-radius: 16px;
+  border: 1px solid #e2e8f0;
+  box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05), 0 2px 4px -2px rgba(0,0,0,0.05);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.diag-panel-header {
+  padding: 16px 20px;
+  border-bottom: 1px solid #f1f5f9;
+  background: #f8fafc;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.diag-icon-box {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+}
+
+.diag-icon-box.blue { background: #3b82f6; }
+.diag-icon-box.purple { background: #8b5cf6; }
+.diag-icon-box.rose { background: #f43f5e; }
+
+.diag-panel-title {
+  display: flex;
+  flex-direction: column;
+}
+
+.diag-panel-title h3 {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 700;
+  color: #1e293b;
+}
+
+.diag-panel-title span {
+  font-size: 0.75rem;
+  color: #64748b;
+  font-weight: 500;
+}
+
+.diag-panel-body {
+  padding: 20px;
+  flex: 1;
+  position: relative;
+}
+
+/* Tooltip custom overrides for ECharts */
+.custom-tooltip {
+  pointer-events: none;
+}

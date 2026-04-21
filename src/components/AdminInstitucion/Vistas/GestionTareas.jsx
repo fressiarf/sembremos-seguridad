@@ -3,6 +3,8 @@ import { adminInstitucionService } from '../../../services/adminInstitucionServi
 import { useToast } from '../../../context/ToastContext';
 import { useLogin } from '../../../context/LoginContext';
 import { Activity, Users, Target, MapPin, Calendar, CheckSquare, Search, ChevronDown, ChevronUp, Filter } from 'lucide-react';
+import SkeletonLoader from '../../Shared/SkeletonLoader';
+import PageTransition from '../../Shared/PageTransition';
 import '../AdminInstitucion.css';
 
 // No hardcoded LINEAS_ACCION_INFO here anymore
@@ -117,7 +119,13 @@ const GestionTareas = () => {
     setLineasExpandidas(prev => ({...prev, [id]: !prev[id]}));
   };
 
-  if (loading) return <div style={{ padding: '3rem', color: '#7a9cc4' }}>Cargando tareas...</div>;
+  if (loading) {
+    return (
+      <PageTransition>
+        <SkeletonLoader type="table" />
+      </PageTransition>
+    );
+  }
 
   const getBadgeClass = (estado) => {
     if (estado === 'Con Actividades') return 'admin-inst-badge--con-actividades';
@@ -125,7 +133,8 @@ const GestionTareas = () => {
   };
 
   return (
-    <div style={{ padding: '2rem 2.5rem', fontFamily: 'Inter, sans-serif' }}>
+    <PageTransition>
+      <div style={{ padding: '2rem 2.5rem', fontFamily: 'Inter, sans-serif' }}>
       <div style={{ marginBottom: '1.5rem' }}>
         <h1 style={{ fontSize: '1.5rem', fontWeight: 700, color: '#fff', margin: '0 0 4px', textShadow: '0 2px 8px rgba(0,0,0,0.3)' }}>
           Gestión de Tareas
@@ -272,6 +281,7 @@ const GestionTareas = () => {
         })}
       </div>
     </div>
+  </PageTransition>
   );
 };
 

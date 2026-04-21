@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import '../../Dashboard/SidebarAdmin/SidebarAdmin.css';
 import { useLogin } from "../../../context/LoginContext";
 import UserBrand from "../../Shared/Navegacion/UserBrand";
-import { ChevronLeft, ChevronDown, LayoutDashboard, Activity, Clock, LogOut, User, MapPin, Calendar, AlertCircle, MessageCircle, FileBarChart } from "lucide-react";
+import { ChevronLeft, ChevronDown, LayoutDashboard, Activity, Clock, LogOut, User, MapPin, Calendar, AlertCircle, MessageCircle, FileBarChart, Map, Target, BookOpen } from "lucide-react";
 import Swal from 'sweetalert2';
 
 const SidebarInstitucion = ({ collapsed = false, onToggle, activeView, onViewChange }) => {
@@ -11,23 +11,29 @@ const SidebarInstitucion = ({ collapsed = false, onToggle, activeView, onViewCha
     OPERATIVO: true, GESTIÓN: true,
   });
 
-  // ── Secciones de navegación para el Oficial ──
+  // ── Secciones de navegación para el Oficial en Campo ──
   const navSections = [
     {
       label: 'OPERATIVO',
       items: [
-        { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
-        { id: 'lineas', label: 'Mis Tareas', icon: Activity },
+        { id: 'lineas', label: 'Hoja de Ruta Diaria', icon: Activity },
+        { id: 'zonas', label: 'Mapa de Nodos', icon: Map },
       ],
     },
     {
-      label: 'GESTIÓN',
+      label: 'DESEMPEÑO',
       items: [
-        { id: 'informeTrimestral', label: 'Informe Trimestral', icon: FileBarChart },
-        { id: 'rechazados',  label: 'Devoluciones',           icon: AlertCircle },
+        { id: 'dashboard', label: 'Resumen Personal', icon: LayoutDashboard },
+        { id: 'avances', label: 'Consultor de Metas', icon: Target },
         { id: 'historial',   label: 'Historial de Reportes',  icon: Clock },
-        { id: 'calendario',  label: 'Calendario de Tareas',   icon: Calendar },
-        { id: 'alertas',     label: 'Soporte y Comentarios',  icon: MessageCircle },
+      ],
+    },
+    {
+      label: 'GESTIÓN Y APOYO',
+      items: [
+        { id: 'rechazados',  label: 'Devoluciones y Feedback', icon: AlertCircle },
+        { id: 'documentacion', label: 'Documentación Operativa', icon: BookOpen },
+        { id: 'alertas',     label: 'Soporte Directo',  icon: MessageCircle },
       ],
     },
   ];

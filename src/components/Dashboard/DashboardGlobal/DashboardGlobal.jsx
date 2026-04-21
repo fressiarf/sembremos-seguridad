@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { FileText, ChevronDown, Download, LayoutGrid, MapPin, AlertTriangle, CheckSquare, BarChart3, TrendingUp, DollarSign, Activity, MessageSquare } from 'lucide-react';
+import { FileText, ChevronDown, Download, LayoutGrid, MapPin, AlertTriangle, CheckSquare, BarChart3, TrendingUp, DollarSign, Activity, MessageSquare, PieChart, Users, Camera, AlertCircle } from 'lucide-react';
 import { dashboardService } from '../../../services/dashboardService';
 import './DashboardGlobal.css';
+import SkeletonLoader from '../../Shared/SkeletonLoader';
+import PageTransition from '../../Shared/PageTransition';
 import ReactECharts from 'echarts-for-react';
 import { exportToCSV } from '../../../utils/exportUtils';
 
@@ -132,8 +134,12 @@ const DashboardGlobal = ({ collapsed, onViewChange }) => {
 
   const top4Lineas = lineasDeAccion.slice(0, 4);
 
+  if (loading) {
+    return <PageTransition><SkeletonLoader type="dashboard" /></PageTransition>;
+  }
+
   return (
-    <div className={`dashboard-global ${collapsed ? 'dashboard-global--collapsed' : ''}`}>
+    <PageTransition className={`dashboard-global ${collapsed ? 'dashboard-global--collapsed' : ''}`}>
       
       {/* ── Header Banner ── */}
       <header className="dashboard-global__banner">
@@ -181,8 +187,8 @@ const DashboardGlobal = ({ collapsed, onViewChange }) => {
       <div className="dashboard-global-body">
         <div className="dashboard-main-grid-layout" style={{ display: 'block' }}>
           
-          {/* ── Intelligence Duo Center (1x2 Full Width) ── */}
-          <main className="intelligence-grid" style={{ gridTemplateColumns: '1fr', gap: '2rem' }}>
+          {/* ── Intelligence Grid 3x2 ── */}
+          <main className="intelligence-grid">
             
             {/* Cuadro 1: Avance Estratégico (Líneas de Acción con Despliegue) */}
             <section className="dashboard-card-v4">
@@ -294,11 +300,111 @@ const DashboardGlobal = ({ collapsed, onViewChange }) => {
               </div>
             </section>
 
-            {/* Cuadro 2: Soporte & Comunicación */}
+            {/* ── Card 2: Panel de Articulación (Mesa CIR) ── */}
+            <section className="dashboard-card-v4">
+              <div className="card-v4-header">
+                <Users size={20} className="header-icon" />
+                <h3>Articulación Institucional</h3>
+              </div>
+              <div className="lineas-cascade-container">
+                {[
+                  { inst: 'Fuerza Pública', tasks: 12, budget: '₡15M', prog: 75, color: '#3b82f6' },
+                  { inst: 'IMAS', tasks: 8, budget: '₡20M', prog: 40, color: '#f59e0b' },
+                  { inst: 'PANI', tasks: 5, budget: '₡8M', prog: 60, color: '#10b981' },
+                  { inst: 'Municipalidad', tasks: 15, budget: '₡5M', prog: 20, color: '#ef4444' }
+                ].map((item, idx) => (
+                  <div key={idx} className="cir-inst-row" style={{ padding: '10px 0', borderBottom: '1px solid #f1f5f9' }}>
+                    <div style={{ flex: 1 }}>
+                      <div className="cir-inst-row">
+                        <span className="cir-inst-name">{item.inst}</span>
+                        <span className="cir-inst-budget">{item.budget}</span>
+                      </div>
+                      <div className="impact-bar-track" style={{ height: '6px' }}>
+                        <div className="impact-bar-fill" style={{ width: `${item.prog}%`, backgroundColor: item.color }} />
+                      </div>
+                      <div style={{ fontSize: '0.65rem', color: '#64748b', marginTop: '4px' }}>{item.tasks} tareas / {item.prog}% avance</div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </section>
+
+            {/* ── Card 3: Semáforo de Peligro (Mapa) ── */}
+            <section className="dashboard-card-v4">
+              <div className="card-v4-header">
+                <MapPin size={20} className="header-icon" />
+                <h3>Semáforo Territorial</h3>
+              </div>
+              <div style={{ padding: '1.25rem', flex: 1, display: 'flex', flexDirection: 'column' }}>
+                <p style={{ fontSize: '0.8rem', color: '#64748b', marginBottom: '1rem' }}>Concentración de Riesgo Actual</p>
+                
+                {/* SVG mock minimap */}
+                <div style={{ height: '180px', width: '100%', background: '#f8fafc', borderRadius: '12px', position: 'relative', overflow: 'hidden', border: '1px solid #e2e8f0', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                  <MapPin size={48} color="#ef4444" style={{ opacity: 0.2, position: 'absolute' }} />
+                  
+                  {/* Heat zones */}
+                  <div style={{ position: 'absolute', top: '30%', left: '40%', width: '40px', height: '40px', background: 'radial-gradient(circle, rgba(239,68,68,0.6) 0%, rgba(239,68,68,0) 70%)' }}></div>
+                  <div style={{ position: 'absolute', top: '60%', left: '60%', width: '30px', height: '30px', background: 'radial-gradient(circle, rgba(245,158,11,0.6) 0%, rgba(245,158,11,0) 70%)' }}></div>
+                </div>
+
+                <div style={{ marginTop: '1rem', display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
+                  <span className="mini-tag" style={{ background: '#fef2f2', color: '#b91c1c', border: '1px solid #fecaca', padding: '4px 8px', borderRadius: '4px', fontSize: '0.7rem', fontWeight: 600 }}>Alta: Barranca</span>
+                  <span className="mini-tag" style={{ background: '#fffbeb', color: '#b45309', border: '1px solid #fde68a', padding: '4px 8px', borderRadius: '4px', fontSize: '0.7rem', fontWeight: 600 }}>Media: Chacarita</span>
+                </div>
+              </div>
+            </section>
+
+            {/* ── Card 4: Insumo Metodológico ── */}
+            <section className="dashboard-card-v4">
+              <div className="card-v4-header">
+                <PieChart size={20} className="header-icon" />
+                <h3>Fundamento Metodológico</h3>
+              </div>
+              <div style={{ padding: '0 1rem' }}>
+                <RiskRadar />
+              </div>
+              <div className="card-v4-footer-info" style={{ marginTop: 0, borderTop: 'none', background: 'white' }}>
+                 <p style={{ margin: 0, fontWeight: 700, color: '#1e293b' }}>Top Factores de Riesgo (Pareto):</p>
+                 <ul style={{ margin: '4px 0 0', paddingLeft: '1.2rem', color: '#64748b' }}>
+                    <li>Venta de drogas (Alta influencia)</li>
+                    <li>Desempleo juvenil</li>
+                 </ul>
+              </div>
+            </section>
+
+            {/* ── Card 5: Feed Evidencias y Alertas ── */}
+            <section className="dashboard-card-v4">
+              <div className="card-v4-header">
+                <Camera size={20} className="header-icon" />
+                <h3>Feed de Evidencias y Alertas</h3>
+              </div>
+              <div className="timeline-list">
+                
+                <div className="timeline-item alert-timeline">
+                  <div className="timeline-icon"><AlertCircle size={14} /></div>
+                  <div className="timeline-content">
+                    <p className="timeline-title">Alerta de Cumplimiento</p>
+                    <p className="timeline-sub">Tarea "Recuperación Parque Central" (IMAS) vence en 2 días sin evidencia.</p>
+                  </div>
+                </div>
+
+                <div className="timeline-item">
+                  <div className="timeline-icon"><CheckSquare size={14} color="#10b981" /></div>
+                  <div className="timeline-content">
+                    <p className="timeline-title">Evidencia Validada: Fuerza Pública</p>
+                    <p className="timeline-sub">Operativo focalizado en Chacarita. 150 impactados.</p>
+                    <div className="timeline-image" style={{ backgroundImage: 'url(https://images.unsplash.com/photo-1582213782179-e0d53f98f2ca?q=80&w=400&auto=format&fit=crop)' }}></div>
+                  </div>
+                </div>
+
+              </div>
+            </section>
+
+            {/* ── Card 6: Centro de Comunicación ── */}
             <section className="dashboard-card-v4 dashboard-card-v4--support">
               <div className="card-v4-header">
                 <MessageSquare size={20} className="header-icon" />
-                <h3>Centro de Comunicación de Soporte</h3>
+                <h3>Centro de Soporte</h3>
               </div>
               <div className="support-summary-list">
                 {[
@@ -325,7 +431,7 @@ const DashboardGlobal = ({ collapsed, onViewChange }) => {
           </main>
         </div>
       </div>
-    </div>
+    </PageTransition>
   );
 };
 

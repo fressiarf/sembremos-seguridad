@@ -11,6 +11,9 @@ import EstadisticasInstitucion from './Vistas/EstadisticasInstitucion';
 import DashboardAvances from '../Dashboard/DashboardAvances/DashboardAvances';
 import TopbarInstitucion from '../DashboardInstitucion/Navegacion/TopbarInstitucion';
 import SoporteInstitucional from '../Dashboard/SoporteInstitucional/SoporteInstitucional';
+import MesaCIR from '../Dashboard/MesaCIR/MesaCIR';
+import DiagnosticoMetodologico from '../Dashboard/DiagnosticoMetodologico/DiagnosticoMetodologico';
+import ZonasCriticas from '../Dashboard/ZonasCriticas/ZonasCriticas';
 import { useLogin } from '../../context/LoginContext';
 import { useState, useEffect, useRef } from 'react';
 import { Bot, Bell, X } from 'lucide-react';
@@ -52,6 +55,9 @@ const SeccionPrincipalAdminInstitucion = ({ activeView = 'dashboard', collapsed,
       calendario: 'Calendario',
       estadisticas: 'Estadísticas',
       avances: 'Dashboard de Avances',
+      diagnostico: 'Diagnóstico Metodológico',
+      zonas: 'Zonas Críticas y Riesgo',
+      'mesa-cir': 'Mesa CIR Social',
       alertas: 'Soporte y Comentarios',
       perfil: 'Mi Perfil',
     };
@@ -88,6 +94,12 @@ const SeccionPrincipalAdminInstitucion = ({ activeView = 'dashboard', collapsed,
         return <EstadisticasInstitucion />;
       case 'avances':
         return <DashboardAvances scope="institucion" />;
+      case 'diagnostico':
+        return <DiagnosticoMetodologico />;
+      case 'zonas':
+        return <ZonasCriticas />;
+      case 'mesa-cir':
+        return <MesaCIR />;
       case 'perfil':
         return (
           <div style={{ padding: '2rem 2.5rem' }}>

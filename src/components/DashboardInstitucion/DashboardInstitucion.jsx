@@ -8,6 +8,8 @@ import ModuloDelegacion from './ModuloDelegacion';
 import CargaEvidencia from './CargaEvidencia';
 import { Building2, FileText, Download, Building, FileSpreadsheet } from 'lucide-react';
 import * as XLSX from 'xlsx';
+import SkeletonLoader from '../Shared/SkeletonLoader';
+import PageTransition from '../Shared/PageTransition';
 
 const DashboardInstitucion = () => {
   const { user } = useLogin();
@@ -122,11 +124,11 @@ const DashboardInstitucion = () => {
   };
 
   if (loading) {
-    return <div style={{ padding: '3rem', color: '#64748b' }}>Cargando Panel Operativo...</div>;
+    return <PageTransition><SkeletonLoader type="dashboard" /></PageTransition>;
   }
 
   return (
-    <div className="dashboard-institucion-wrapper" style={{ width: '100%' }}>
+    <PageTransition className="dashboard-institucion-wrapper" style={{ width: '100%' }}>
       {/* Contenido Principal con fondo transparente para dejar ver el fondo global (navy azul) */}
       <div className="dashboard-institucion-content" style={{ 
         flex: 1, 
@@ -212,7 +214,7 @@ const DashboardInstitucion = () => {
           )}
         </div>
       </div>
-    </div>
+    </PageTransition>
   );
 };
 
