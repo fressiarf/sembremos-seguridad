@@ -106,13 +106,7 @@ const ReportesResultados = () => {
         backgroundPosition: 'center'
       }}
     >
-      <div className="reportes-hero-banner">
-        <div className="reportes-hero-content">
-          <div className="banner-badge">REPORTES ACTIVOS / EN REVISIÓN</div>
-          <h1>Gestión de Reportes Activos</h1>
-          <p>Consolidado de actividades institucionales pendientes de validación técnica</p>
-        </div>
-      </div>
+
 
       <div className="reportes-container-custom">
         <div className="matriz-toolbar-v4" style={{ marginBottom: '1.5rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: '#fff', padding: '12px 24px', borderRadius: '12px', boxShadow: '0 4px 6px -1px rgba(0,0,0,0.05)' }}>

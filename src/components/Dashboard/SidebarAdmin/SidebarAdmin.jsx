@@ -52,7 +52,7 @@ const SidebarAdmin = ({ collapsed = false, onToggle, activeView, onViewChange })
     {
       label: 'DIRECCIÓN ESTRATÉGICA',
       items: [
-        { id: 'estadisticas', label: 'Centro de Análisis Integral', icon: LayoutDashboard },
+        { id: 'estadisticas', label: 'Centro de Análisis', icon: LayoutDashboard },
         { id: 'mesa-cir', label: 'Mesa CIR Social', icon: Activity },
         { id: 'matriz-seguimiento', label: 'Matriz Completa', icon: FileText },
       ],
@@ -67,22 +67,22 @@ const SidebarAdmin = ({ collapsed = false, onToggle, activeView, onViewChange })
     {
       label: 'GESTIÓN OPERATIVA',
       items: [
-        { id: 'lineas-accion', label: 'Líneas, Tareas y Delegación', icon: LayoutGrid },
-        { id: 'calendario',  label: 'Calendario de Hitos', icon: Calendar },
+        { id: 'lineas-accion', label: 'Gestión de Tareas', icon: LayoutGrid },
+        { id: 'calendario',  label: 'Calendario Institucional', icon: Calendar },
       ],
     },
     {
       label: 'MONITOREO Y EVALUACIÓN',
       items: [
-        { id: 'reportes-resultados', label: 'Auditoría de Reportes', icon: FileSearch },
-        { id: 'historial', label: 'Historial INL/MSP', icon: Clock },
+        { id: 'reportes-resultados', label: 'Revisión de Reportes', icon: FileSearch },
+        { id: 'historial', label: 'Historial de Reportes', icon: Clock },
       ],
     },
     {
       label: 'ADMINISTRACIÓN',
       items: [
-        { id: 'usuarios', label: 'Seguridad y Accesos', icon: User, badge: stats.solicitudesCount },
-        { id: 'alertas', label: 'Soporte al Usuario',  icon: MessageCircle, badge: stats.alertsCount },
+        { id: 'usuarios', label: 'Gestión de Funcionarios', icon: User, badge: stats.solicitudesCount },
+        { id: 'alertas', label: 'Soporte y Comentarios',  icon: MessageCircle, badge: stats.alertsCount },
       ],
     },
   ];

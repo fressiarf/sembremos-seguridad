@@ -144,13 +144,7 @@ const DashboardGlobal = ({ collapsed, onViewChange }) => {
       {/* ── Header Banner ── */}
       <header className="dashboard-global__banner">
         <div className="banner-content">
-          <div className="dashboard-global__title-block">
-            <div className="banner-badge">SISTEMA INTEGRAL DE MONITOREO</div>
-            <h1>Dashboard Global Estratégico</h1>
-            <p>Observatorio Sembremos Seguridad · Cantón Puntarenas (Periodo 2025)</p>
-          </div>
-
-          <div className="dashboard-top-stats-grid">
+          <div className="dashboard-top-stats-grid" style={{ width: '100%' }}>
              <div className="stat-card-mini">
                <div className="mini-icon blue"><CheckSquare size={16} /></div>
                <div className="mini-data">

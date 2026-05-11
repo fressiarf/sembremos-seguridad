@@ -11,23 +11,33 @@ import Swal from 'sweetalert2';
 const SidebarAdminInstitucion = ({ collapsed = false, onToggle, activeView, onViewChange }) => {
   const { user, logout } = useLogin();
   const [openSections, setOpenSections] = useState({
-    OPERATIVO: true,
-    SUPERVISIÓN: true,
-    ANÁLISIS: true,
-    PLANIFICACIÓN: true,
+    'DIRECCIÓN ESTRATÉGICA': true,
+    'GESTIÓN OPERATIVA': true,
   });
 
   const navSections = [
     {
-      label: 'OPERATIVO',
+      label: 'DIRECCIÓN ESTRATÉGICA',
       items: [
-        { id: 'estadisticas', label: 'Dashboard Analítico', icon: LayoutDashboard },
-        { id: 'tareas', label: 'Gestión de Tareas', icon: ClipboardList, badge: 3 },
-        { id: 'usuarios', label: 'Gestión de Funcionarios', icon: Users },
+        { id: 'dashboard', label: 'Centro de Análisis', icon: LayoutDashboard },
+        { id: 'mesa-cir', label: 'Mesa CIR Social', icon: Activity },
       ],
     },
     {
-      label: 'SUPERVISIÓN',
+      label: 'INTELIGENCIA TERRITORIAL',
+      items: [
+        { id: 'zonas', label: 'Zonas Críticas y Riesgo', icon: MapPin },
+      ],
+    },
+    {
+      label: 'GESTIÓN OPERATIVA',
+      items: [
+        { id: 'tareas', label: 'Gestión de Tareas', icon: ClipboardList, badge: 3 },
+        { id: 'calendario', label: 'Calendario Institucional', icon: Calendar },
+      ],
+    },
+    {
+      label: 'MONITOREO Y EVALUACIÓN',
       items: [
         { id: 'reportes',   label: 'Revisión de Reportes', icon: FileSearch, badge: 5 },
         { id: 'informesTrimestral', label: 'Informes Trimestrales', icon: FileBarChart },
@@ -35,17 +45,9 @@ const SidebarAdminInstitucion = ({ collapsed = false, onToggle, activeView, onVi
       ],
     },
     {
-      label: 'ANÁLISIS',
+      label: 'ADMINISTRACIÓN',
       items: [
-        { id: 'zonas', label: 'Zonas Críticas y Riesgo', icon: MapPin },
-        { id: 'avances', label: 'Dashboard de Avances', icon: BarChart3 },
-      ],
-    },
-    {
-      label: 'PLANIFICACIÓN',
-      items: [
-        { id: 'mesa-cir', label: 'Mesa CIR Social', icon: Activity },
-        { id: 'calendario', label: 'Calendario', icon: Calendar },
+        { id: 'usuarios', label: 'Gestión de Funcionarios', icon: Users },
         { id: 'alertas', label: 'Soporte y Comentarios', icon: MessageCircle, badge: 1 },
       ],
     },

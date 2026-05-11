@@ -130,10 +130,7 @@ const LineasAccionView = ({ onViewChange }) => {
   return (
     <div className="lineas-accion-view">
       <header className="lineas-view-header">
-        <div className="header-text">
-          <h1>Líneas de Acción Estratégicas</h1>
-          <p>Gestión completa de metas y objetivos del Programa Sembremos Seguridad</p>
-        </div>
+
         
         <div className="header-controls">
           <div className="search-box">

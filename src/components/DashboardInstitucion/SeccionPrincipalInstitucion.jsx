@@ -16,11 +16,13 @@ import ChatBotWindow from '../Shared/ChatBot/ChatBotWindow';
 import NotificacionAdmin from '../Dashboard/NotificacionesAdmin/NotificacionAdmin';
 import ZonasCriticas from '../Dashboard/ZonasCriticas/ZonasCriticas';
 import { useRef } from 'react';
+import '../Dashboard/DashboardGlobal/DashboardGlobal.css';
 
 const SeccionPrincipalInstitucion = ({ activeView = 'dashboard', collapsed, setCollapsed }) => {
   const { user } = useLogin();
   const [showTopbarNotifs, setShowTopbarNotifs] = useState(false);
   const [showChatBot, setShowChatBot] = useState(false);
+  const [activeTab, setActiveTab] = useState('resumen');
   const notifRef = useRef(null);
 
   const toggleDrawer = () => setShowTopbarNotifs(prev => !prev);
@@ -142,9 +144,116 @@ const SeccionPrincipalInstitucion = ({ activeView = 'dashboard', collapsed, setC
       );
     }
 
-    // ── Vista Dashboard de Avances ──
-    if (activeView === 'avances') {
-      return <DashboardAvances scope="editor" />;
+    // ── Vista Dashboard (Resumen y Avances) ──
+    if (activeView === 'dashboard') {
+      const getTabClass = (tabId) => `estadisticas-tab-btn ${activeTab === tabId ? 'active' : ''}`;
+
+      return (
+        <div className="estadisticas-global">
+          <div className="estadisticas-tabs-nav" style={{ margin: '0 2rem 2rem 2rem' }}>
+            <button className={getTabClass('resumen')} onClick={() => setActiveTab('resumen')}>
+              <LayoutDashboard size={16} /> 1. Resumen Personal
+            </button>
+            <button className={getTabClass('avances')} onClick={() => setActiveTab('avances')}>
+              <CheckCircle size={16} /> 2. Consultor de Metas
+            </button>
+          </div>
+
+          <div className="estadisticas-tab-content">
+            {activeTab === 'resumen' && (
+              <div className="tab-pane-fade-in" style={{ margin: '-2rem -2.5rem -4rem', padding: 0 }}>
+                <div className="dashboard-global" style={{ padding: 0 }}>
+                  <header className="dashboard-global__banner" style={{ margin: '2rem 2.5rem 0', borderRadius: '12px' }}>
+                    <div className="banner-content">
+                      <div className="dashboard-top-stats-grid" style={{ width: '100%' }}>
+                        <div className="stat-card-mini">
+                          <div className="mini-icon blue"><Activity size={16} /></div>
+                          <div className="mini-data">
+                            <span className="mini-val">{estadisticas.totalTareas}</span>
+                            <span className="mini-lbl">Tareas Asignadas</span>
+                          </div>
+                        </div>
+                        
+                        <div className="stat-card-mini progress-main-card">
+                          <span className="mini-lbl">Avance Tareas</span>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                            <div className="mini-icon green"><CheckCircle size={16} /></div>
+                            <span className="mini-val" style={{ fontSize: '0.9rem', color: '#0b2240' }}>
+                              {estadisticas.completadas} / {estadisticas.totalTareas || 0}
+                            </span>
+                          </div>
+                          <div className="main-prog-group" style={{ marginTop: '6px' }}>
+                            <span className="main-prog-val">{Math.round((estadisticas.completadas / (estadisticas.totalTareas || 1)) * 100)}%</span>
+                            <div className="main-prog-bar">
+                              <div className="fill" style={{ width: `${Math.min(100, (estadisticas.completadas / (estadisticas.totalTareas || 1)) * 100)}%`, backgroundColor: '#22c55e' }}></div>
+                            </div>
+                          </div>
+                        </div>
+
+                        <div className="stat-card-mini progress-main-card">
+                          <span className="mini-lbl">Progreso Total de Tareas</span>
+                          <div className="main-prog-group">
+                            <span className="main-prog-val">{estadisticas.progresoGeneral}%</span>
+                            <div className="main-prog-bar"><div className="fill" style={{width:`${estadisticas.progresoGeneral}%`, backgroundColor: '#3b82f6'}}></div></div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </header>
+
+                  <div className="dashboard-global-body" style={{ padding: '2rem 2.5rem' }}>
+                    <div className="dashboard-main-grid-layout" style={{ display: 'block' }}>
+                      <main className="intelligence-grid" style={{ gridTemplateColumns: 'repeat(2, 1fr)' }}>
+                        
+                        {/* Card 1: Inversión Financiera */}
+                        <section className="dashboard-card-v4">
+                          <div className="card-v4-header">
+                            <DollarSign size={20} className="header-icon" style={{ color: '#8b5cf6' }} />
+                            <h3>Mi Inversión Total</h3>
+                          </div>
+                          <div style={{ padding: '2rem', textAlign: 'center' }}>
+                            <p style={{ fontSize: '2.5rem', fontWeight: 800, color: '#0b2240', margin: '0 0 10px 0' }}>{formatColones(estadisticas.inversionTotal)}</p>
+                            <span className="mini-tag" style={{ background: '#f5f3ff', color: '#6d28d9', padding: '6px 12px', fontSize: '0.8rem', borderRadius: '20px' }}>Inversión Ejecutada en Actividades</span>
+                          </div>
+                        </section>
+
+                        {/* Card 2: Balance Operativo */}
+                        <section className="dashboard-card-v4">
+                          <div className="card-v4-header">
+                            <Clock size={20} className="header-icon" style={{ color: '#f59e0b' }} />
+                            <h3>Balance Operativo</h3>
+                          </div>
+                          <div className="lineas-cascade-container">
+                            <div className="cir-inst-row" style={{ padding: '15px', borderBottom: '1px solid #f1f5f9' }}>
+                                <div style={{ flex: 1, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                                  <span className="cir-inst-name" style={{ fontSize: '0.9rem' }}>Completadas</span>
+                                  <span className="cir-inst-budget" style={{ fontSize: '1.2rem' }}>{estadisticas.completadas}</span>
+                                </div>
+                            </div>
+                            <div className="cir-inst-row" style={{ padding: '15px' }}>
+                                <div style={{ flex: 1, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                                  <span className="cir-inst-name" style={{ fontSize: '0.9rem' }}>Pendientes de Concluir</span>
+                                  <span className="cir-inst-budget" style={{ fontSize: '1.2rem', color: '#f59e0b' }}>{estadisticas.pendientes}</span>
+                                </div>
+                            </div>
+                          </div>
+                        </section>
+
+                      </main>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {activeTab === 'avances' && (
+              <div className="tab-pane-fade-in" style={{ margin: '-2rem -2.5rem -4rem', padding: 0 }}>
+                <DashboardAvances scope="editor" />
+              </div>
+            )}
+          </div>
+        </div>
+      );
     }
 
     // ── Vista Mapa de Nodos (Zonas Críticas) ──
@@ -159,49 +268,6 @@ const SeccionPrincipalInstitucion = ({ activeView = 'dashboard', collapsed, setC
           <div style={{ background: '#fff', border: '1px solid #e2e8f0', borderRadius: '12px', padding: '3rem', textAlign: 'center' }}>
             <h2 style={{ fontSize: '1.25rem', color: '#1e293b', marginBottom: '8px' }}>Repositorio de Documentación Operativa</h2>
             <p style={{ color: '#64748b' }}>Aquí encontrará los manuales, guías y protocolos necesarios para su despliegue en campo. (Módulo en preparación)</p>
-          </div>
-        </div>
-      );
-    }
-
-    // ── Vista Dashboard (Solo Resumen / Estadísticas) ──
-    if (activeView === 'dashboard') {
-      return (
-        <div style={{ padding: '2rem 2.5rem', fontFamily: 'Inter, sans-serif' }}>
-          <div style={{ marginBottom: '2rem' }}>
-            <h1 style={{ fontSize: '1.5rem', fontWeight: 700, color: '#fff', margin: '0 0 4px', textShadow: '0 2px 8px rgba(0,0,0,0.3)' }}>Dashboard de Rendimiento</h1>
-            <p style={{ color: 'rgba(255,255,255,0.75)', fontSize: '0.85rem', margin: 0, textShadow: '0 1px 4px rgba(0,0,0,0.2)' }}>Resumen de tus actividades, avance e inversión.</p>
-          </div>
-
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '1rem', marginBottom: '2rem' }}>
-            <div style={{ background: '#fff', border: '1px solid #e2e8f0', borderRadius: '14px', padding: '1.25rem', borderLeft: '4px solid #22c55e', boxShadow: '0 4px 12px rgba(0,0,0,0.02)' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '6px' }}>
-                <CheckCircle size={18} color="#22c55e" />
-                <span style={{ fontSize: '0.75rem', color: '#64748b', fontWeight: 600, textTransform: 'uppercase' }}>Completadas</span>
-              </div>
-              <span style={{ fontSize: '1.8rem', fontWeight: 800, color: '#0b2240' }}>{estadisticas.completadas}</span>
-            </div>
-            <div style={{ background: '#fff', border: '1px solid #e2e8f0', borderRadius: '14px', padding: '1.25rem', borderLeft: '4px solid #f59e0b', boxShadow: '0 4px 12px rgba(0,0,0,0.02)' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '6px' }}>
-                <Clock size={18} color="#f59e0b" />
-                <span style={{ fontSize: '0.75rem', color: '#64748b', fontWeight: 600, textTransform: 'uppercase' }}>Pendientes</span>
-              </div>
-              <span style={{ fontSize: '1.8rem', fontWeight: 800, color: '#0b2240' }}>{estadisticas.pendientes}</span>
-            </div>
-            <div style={{ background: '#fff', border: '1px solid #e2e8f0', borderRadius: '14px', padding: '1.25rem', borderLeft: '4px solid #3b82f6', boxShadow: '0 4px 12px rgba(0,0,0,0.02)' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '6px' }}>
-                <Activity size={18} color="#3b82f6" />
-                <span style={{ fontSize: '0.75rem', color: '#64748b', fontWeight: 600, textTransform: 'uppercase' }}>Progreso Total</span>
-              </div>
-              <span style={{ fontSize: '1.8rem', fontWeight: 800, color: '#0b2240' }}>{estadisticas.progresoGeneral}%</span>
-            </div>
-            <div style={{ background: '#fff', border: '1px solid #e2e8f0', borderRadius: '14px', padding: '1.25rem', borderLeft: '4px solid #8b5cf6', boxShadow: '0 4px 12px rgba(0,0,0,0.02)' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '6px' }}>
-                <DollarSign size={18} color="#8b5cf6" />
-                <span style={{ fontSize: '0.75rem', color: '#64748b', fontWeight: 600, textTransform: 'uppercase' }}>Mi Inversión Total</span>
-              </div>
-              <span style={{ fontSize: '1.4rem', fontWeight: 800, color: '#0b2240' }}>{formatColones(estadisticas.inversionTotal)}</span>
-            </div>
           </div>
         </div>
       );

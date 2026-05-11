@@ -307,15 +307,8 @@ const DashboardAvances = ({ scope = 'global' }) => {
   return (
     <div className="dashboard-avances" id="dashboard-avances">
 
-      {/* ── Header Banner ── */}
-      <header className="avances-banner">
-        <div className="banner-badge">DASHBOARD DE AVANCES</div>
-        <h1>{scopeLabels[scope]?.title}</h1>
-        <p>{scopeLabels[scope]?.subtitle}</p>
-      </header>
-
       {/* ── KPI Strip ── */}
-      <div className="avances-kpi-strip">
+      <div className="avances-kpi-strip" style={{ marginTop: '0' }}>
         <div className="avances-kpi-card">
           <div className="avances-kpi-icon blue"><Layers size={22} /></div>
           <div className="avances-kpi-data">

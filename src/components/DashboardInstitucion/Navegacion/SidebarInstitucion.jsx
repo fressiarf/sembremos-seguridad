@@ -8,32 +8,42 @@ import Swal from 'sweetalert2';
 const SidebarInstitucion = ({ collapsed = false, onToggle, activeView, onViewChange }) => {
   const { user, logout } = useLogin();
   const [openSections, setOpenSections] = useState({
-    OPERATIVO: true, GESTIÓN: true,
+    'DIRECCIÓN ESTRATÉGICA': true,
+    'GESTIÓN OPERATIVA': true,
   });
 
   // ── Secciones de navegación para el Oficial en Campo ──
   const navSections = [
     {
-      label: 'OPERATIVO',
+      label: 'DIRECCIÓN ESTRATÉGICA',
       items: [
-        { id: 'lineas', label: 'Hoja de Ruta Diaria', icon: Activity },
-        { id: 'zonas', label: 'Mapa de Nodos', icon: Map },
+        { id: 'dashboard', label: 'Centro de Análisis', icon: LayoutDashboard },
       ],
     },
     {
-      label: 'DESEMPEÑO',
+      label: 'INTELIGENCIA TERRITORIAL',
       items: [
-        { id: 'dashboard', label: 'Resumen Personal', icon: LayoutDashboard },
-        { id: 'avances', label: 'Consultor de Metas', icon: Target },
-        { id: 'historial',   label: 'Historial de Reportes',  icon: Clock },
+        { id: 'zonas', label: 'Zonas Críticas y Riesgo', icon: MapPin },
       ],
     },
     {
-      label: 'GESTIÓN Y APOYO',
+      label: 'GESTIÓN OPERATIVA',
       items: [
-        { id: 'rechazados',  label: 'Devoluciones y Feedback', icon: AlertCircle },
+        { id: 'lineas', label: 'Gestión de Tareas', icon: Activity },
         { id: 'documentacion', label: 'Documentación Operativa', icon: BookOpen },
-        { id: 'alertas',     label: 'Soporte Directo',  icon: MessageCircle },
+      ],
+    },
+    {
+      label: 'MONITOREO Y EVALUACIÓN',
+      items: [
+        { id: 'historial',   label: 'Historial de Reportes',  icon: Clock },
+        { id: 'rechazados',  label: 'Devoluciones y Feedback', icon: AlertCircle },
+      ],
+    },
+    {
+      label: 'ADMINISTRACIÓN',
+      items: [
+        { id: 'alertas',     label: 'Soporte y Comentarios',  icon: MessageCircle },
       ],
     },
   ];

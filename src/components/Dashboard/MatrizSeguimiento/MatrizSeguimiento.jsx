@@ -116,10 +116,7 @@ const MatrizSeguimiento = () => {
   return (
     <PageTransition className="matriz-seguimiento-v2">
       <header className="matriz-v2-header">
-        <div className="header-titles">
-          <h1>Matriz Plan Operativo Institucional - Sembremos Seguridad</h1>
-          <p>Módulo de Control y Seguimiento Estratégico Multidisciplinario</p>
-        </div>
+
         <div className="header-actions">
           <button className="btn-secondary" onClick={handleExportExcel}>
             <Download size={16} /> Exportar Excel

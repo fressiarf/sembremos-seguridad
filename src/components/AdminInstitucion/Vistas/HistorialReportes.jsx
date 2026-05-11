@@ -71,10 +71,7 @@ const HistorialReportes = ({ isGlobal = false }) => {
     <div className="historial-container">
       {/* ── HEADER & FILTROS ── */}
       <div className="historial-header-section">
-        <div className="header-text">
-          <h1>{isGlobal ? 'Bitácora Estratégica Cantonal' : 'Bitácora Institucional'}</h1>
-          <p>{isGlobal ? 'Seguimiento consolidado de todos los actores del cantón' : 'Línea de tiempo de actualizaciones y registros oficiales'}</p>
-        </div>
+
 
         <div className="timeline-filters-bar">
           <div className="search-wrapper">

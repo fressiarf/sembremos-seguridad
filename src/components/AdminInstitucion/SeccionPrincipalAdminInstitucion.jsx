@@ -1,5 +1,5 @@
 import React from 'react';
-import DashboardAdminInst from './Vistas/DashboardAdminInst';
+import CentroMandoTabs from './Vistas/CentroMandoTabs';
 import GestionTareas from './Vistas/GestionTareas';
 import RevisionReportes from './Vistas/RevisionReportes';
 import RevisionInformesTrimestral from './Vistas/RevisionInformesTrimestral';
@@ -8,7 +8,6 @@ import Calendario from '../Shared/Calendario/Calendario';
 import GestionFuncionarios from './Vistas/GestionFuncionarios';
 import PerfilUsuario from '../Dashboard/PerfilUsuario/PerfilUsuario';
 import EstadisticasInstitucion from './Vistas/EstadisticasInstitucion';
-import DashboardAvances from '../Dashboard/DashboardAvances/DashboardAvances';
 import TopbarInstitucion from '../DashboardInstitucion/Navegacion/TopbarInstitucion';
 import SoporteInstitucional from '../Dashboard/SoporteInstitucional/SoporteInstitucional';
 import MesaCIR from '../Dashboard/MesaCIR/MesaCIR';
@@ -54,10 +53,8 @@ const SeccionPrincipalAdminInstitucion = ({ activeView = 'dashboard', collapsed,
       historial: 'Historial de Reportes',
       calendario: 'Calendario',
       estadisticas: 'Estadísticas',
-      avances: 'Dashboard de Avances',
       diagnostico: 'Diagnóstico Metodológico',
       zonas: 'Zonas Críticas y Riesgo',
-      'mesa-cir': 'Mesa CIR Social',
       alertas: 'Soporte y Comentarios',
       perfil: 'Mi Perfil',
     };
@@ -67,7 +64,7 @@ const SeccionPrincipalAdminInstitucion = ({ activeView = 'dashboard', collapsed,
   const renderView = () => {
     switch (activeView) {
       case 'dashboard':
-        return <DashboardAdminInst />;
+        return <CentroMandoTabs />;
       case 'tareas':
         return <GestionTareas />;
       case 'usuarios':
@@ -92,8 +89,6 @@ const SeccionPrincipalAdminInstitucion = ({ activeView = 'dashboard', collapsed,
         );
       case 'estadisticas':
         return <EstadisticasInstitucion />;
-      case 'avances':
-        return <DashboardAvances scope="institucion" />;
       case 'diagnostico':
         return <DiagnosticoMetodologico />;
       case 'zonas':
@@ -107,7 +102,7 @@ const SeccionPrincipalAdminInstitucion = ({ activeView = 'dashboard', collapsed,
           </div>
         );
       default:
-        return <DashboardAdminInst />;
+        return <CentroMandoTabs />;
     }
   };
 

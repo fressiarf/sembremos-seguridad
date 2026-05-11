@@ -83,15 +83,6 @@ const MesaCIR = () => {
   return (
     <PageTransition>
       <div className="mesa-cir-container">
-        {/* Banner */}
-        <div className="mesa-cir-banner">
-          <span className="mesa-cir-badge">COMITÉ INTERSECTORIAL REGIONAL SOCIAL</span>
-          <h1>Mesa CIR Social — Coordinación Interinstitucional</h1>
-          <p>
-            Articulación de esfuerzos entre instituciones corresponsables para atender 
-            poblaciones vulnerables, consumo de drogas y recuperación de espacios públicos.
-          </p>
-        </div>
 
         {/* Stats */}
         <div className="mesa-cir-stats">
