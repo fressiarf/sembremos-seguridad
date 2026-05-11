@@ -2,31 +2,47 @@ import React, { useState } from 'react';
 import '../../Dashboard/SidebarAdmin/SidebarAdmin.css';
 import { useLogin } from "../../../context/LoginContext";
 import UserBrand from "../../Shared/Navegacion/UserBrand";
-import { ChevronLeft, ChevronDown, LayoutDashboard, Activity, Clock, LogOut, User, MapPin, Calendar, AlertCircle, MessageCircle, FileBarChart } from "lucide-react";
+import { ChevronLeft, ChevronDown, LayoutDashboard, Activity, Clock, LogOut, User, MapPin, Calendar, AlertCircle, MessageCircle, FileBarChart, Map, Target, BookOpen } from "lucide-react";
 import Swal from 'sweetalert2';
 
 const SidebarInstitucion = ({ collapsed = false, onToggle, activeView, onViewChange }) => {
   const { user, logout } = useLogin();
   const [openSections, setOpenSections] = useState({
-    OPERATIVO: true, GESTIÓN: true,
+    'DIRECCIÓN ESTRATÉGICA': true,
+    'GESTIÓN OPERATIVA': true,
   });
 
-  // ── Secciones de navegación para el Oficial ──
+  // ── Secciones de navegación para el Oficial en Campo ──
   const navSections = [
     {
-      label: 'OPERATIVO',
+      label: 'DIRECCIÓN ESTRATÉGICA',
       items: [
-        { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
-        { id: 'lineas', label: 'Mis Tareas', icon: Activity },
+        { id: 'dashboard', label: 'Centro de Análisis', icon: LayoutDashboard },
       ],
     },
     {
-      label: 'GESTIÓN',
+      label: 'INTELIGENCIA TERRITORIAL',
       items: [
-        { id: 'informeTrimestral', label: 'Informe Trimestral', icon: FileBarChart },
-        { id: 'rechazados',  label: 'Devoluciones',           icon: AlertCircle },
+        { id: 'zonas', label: 'Zonas Críticas y Riesgo', icon: MapPin },
+      ],
+    },
+    {
+      label: 'GESTIÓN OPERATIVA',
+      items: [
+        { id: 'lineas', label: 'Gestión de Tareas', icon: Activity },
+        { id: 'documentacion', label: 'Documentación Operativa', icon: BookOpen },
+      ],
+    },
+    {
+      label: 'MONITOREO Y EVALUACIÓN',
+      items: [
         { id: 'historial',   label: 'Historial de Reportes',  icon: Clock },
-        { id: 'calendario',  label: 'Calendario de Tareas',   icon: Calendar },
+        { id: 'rechazados',  label: 'Devoluciones y Feedback', icon: AlertCircle },
+      ],
+    },
+    {
+      label: 'ADMINISTRACIÓN',
+      items: [
         { id: 'alertas',     label: 'Soporte y Comentarios',  icon: MessageCircle },
       ],
     },

@@ -220,12 +220,15 @@ const GestionUsuarios = () => {
 
   const handleCreateUser = async (e) => {
     e.preventDefault();
+    
+    // Validación de campos según el rol
     if (newUser.rol === 'admin') {
       if (!newUser.nombre || !newUser.usuario || !newUser.password || !newUser.cedula) {
         showToast('Completa todos los campos del Administrador', 'warning');
         return;
       }
     } else {
+      // Validaciones para adminInstitucion
       if (!newUser.institucion || !newUser.usuario || !newUser.password) {
         showToast('Selecciona la Institución y completa los datos de acceso para la misma', 'warning');
         return;
@@ -237,6 +240,7 @@ const GestionUsuarios = () => {
       return;
     }
 
+    // Validación General de Cédula (numérica y longitud)
     if (!/^\d+$/.test(newUser.cedula)) {
       showToast('La cédula debe contener solo números', 'warning');
       return;
@@ -247,19 +251,16 @@ const GestionUsuarios = () => {
       return;
     }
 
+    // Validación General de Email
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(newUser.usuario)) {
       showToast('Por favor ingresa un correo electrónico válido', 'warning');
       return;
     }
 
+    // Validación General de Contraseña
     if (newUser.password.length < 6) {
       showToast('La contraseña debe tener al menos 6 caracteres', 'warning');
-      return;
-    }
-
-    if (newUser.rol === 'adminInstitucion' && !newUser.institucion) {
-      showToast('Selecciona una institución para el admin institucional', 'warning');
       return;
     }
 
@@ -303,34 +304,7 @@ const GestionUsuarios = () => {
 
   return (
     <div className="gestion-usuarios" style={{ padding: '2rem 2.5rem', fontFamily: 'Inter, sans-serif' }}>
-      <div style={{ marginBottom: '2.5rem' }}>
-        <span style={{ 
-          display: 'inline-block',
-          padding: '6px 16px',
-          borderRadius: '20px',
-          backgroundColor: 'rgba(255, 255, 255, 0.1)',
-          color: '#e2e8f0',
-          fontSize: '0.75rem',
-          fontWeight: '700',
-          letterSpacing: '1px',
-          marginBottom: '1rem',
-          border: '1px solid rgba(255,255,255,0.2)'
-        }}>CONTROL DE ACCESO</span>
-        <h1 style={{ 
-          fontSize: '2.5rem', 
-          fontWeight: 800, 
-          color: 'white', 
-          margin: '0 0 8px 0',
-          letterSpacing: '-0.5px',
-          textShadow: '0 2px 10px rgba(0,0,0,0.3)'
-        }}>Gestión de Instituciones</h1>
-        <p style={{ 
-          fontSize: '1rem', 
-          color: '#94a3b8', 
-          margin: 0,
-          fontWeight: 500
-        }}>Administración de identidades, roles y accesos corporativos</p>
-      </div>
+
 
       <section className="gestion-usuarios__filters" style={{ marginTop: '0', borderRadius: '16px', border: 'none', background: 'rgba(255,255,255,0.03)', backdropFilter: 'blur(10px)', border: '1px solid rgba(255,255,255,0.1)' }}>
         <div className="search-wrapper">

@@ -8,6 +8,8 @@ import ModuloDelegacion from './ModuloDelegacion';
 import CargaEvidencia from './CargaEvidencia';
 import { Building2, FileText, Download, Building, FileSpreadsheet } from 'lucide-react';
 import * as XLSX from 'xlsx';
+import SkeletonLoader from '../Shared/SkeletonLoader';
+import PageTransition from '../Shared/PageTransition';
 
 const DashboardInstitucion = () => {
   const { user } = useLogin();
@@ -82,7 +84,7 @@ const DashboardInstitucion = () => {
       if (l.tareas && l.tareas.length > 0) {
         l.tareas.forEach(t => {
           exportData.push({
-            'Problemática': l.problematica,
+            'Nombre de Línea Estratégica': l.problematica,
             'Línea de Acción': l.titulo,
             'Tarea Estratégica Asignada': t.titulo,
             'Prioridad': t.prioridad || 'Media',
@@ -96,7 +98,7 @@ const DashboardInstitucion = () => {
         });
       } else {
         exportData.push({
-          'Problemática': l.problematica,
+          'Nombre de Línea Estratégica': l.problematica,
           'Línea de Acción': l.titulo,
           'Tarea Estratégica Asignada': 'Sin tareas bajo tu responsabilidad',
           'Prioridad': '-',
@@ -122,11 +124,11 @@ const DashboardInstitucion = () => {
   };
 
   if (loading) {
-    return <div style={{ padding: '3rem', color: '#64748b' }}>Cargando Panel Operativo...</div>;
+    return <PageTransition><SkeletonLoader type="dashboard" /></PageTransition>;
   }
 
   return (
-    <div className="dashboard-institucion-wrapper" style={{ width: '100%' }}>
+    <PageTransition className="dashboard-institucion-wrapper" style={{ width: '100%' }}>
       {/* Contenido Principal con fondo transparente para dejar ver el fondo global (navy azul) */}
       <div className="dashboard-institucion-content" style={{ 
         flex: 1, 
@@ -212,7 +214,7 @@ const DashboardInstitucion = () => {
           )}
         </div>
       </div>
-    </div>
+    </PageTransition>
   );
 };
 

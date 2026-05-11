@@ -111,7 +111,108 @@ function ZonasCriticas() {
            </div>
         </div>
       </div>
-      
+
+      {/* ── MAPA DE CALOR SVG ── */}
+      <div className="heatmap-container">
+        <div className="heatmap-header">
+          <h3 className="heatmap-title">Mapa de Calor — Nivel de Riesgo por Distrito</h3>
+          <div className="heatmap-legend">
+            <span className="legend-item"><span className="legend-dot" style={{background:'#ef4444'}}></span>Crítico</span>
+            <span className="legend-item"><span className="legend-dot" style={{background:'#f97316'}}></span>Alto</span>
+            <span className="legend-item"><span className="legend-dot" style={{background:'#eab308'}}></span>Medio</span>
+            <span className="legend-item"><span className="legend-dot" style={{background:'#22c55e'}}></span>Bajo</span>
+          </div>
+        </div>
+        <svg className="heatmap-svg" viewBox="0 0 1000 500" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            {/* Gradientes de calor radial por zona */}
+            {zonas.map(z => {
+              const nivelColor = {
+                'Crítico': ['#ef4444', 'rgba(239,68,68,0.15)'],
+                'Alto': ['#f97316', 'rgba(249,115,22,0.15)'],
+                'Medio': ['#eab308', 'rgba(234,179,8,0.12)'],
+                'Bajo': ['#22c55e', 'rgba(34,197,94,0.1)'],
+              };
+              const [inner, outer] = nivelColor[z.nivel] || ['#94a3b8', 'rgba(148,163,184,0.1)'];
+              return (
+                <radialGradient key={`grad-${z.id}`} id={`heat-${z.id}`} cx="50%" cy="50%" r="50%">
+                  <stop offset="0%" stopColor={inner} stopOpacity="0.7" />
+                  <stop offset="60%" stopColor={inner} stopOpacity="0.3" />
+                  <stop offset="100%" stopColor={outer} stopOpacity="0" />
+                </radialGradient>
+              );
+            })}
+          </defs>
+
+          {/* Fondo del mapa */}
+          <rect width="1000" height="500" fill="#f0f9ff" rx="12" />
+          {/* Mar / Golfo */}
+          <path d="M 0,330 Q 300,340 500,350 Q 700,360 800,450 Q 820,500 780,500 L 0,500 Z" fill="#bae6fd" opacity="0.5" />
+          <path d="M 0,180 Q 150,160 300,170 Q 450,180 600,140 L 1050,140 L 1050,0 L 0,0 Z" fill="#bae6fd" opacity="0.4" />
+          <text x="350" y="460" fill="#0369a1" fontSize="32" fontWeight="800" fontStyle="italic" opacity="0.3">Golfo de Nicoya</text>
+
+          {/* Carreteras */}
+          <path d="M 10,240 L 350,205 L 450,205 L 650,235 L 750,245 L 850,195 L 1000,95" stroke="#94a3b8" strokeWidth="2" fill="none" strokeDasharray="6,4" opacity="0.5" />
+
+          {/* Zonas geográficas con color de riesgo */}
+          {(() => {
+            const geoData = [
+              { nombre: 'Puntarenas Centro', path: 'M 10,210 L 80,205 Q 150,210 250,203 T 440,200 L 440,230 Q 250,240 150,235 T 10,230 Z', cx: 220, cy: 218 },
+              { nombre: 'Chacarita', path: 'M 440,200 Q 500,190 580,200 L 660,185 L 660,235 Q 580,245 440,230 Z', cx: 545, cy: 215 },
+              { nombre: 'El Roble', path: 'M 660,185 Q 720,170 780,180 L 835,350 L 660,235 Z', cx: 730, cy: 240 },
+              { nombre: 'Barranca', path: 'M 780,180 Q 880,160 970,150 L 980,380 L 835,350 Z', cx: 885, cy: 210 },
+              { nombre: 'El Carmen', path: 'M 150,260 Q 200,270 280,265 Q 340,260 380,270 L 380,320 Q 280,330 150,310 Z', cx: 265, cy: 290 },
+            ];
+
+            const nivelFill = {
+              'Crítico': '#ef4444',
+              'Alto': '#f97316',
+              'Medio': '#eab308',
+              'Bajo': '#22c55e',
+            };
+
+            return geoData.map(geo => {
+              const zonaData = zonas.find(z => z.nombre === geo.nombre);
+              if (!zonaData) return null;
+              const fillColor = nivelFill[zonaData.nivel] || '#94a3b8';
+              const incidentes = zonaData.incidentes || 0;
+              const heatRadius = Math.min(120, 40 + incidentes * 5);
+
+              return (
+                <g key={geo.nombre}>
+                  {/* Forma del distrito coloreada */}
+                  <path
+                    d={geo.path}
+                    fill={fillColor}
+                    opacity="0.35"
+                    stroke={fillColor}
+                    strokeWidth="2"
+                    style={{ transition: 'all 0.4s' }}
+                  />
+                  {/* Gradiente de calor basado en incidentes */}
+                  <circle
+                    cx={geo.cx}
+                    cy={geo.cy}
+                    r={heatRadius}
+                    fill={`url(#heat-${zonaData.id})`}
+                    style={{ transition: 'r 0.5s' }}
+                  />
+                  {/* Label */}
+                  <text x={geo.cx} y={geo.cy - 12} textAnchor="middle" fill="#0f172a" fontSize="12" fontWeight="800" style={{ textTransform: 'uppercase' }}>
+                    {geo.nombre}
+                  </text>
+                  {/* Badge de incidentes */}
+                  <rect x={geo.cx - 28} y={geo.cy} width="56" height="20" rx="10" fill="white" stroke={fillColor} strokeWidth="1.5" opacity="0.95" />
+                  <text x={geo.cx} y={geo.cy + 14} textAnchor="middle" fill={fillColor} fontSize="10" fontWeight="800">
+                    {incidentes} incid.
+                  </text>
+                </g>
+              );
+            });
+          })()}
+        </svg>
+      </div>
+
       <div className="zonas-grid">
         {localZonas.map(renderZonaCard)}
       </div>

@@ -4,47 +4,51 @@ import { useLogin } from "../../../context/LoginContext";
 import UserBrand from "../../Shared/Navegacion/UserBrand";
 import {
   ChevronLeft, ChevronDown, LayoutDashboard, ClipboardList,
-  FileSearch, Clock, Calendar, LogOut, Users, BarChart3, FileBarChart, MessageCircle
+  FileSearch, Clock, Calendar, LogOut, Users, BarChart3, FileBarChart, MessageCircle, PieChart, Activity, MapPin
 } from "lucide-react";
 import Swal from 'sweetalert2';
 
 const SidebarAdminInstitucion = ({ collapsed = false, onToggle, activeView, onViewChange }) => {
   const { user, logout } = useLogin();
   const [openSections, setOpenSections] = useState({
-    OPERATIVO: true,
-    SUPERVISIÓN: true,
-    ANÁLISIS: true,
-    PLANIFICACIÓN: true,
+    'DIRECCIÓN ESTRATÉGICA': true,
+    'GESTIÓN OPERATIVA': true,
   });
 
   const navSections = [
     {
-      label: 'OPERATIVO',
+      label: 'DIRECCIÓN ESTRATÉGICA',
       items: [
-        { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
-        { id: 'tareas', label: 'Gestión de Tareas', icon: ClipboardList },
-        { id: 'usuarios', label: 'Gestión de Funcionarios', icon: Users },
+        { id: 'dashboard', label: 'Centro de Análisis', icon: LayoutDashboard },
+        { id: 'mesa-cir', label: 'Mesa CIR Social', icon: Activity },
       ],
     },
     {
-      label: 'SUPERVISIÓN',
+      label: 'INTELIGENCIA TERRITORIAL',
       items: [
-        { id: 'reportes',   label: 'Revisión de Reportes', icon: FileSearch },
+        { id: 'zonas', label: 'Zonas Críticas y Riesgo', icon: MapPin },
+      ],
+    },
+    {
+      label: 'GESTIÓN OPERATIVA',
+      items: [
+        { id: 'tareas', label: 'Gestión de Tareas', icon: ClipboardList, badge: 3 },
+        { id: 'calendario', label: 'Calendario Institucional', icon: Calendar },
+      ],
+    },
+    {
+      label: 'MONITOREO Y EVALUACIÓN',
+      items: [
+        { id: 'reportes',   label: 'Revisión de Reportes', icon: FileSearch, badge: 5 },
         { id: 'informesTrimestral', label: 'Informes Trimestrales', icon: FileBarChart },
         { id: 'historial',  label: 'Historial de Reportes', icon: Clock },
       ],
     },
     {
-      label: 'ANÁLISIS',
+      label: 'ADMINISTRACIÓN',
       items: [
-        { id: 'estadisticas', label: 'Estadísticas', icon: BarChart3 },
-      ],
-    },
-    {
-      label: 'PLANIFICACIÓN',
-      items: [
-        { id: 'calendario', label: 'Calendario', icon: Calendar },
-        { id: 'alertas', label: 'Soporte y Comentarios', icon: MessageCircle },
+        { id: 'usuarios', label: 'Gestión de Funcionarios', icon: Users },
+        { id: 'alertas', label: 'Soporte y Comentarios', icon: MessageCircle, badge: 1 },
       ],
     },
   ];
@@ -132,6 +136,11 @@ const SidebarAdminInstitucion = ({ collapsed = false, onToggle, activeView, onVi
                       </span>
                       {!collapsed && (
                         <span className="sidebar-admin__item-label">{item.label}</span>
+                      )}
+                      {item.badge && (
+                        <span className={`sidebar-admin__badge ${collapsed ? 'sidebar-admin__badge--dot' : ''}`}>
+                          {!collapsed && item.badge}
+                        </span>
                       )}
                     </button>
                   </li>

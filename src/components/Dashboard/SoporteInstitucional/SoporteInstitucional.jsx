@@ -121,21 +121,7 @@ const SoporteInstitucional = () => {
 
   return (
     <div className="soporte-view-wrapper">
-      <div 
-        className="soporte-hero-banner"
-        style={{ 
-          background: `linear-gradient(rgba(11, 34, 64, 0.85), rgba(11, 34, 64, 0.85)), url('/bg-institucional.png')`,
-          backgroundAttachment: 'fixed',
-          backgroundSize: 'cover',
-          backgroundPosition: 'center'
-        }}
-      >
-        <div className="soporte-hero-content">
-          <div className="banner-badge">CANAL DE COORDINACIÓN TÉCNICA</div>
-          <h1>Soporte y Comunicación</h1>
-          <p>Herramienta directa para la coordinación entre instituciones federadas y la administración central.</p>
-        </div>
-      </div>
+
 
       <div className="soporte-container-custom">
         <aside className="soporte-sidebar-glass">

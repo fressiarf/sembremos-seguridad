@@ -92,10 +92,7 @@ export const MapaRiesgos = () => {
   return (
     <div className="mapa-distribucion">
       <header className="map-header">
-        <div className="map-header__title">
-          <h1>Distribución Policial</h1>
-          <p>Supervisión estratégica de recursos en Puntarenas y distritos aledaños</p>
-        </div>
+
         <div className="map-kpis">
           <div className="kpi-chip">
             <span className="kpi-chip__val">{totalOficiales}</span>

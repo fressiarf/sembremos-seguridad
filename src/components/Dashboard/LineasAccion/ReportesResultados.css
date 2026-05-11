@@ -63,7 +63,7 @@
 .reportes-container-custom {
   max-width: 1600px;
   width: 98%;
-  margin: -4rem auto 5rem;
+  margin: 1rem auto 5rem;
   position: relative;
   z-index: 2;
 }

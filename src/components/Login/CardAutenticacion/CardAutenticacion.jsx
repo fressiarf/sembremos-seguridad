@@ -28,7 +28,7 @@ const CardAutenticacion = ({ children }) => {
           navigate('/dasboardMuni');
         } else if (user.rol === ROLES.ADMIN_INSTITUCION) {
           navigate('/dashboardAdminInstitucion');
-        } else if (user.rol === 'institucion' || user.rol === ROLES.EDITOR) {
+        } else if (user.rol === ROLES.EDITOR) {
           navigate('/dashboardEditores');
         } else {
           navigate('/dashboardEditores');

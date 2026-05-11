@@ -57,7 +57,7 @@ const LineasAccionView = ({ onViewChange }) => {
 
     autoTable(doc, {
       startY: 35,
-      head: [['No.', 'Título', 'Problemática', 'Progreso', 'Responsables']],
+      head: [['No.', 'Título', 'Línea de Acción', 'Progreso', 'Responsables']],
       body: tableData,
       headStyles: { fillColor: [11, 34, 64], textColor: [255, 255, 255], fontStyle: 'bold' },
       styles: { fontSize: 8, cellPadding: 3 },
@@ -75,7 +75,7 @@ const LineasAccionView = ({ onViewChange }) => {
         'No.': l.no,
         'Cantón': l.canton,
         'Título Línea de Acción': l.titulo,
-        'Problemática Priorizada': l.problematica,
+        'Nombre de Línea Estratégica': l.problematica,
         'Objetivo General': l.objetivo || 'Sin objetivo definido',
         'Indicador Meta': l.indicador || l.metaIndicador || '-',
         'Progreso Línea (%)': l.progreso,
@@ -130,17 +130,14 @@ const LineasAccionView = ({ onViewChange }) => {
   return (
     <div className="lineas-accion-view">
       <header className="lineas-view-header">
-        <div className="header-text">
-          <h1>Líneas de Acción Estratégicas</h1>
-          <p>Gestión completa de metas y objetivos del Programa Sembremos Seguridad</p>
-        </div>
+
         
         <div className="header-controls">
           <div className="search-box">
             <Search size={18} />
             <input 
               type="text" 
-              placeholder="Buscar por título o problemática..." 
+              placeholder="Buscar por título o línea de acción..." 
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
             />
@@ -202,7 +199,7 @@ const LineasAccionView = ({ onViewChange }) => {
                 <div className="linea-card-details">
                   <div className="details-grid">
                     <div className="detail-section">
-                      <h4><Info size={14} /> Problemática Detectada</h4>
+                      <h4><Info size={14} /> Línea de Acción</h4>
                       <p>{linea.problematica}</p>
                     </div>
 

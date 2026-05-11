@@ -1,0 +1,17 @@
+﻿
+> sembremosseguridad@0.0.0 build
+> vite build
+
+[36mvite v8.0.0 [32mbuilding client environment for production...[36m[39m
+[2K
+transforming...Ô£ô 2475 modules transformed.
+rendering chunks...
+computing gzip size...
+dist/index.html                                                                      0.77 kB Ôöé gzip:   0.42 kB
+dist/assets/hero-5sT3BiRD.png                                                       44.91 kB
+dist/assets/Captura_de_pantalla_2026-03-15_191337-removebg-preview-DTscT6rA.png     76.38 kB
+dist/assets/inl-logo-acronym-vertical-navy-removebg-preview-D87Jkbaw.png           126.24 kB
+dist/assets/Msp_logo-removebg-preview-Nv7yhW2v.png                                 440.76 kB
+dist/assets/index-CFtisIao.css                                                     149.41 kB Ôöé gzip:  26.86 kB
+dist/assets/index-XR3tEVBb.js                                                    1,770.40 kB Ôöé gzip: 537.38 kB
+

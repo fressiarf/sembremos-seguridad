@@ -1,5 +1,5 @@
 import React from 'react';
-import DashboardAdminInst from './Vistas/DashboardAdminInst';
+import CentroMandoTabs from './Vistas/CentroMandoTabs';
 import GestionTareas from './Vistas/GestionTareas';
 import RevisionReportes from './Vistas/RevisionReportes';
 import RevisionInformesTrimestral from './Vistas/RevisionInformesTrimestral';
@@ -10,6 +10,9 @@ import PerfilUsuario from '../Dashboard/PerfilUsuario/PerfilUsuario';
 import EstadisticasInstitucion from './Vistas/EstadisticasInstitucion';
 import TopbarInstitucion from '../DashboardInstitucion/Navegacion/TopbarInstitucion';
 import SoporteInstitucional from '../Dashboard/SoporteInstitucional/SoporteInstitucional';
+import MesaCIR from '../Dashboard/MesaCIR/MesaCIR';
+import DiagnosticoMetodologico from '../Dashboard/DiagnosticoMetodologico/DiagnosticoMetodologico';
+import ZonasCriticas from '../Dashboard/ZonasCriticas/ZonasCriticas';
 import { useLogin } from '../../context/LoginContext';
 import { useState, useEffect, useRef } from 'react';
 import { Bot, Bell, X } from 'lucide-react';
@@ -50,6 +53,8 @@ const SeccionPrincipalAdminInstitucion = ({ activeView = 'dashboard', collapsed,
       historial: 'Historial de Reportes',
       calendario: 'Calendario',
       estadisticas: 'Estadísticas',
+      diagnostico: 'Diagnóstico Metodológico',
+      zonas: 'Zonas Críticas y Riesgo',
       alertas: 'Soporte y Comentarios',
       perfil: 'Mi Perfil',
     };
@@ -59,7 +64,7 @@ const SeccionPrincipalAdminInstitucion = ({ activeView = 'dashboard', collapsed,
   const renderView = () => {
     switch (activeView) {
       case 'dashboard':
-        return <DashboardAdminInst />;
+        return <CentroMandoTabs />;
       case 'tareas':
         return <GestionTareas />;
       case 'usuarios':
@@ -84,6 +89,12 @@ const SeccionPrincipalAdminInstitucion = ({ activeView = 'dashboard', collapsed,
         );
       case 'estadisticas':
         return <EstadisticasInstitucion />;
+      case 'diagnostico':
+        return <DiagnosticoMetodologico />;
+      case 'zonas':
+        return <ZonasCriticas />;
+      case 'mesa-cir':
+        return <MesaCIR />;
       case 'perfil':
         return (
           <div style={{ padding: '2rem 2.5rem' }}>
@@ -91,7 +102,7 @@ const SeccionPrincipalAdminInstitucion = ({ activeView = 'dashboard', collapsed,
           </div>
         );
       default:
-        return <DashboardAdminInst />;
+        return <CentroMandoTabs />;
     }
   };
 

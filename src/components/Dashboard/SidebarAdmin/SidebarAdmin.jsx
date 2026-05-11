@@ -3,7 +3,7 @@ import '../../Dashboard/SidebarAdmin/SidebarAdmin.css';
 import { dashboardService } from '../../../services/dashboardService';
 import { useLogin } from "../../../context/LoginContext";
 import UserBrand from "../../Shared/Navegacion/UserBrand";
-import { ChevronLeft, ChevronDown, LayoutGrid, Activity, Clock, LogOut, User, MapPin, Shield, Bell, BellRing, TriangleAlert, FileText, Settings, Calendar, LayoutDashboard, MessageCircle, FileBarChart } from "lucide-react";
+import { ChevronLeft, ChevronDown, LayoutGrid, Activity, Clock, LogOut, User, MapPin, Shield, Bell, BellRing, TriangleAlert, FileText, Settings, Calendar, LayoutDashboard, MessageCircle, FileBarChart, TrendingUp, PieChart, FileSearch, BarChart3 } from "lucide-react";
 import Swal from 'sweetalert2';
 
 
@@ -50,38 +50,39 @@ const SidebarAdmin = ({ collapsed = false, onToggle, activeView, onViewChange })
   // ── Secciones de navegación dinámicas ──
   const navSections = [
     {
-      label: 'GESTIÓN ESTRATÉGICA',
+      label: 'DIRECCIÓN ESTRATÉGICA',
       items: [
-        { id: 'dashboard', label: 'Resumen Ejecutivo', icon: LayoutDashboard, path: '/dashboard' },
-        { id: 'lineas-accion', label: 'Líneas y Tareas', icon: LayoutGrid, path: '/lineas-accion' },
-        { id: 'reportes-resultados', label: 'Reportes Activos', icon: Activity, path: '/reportes-resultados' },
-        { id: 'historial', label: 'Historial', icon: Clock, path: '/historial' },
-        { id: 'matriz-seguimiento', label: 'Matriz Completa', icon: FileText, path: '/matriz-seguimiento' },
+        { id: 'estadisticas', label: 'Centro de Análisis', icon: LayoutDashboard },
+        { id: 'mesa-cir', label: 'Mesa CIR Social', icon: Activity },
+        { id: 'matriz-seguimiento', label: 'Matriz Completa', icon: FileText },
       ],
     },
     {
-      label: 'HERRAMIENTAS',
+      label: 'INTELIGENCIA TERRITORIAL',
       items: [
-        { id: 'actividades', label: 'Gestión de Tareas', icon: Activity, path: '/actividades', badge: stats.activitiesCount },
-        { id: 'zonas',       label: 'Zonas críticas',        icon: MapPin,      path: '/zonas',    badge: stats.zonesCount },
-        { id: 'alertas',     label: 'Soporte y Comentarios',  icon: MessageCircle, path: '/alertas',  badge: stats.alertsCount },
+        { id: 'zonas', label: 'Zonas Críticas y Riesgo', icon: MapPin },
+        { id: 'mapa', label: 'Despliegue Policial', icon: MapPin },
       ],
     },
     {
-      label: 'ANÁLISIS',
+      label: 'GESTIÓN OPERATIVA',
       items: [
-        { id: 'mapa',        label: 'Distribución policial', icon: MapPin,       path: '/mapa' },
-        { id: 'consolidado', label: 'Consolidado Trimestral', icon: FileBarChart, path: '/consolidado' },
-        { id: 'historial',   label: 'Historial',             icon: Clock,     path: '/historial' },
-        { id: 'estadisticas',label: 'Estadísticas',          icon: Activity,     path: '/estadisticas' },
-        { id: 'calendario',  label: 'Calendario',            icon: Calendar,  path: '/calendario' },
+        { id: 'lineas-accion', label: 'Gestión de Tareas', icon: LayoutGrid },
+        { id: 'calendario',  label: 'Calendario Institucional', icon: Calendar },
+      ],
+    },
+    {
+      label: 'MONITOREO Y EVALUACIÓN',
+      items: [
+        { id: 'reportes-resultados', label: 'Revisión de Reportes', icon: FileSearch },
+        { id: 'historial', label: 'Historial de Reportes', icon: Clock },
       ],
     },
     {
       label: 'ADMINISTRACIÓN',
       items: [
-        { id: 'usuarios',    label: 'Gestión de usuarios',   icon: User,     path: '/usuarios', badge: stats.solicitudesCount },
-        { id: 'reportes',    label: 'Reportes INL/MSP',      icon: FileText,    path: '/reportes' },
+        { id: 'usuarios', label: 'Gestión de Funcionarios', icon: User, badge: stats.solicitudesCount },
+        { id: 'alertas', label: 'Soporte y Comentarios',  icon: MessageCircle, badge: stats.alertsCount },
       ],
     },
   ];

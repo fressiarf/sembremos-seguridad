@@ -5,6 +5,8 @@ import { dashboardService } from '../../../services/dashboardService';
 import { useLogin } from '../../../context/LoginContext';
 import { Save, Edit2, Search, Filter, Download, Plus } from 'lucide-react';
 import { exportToCSV } from '../../../utils/exportUtils';
+import SkeletonLoader from '../../Shared/SkeletonLoader';
+import PageTransition from '../../Shared/PageTransition';
 
 const MatrizSeguimiento = () => {
   const { user } = useLogin();
@@ -60,7 +62,7 @@ const MatrizSeguimiento = () => {
 
     const columns = [
       { label: 'No.', key: 'no' },
-      { label: 'Problemática', key: 'problematica' },
+      { label: 'Nombre de Línea Estratégica', key: 'problematica' },
       { label: 'Línea de Acción', key: 'lineaAccion' },
       { label: 'ID Tarea', key: 'tareaId' },
       { label: 'Acción Estratégica', key: 'tareaTitulo' },
@@ -109,15 +111,12 @@ const MatrizSeguimiento = () => {
     return lineMatches || hasMatchingTask;
   });
 
-  if (loading) return <div className="matriz-loading">Cargando datos de matriz estratégica...</div>;
+  if (loading) return <PageTransition><SkeletonLoader type="table" /></PageTransition>;
 
   return (
-    <div className="matriz-seguimiento-v2">
+    <PageTransition className="matriz-seguimiento-v2">
       <header className="matriz-v2-header">
-        <div className="header-titles">
-          <h1>Matriz Plan Operativo Institucional - Sembremos Seguridad</h1>
-          <p>Módulo de Control y Seguimiento Estratégico Multidisciplinario</p>
-        </div>
+
         <div className="header-actions">
           <button className="btn-secondary" onClick={handleExportExcel}>
             <Download size={16} /> Exportar Excel
@@ -135,7 +134,7 @@ const MatrizSeguimiento = () => {
           <Search size={18} color="#64748b" />
           <input 
             type="text" 
-            placeholder="Buscar por problemática, institución, indicador..." 
+            placeholder="Buscar por línea de acción, institución, indicador..." 
             value={searchTerm} 
             onChange={e => setSearchTerm(e.target.value)} 
           />
@@ -160,7 +159,7 @@ const MatrizSeguimiento = () => {
           <thead>
             <tr>
               <th>No.</th>
-              <th>Problemática</th>
+              <th>Nombre de Línea Estratégica</th>
               <th>Línea de Acción</th>
               <th>Indicador / Meta</th>
               <th>Responsables</th>
@@ -283,7 +282,7 @@ const MatrizSeguimiento = () => {
           </tbody>
         </table>
       </div>
-    </div>
+    </PageTransition>
   );
 };
 

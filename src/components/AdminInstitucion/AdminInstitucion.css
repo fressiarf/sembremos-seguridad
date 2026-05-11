@@ -21,8 +21,9 @@
 }
 
 .admin-inst-stat-card:hover {
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.06);
-  transform: translateY(-1px);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+  transform: translateY(-4px);
+  border-color: #3b82f6;
 }
 
 .admin-inst-stat-header {
@@ -77,7 +78,9 @@
 }
 
 .admin-inst-task-card:hover {
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.06);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
+  border-color: #cbd5e1;
+  transform: translateX(4px);
 }
 
 .admin-inst-task-linea {

@@ -6,6 +6,8 @@ import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
 import * as XLSX from 'xlsx';
 import './MatrizSeguimiento.css';
+import SkeletonLoader from '../../Shared/SkeletonLoader';
+import PageTransition from '../../Shared/PageTransition';
 
 const MatrizSeguimiento = () => {
   const [lineas, setLineas] = useState([]);
@@ -61,7 +63,7 @@ const MatrizSeguimiento = () => {
 
     autoTable(doc, {
       startY: 35,
-      head: [['No.', 'Cantón', 'Factores Priorizados', 'Línea de Acción', 'Objetivo']],
+      head: [['No.', 'Cantón', 'Nombre de Línea Estratégica', 'Línea de Acción', 'Objetivo']],
       body: tableData,
       headStyles: { fillColor: [11, 34, 64], textColor: [255, 255, 255], fontStyle: 'bold' },
       styles: { fontSize: 8, cellPadding: 3 },
@@ -80,7 +82,7 @@ const MatrizSeguimiento = () => {
       const baseRowL = {
         'No.': l.no,
         'Cantón': l.canton,
-        'Factores Priorizados': l.problematica,
+        'Nombre de Línea Estratégica': l.problematica,
         'Líneas de Acción Recomendadas': l.titulo,
         'Objetivo General': l.objetivo
       };
@@ -114,10 +116,10 @@ const MatrizSeguimiento = () => {
     XLSX.writeFile(wb, `Matriz_SembremosSeguridad_Oficial_${new Date().getTime()}.xlsx`);
   };
 
-  if (loading) return <div className="matriz-loading">Cargando matriz estratégica...</div>;
+  if (loading) return <PageTransition><SkeletonLoader type="table" /></PageTransition>;
 
   return (
-    <div 
+    <PageTransition
       className="matriz-view-wrapper" 
       style={{ 
         background: `linear-gradient(rgba(11, 34, 64, 0.85), rgba(11, 34, 64, 0.85)), url('/bg-institucional.png')`,
@@ -126,31 +128,19 @@ const MatrizSeguimiento = () => {
         backgroundPosition: 'center'
       }}
     >
-      <div className="matriz-hero-banner">
-        <div className="matriz-hero-content">
-          <div className="banner-badge">MATRIZ DE CONTROL ESTRATÉGICO</div>
-          <h1>Matriz de Seguimiento Estratégico</h1>
-          <p>Consolidado de Indicadores y Avances · Cantón Puntarenas (Periodo 2025)</p>
-          
-          <div className="matriz-search-container">
-            <div className="matriz-search-wrapper">
+      <div className="matriz-container-custom" style={{ marginTop: '0' }}>
+        <div className="matriz-toolbar-v4">
+          <div className="toolbar-info">
+            <div className="matriz-search-wrapper" style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
               <Search size={20} className="search-icon" />
               <input 
                 type="text" 
-                placeholder="Filtrar por línea de acción, objetivo o problemática priorizada..." 
+                placeholder="Filtrar por línea de acción, objetivo o línea estratégica..." 
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
+                style={{ background: 'rgba(255,255,255,0.1)', border: '1px solid rgba(255,255,255,0.2)', color: '#fff', padding: '8px 12px', borderRadius: '8px', fontSize: '0.85rem', width: '350px' }}
               />
             </div>
-          </div>
-        </div>
-      </div>
-
-      <div className="matriz-container-custom">
-        <div className="matriz-toolbar-v4">
-          <div className="toolbar-info">
-            <Activity size={18} className="icon-pulse" />
-            <span>Resumen Estratégico del Plan de Acción</span>
           </div>
           <div className="toolbar-actions">
              <button className="btn-export-v4 pdf" onClick={exportPDF} title="Generar ficher PDF Institucional">
@@ -171,7 +161,7 @@ const MatrizSeguimiento = () => {
                 <tr>
                   <th className="col-no">No.</th>
                   <th className="col-canton">Cantón</th>
-                  <th className="col-problematica">Factores Priorizados</th>
+                  <th className="col-problematica">Nombre de Línea Estratégica</th>
                   <th className="col-titulo">Línea de Acción</th>
                   <th className="col-objetivo">Objetivo</th>
                   <th className="col-meta">Meta / Indicador</th>
@@ -218,13 +208,13 @@ const MatrizSeguimiento = () => {
                           <div className="planificacion-box">
                             <div className="plan-header">
                               <Activity size={18} />
-                              <h3>PLANIFICACIÓN OPERATIVA 2025: Acciones Estratégicas Detalladas</h3>
+                              <h3>PLANIFICACIÓN OPERATIVA 2025: Tareas Estratégicas Detalladas</h3>
                             </div>
                             <div className="plan-table-container">
                               <table className="plan-table-nested">
                                 <thead>
                                   <tr>
-                                    <th>Acción Estratégica</th>
+                                    <th>Tarea Estratégica</th>
                                     <th>Indicador de Avance</th>
                                     <th>Meta y Logro (Beneficiados)</th>
                                     <th>Inversión (₡)</th>
@@ -261,7 +251,7 @@ const MatrizSeguimiento = () => {
                                   ))}
                                   {tareas.filter(t => t.lineaAccionId === linea.id).length === 0 && (
                                     <tr>
-                                      <td colSpan="6" className="empty-subtable">Sin acciones estratégicas vinculadas actualmente.</td>
+                                      <td colSpan="6" className="empty-subtable">Sin tareas estratégicas vinculadas actualmente.</td>
                                     </tr>
                                   )}
                                 </tbody>
@@ -278,7 +268,7 @@ const MatrizSeguimiento = () => {
           </div>
         </div>
       </div>
-    </div>
+    </PageTransition>
   );
 };
 
