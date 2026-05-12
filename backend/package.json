@@ -11,7 +11,11 @@
     "start": "node server.js",
     "dev": "nodemon server.js",
     "db:setup": "node create_dbs.js",
-    "db:sync": "node sync.js"
+    "db:sync": "node sync.js",
+    "migrate:msp": "sequelize-cli db:migrate --env msp --migrations-path src/migrations/msp",
+    "migrate:muni": "sequelize-cli db:migrate --env muni --migrations-path src/migrations/muni",
+    "migrate:undo:msp": "sequelize-cli db:migrate:undo --env msp --migrations-path src/migrations/msp",
+    "migrate:undo:muni": "sequelize-cli db:migrate:undo --env muni --migrations-path src/migrations/muni"
   },
   "keywords": [],
   "author": "",
