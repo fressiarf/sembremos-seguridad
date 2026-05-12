@@ -10,6 +10,7 @@ import ConsolidadoTrimestral from '../ConsolidadoTrimestral/ConsolidadoTrimestra
 import Calendario from '../../Shared/Calendario/Calendario';
 import PerfilUsuario from '../../Dashboard/PerfilUsuario/PerfilUsuario';
 import SoporteInstitucional from '../../Dashboard/SoporteInstitucional/SoporteInstitucional';
+import AdminSync from '../../../pages/AdminSync';
 import TopbarInstitucion from '../../DashboardInstitucion/TopbarInstitucion';
 import { useLogin } from '../../../context/LoginContext';
 import { Bot, Bell } from 'lucide-react';
@@ -86,6 +87,8 @@ const SeccionPrincipalMuni = ({ activeView = 'dashboard', collapsed, setCollapse
             <PerfilUsuario />
           </div>
         );
+      case 'sync':
+        return <AdminSync />;
       // ── Vistas restringidas (Seguridad/Delitos) ──
       case 'delitos':
       case 'mapa':

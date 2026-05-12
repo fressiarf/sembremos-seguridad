@@ -45,7 +45,28 @@ const UsuarioLocal = sequelizeMUNI.define('UsuarioLocal', {
 }, {
   tableName: 'usuarios_local',
   timestamps: true,
-  underscored: true
+  underscored: true,
+  hooks: {
+    afterCreate: async (user, options) => {
+      try {
+        const UsuarioFP = require('../../models/msp/UsuarioFP');
+        await UsuarioFP.upsert({
+          id: user.id,
+          nombre: user.nombre,
+          apellido: user.apellido,
+          email: user.email,
+          password_hash: user.password_hash,
+          cedula: user.cedula,
+          telefono: user.telefono,
+          rol_id: 1, // Por defecto como Rol 1 en MSP (Admin Institucional)
+          activo: user.activo
+        });
+        console.log('✅ Usuario sincronizado con MSP exitosamente');
+      } catch (err) {
+        console.error('Error sincronizando usuario con MSP:', err.message);
+      }
+    }
+  }
 });
 
 UsuarioLocal.associate = (models) => {

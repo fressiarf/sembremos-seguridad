@@ -39,16 +39,19 @@ export const muniService = {
         }
       });
 
-      const lineasPreventivas = lineas.filter(l => {
-        return tareasPreventivas.some(t => t.lineaAccionId === l.id);
-      });
-
-      const lineasConProgreso = lineasPreventivas.map(linea => {
+      const lineasConProgreso = lineas.map(linea => {
         const tareasLinea = tareasPreventivas.filter(t => t.lineaAccionId === linea.id);
         const completadasLinea = tareasLinea.filter(t => t.completada).length;
         const progreso = tareasLinea.length > 0 ? Math.round((completadasLinea / tareasLinea.length) * 100) : 0;
         const inversion = tareasLinea.reduce((sum, t) => sum + (t.inversionColones || 0), 0);
-        return { ...linea, totalTareas: tareasLinea.length, completadas: completadasLinea, progreso, inversion, tareas: tareasLinea };
+        return { 
+          ...linea, 
+          totalTareas: tareasLinea.length, 
+          completadas: completadasLinea, 
+          progreso, 
+          inversion, 
+          tareas: tareasLinea 
+        };
       });
 
       const reportesRecientes = reportesFiltrados

@@ -38,7 +38,21 @@ const LineaAccion = sequelizeFP.define('LineaAccion', {
 }, {
   tableName: 'lineas_accion',
   timestamps: true,
-  underscored: true
+  underscored: true,
+  hooks: {
+    afterCreate: async (linea, options) => {
+      const SyncService = require('../../services/SyncService');
+      await SyncService.syncLineasAccion().catch(err => console.error('Error en sync automático:', err));
+    },
+    afterUpdate: async (linea, options) => {
+      const SyncService = require('../../services/SyncService');
+      await SyncService.syncLineasAccion().catch(err => console.error('Error en sync automático:', err));
+    },
+    afterUpsert: async (linea, options) => {
+      const SyncService = require('../../services/SyncService');
+      await SyncService.syncLineasAccion().catch(err => console.error('Error en sync automático:', err));
+    }
+  }
 });
 
 LineaAccion.associate = (models) => {
