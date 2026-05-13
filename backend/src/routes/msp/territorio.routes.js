@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const territorioController = require('../controllers/territorioController');
+const territorioController = require('../../controllers/msp/territorioController');
 
 router.get('/provincias', territorioController.getProvincias);
 router.get('/cantones/:provinciaId', territorioController.getCantonesByProvincia);
