@@ -3,9 +3,9 @@ const cors = require('cors');
 
 const app = express();
 
-const adminRoutes = require('./src/routes/adminRoutes');
-const UserController = require('./src/controllers/UserController');
-const DashboardController = require('./src/controllers/DashboardController');
+const adminRoutes = require('./routes/adminRoutes');
+const UserController = require('./controllers/UserController');
+const DashboardController = require('./controllers/DashboardController');
 
 app.use(cors({ origin: '*' }));
 app.use(express.json());

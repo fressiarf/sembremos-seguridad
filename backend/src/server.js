@@ -1,6 +1,6 @@
 require('dotenv').config();
-const app = require('./app'); // Corregido: está en la raíz
-const { sequelizeFP, sequelizeMUNI } = require('./src/config/database');
+const app = require('./app');
+const { sequelizeFP, sequelizeMUNI } = require('./config/database');
 
 const PORT = process.env.PORT || 5000;
 
