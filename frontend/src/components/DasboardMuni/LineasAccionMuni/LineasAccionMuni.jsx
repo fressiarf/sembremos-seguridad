@@ -116,21 +116,20 @@ const LineasAccionMuni = () => {
               {/* Expanded: Tareas de la línea */}
               {isExpanded && (
                 <div style={{ padding: '1.25rem' }}>
-                  {/* Progress bar */}
-                  <div style={{ marginBottom: '16px' }}>
-                    <div style={{ width: '100%', height: '8px', background: '#f1f5f9', borderRadius: '999px', overflow: 'hidden' }}>
-                      <div style={{
-                        height: '100%',
-                        width: `${linea.progreso}%`,
-                        background: linea.progreso >= 75
-                          ? 'linear-gradient(90deg, #22c55e, #16a34a)'
-                          : linea.progreso >= 40
-                            ? 'linear-gradient(90deg, #f59e0b, #d97706)'
-                            : 'linear-gradient(90deg, #94a3b8, #64748b)',
-                        borderRadius: '999px',
-                        transition: 'width 0.6s ease',
-                      }} />
-                    </div>
+                  {/* Objetivo General */}
+                  <div style={{ 
+                    marginBottom: '20px', 
+                    padding: '12px 16px', 
+                    background: 'rgba(2, 132, 199, 0.05)', 
+                    borderRadius: '10px',
+                    borderLeft: '4px solid #0284c7'
+                  }}>
+                    <h4 style={{ margin: '0 0 6px', fontSize: '0.75rem', fontWeight: 800, color: '#0284c7', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+                      Objetivo Estratégico
+                    </h4>
+                    <p style={{ margin: 0, fontSize: '0.9rem', color: '#334155', lineHeight: 1.5, fontWeight: 500 }}>
+                      {linea.objetivo_general || 'Sin objetivo definido'}
+                    </p>
                   </div>
 
                   {/* Lista de tareas */}

@@ -7,6 +7,7 @@ import DashboardAdminInstitucion from '../pages/DashboardAdminInstitucion';
 import DasboardMuni from '../pages/DasboardMuni';
 import PrivateRoutes from './PrivateRoutes';
 import SoporteAcceso from '../components/Login/SoporteContra/SoporteAcceso';
+import AdminSync from '../pages/AdminSync';
 import { ROLES } from '../constants/roles';
 
 const Routing = () => {
@@ -15,6 +16,7 @@ const Routing = () => {
             <Routes>
                 <Route path="/" element={<Login />} />
                 <Route path="/soporte-acceso" element={<SoporteAcceso />} />
+                <Route path="/admin/sync" element={<AdminSync />} />
                 {/*  Rutas Privadas */}
                 <Route path="/dashboard" element={<PrivateRoutes allowedRoles={[ROLES.SUPER_ADMIN]}><Dashboard /></PrivateRoutes>} />
                 <Route path="/dasboardMuni" element={<PrivateRoutes allowedRoles={[ROLES.SUB_ADMIN]}><DasboardMuni /></PrivateRoutes>} />

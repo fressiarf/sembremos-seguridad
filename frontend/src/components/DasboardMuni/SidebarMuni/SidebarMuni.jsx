@@ -4,7 +4,7 @@ import { useLogin } from "../../../context/LoginContext";
 import UserBrand from "../../../components/Shared/Navegacion/UserBrand";
 import {
   ChevronLeft, ChevronDown, LayoutDashboard, ClipboardList,
-  FileText, Clock, Calendar, LogOut, BarChart3, MessageCircle, FileBarChart
+  FileText, Clock, Calendar, LogOut, BarChart3, MessageCircle, FileBarChart, RefreshCw
 } from "lucide-react";
 import Swal from 'sweetalert2';
 
@@ -35,10 +35,9 @@ const SidebarMuni = ({ collapsed = false, onToggle, activeView, onViewChange }) 
       ],
     },
     {
-      label: 'ANÁLISIS',
+      label: 'SISTEMA',
       items: [
-        { id: 'estadisticas', label: 'Estadísticas de Impacto', icon: BarChart3 },
-        { id: 'calendario', label: 'Calendario', icon: Calendar },
+        { id: 'sync', label: 'Sincronización', icon: RefreshCw },
       ],
     },
   ];
