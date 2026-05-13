@@ -196,25 +196,25 @@ sembremos-seguridad/
 
 | Requerimiento del Programa | Estado | Módulo en Código |
 | :--- | :---: | :--- |
-| Acceso basado en roles (RBAC) | <img src="https://img.shields.io/badge/-%E2%9C%94-success?style=flat-square" /> | `PrivateRoutes.jsx` + `roles.js` |
-| Matriz de Seguimiento Estratégico | <img src="https://img.shields.io/badge/-%E2%9C%94-success?style=flat-square" /> | `MatrizSeguimiento.jsx` |
-| Jerarquía Línea Estratégica → Línea de Acción → Tarea | <img src="https://img.shields.io/badge/-%E2%9C%94-success?style=flat-square" /> | `DashboardGlobal.jsx` + `MatrizSeguimiento.jsx` |
-| Asignación de responsabilidades y presupuestos | <img src="https://img.shields.io/badge/-%E2%9C%94-success?style=flat-square" /> | `GestionTareas.jsx` + `ModuloDelegacion.jsx` |
-| Filtros dinámicos (cantón, trimestre, estado) | <img src="https://img.shields.io/badge/-%E2%9C%94-success?style=flat-square" /> | `GestionTareas.jsx` + `MatrizSeguimiento.jsx` |
-| Reporte de oficiales con evidencia fotográfica | <img src="https://img.shields.io/badge/-%E2%9C%94-success?style=flat-square" /> | `CargaEvidencia.jsx` (drag-and-drop) |
-| Indicadores de impacto (personas, inversión ₡) | <img src="https://img.shields.io/badge/-%E2%9C%94-success?style=flat-square" /> | `CargaEvidencia.jsx` (KPIs) |
-| Revisión y aprobación de evidencias | <img src="https://img.shields.io/badge/-%E2%9C%94-success?style=flat-square" /> | `RevisionReportes.jsx` |
-| Zonas Críticas (semáforo territorial) | <img src="https://img.shields.io/badge/-%E2%9C%94-success?style=flat-square" /> | `ZonasCriticas.jsx` |
-| Distribución policial (mapa interactivo) | <img src="https://img.shields.io/badge/-%E2%9C%94-success?style=flat-square" /> | `MapaDistribucion.jsx` (SVG interactivo) |
-| Exportación PDF/Excel en un clic | <img src="https://img.shields.io/badge/-%E2%9C%94-success?style=flat-square" /> | `MatrizSeguimiento.jsx` + `DashboardGlobal.jsx` |
-| Auditoría y logs de seguridad | <img src="https://img.shields.io/badge/-%E2%9C%94-success?style=flat-square" /> | `securityService.js` → `logs_seguridad` |
-| Protocolo de cambio de clave con ventana de 15 min | <img src="https://img.shields.io/badge/-%E2%9C%94-success?style=flat-square" /> | `securityService.js` |
-| Skeleton Loading premium | <img src="https://img.shields.io/badge/-%E2%9C%94-success?style=flat-square" /> | `SkeletonLoader.jsx` |
-| Transiciones y micro-interacciones | <img src="https://img.shields.io/badge/-%E2%9C%94-success?style=flat-square" /> | `PageTransition.jsx` + `CardLineaAccion.jsx` |
-| Informes trimestrales | <img src="https://img.shields.io/badge/-%E2%9C%94-success?style=flat-square" /> | `RevisionInformesTrimestral.jsx` |
-| Estadísticas con gráficos (ECharts) | <img src="https://img.shields.io/badge/-%E2%9C%94-success?style=flat-square" /> | `EstadisticasGlobal.jsx` + `EstadisticasInstitucion.jsx` |
-| Centro de Comunicación / Soporte | <img src="https://img.shields.io/badge/-%E2%9C%94-success?style=flat-square" /> | `SoporteInstitucional/` + `DashboardGlobal.jsx` |
-| Calendario institucional | <img src="https://img.shields.io/badge/-%E2%9C%94-success?style=flat-square" /> | `CalendarioAdminInst.jsx` |
+| Acceso basado en roles (RBAC) | <img src="https://img.shields.io/badge/-%E2%9C%94-000000?style=flat-square" /> | `PrivateRoutes.jsx` + `roles.js` |
+| Matriz de Seguimiento Estratégico | <img src="https://img.shields.io/badge/-%E2%9C%94-000000?style=flat-square" /> | `MatrizSeguimiento.jsx` |
+| Jerarquía Línea Estratégica → Línea de Acción → Tarea | <img src="https://img.shields.io/badge/-%E2%9C%94-000000?style=flat-square" /> | `DashboardGlobal.jsx` + `MatrizSeguimiento.jsx` |
+| Asignación de responsabilidades y presupuestos | <img src="https://img.shields.io/badge/-%E2%9C%94-000000?style=flat-square" /> | `GestionTareas.jsx` + `ModuloDelegacion.jsx` |
+| Filtros dinámicos (cantón, trimestre, estado) | <img src="https://img.shields.io/badge/-%E2%9C%94-000000?style=flat-square" /> | `GestionTareas.jsx` + `MatrizSeguimiento.jsx` |
+| Reporte de oficiales con evidencia fotográfica | <img src="https://img.shields.io/badge/-%E2%9C%94-000000?style=flat-square" /> | `CargaEvidencia.jsx` (drag-and-drop) |
+| Indicadores de impacto (personas, inversión ₡) | <img src="https://img.shields.io/badge/-%E2%9C%94-000000?style=flat-square" /> | `CargaEvidencia.jsx` (KPIs) |
+| Revisión y aprobación de evidencias | <img src="https://img.shields.io/badge/-%E2%9C%94-000000?style=flat-square" /> | `RevisionReportes.jsx` |
+| Zonas Críticas (semáforo territorial) | <img src="https://img.shields.io/badge/-%E2%9C%94-000000?style=flat-square" /> | `ZonasCriticas.jsx` |
+| Distribución policial (mapa interactivo) | <img src="https://img.shields.io/badge/-%E2%9C%94-000000?style=flat-square" /> | `MapaDistribucion.jsx` (SVG interactivo) |
+| Exportación PDF/Excel en un clic | <img src="https://img.shields.io/badge/-%E2%9C%94-000000?style=flat-square" /> | `MatrizSeguimiento.jsx` + `DashboardGlobal.jsx` |
+| Auditoría y logs de seguridad | <img src="https://img.shields.io/badge/-%E2%9C%94-000000?style=flat-square" /> | `securityService.js` → `logs_seguridad` |
+| Protocolo de cambio de clave con ventana de 15 min | <img src="https://img.shields.io/badge/-%E2%9C%94-000000?style=flat-square" /> | `securityService.js` |
+| Skeleton Loading premium | <img src="https://img.shields.io/badge/-%E2%9C%94-000000?style=flat-square" /> | `SkeletonLoader.jsx` |
+| Transiciones y micro-interacciones | <img src="https://img.shields.io/badge/-%E2%9C%94-000000?style=flat-square" /> | `PageTransition.jsx` + `CardLineaAccion.jsx` |
+| Informes trimestrales | <img src="https://img.shields.io/badge/-%E2%9C%94-000000?style=flat-square" /> | `RevisionInformesTrimestral.jsx` |
+| Estadísticas con gráficos (ECharts) | <img src="https://img.shields.io/badge/-%E2%9C%94-000000?style=flat-square" /> | `EstadisticasGlobal.jsx` + `EstadisticasInstitucion.jsx` |
+| Centro de Comunicación / Soporte | <img src="https://img.shields.io/badge/-%E2%9C%94-000000?style=flat-square" /> | `SoporteInstitucional/` + `DashboardGlobal.jsx` |
+| Calendario institucional | <img src="https://img.shields.io/badge/-%E2%9C%94-000000?style=flat-square" /> | `CalendarioAdminInst.jsx` |
 
 ---
 
