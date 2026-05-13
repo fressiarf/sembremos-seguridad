@@ -3,7 +3,10 @@ const cors = require('cors');
 
 const app = express();
 
-const adminRoutes = require('./routes/adminRoutes');
+const adminRoutes = require('./routes/admin.routes');
+const territorioRoutes = require('./routes/territorio.routes');
+const institucionRoutes = require('./routes/institucion.routes');
+
 const UserController = require('./controllers/UserController');
 const DashboardController = require('./controllers/DashboardController');
 
@@ -11,10 +14,12 @@ app.use(cors({ origin: '*' }));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-app.use('/api/admin', adminRoutes);
+app.use('/api/v1/msp/territorio', territorioRoutes);
+app.use('/api/v1/msp/instituciones', institucionRoutes);
+app.use('/api/v1/admin', adminRoutes);
+
 app.get('/usuarios', UserController.getAllUsers);
 
-// Rutas para el Dashboard Nacional (MSP)
 app.get('/lineasAccion', DashboardController.getGlobalStats);
 app.get('/tareas', DashboardController.getTareas);
 app.get('/zonas', DashboardController.getZonas);
