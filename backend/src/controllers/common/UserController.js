@@ -1,10 +1,9 @@
-const UsuarioLocal = require('../models/muni/UsuarioLocal');
-const UsuarioFP = require('../models/msp/UsuarioFP');
+const UsuarioLocal = require('../../models/muni/UsuarioLocal');
+const UsuarioFP = require('../../models/msp/UsuarioFP');
 
 class UserController {
   async getAllUsers(req, res) {
     try {
-      // Obtenemos los usuarios sin el include para evitar errores de asociación
       const muniUsers = await UsuarioLocal.findAll();
       const mspUsers = await UsuarioFP.findAll();
 
@@ -13,7 +12,7 @@ class UserController {
         usuario: u.email,
         password: u.password_hash,
         nombre: u.nombre,
-        rol: 'municipalidad', // Coincide con ROLES.SUB_ADMIN
+        rol: 'municipalidad',
         institucion: 'Municipalidad',
         tipo: 'MUNI'
       }));
@@ -23,7 +22,7 @@ class UserController {
         usuario: u.email,
         password: u.password_hash,
         nombre: u.nombre,
-        rol: 'admin', // Coincide con ROLES.SUPER_ADMIN
+        rol: 'admin',
         institucion: 'Ministerio de Seguridad Pública',
         tipo: 'MSP'
       }));

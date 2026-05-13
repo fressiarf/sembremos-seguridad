@@ -1,9 +1,7 @@
 const express = require('express');
 const router = express.Router();
-const SyncController = require('../controllers/SyncController');
+const SyncController = require('../../controllers/common/SyncController');
 
-// Ruta para disparar la sincronización manualmente
-// POST /api/admin/sync
 router.post('/sync', SyncController.triggerSync);
 router.post('/lineas', SyncController.createLinea);
 
