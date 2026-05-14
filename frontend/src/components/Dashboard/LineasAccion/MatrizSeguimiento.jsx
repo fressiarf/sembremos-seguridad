@@ -128,7 +128,7 @@ const MatrizSeguimiento = () => {
         backgroundPosition: 'center'
       }}
     >
-      <div className="matriz-container-custom" style={{ marginTop: '0' }}>
+      <div className="matriz-container-custom" style={{ marginTop: '3rem' }}>
         <div className="matriz-toolbar-v4">
           <div className="toolbar-info">
             <div className="matriz-search-wrapper" style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
@@ -138,7 +138,7 @@ const MatrizSeguimiento = () => {
                 placeholder="Filtrar por línea de acción, objetivo o línea estratégica..." 
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                style={{ background: 'rgba(255,255,255,0.1)', border: '1px solid rgba(255,255,255,0.2)', color: '#fff', padding: '8px 12px', borderRadius: '8px', fontSize: '0.85rem', width: '350px' }}
+                style={{ background: 'rgba(255,255,255,0.1)', border: '1px solid rgba(255,255,255,0.2)', color: '#fff', padding: '8px 12px', borderRadius: '8px', fontSize: '0.85rem', maxWidth: '400px', width: '100%' }}
               />
             </div>
           </div>

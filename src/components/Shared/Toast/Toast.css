@@ -1,0 +1,116 @@
+.toast-container {
+  position: fixed;
+  top: 2rem;
+  right: 2rem;
+  z-index: 10000;
+  pointer-events: none;
+  animation: slideIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+}
+
+.toast-exit {
+  animation: slideOut 0.3s ease forwards;
+}
+
+.toast-card {
+  pointer-events: auto;
+  min-width: 320px;
+  max-width: 450px;
+  background: #ffffff;
+  padding: 1rem 1.25rem;
+  border-radius: 16px;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.12);
+  border: 1px solid var(--inst-border);
+  position: relative;
+  overflow: hidden;
+}
+
+.toast-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.toast-card--success { border-left: 5px solid #22c55e; }
+.toast-card--success .toast-icon { background: rgba(34, 197, 94, 0.1); color: #22c55e; }
+
+.toast-card--error { border-left: 5px solid #ef4444; }
+.toast-card--error .toast-icon { background: rgba(239, 68, 68, 0.1); color: #ef4444; }
+
+.toast-card--info { border-left: 5px solid #3b82f6; }
+.toast-card--info .toast-icon { background: rgba(59, 130, 246, 0.1); color: #3b82f6; }
+
+.toast-content {
+  flex: 1;
+}
+
+.toast-message {
+  margin: 0;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--inst-text-dark);
+  line-height: 1.4;
+}
+
+.toast-close {
+  background: transparent;
+  border: none;
+  color: var(--inst-text-muted);
+  cursor: pointer;
+  padding: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px;
+  transition: all 0.2s;
+}
+
+.toast-close:hover {
+  background: var(--inst-light-bg);
+  color: var(--inst-text-dark);
+}
+
+.toast-progress {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  height: 3px;
+  background: rgba(0, 0, 0, 0.05);
+  width: 100%;
+}
+
+.toast-card::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  height: 3px;
+  background: currentColor;
+  width: 100%;
+  animation: progress 4s linear forwards;
+}
+
+.toast-card--success::after { color: #22c55e; }
+.toast-card--error::after { color: #ef4444; }
+.toast-card--info::after { color: #3b82f6; }
+
+@keyframes slideIn {
+  from { transform: translateX(120%) scale(0.9); opacity: 0; }
+  to { transform: translateX(0) scale(1); opacity: 1; }
+}
+
+@keyframes slideOut {
+  from { transform: translateX(0) scale(1); opacity: 1; }
+  to { transform: translateX(120%) scale(0.9); opacity: 0; }
+}
+
+@keyframes progress {
+  from { width: 100%; }
+  to { width: 0%; }
+}

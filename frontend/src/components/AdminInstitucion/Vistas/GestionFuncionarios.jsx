@@ -134,44 +134,55 @@ const GestionFuncionarios = () => {
             </div>
             <form onSubmit={handleCreateFuncionario} className="user-modal__form">
               <div className="form-grid">
+                
                 <div className="form-group">
-                  <label>Nombre Completo</label>
+                  <label>Nombre Completo *</label>
                   <div className="input-with-icon">
                     <UserIcon size={16} />
                     <input
                       type="text"
                       placeholder="Ej: María Solano"
                       value={newUser.nombre}
-                      onChange={e => setNewUser({ ...newUser, nombre: e.target.value })}
+                      onChange={e => {
+                        const val = e.target.value.replace(/[^a-zA-ZáéíóúÁÉÍÓÚñÑ ]/g, '');
+                        setNewUser({ ...newUser, nombre: val });
+                      }}
                     />
                   </div>
                 </div>
+
                 <div className="form-group">
-                  <label>Número de Cédula</label>
+                  <label>Número de Cédula *</label>
                   <div className="input-with-icon">
                     <Fingerprint size={16} />
                     <input
                       type="text"
                       placeholder="Ej: 102340567"
+                      maxLength={12}
                       value={newUser.cedula}
-                      onChange={e => setNewUser({ ...newUser, cedula: e.target.value })}
+                      onChange={e => {
+                        const val = e.target.value.replace(/\D/g, '');
+                        setNewUser({ ...newUser, cedula: val });
+                      }}
                     />
                   </div>
                 </div>
+
                 <div className="form-group">
-                  <label>Correo Electrónico</label>
+                  <label>Correo Electrónico *</label>
                   <div className="input-with-icon">
                     <Mail size={16} />
                     <input
                       type="email"
                       placeholder="usuario@sembremos.cr"
                       value={newUser.usuario}
-                      onChange={e => setNewUser({ ...newUser, usuario: e.target.value })}
+                      onChange={e => setNewUser({ ...newUser, usuario: e.target.value.toLowerCase().trim() })}
                     />
                   </div>
                 </div>
+
                 <div className="form-group">
-                  <label>Contraseña Temporal</label>
+                  <label>Contraseña Temporal *</label>
                   <div className="input-with-icon">
                     <Key size={16} />
                     <input
@@ -182,9 +193,19 @@ const GestionFuncionarios = () => {
                     />
                   </div>
                 </div>
+
               </div>
-              <div style={{ padding: '0 1.5rem 0.5rem', fontSize: '0.8rem', color: '#64748b' }}>
-                Este funcionario será asignado automáticamente a <strong>{user?.institucion}</strong> con rol de <strong>Editor</strong>.
+              <div style={{ 
+                padding: '1.5rem', 
+                background: '#f8fafc', 
+                borderRadius: '12px', 
+                margin: '0 0 1.5rem 0',
+                border: '1px solid #e2e8f0',
+                fontSize: '0.85rem', 
+                color: '#475569',
+                lineHeight: '1.5'
+              }}>
+                Este funcionario será asignado automáticamente a <strong>{user?.institucion}</strong> con el rol de <strong>Editor (Funcionario)</strong>.
               </div>
               <div className="user-modal__footer">
                 <button type="button" className="btn-cancel-modal" onClick={() => setShowCreateModal(false)}>Cancelar</button>

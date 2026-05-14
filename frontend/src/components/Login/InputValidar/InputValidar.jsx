@@ -1,7 +1,7 @@
 import React from 'react';
 import { useLogin } from '../../../context/LoginContext';
 import './InputValidar.css';
-import { Lock, Eye, EyeOff, Mail, AlertCircle } from 'lucide-react';
+import { Lock, Eye, EyeOff, Mail, AlertCircle, User } from 'lucide-react';
 
 const InputValidar = () => {
   const { formData, setFormData, errors, setErrors } = useLogin();
@@ -13,7 +13,11 @@ const InputValidar = () => {
 
   const handleChange = (e) => {
     const { id, value } = e.target;
-    const name = id === 'EntradaUsuario' ? 'usuario' : 'password';
+    let name = '';
+    
+    if (id === 'EntradaUsuario') name = 'usuario';
+    else if (id === 'EntradaCedula') name = 'cedula';
+    else if (id === 'EntradaPassword') name = 'password';
     
     setFormData(prev => ({ ...prev, [name]: value }));
     // Limpiamos el error del campo que se está editando
@@ -26,7 +30,7 @@ const InputValidar = () => {
     <div className="SeccionEntradasValidar">
       
       {/* Alerta de Error Global (Solo para errores de seguridad/credenciales) */}
-      {(errors.usuario === 'Las credenciales son incorrectas' || errors.password === 'Las credenciales son incorrectas') && (
+      {(errors.usuario === 'Las credenciales son incorrectas' || errors.cedula === 'Las credenciales son incorrectas' || errors.password === 'Las credenciales son incorrectas') && (
         <div className="AlertaErrorGlobal animacion-entrada-error">
           <div className="ContenedorIconoError">
             <AlertCircle size={18} />
@@ -64,6 +68,35 @@ const InputValidar = () => {
         </div>
         {errors.usuario && errors.usuario !== 'Las credenciales son incorrectas' && errors.usuario !== 'campo-vacio' && (
           <span className="MensajeErrorValidacion">{errors.usuario}</span>
+        )}
+      </div>
+
+      {/* Entrada de Cédula */}
+      <div className="ContenedorInputValidar">
+        <label htmlFor="EntradaCedula" className="LabelValidacion">
+          Cédula
+        </label>
+        <div className={`CajaEntradaInteractiva ${errors.cedula ? 'CajaError' : ''}`}>
+          <span className="IconoEntrada">
+            <User size={18} />
+          </span>
+          <input 
+            type="text" 
+            id="EntradaCedula" 
+            className="InputCampoValidado" 
+            placeholder="Ej: 102340567"
+            value={formData.cedula}
+            onChange={handleChange}
+          />
+          {errors.cedula === 'campo-vacio' && (
+            <div className="BurbujaAlertaNativa">
+              <div className="IconoAdvertenciaNaranja">!</div>
+              <span className="TextoBurbujaNativa">Rellene este campo.</span>
+            </div>
+          )}
+        </div>
+        {errors.cedula && errors.cedula !== 'Las credenciales son incorrectas' && errors.cedula !== 'campo-vacio' && (
+          <span className="MensajeErrorValidacion">{errors.cedula}</span>
         )}
       </div>
 

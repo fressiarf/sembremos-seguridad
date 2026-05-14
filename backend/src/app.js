@@ -1,13 +1,18 @@
 const express = require('express');
 const cors = require('cors');
 const path = require('path');
+const cookieParser = require('cookie-parser');
 
 const app = express();
 
 // Middleware
-app.use(cors({ origin: '*' }));
+app.use(cors({ 
+  origin: 'http://localhost:5173', 
+  credentials: true 
+}));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+app.use(cookieParser());
 
 // Archivos estáticos (para evidencias)
 app.use('/uploads', express.static(path.join(__dirname, '../uploads')));
@@ -30,6 +35,7 @@ const presupuestoRoutes = require('./routes/muni/presupuesto.routes');
 const systemRoutes = require('./routes/common/system.routes');
 const notificacionRoutes = require('./routes/common/notificacion.routes');
 const aiRoutes = require('./routes/common/ai.routes');
+const authRoutes = require('./routes/common/auth.routes');
 
 // Endpoints v1
 app.use('/api/v1/msp/territorio', territorioRoutes);
@@ -46,7 +52,12 @@ app.use('/api/v1/muni/presupuesto', presupuestoRoutes);
 
 app.use('/api/v1/system', systemRoutes);
 app.use('/api/v1/system/notificaciones', notificacionRoutes);
+app.use('/api/v1/auth', authRoutes);
 app.use('/api/v1/ai', aiRoutes);
+
+// Rutas Legacy (Compatibilidad con json-server para el frontend existente)
+const legacyRoutes = require('./routes/legacy/jsonProxy.routes');
+app.use('/', legacyRoutes);
 
 // Health Check
 app.get('/health', (req, res) => {
