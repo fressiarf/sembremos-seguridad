@@ -45,12 +45,31 @@ const LineaAccion = sequelizeFP.define('LineaAccion', {
   underscored: true,
   hooks: {
     afterCreate: async (linea, options) => {
+      // Sincronización MSP -> MUNI
       const SyncService = require('../../services/SyncService');
       await SyncService.syncLineasAccion().catch(err => console.error('Error en sync automático:', err));
+      // Auditoría automática
+      const LogAuditoriaFP = require('./LogAuditoriaFP');
+      const { generarHooksAuditoria } = require('../../common/helpers/auditHelper');
+      const hooks = generarHooksAuditoria(LogAuditoriaFP, 'LineaAccion');
+      await hooks.afterCreate(linea, options);
     },
     afterUpdate: async (linea, options) => {
+      // Sincronización MSP -> MUNI
       const SyncService = require('../../services/SyncService');
       await SyncService.syncLineasAccion().catch(err => console.error('Error en sync automático:', err));
+      // Auditoría automática
+      const LogAuditoriaFP = require('./LogAuditoriaFP');
+      const { generarHooksAuditoria } = require('../../common/helpers/auditHelper');
+      const hooks = generarHooksAuditoria(LogAuditoriaFP, 'LineaAccion');
+      await hooks.afterUpdate(linea, options);
+    },
+    afterDestroy: async (linea, options) => {
+      // Auditoría automática (sin sync porque ya no existe)
+      const LogAuditoriaFP = require('./LogAuditoriaFP');
+      const { generarHooksAuditoria } = require('../../common/helpers/auditHelper');
+      const hooks = generarHooksAuditoria(LogAuditoriaFP, 'LineaAccion');
+      await hooks.afterDestroy(linea, options);
     },
     afterUpsert: async (linea, options) => {
       const SyncService = require('../../services/SyncService');
@@ -63,6 +82,7 @@ LineaAccion.associate = (models) => {
   LineaAccion.belongsTo(models.Canton, { foreignKey: 'canton_id', as: 'canton' });
   LineaAccion.belongsTo(models.UsuarioFP, { foreignKey: 'responsable_id', as: 'responsable' });
   LineaAccion.hasMany(models.AccionEstrategica, { foreignKey: 'linea_id', as: 'acciones' });
+  LineaAccion.hasMany(models.AlertaCumplimiento, { foreignKey: 'linea_id', as: 'alertas' });
 };
 
 module.exports = LineaAccion;

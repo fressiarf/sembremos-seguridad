@@ -11,7 +11,31 @@ const IncidenteDelictivo = sequelizeFP.define('IncidenteDelictivo', {
   descripcion: { type: DataTypes.TEXT, allowNull: true },
   coordenada_gps: { type: DataTypes.JSON, allowNull: true },
   fecha_incidente: { type: DataTypes.DATE, allowNull: false }
-}, { tableName: 'incidentes_delictivos', timestamps: true, underscored: true });
+}, {
+  tableName: 'incidentes_delictivos',
+  timestamps: true,
+  underscored: true,
+  hooks: {
+    afterCreate: async (instance, options) => {
+      const LogAuditoriaFP = require('./LogAuditoriaFP');
+      const { generarHooksAuditoria } = require('../../common/helpers/auditHelper');
+      const hooks = generarHooksAuditoria(LogAuditoriaFP, 'IncidenteDelictivo');
+      await hooks.afterCreate(instance, options);
+    },
+    afterUpdate: async (instance, options) => {
+      const LogAuditoriaFP = require('./LogAuditoriaFP');
+      const { generarHooksAuditoria } = require('../../common/helpers/auditHelper');
+      const hooks = generarHooksAuditoria(LogAuditoriaFP, 'IncidenteDelictivo');
+      await hooks.afterUpdate(instance, options);
+    },
+    afterDestroy: async (instance, options) => {
+      const LogAuditoriaFP = require('./LogAuditoriaFP');
+      const { generarHooksAuditoria } = require('../../common/helpers/auditHelper');
+      const hooks = generarHooksAuditoria(LogAuditoriaFP, 'IncidenteDelictivo');
+      await hooks.afterDestroy(instance, options);
+    }
+  }
+});
 
 IncidenteDelictivo.associate = (models) => {
   IncidenteDelictivo.belongsTo(models.ZonaRiesgo, { foreignKey: 'zona_id', as: 'zona' });

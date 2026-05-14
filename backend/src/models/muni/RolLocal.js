@@ -18,8 +18,12 @@ const RolLocal = sequelizeMUNI.define('RolLocal', {
   }
 }, {
   tableName: 'roles_local',
-  timestamps: false,
+  timestamps: true,
   underscored: true
 });
+
+RolLocal.associate = (models) => {
+  RolLocal.hasMany(models.UsuarioLocal, { foreignKey: 'rol_id', as: 'usuarios' });
+};
 
 module.exports = RolLocal;

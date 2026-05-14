@@ -63,7 +63,27 @@ const ActividadLocal = sequelizeMUNI.define('ActividadLocal', {
 }, {
   tableName: 'actividades_local',
   timestamps: true,
-  underscored: true
+  underscored: true,
+  hooks: {
+    afterCreate: async (instance, options) => {
+      const LogAuditoriaLocal = require('./LogAuditoriaLocal');
+      const { generarHooksAuditoria } = require('../../common/helpers/auditHelper');
+      const hooks = generarHooksAuditoria(LogAuditoriaLocal, 'ActividadLocal');
+      await hooks.afterCreate(instance, options);
+    },
+    afterUpdate: async (instance, options) => {
+      const LogAuditoriaLocal = require('./LogAuditoriaLocal');
+      const { generarHooksAuditoria } = require('../../common/helpers/auditHelper');
+      const hooks = generarHooksAuditoria(LogAuditoriaLocal, 'ActividadLocal');
+      await hooks.afterUpdate(instance, options);
+    },
+    afterDestroy: async (instance, options) => {
+      const LogAuditoriaLocal = require('./LogAuditoriaLocal');
+      const { generarHooksAuditoria } = require('../../common/helpers/auditHelper');
+      const hooks = generarHooksAuditoria(LogAuditoriaLocal, 'ActividadLocal');
+      await hooks.afterDestroy(instance, options);
+    }
+  }
 });
 
 ActividadLocal.associate = (models) => {
@@ -73,6 +93,8 @@ ActividadLocal.associate = (models) => {
   ActividadLocal.belongsTo(models.UsuarioLocal, { foreignKey: 'gestor_id', as: 'gestor' });
   ActividadLocal.hasMany(models.HitoActividad, { foreignKey: 'actividad_id', as: 'hitos' });
   ActividadLocal.hasMany(models.PresupuestoDetalle, { foreignKey: 'actividad_id', as: 'presupuestos' });
+  ActividadLocal.hasMany(models.AsignacionCogestor, { foreignKey: 'actividad_id', as: 'cogestores' });
+  ActividadLocal.hasMany(models.ReporteEvidencia, { foreignKey: 'actividad_id', as: 'reportes' });
 };
 
 module.exports = ActividadLocal;

@@ -1,4 +1,5 @@
 const { DataTypes } = require('sequelize');
+const bcrypt = require('bcryptjs');
 const { sequelizeFP } = require('../../config/database');
 
 const UsuarioFP = sequelizeFP.define('UsuarioFP', {
@@ -20,6 +21,12 @@ const UsuarioFP = sequelizeFP.define('UsuarioFP', {
     allowNull: false,
     unique: {
       msg: 'La cédula ya se encuentra registrada'
+    },
+    validate: {
+      is: {
+        args: /^[0-9]{9,12}$/,
+        msg: 'La cédula debe contener entre 9 y 12 dígitos numéricos'
+      }
     }
   },
   email: {
@@ -31,6 +38,17 @@ const UsuarioFP = sequelizeFP.define('UsuarioFP', {
     validate: {
       isEmail: {
         msg: 'Debe proporcionar un formato de correo electrónico válido'
+      }
+    }
+  },
+  // Campo VIRTUAL: recibe la contraseña en texto plano para validación
+  password: {
+    type: DataTypes.VIRTUAL,
+    allowNull: true,
+    validate: {
+      len: {
+        args: [8, 50],
+        msg: 'La contraseña debe tener entre 8 y 50 caracteres'
       }
     }
   },
@@ -66,12 +84,49 @@ const UsuarioFP = sequelizeFP.define('UsuarioFP', {
 }, {
   tableName: 'usuarios_fp',
   timestamps: true,
-  underscored: true
+  underscored: true,
+  hooks: {
+    beforeValidate: async (user) => {
+      if (user.password) {
+        user.password_hash = await bcrypt.hash(user.password, 10);
+      }
+    },
+    afterCreate: async (instance, options) => {
+      const LogAuditoriaFP = require('./LogAuditoriaFP');
+      const { generarHooksAuditoria } = require('../../common/helpers/auditHelper');
+      const hooks = generarHooksAuditoria(LogAuditoriaFP, 'UsuarioFP');
+      await hooks.afterCreate(instance, options);
+    },
+    afterUpdate: async (instance, options) => {
+      const LogAuditoriaFP = require('./LogAuditoriaFP');
+      const { generarHooksAuditoria } = require('../../common/helpers/auditHelper');
+      const hooks = generarHooksAuditoria(LogAuditoriaFP, 'UsuarioFP');
+      await hooks.afterUpdate(instance, options);
+    },
+    afterDestroy: async (instance, options) => {
+      const LogAuditoriaFP = require('./LogAuditoriaFP');
+      const { generarHooksAuditoria } = require('../../common/helpers/auditHelper');
+      const hooks = generarHooksAuditoria(LogAuditoriaFP, 'UsuarioFP');
+      await hooks.afterDestroy(instance, options);
+    }
+  }
 });
 
 UsuarioFP.associate = (models) => {
+  // belongsTo
   UsuarioFP.belongsTo(models.RolFP, { foreignKey: 'rol_id', as: 'rol' });
   UsuarioFP.belongsTo(models.InstitucionMaestra, { foreignKey: 'institucion_id', as: 'institucion' });
+  // hasMany (relaciones inversas)
+  UsuarioFP.hasMany(models.IncidenteDelictivo, { foreignKey: 'registrado_por', as: 'incidentesRegistrados' });
+  UsuarioFP.hasMany(models.InteligenciaTactica, { foreignKey: 'analista_id', as: 'analisis' });
+  UsuarioFP.hasMany(models.LineaAccion, { foreignKey: 'responsable_id', as: 'lineasResponsable' });
+  UsuarioFP.hasMany(models.SesionActivaFP, { foreignKey: 'usuario_id', as: 'sesiones' });
+  UsuarioFP.hasMany(models.LogAuditoriaFP, { foreignKey: 'usuario_id', as: 'logs' });
+  UsuarioFP.hasMany(models.NotificacionFP, { foreignKey: 'usuario_id', as: 'notificaciones' });
+  UsuarioFP.hasMany(models.CambioPassword, { foreignKey: 'usuario_id', as: 'cambiosPassword' });
+  UsuarioFP.hasMany(models.AprobacionReporte, { foreignKey: 'revisor_id', as: 'aprobaciones' });
+  UsuarioFP.hasMany(models.DocumentoNacional, { foreignKey: 'publicado_por', as: 'documentos' });
+  UsuarioFP.hasMany(models.HistorialIA, { foreignKey: 'usuario_id', as: 'consultasIA' });
 };
 
 module.exports = UsuarioFP;

@@ -22,8 +22,12 @@ const CatTurno = sequelizeFP.define('CatTurno', {
   }
 }, {
   tableName: 'cat_turno',
-  timestamps: false,
+  timestamps: true,
   underscored: true
 });
+
+CatTurno.associate = (models) => {
+  CatTurno.hasMany(models.DistribucionPolicial, { foreignKey: 'turno_id', as: 'distribuciones' });
+};
 
 module.exports = CatTurno;

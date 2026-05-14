@@ -9,7 +9,31 @@ const AlertaCumplimiento = sequelizeFP.define('AlertaCumplimiento', {
   prioridad_id: { type: DataTypes.INTEGER, allowNull: false, references: { model: 'cat_prioridad', key: 'id' } },
   mensaje: { type: DataTypes.TEXT, allowNull: false },
   resuelta: { type: DataTypes.BOOLEAN, allowNull: false, defaultValue: false }
-}, { tableName: 'alertas_cumplimiento', timestamps: true, underscored: true });
+}, {
+  tableName: 'alertas_cumplimiento',
+  timestamps: true,
+  underscored: true,
+  hooks: {
+    afterCreate: async (instance, options) => {
+      const LogAuditoriaFP = require('./LogAuditoriaFP');
+      const { generarHooksAuditoria } = require('../../common/helpers/auditHelper');
+      const hooks = generarHooksAuditoria(LogAuditoriaFP, 'AlertaCumplimiento');
+      await hooks.afterCreate(instance, options);
+    },
+    afterUpdate: async (instance, options) => {
+      const LogAuditoriaFP = require('./LogAuditoriaFP');
+      const { generarHooksAuditoria } = require('../../common/helpers/auditHelper');
+      const hooks = generarHooksAuditoria(LogAuditoriaFP, 'AlertaCumplimiento');
+      await hooks.afterUpdate(instance, options);
+    },
+    afterDestroy: async (instance, options) => {
+      const LogAuditoriaFP = require('./LogAuditoriaFP');
+      const { generarHooksAuditoria } = require('../../common/helpers/auditHelper');
+      const hooks = generarHooksAuditoria(LogAuditoriaFP, 'AlertaCumplimiento');
+      await hooks.afterDestroy(instance, options);
+    }
+  }
+});
 
 AlertaCumplimiento.associate = (models) => {
   AlertaCumplimiento.belongsTo(models.LineaAccion, { foreignKey: 'linea_id', as: 'linea' });

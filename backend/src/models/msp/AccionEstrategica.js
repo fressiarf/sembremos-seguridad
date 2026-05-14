@@ -28,7 +28,27 @@ const AccionEstrategica = sequelizeFP.define('AccionEstrategica', {
 }, {
   tableName: 'acciones_estrategicas',
   timestamps: true,
-  underscored: true
+  underscored: true,
+  hooks: {
+    afterCreate: async (instance, options) => {
+      const LogAuditoriaFP = require('./LogAuditoriaFP');
+      const { generarHooksAuditoria } = require('../../common/helpers/auditHelper');
+      const hooks = generarHooksAuditoria(LogAuditoriaFP, 'AccionEstrategica');
+      await hooks.afterCreate(instance, options);
+    },
+    afterUpdate: async (instance, options) => {
+      const LogAuditoriaFP = require('./LogAuditoriaFP');
+      const { generarHooksAuditoria } = require('../../common/helpers/auditHelper');
+      const hooks = generarHooksAuditoria(LogAuditoriaFP, 'AccionEstrategica');
+      await hooks.afterUpdate(instance, options);
+    },
+    afterDestroy: async (instance, options) => {
+      const LogAuditoriaFP = require('./LogAuditoriaFP');
+      const { generarHooksAuditoria } = require('../../common/helpers/auditHelper');
+      const hooks = generarHooksAuditoria(LogAuditoriaFP, 'AccionEstrategica');
+      await hooks.afterDestroy(instance, options);
+    }
+  }
 });
 
 AccionEstrategica.associate = (models) => {

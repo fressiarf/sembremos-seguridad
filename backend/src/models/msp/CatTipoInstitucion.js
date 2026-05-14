@@ -18,8 +18,12 @@ const CatTipoInstitucion = sequelizeFP.define('CatTipoInstitucion', {
   }
 }, {
   tableName: 'cat_tipo_institucion',
-  timestamps: false,
+  timestamps: true,
   underscored: true
 });
+
+CatTipoInstitucion.associate = (models) => {
+  CatTipoInstitucion.hasMany(models.InstitucionMaestra, { foreignKey: 'tipo_id', as: 'instituciones' });
+};
 
 module.exports = CatTipoInstitucion;

@@ -29,7 +29,27 @@ const HitoActividad = sequelizeMUNI.define('HitoActividad', {
 }, {
   tableName: 'hitos_actividad',
   timestamps: true,
-  underscored: true
+  underscored: true,
+  hooks: {
+    afterCreate: async (instance, options) => {
+      const LogAuditoriaLocal = require('./LogAuditoriaLocal');
+      const { generarHooksAuditoria } = require('../../common/helpers/auditHelper');
+      const hooks = generarHooksAuditoria(LogAuditoriaLocal, 'HitoActividad');
+      await hooks.afterCreate(instance, options);
+    },
+    afterUpdate: async (instance, options) => {
+      const LogAuditoriaLocal = require('./LogAuditoriaLocal');
+      const { generarHooksAuditoria } = require('../../common/helpers/auditHelper');
+      const hooks = generarHooksAuditoria(LogAuditoriaLocal, 'HitoActividad');
+      await hooks.afterUpdate(instance, options);
+    },
+    afterDestroy: async (instance, options) => {
+      const LogAuditoriaLocal = require('./LogAuditoriaLocal');
+      const { generarHooksAuditoria } = require('../../common/helpers/auditHelper');
+      const hooks = generarHooksAuditoria(LogAuditoriaLocal, 'HitoActividad');
+      await hooks.afterDestroy(instance, options);
+    }
+  }
 });
 
 HitoActividad.associate = (models) => {

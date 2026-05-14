@@ -14,8 +14,12 @@ const CatTipoComentario = sequelizeMUNI.define('CatTipoComentario', {
   }
 }, {
   tableName: 'cat_tipo_comentario',
-  timestamps: false,
+  timestamps: true,
   underscored: true
 });
+
+CatTipoComentario.associate = (models) => {
+  CatTipoComentario.hasMany(models.ComentarioRevision, { foreignKey: 'tipo_id', as: 'comentarios' });
+};
 
 module.exports = CatTipoComentario;

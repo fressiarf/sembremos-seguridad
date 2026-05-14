@@ -3,6 +3,7 @@ const router = express.Router();
 const UserController = require('../../controllers/common/UserController');
 const DashboardController = require('../../controllers/common/DashboardController');
 const AuthController = require('../../controllers/common/AuthController');
+const syncController = require('../../controllers/common/syncController');
 const authMiddleware = require('../../common/middlewares/authMiddleware');
 const { authorizeRoles, ROLES } = require('../../common/middlewares/roleMiddleware');
 
@@ -31,5 +32,12 @@ router.post('/logout', AuthController.logout);
 // Rutas de prueba para AuthHelper (Restringidas a ADMIN_MSP para mayor seguridad)
 router.post('/auth/test-hash', authMiddleware, authorizeRoles([ROLES.ADMIN_MSP]), AuthController.testHash);
 router.post('/auth/test-compare', authMiddleware, authorizeRoles([ROLES.ADMIN_MSP]), AuthController.testCompare);
+
+// Rutas de Sincronización MSP ↔ MUNI (Solo ADMIN_MSP)
+router.post('/sync/lineas', authMiddleware, authorizeRoles([ROLES.ADMIN_MSP]), syncController.syncLineas);
+router.post('/sync/instituciones', authMiddleware, authorizeRoles([ROLES.ADMIN_MSP]), syncController.syncInstituciones);
+router.post('/sync/kpis', authMiddleware, authorizeRoles([ROLES.ADMIN_MSP]), syncController.syncKpis);
+router.post('/sync/all', authMiddleware, authorizeRoles([ROLES.ADMIN_MSP]), syncController.syncAll);
+router.post('/sync/lineas/create', authMiddleware, authorizeRoles([ROLES.ADMIN_MSP]), syncController.createLinea);
 
 module.exports = router;

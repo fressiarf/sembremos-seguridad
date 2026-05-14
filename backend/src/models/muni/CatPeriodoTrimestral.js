@@ -22,8 +22,12 @@ const CatPeriodoTrimestral = sequelizeMUNI.define('CatPeriodoTrimestral', {
   }
 }, {
   tableName: 'cat_periodo_trimestral',
-  timestamps: false,
+  timestamps: true,
   underscored: true
 });
+
+CatPeriodoTrimestral.associate = (models) => {
+  CatPeriodoTrimestral.hasMany(models.InformeD71, { foreignKey: 'periodo_id', as: 'informes' });
+};
 
 module.exports = CatPeriodoTrimestral;

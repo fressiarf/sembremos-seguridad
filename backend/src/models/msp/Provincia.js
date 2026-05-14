@@ -18,4 +18,8 @@ const Provincia = sequelizeFP.define('Provincia', {
   underscored: true
 });
 
+Provincia.associate = (models) => {
+  Provincia.hasMany(models.Canton, { foreignKey: 'provincia_id', as: 'cantones' });
+};
+
 module.exports = Provincia;

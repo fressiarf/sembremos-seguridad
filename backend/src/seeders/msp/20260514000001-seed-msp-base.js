@@ -1,9 +1,10 @@
 'use strict';
-const bcrypt = require('bcryptjs');
+const UsuarioFP = require('../../models/msp/UsuarioFP');
+const RolFP = require('../../models/msp/RolFP');
 
 module.exports = {
   async up(queryInterface, Sequelize) {
-    // 1. Insertar Roles MSP
+    // 1. Insertar Roles MSP (Usamos bulkInsert para IDs fijos)
     await queryInterface.bulkInsert('roles_fp', [
       { id: 1, nombre: 'SuperAdmin', permisos: JSON.stringify(['all']) },
       { id: 2, nombre: 'Admin Institucional', permisos: JSON.stringify(['read', 'write']) },
@@ -11,21 +12,18 @@ module.exports = {
       { id: 4, nombre: 'Operativo', permisos: JSON.stringify(['read', 'report']) }
     ], {});
 
-    // 2. Insertar Usuario SuperAdmin inicial
-    const hashedPassword = await bcrypt.hash('Sembremos.2026*', 10);
-    
-    await queryInterface.bulkInsert('usuarios_fp', [{
+    // 2. Insertar Usuario SuperAdmin inicial usando el Modelo
+    // Esto asegura que pase por las validaciones de Cédula y Longitud de Password
+    await UsuarioFP.create({
       id: '00000000-0000-0000-0000-000000000001',
       nombre: 'Super',
       apellido: 'Admin Sistema',
-      cedula: '100000000',
-      email: 'super@sembremosseguridad.go.cr',
-      password_hash: hashedPassword,
+      cedula: '100000001', // Cédula válida de 9 dígitos
+      email: 'super@sembremoseguridad.go.cr',
+      password: 'Sembremos.2026*', // Texto plano -> El hook del modelo lo hashea
       rol_id: 1,
-      activo: true,
-      created_at: new Date(),
-      updated_at: new Date()
-    }], {});
+      activo: true
+    });
   },
 
   async down(queryInterface, Sequelize) {

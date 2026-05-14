@@ -3,7 +3,7 @@
 //  Gestiona CRUD, workflow de aprobación y notificaciones
 // ─────────────────────────────────────────────────────────
 
-const API = 'http://localhost:5000';
+import { apiFetch } from '../utils/apiFetch';
 
 export const ESTADOS_INFORME = {
   BORRADOR: 'BORRADOR',
@@ -36,7 +36,7 @@ export const informesService = {
 
   // Obtener todos los informes
   async getAll() {
-    const res = await fetch(`${API}/informes_trimestrales`);
+    const res = await apiFetch('/informes_trimestrales');
     if (!res.ok) throw new Error('Error al obtener informes');
     return res.json();
   },
@@ -67,7 +67,7 @@ export const informesService = {
 
   // Crear un nuevo informe
   async crear(informe) {
-    const res = await fetch(`${API}/informes_trimestrales`, {
+    const res = await apiFetch('/informes_trimestrales', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(informe),
@@ -78,7 +78,7 @@ export const informesService = {
 
   // Actualizar un informe existente
   async actualizar(id, data) {
-    const res = await fetch(`${API}/informes_trimestrales/${id}`, {
+    const res = await apiFetch(`/informes_trimestrales/${id}`, {
       method: 'PATCH',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(data),
@@ -182,14 +182,14 @@ export const informesService = {
   // ── HISTORIAL ──
 
   async getHistorial(informeId) {
-    const res = await fetch(`${API}/historial_informes?informeId=${informeId}&_sort=fecha&_order=desc`);
+    const res = await apiFetch(`/historial_informes?informeId=${informeId}&_sort=fecha&_order=desc`);
     if (!res.ok) return [];
     return res.json();
   },
 
   async agregarHistorial(informeId, entrada) {
     const id = `HI-${Date.now().toString(36)}`;
-    await fetch(`${API}/historial_informes`, {
+    await apiFetch('/historial_informes', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ id, informeId, ...entrada }),
@@ -200,7 +200,7 @@ export const informesService = {
 
   async crearNotificacion(notif) {
     const id = `NIT-${Date.now().toString(36)}`;
-    await fetch(`${API}/notificaciones_informes`, {
+    await apiFetch('/notificaciones_informes', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -213,7 +213,7 @@ export const informesService = {
 
   async getNotificaciones(institucion) {
     try {
-      const res = await fetch(`${API}/notificaciones_informes`);
+      const res = await apiFetch('/notificaciones_informes');
       if (!res.ok) return [];
       const all = await res.json();
       return all.filter(n => n.institucion === institucion && !n.leida);
@@ -223,7 +223,7 @@ export const informesService = {
   },
 
   async marcarNotificacionLeida(id) {
-    await fetch(`${API}/notificaciones_informes/${id}`, {
+    await apiFetch(`/notificaciones_informes/${id}`, {
       method: 'PATCH',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ leida: true }),

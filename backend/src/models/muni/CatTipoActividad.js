@@ -14,8 +14,12 @@ const CatTipoActividad = sequelizeMUNI.define('CatTipoActividad', {
   }
 }, {
   tableName: 'cat_tipo_actividad',
-  timestamps: false,
+  timestamps: true,
   underscored: true
 });
+
+CatTipoActividad.associate = (models) => {
+  CatTipoActividad.hasMany(models.ActividadLocal, { foreignKey: 'tipo_id', as: 'actividades' });
+};
 
 module.exports = CatTipoActividad;

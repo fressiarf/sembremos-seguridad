@@ -6,6 +6,8 @@
  * Para conectar a backend real, reemplazar las funciones internas por fetch().
  */
 
+import { apiFetch } from '../utils/apiFetch';
+
 // ── Responsables (funcionarios municipales de Puntarenas) ──
 const RESPONSABLES = [
   { id: 'r1', nombre: 'Andrea Villalobos Mora', cargo: 'Coordinadora de Programas Sociales', institucion: 'Municipalidad de Puntarenas' },
@@ -375,7 +377,7 @@ export const adminInstitucionService = {
 
   getResponsables: async (institucionNombre) => {
     try {
-      const res = await fetch('http://localhost:5000/usuarios');
+      const res = await apiFetch('/usuarios');
       const usuarios = await res.json();
       
       // Si no hay filtro, devolvemos los mock por compatibilidad (aunque lo ideal es filtrar)
@@ -394,7 +396,7 @@ export const adminInstitucionService = {
 
   getLineasAccion: async () => {
     try {
-      const response = await fetch('http://localhost:5000/lineasAccion');
+      const response = await apiFetch('/lineasAccion');
       if (!response.ok) throw new Error('Error fetching líneas');
       return await response.json();
     } catch (error) {
@@ -406,8 +408,8 @@ export const adminInstitucionService = {
   getDashboardData: async (institucionId) => {
     try {
       const [tareasReq, reportesReq] = await Promise.all([
-        fetch('http://localhost:5000/tareas'),
-        fetch('http://localhost:5000/reportes')
+        apiFetch('/tareas'),
+        apiFetch('/reportes')
       ]);
       const allTareas = await tareasReq.json();
       const reportes = await reportesReq.json();
@@ -493,7 +495,7 @@ export const adminInstitucionService = {
 
   getTareas: async (filtros = {}) => {
     try {
-      const res = await fetch('http://localhost:5000/tareas');
+      const res = await apiFetch('/tareas');
       let tareas = await res.json();
       if (filtros.institucionId) {
         tareas = tareas.filter(t => {
@@ -527,7 +529,7 @@ export const adminInstitucionService = {
 
   asignarResponsable: async (tareaId, responsableIds) => {
     try {
-      const response = await fetch(`http://localhost:5000/tareas/${tareaId}`, {
+      const response = await apiFetch(`/tareas/${tareaId}`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ responsableIds })
@@ -541,9 +543,9 @@ export const adminInstitucionService = {
   getReportesPendientes: async (institucionId) => {
     try {
       const [resReq, tareasReq, usersReq] = await Promise.all([
-        fetch('http://localhost:5000/reportes'),
-        fetch('http://localhost:5000/tareas'),
-        fetch('http://localhost:5000/usuarios')
+        apiFetch('/reportes'),
+        apiFetch('/tareas'),
+        apiFetch('/usuarios')
       ]);
       const allReportes = await resReq.json();
       const reportes = allReportes.filter(r => r.estado === 'pendiente');
@@ -568,12 +570,12 @@ export const adminInstitucionService = {
   aprobarReporte: async (reporteId) => {
     try {
       // 1. Obtener el reporte para saber a qué tarea pertenece
-      const resRep = await fetch(`http://localhost:5000/reportes/${reporteId}`);
+      const resRep = await apiFetch(`/reportes/${reporteId}`);
       if (!resRep.ok) return { success: false };
       const reporte = await resRep.json();
 
       // 2. Aprobar el reporte
-      const response = await fetch(`http://localhost:5000/reportes/${reporteId}`, {
+      const response = await apiFetch(`/reportes/${reporteId}`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ estado: 'aprobado', observacionRechazo: null })
@@ -584,8 +586,8 @@ export const adminInstitucionService = {
       if (reporte.tareaId) {
         // Obtenemos todos los reportes aprobados para esta tarea para calcular el progreso total
         const [resRep, resTarea] = await Promise.all([
-          fetch(`http://localhost:5000/reportes?tareaId=${reporte.tareaId}&estado=aprobado`),
-          fetch(`http://localhost:5000/tareas/${reporte.tareaId}`)
+          apiFetch(`/reportes?tareaId=${reporte.tareaId}&estado=aprobado`),
+          apiFetch(`/tareas/${reporte.tareaId}`)
         ]);
         
         const reportesAprobados = resRep.ok ? await resRep.json() : [];
@@ -606,7 +608,7 @@ export const adminInstitucionService = {
           fechaCompletada: reachedMeta ? new Date().toISOString().split('T')[0] : null
         };
 
-        await fetch(`http://localhost:5000/tareas/${reporte.tareaId}`, {
+        await apiFetch(`/tareas/${reporte.tareaId}`, {
           method: 'PATCH',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(updatePayload)
@@ -619,7 +621,7 @@ export const adminInstitucionService = {
 
   editarReporte: async (reporteId, nuevosDatos) => {
     try {
-      const currentRes = await fetch(`http://localhost:5000/reportes/${reporteId}`);
+      const currentRes = await apiFetch(`/reportes/${reporteId}`);
       if (!currentRes.ok) return { success: false };
       const reporte = await currentRes.json();
       
@@ -630,7 +632,7 @@ export const adminInstitucionService = {
       };
       if (nuevosDatos.asistentes) payload.asistentes = { ...reporte.asistentes, ...nuevosDatos.asistentes };
       
-      const response = await fetch(`http://localhost:5000/reportes/${reporteId}`, {
+      const response = await apiFetch(`/reportes/${reporteId}`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload)
@@ -641,7 +643,7 @@ export const adminInstitucionService = {
 
   rechazarReporte: async (reporteId, observacion) => {
     try {
-      const response = await fetch(`http://localhost:5000/reportes/${reporteId}`, {
+      const response = await apiFetch(`/reportes/${reporteId}`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ estado: 'rechazado', observacionRechazo: observacion })
@@ -653,10 +655,10 @@ export const adminInstitucionService = {
   getHistorial: async (filtros = {}) => {
     try {
       const [resReq, tareasReq, usersReq, lineasReq] = await Promise.all([
-        fetch('http://localhost:5000/reportes'),
-        fetch('http://localhost:5000/tareas'),
-        fetch('http://localhost:5000/usuarios'),
-        fetch('http://localhost:5000/lineasAccion')
+        apiFetch('/reportes'),
+        apiFetch('/tareas'),
+        apiFetch('/usuarios'),
+        apiFetch('/lineasAccion')
       ]);
       const reportes = await resReq.json();
       const tareas = await tareasReq.json();
@@ -732,7 +734,7 @@ export const adminInstitucionService = {
 
   getCalendarioTareas: async (institucionId) => {
     try {
-      const res = await fetch('http://localhost:5000/tareas');
+      const res = await apiFetch('/tareas');
       const allTareas = await res.json();
       const tareas = allTareas.filter(t => {
         if (t.institucionesIds && Array.isArray(t.institucionesIds)) {

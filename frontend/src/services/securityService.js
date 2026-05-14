@@ -1,4 +1,4 @@
-const BASE_URL = 'http://localhost:5000';
+import { apiFetch } from '../utils/apiFetch';
 
 export const securityService = {
   // 1. Editor solicita el cambio
@@ -13,14 +13,14 @@ export const securityService = {
         expiresAt: null
       };
 
-      const res = await fetch(`${BASE_URL}/password_approvals`, {
+      const res = await apiFetch('/password_approvals', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(requestPayload)
       });
 
       // Notificar al Admin Institucional
-      await fetch(`${BASE_URL}/notificaciones_admin`, {
+      await apiFetch('/notificaciones_admin', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -52,7 +52,7 @@ export const securityService = {
         approvedAt: new Date().toISOString()
       };
 
-      const res = await fetch(`${BASE_URL}/password_approvals/${requestId}`, {
+      const res = await apiFetch(`/password_approvals/${requestId}`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(updatePayload)
@@ -60,7 +60,7 @@ export const securityService = {
       const updatedReq = await res.json();
 
       // Notificar al Editor
-      await fetch(`${BASE_URL}/notificaciones_editor`, {
+      await apiFetch('/notificaciones_editor', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -83,7 +83,7 @@ export const securityService = {
   // 3. Verificar si la ventana sigue abierta (Middleware Logic Simulator)
   checkApprovalWindow: async (userId) => {
     try {
-      const res = await fetch(`${BASE_URL}/password_approvals?userId=${userId}&status=VENTANA_ABIERTA`);
+      const res = await apiFetch(`/password_approvals?userId=${userId}&status=VENTANA_ABIERTA`);
       const results = await res.json();
       
       if (results.length === 0) return { active: false, reason: 'No hay ventana abierta' };
@@ -94,7 +94,7 @@ export const securityService = {
 
       if (now > expiration) {
         // Bloqueo por expiración
-        await fetch(`${BASE_URL}/password_approvals/${currentReq.id}`, {
+        await apiFetch(`/password_approvals/${currentReq.id}`, {
           method: 'PATCH',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ status: 'EXPIRADO_BLOQUEADO' })
@@ -112,14 +112,14 @@ export const securityService = {
   finalizePasswordChange: async (userId, requestId, newPassword) => {
     try {
       // Cambio de contraseña
-      await fetch(`${BASE_URL}/usuarios/${userId}`, {
+      await apiFetch(`/usuarios/${userId}`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ password: newPassword })
       });
 
       // Cerrar ventana
-      await fetch(`${BASE_URL}/password_approvals/${requestId}`, {
+      await apiFetch(`/password_approvals/${requestId}`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ 
@@ -129,7 +129,7 @@ export const securityService = {
       });
 
       // Registrar en el LOG DE AUDITORÍA
-      await fetch(`${BASE_URL}/logs_seguridad`, {
+      await apiFetch('/logs_seguridad', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

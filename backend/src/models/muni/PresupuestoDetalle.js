@@ -39,7 +39,27 @@ const PresupuestoDetalle = sequelizeMUNI.define('PresupuestoDetalle', {
 }, {
   tableName: 'presupuesto_detalle',
   timestamps: true,
-  underscored: true
+  underscored: true,
+  hooks: {
+    afterCreate: async (instance, options) => {
+      const LogAuditoriaLocal = require('./LogAuditoriaLocal');
+      const { generarHooksAuditoria } = require('../../common/helpers/auditHelper');
+      const hooks = generarHooksAuditoria(LogAuditoriaLocal, 'PresupuestoDetalle');
+      await hooks.afterCreate(instance, options);
+    },
+    afterUpdate: async (instance, options) => {
+      const LogAuditoriaLocal = require('./LogAuditoriaLocal');
+      const { generarHooksAuditoria } = require('../../common/helpers/auditHelper');
+      const hooks = generarHooksAuditoria(LogAuditoriaLocal, 'PresupuestoDetalle');
+      await hooks.afterUpdate(instance, options);
+    },
+    afterDestroy: async (instance, options) => {
+      const LogAuditoriaLocal = require('./LogAuditoriaLocal');
+      const { generarHooksAuditoria } = require('../../common/helpers/auditHelper');
+      const hooks = generarHooksAuditoria(LogAuditoriaLocal, 'PresupuestoDetalle');
+      await hooks.afterDestroy(instance, options);
+    }
+  }
 });
 
 PresupuestoDetalle.associate = (models) => {

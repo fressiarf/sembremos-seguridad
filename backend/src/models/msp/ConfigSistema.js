@@ -22,7 +22,7 @@ const ConfigSistema = sequelizeFP.define('ConfigSistema', {
   }
 }, {
   tableName: 'config_sistema',
-  timestamps: false,
+  timestamps: true,
   underscored: true
 });
 
