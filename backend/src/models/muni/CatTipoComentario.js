@@ -14,7 +14,8 @@ const CatTipoComentario = sequelizeMUNI.define('CatTipoComentario', {
   }
 }, {
   tableName: 'cat_tipo_comentario',
-  timestamps: false
+  timestamps: false,
+  underscored: true
 });
 
 module.exports = CatTipoComentario;

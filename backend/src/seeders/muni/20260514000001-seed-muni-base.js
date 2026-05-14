@@ -16,7 +16,7 @@ module.exports = {
     await queryInterface.bulkInsert('usuarios_local', [{
       id: '00000000-0000-0000-0000-000000000002',
       nombre: 'Admin',
-      apellido: 'Municipal',
+      apellido: 'Municipal Puntarenas',
       cedula: '200000000',
       email: 'admin@muni.cr',
       password_hash: hashedPassword,

@@ -18,7 +18,8 @@ const CatTipoDelito = sequelizeFP.define('CatTipoDelito', {
   }
 }, {
   tableName: 'cat_tipo_delito',
-  timestamps: false
+  timestamps: false,
+  underscored: true
 });
 
 module.exports = CatTipoDelito;

@@ -14,7 +14,8 @@ const CatEstadoActividad = sequelizeMUNI.define('CatEstadoActividad', {
   }
 }, {
   tableName: 'cat_estado_actividad',
-  timestamps: false
+  timestamps: false,
+  underscored: true
 });
 
 module.exports = CatEstadoActividad;

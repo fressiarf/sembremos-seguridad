@@ -17,7 +17,7 @@ module.exports = {
     await queryInterface.bulkInsert('usuarios_fp', [{
       id: '00000000-0000-0000-0000-000000000001',
       nombre: 'Super',
-      apellido: 'Admin',
+      apellido: 'Admin Sistema',
       cedula: '100000000',
       email: 'super@sembremosseguridad.go.cr',
       password_hash: hashedPassword,

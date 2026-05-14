@@ -22,7 +22,8 @@ const CatPeriodoTrimestral = sequelizeMUNI.define('CatPeriodoTrimestral', {
   }
 }, {
   tableName: 'cat_periodo_trimestral',
-  timestamps: false
+  timestamps: false,
+  underscored: true
 });
 
 module.exports = CatPeriodoTrimestral;

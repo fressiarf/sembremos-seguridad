@@ -18,7 +18,8 @@ const RolLocal = sequelizeMUNI.define('RolLocal', {
   }
 }, {
   tableName: 'roles_local',
-  timestamps: false
+  timestamps: false,
+  underscored: true
 });
 
 module.exports = RolLocal;

@@ -1,7 +1,7 @@
 const { DataTypes } = require('sequelize');
-const { sequelizeMuni } = require('../../config/database');
+const { sequelizeMUNI } = require('../../config/database');
 
-const HistorialIALocal = sequelizeMuni.define('HistorialIALocal', {
+const HistorialIALocal = sequelizeMUNI.define('HistorialIALocal', {
   id: { type: DataTypes.UUID, primaryKey: true, defaultValue: DataTypes.UUIDV4 },
   usuario_id: {
     type: DataTypes.UUID,

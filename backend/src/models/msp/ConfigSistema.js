@@ -22,7 +22,8 @@ const ConfigSistema = sequelizeFP.define('ConfigSistema', {
   }
 }, {
   tableName: 'config_sistema',
-  timestamps: false
+  timestamps: false,
+  underscored: true
 });
 
 module.exports = ConfigSistema;

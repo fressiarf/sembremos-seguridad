@@ -22,7 +22,8 @@ const CatTurno = sequelizeFP.define('CatTurno', {
   }
 }, {
   tableName: 'cat_turno',
-  timestamps: false
+  timestamps: false,
+  underscored: true
 });
 
 module.exports = CatTurno;

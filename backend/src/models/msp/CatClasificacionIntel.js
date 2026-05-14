@@ -4,5 +4,5 @@ const CatClasificacionIntel = sequelizeFP.define('CatClasificacionIntel', {
   id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
   nombre: { type: DataTypes.STRING(50), allowNull: false, unique: true },
   nivel_acceso: { type: DataTypes.INTEGER, allowNull: false }
-}, { tableName: 'cat_clasificacion_intel', timestamps: false });
+}, { tableName: 'cat_clasificacion_intel', timestamps: false, underscored: true });
 module.exports = CatClasificacionIntel;

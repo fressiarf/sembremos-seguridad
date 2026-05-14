@@ -18,7 +18,8 @@ const RolFP = sequelizeFP.define('RolFP', {
   }
 }, {
   tableName: 'roles_fp',
-  timestamps: false
+  timestamps: false,
+  underscored: true
 });
 
 module.exports = RolFP;

@@ -18,7 +18,8 @@ const CatNivelRiesgo = sequelizeFP.define('CatNivelRiesgo', {
   }
 }, {
   tableName: 'cat_nivel_riesgo',
-  timestamps: false
+  timestamps: false,
+  underscored: true
 });
 
 module.exports = CatNivelRiesgo;

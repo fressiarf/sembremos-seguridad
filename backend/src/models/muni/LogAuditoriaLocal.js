@@ -28,6 +28,14 @@ const LogAuditoriaLocal = sequelizeMUNI.define('LogAuditoriaLocal', {
   datos_nuevos: {
     type: DataTypes.JSON,
     allowNull: true
+  },
+  entidad: {
+    type: DataTypes.STRING(100),
+    allowNull: true
+  },
+  entidad_id: {
+    type: DataTypes.STRING(36),
+    allowNull: true
   }
 }, {
   tableName: 'logs_auditoria_local',

@@ -18,7 +18,8 @@ const CatFuenteFondos = sequelizeMUNI.define('CatFuenteFondos', {
   }
 }, {
   tableName: 'cat_fuente_fondos',
-  timestamps: false
+  timestamps: false,
+  underscored: true
 });
 
 module.exports = CatFuenteFondos;
