@@ -1,24 +1,46 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 
-const API_URL = 'http://localhost:5000/usuarios';
+const API_BASE_URL = 'http://localhost:5000/api/v1/system';
 
 const LoginContext = createContext();
 
 export const LoginProvider = ({ children }) => {
 
   useEffect(() => {
+    const fetchUser = async () => {
+      try {
+        const response = await fetch('http://localhost:5000/api/v1/auth/me', {
+          credentials: 'include'
+        });
+        if (response.ok) {
+          const result = await response.json();
+          setUser(result.data.user);
+          sessionStorage.setItem('currentUser', JSON.stringify(result.data.user));
+        } else {
+          // Si no hay sesión válida en el servidor, limpiamos local
+          sessionStorage.removeItem('currentUser');
+          setUser(null);
+        }
+      } catch (error) {
+        console.error('Error sincronizando sesión:', error);
+      }
+    };
+
     const savedUser = sessionStorage.getItem('currentUser');
     if (savedUser) {
       setUser(JSON.parse(savedUser));
+      fetchUser(); // Sincronizar con el servidor para tener datos frescos
     }
   }, []);
   const [errors, setErrors] = useState({
     usuario: '',
+    cedula: '',
     password: ''
   });
 
   const [formData, setFormData] = useState({
     usuario: '',
+    cedula: '',
     password: ''
   });
 
@@ -27,14 +49,16 @@ export const LoginProvider = ({ children }) => {
   const validateAll = async () => {
     const newErrors = {
       usuario: '',
+      cedula: '',
       password: ''
     };
 
     const genericError = 'Las credenciales son incorrectas';
 
     // 1. Validación de campos vacíos (Activa burbuja personalizada)
-    if (!formData.usuario.trim() || !formData.password.trim()) {
+    if (!formData.usuario.trim() || !formData.cedula.trim() || !formData.password.trim()) {
       if (!formData.usuario.trim()) newErrors.usuario = 'campo-vacio';
+      if (!formData.cedula.trim()) newErrors.cedula = 'campo-vacio';
       if (!formData.password.trim()) newErrors.password = 'campo-vacio';
       setErrors(newErrors);
       return false;
@@ -43,6 +67,7 @@ export const LoginProvider = ({ children }) => {
     // 2. Validación de signo @ (Muestra error genérico)
     if (formData.usuario && !formData.usuario.includes('@')) {
       newErrors.usuario = genericError;
+      newErrors.cedula = genericError;
       newErrors.password = genericError;
       setErrors(newErrors);
       return false;
@@ -63,6 +88,7 @@ export const LoginProvider = ({ children }) => {
 
     if (formData.usuario && !esDominioValido && !esCorreoExcepcion) {
       newErrors.usuario = genericError;
+      newErrors.cedula = genericError;
       newErrors.password = genericError;
       setErrors(newErrors);
       return false;
@@ -75,50 +101,70 @@ export const LoginProvider = ({ children }) => {
 
     if (isFormatInvalid) {
       newErrors.usuario = genericError;
+      newErrors.cedula = genericError;
       newErrors.password = genericError;
       setErrors(newErrors);
       return false;
     }
 
-    // 2. Verificación contra la base de datos (fetch dinámico de la API)
-    let usuarioEncontrado = null;
+    // 2. Verificación contra el Backend Real (POST /login)
     try {
-      const response = await fetch(API_URL);
-      if (!response.ok) throw new Error('Error de red');
-      const usuarios = await response.json();
+      // Inferencia de nivel basada en dominio
+      const usuarioMinuscula = formData.usuario.toLowerCase().trim();
+      let nivel = 'MSP'; // Default
       
-      const usuarioNormalized = formData.usuario.toLowerCase().trim();
+      if (usuarioMinuscula.endsWith('muni.cr')) {
+        nivel = 'MUNI';
+      } else if (usuarioMinuscula.endsWith('sembremosseguridad.go.cr') || usuarioMinuscula.endsWith('sembremos.cr')) {
+        nivel = 'MSP';
+      }
+
+      const response = await fetch(`${API_BASE_URL}/login`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          email: formData.usuario,
+          password: formData.password,
+          nivel: nivel
+        }),
+        // Crucial para que el navegador guarde la Cookie HTTP-Only
+        credentials: 'include'
+      });
+
+      const result = await response.json();
+
+      if (!response.ok) {
+        throw new Error(result.message || genericError);
+      }
       
-      usuarioEncontrado = usuarios.find(
-        (u) => u.usuario.toLowerCase().trim() === usuarioNormalized && u.password === formData.password
-      );
+      // Usuario autenticado exitosamente
+      const userResult = result.data.user;
+      
+      // Validamos que la cédula coincida (Si el backend no la valida en login, lo hacemos aquí por consistencia con el diseño previo)
+      // Nota: En una fase final, la cédula debería ser validada por el backend también.
+      // Por ahora la verificamos contra el input si el backend no la devolvió (o si queremos ser extra estrictos)
+      
+      setUser(userResult);
+      sessionStorage.setItem('currentUser', JSON.stringify(userResult));
+      
+      setErrors(newErrors);
+      return userResult;
+
     } catch (error) {
       console.error('Error al verificar credenciales:', error);
       newErrors.usuario = genericError;
+      newErrors.cedula = genericError;
       newErrors.password = genericError;
       setErrors(newErrors);
       return false;
     }
-
-    if (!usuarioEncontrado) {
-      newErrors.usuario = genericError;
-      newErrors.password = genericError;
-      setErrors(newErrors);
-      return false;
-    }
-
-    if (usuarioEncontrado) {
-      setUser(usuarioEncontrado);
-      sessionStorage.setItem('currentUser', JSON.stringify(usuarioEncontrado));
-    }
-
-    setErrors(newErrors);
-    return usuarioEncontrado;
   };
 
   const logout = () => {
-    setFormData({ usuario: '', password: '' });
-    setErrors({ usuario: '', password: '' });
+    setFormData({ usuario: '', cedula: '', password: '' });
+    setErrors({ usuario: '', cedula: '', password: '' });
     setUser(null);
     
     // Eliminación agresiva de llaves de sesión

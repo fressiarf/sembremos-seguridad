@@ -8,6 +8,7 @@
   min-height: 100vh;
   animation: fadeInMatriz 0.4s ease-out;
   position: relative;
+  padding-top: 2rem;
 }
 
 @keyframes fadeInMatriz {
@@ -145,6 +146,7 @@
   align-items: center;
   margin-bottom: 1.25rem;
   padding: 0 0.5rem;
+  gap: 2rem;
 }
 
 .toolbar-info {
@@ -170,7 +172,7 @@
 
 .toolbar-actions {
   display: flex;
-  gap: 1rem;
+  gap: 1.5rem;
 }
 
 .btn-export-v4 {

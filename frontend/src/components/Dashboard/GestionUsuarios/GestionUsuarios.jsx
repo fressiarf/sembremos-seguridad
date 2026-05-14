@@ -397,7 +397,9 @@ const GestionUsuarios = () => {
             </div>
             <form onSubmit={handleCreateUser} className="user-modal__form">
               <div className="form-grid">
-                <div className="form-group">
+                
+                {/* 1. Selección de Perfil (Ancho Completo) */}
+                <div className="form-group full-width">
                   <label>Perfil (Tipo de Cuenta)</label>
                   <select 
                     value={newUser.rol}
@@ -418,86 +420,64 @@ const GestionUsuarios = () => {
                   </select>
                 </div>
 
-                {newUser.rol === 'admin' && (
-                  <>
-                    <div className="form-group">
-                      <label>Nombre del Funcionario *</label>
-                      <div className="input-with-icon">
-                        <UserIcon size={16} />
-                        <input 
-                          type="text" 
-                          placeholder="Ej: Juan Pérez" 
-                          value={newUser.nombre}
-                          onChange={e => setNewUser({...newUser, nombre: e.target.value})}
-                        />
-                      </div>
-                    </div>
-                    <div className="form-group">
-                      <label>Identificación (Cédula) *</label>
-                      <div className="input-with-icon">
-                        <Fingerprint size={16} />
-                        <input 
-                          type="text" 
-                          placeholder="Ej: 102340567" 
-                          value={newUser.cedula}
-                          onChange={e => setNewUser({...newUser, cedula: e.target.value})}
-                        />
-                      </div>
-                    </div>
-                  </>
-                )}
+                {/* 2. Datos de Identidad (Nombre y Cédula) */}
+                <div className="form-group">
+                  <label>{newUser.rol === 'admin' ? 'Nombre del Funcionario *' : 'Nombre Completo'}</label>
+                  <div className="input-with-icon">
+                    <UserIcon size={16} />
+                    <input 
+                      type="text" 
+                      placeholder="Ej: Juan Pérez" 
+                      value={newUser.nombre}
+                      onChange={e => {
+                        const val = newUser.rol === 'adminInstitucion' 
+                          ? e.target.value.replace(/[^a-zA-ZáéíóúÁÉÍÓÚñÑ ]/g, '') 
+                          : e.target.value;
+                        setNewUser({...newUser, nombre: val});
+                      }}
+                    />
+                  </div>
+                </div>
 
+                <div className="form-group">
+                  <label>Cédula de Identidad *</label>
+                  <div className="input-with-icon">
+                    <Fingerprint size={16} />
+                    <input 
+                      type="text" 
+                      placeholder="Ej: 102340567" 
+                      maxLength={12}
+                      value={newUser.cedula}
+                      onChange={e => {
+                        const val = e.target.value.replace(/\D/g, '');
+                        setNewUser({...newUser, cedula: val});
+                      }}
+                    />
+                  </div>
+                </div>
+
+                {/* 3. Institución (Solo si aplica, Ancho Completo) */}
                 {newUser.rol === 'adminInstitucion' && (
-                  <>
-                    <div className="form-group">
-                      <label>Institución a Registrar *</label>
-                      <div className="input-with-icon">
-                        <Building2 size={16} />
-                        <select 
-                          value={newUser.institucion}
-                          onChange={e => setNewUser({...newUser, institucion: e.target.value, nombre: e.target.value})}
-                          className="modal-select"
-                          style={{ paddingLeft: '40px' }}
-                        >
-                          <option value="">Seleccionar institución...</option>
-                          {INSTITUCIONES.map(inst => (
-                            <option key={inst} value={inst}>{inst}</option>
-                          ))}
-                        </select>
-                      </div>
-                      <label>Nombre Completo</label>
-                      <div className="input-with-icon">
-                        <UserIcon size={16} />
-                        <input 
-                          type="text" 
-                          placeholder="Ej: Juan Pérez" 
-                          value={newUser.nombre}
-                          onChange={e => {
-                            const val = e.target.value.replace(/[^a-zA-ZáéíóúÁÉÍÓÚñÑ ]/g, '');
-                            setNewUser({...newUser, nombre: val});
-                          }}
-                        />
-                      </div>
+                  <div className="form-group full-width">
+                    <label>Institución a Registrar *</label>
+                    <div className="input-with-icon">
+                      <Building2 size={16} />
+                      <select 
+                        value={newUser.institucion}
+                        onChange={e => setNewUser({...newUser, institucion: e.target.value, nombre: e.target.value || newUser.nombre})}
+                        className="modal-select"
+                        style={{ paddingLeft: '40px' }}
+                      >
+                        <option value="">Seleccionar institución...</option>
+                        {INSTITUCIONES.map(inst => (
+                          <option key={inst} value={inst}>{inst}</option>
+                        ))}
+                      </select>
                     </div>
-                    <div className="form-group">
-                      <label>Número de Cédula</label>
-                      <div className="input-with-icon">
-                        <Fingerprint size={16} />
-                        <input 
-                          type="text" 
-                          placeholder="Ej: 102340567" 
-                          maxLength={12}
-                          value={newUser.cedula}
-                          onChange={e => {
-                            const val = e.target.value.replace(/\D/g, '');
-                            setNewUser({...newUser, cedula: val});
-                          }}
-                        />
-                      </div>
-                    </div>
-                  </>
+                  </div>
                 )}
 
+                {/* 4. Credenciales (Correo y Contraseña) */}
                 <div className="form-group">
                   <label>Correo Electrónico *</label>
                   <div className="input-with-icon">
@@ -511,6 +491,7 @@ const GestionUsuarios = () => {
                     />
                   </div>
                 </div>
+
                 <div className="form-group">
                   <label>Contraseña *</label>
                   <div className="input-with-icon">
@@ -523,6 +504,7 @@ const GestionUsuarios = () => {
                     />
                   </div>
                 </div>
+
               </div>
               <div className="user-modal__footer">
                 <button type="button" className="btn-cancel-modal" onClick={() => setShowCreateModal(false)}>Cancelar</button>

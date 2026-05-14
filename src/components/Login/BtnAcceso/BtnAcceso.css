@@ -1,0 +1,63 @@
+/* BtnAcceso.css */
+.ContenedorBotonAcceso {
+  margin-top: 1rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.BotonPrincipalAcceso {
+  width: 100%;
+  background-color: var(--navy-blue);
+  color: var(--white);
+  border: none;
+  border-radius: 3px;
+  padding: 0.75rem;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  transition: all 0.2s ease;
+  box-shadow: 0 4px 6px -1px rgba(11, 34, 64, 0.1), 0 2px 4px -1px rgba(11, 34, 64, 0.06);
+  font-family: inherit;
+}
+
+.BotonPrincipalAcceso:hover {
+  background-color: var(--navy-blue-light);
+  transform: translateY(-1px);
+  box-shadow: 0 10px 15px -3px rgba(11, 34, 64, 0.2), 0 4px 6px -2px rgba(11, 34, 64, 0.1);
+}
+
+.BotonPrincipalAcceso:active {
+  transform: translateY(1px);
+  box-shadow: 0 0px 2px rgba(11, 34, 64, 0.1);
+}
+
+.TextoBotonAcceso {
+  letter-spacing: 0.025em;
+}
+
+.IconoBotonAcceso {
+  font-size: 0.9rem;
+  transition: transform 0.2s ease;
+}
+
+.BotonPrincipalAcceso:hover .IconoBotonAcceso {
+  transform: translateX(4px);
+}
+
+.IndicadorCargando {
+  display: none; /* For future spinner logic */
+}
+
+.AvisoLegalAcceso {
+  margin-top: 1rem;
+  font-size: 0.7rem;
+  color: #94a3b8;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  font-weight: 600;
+}
