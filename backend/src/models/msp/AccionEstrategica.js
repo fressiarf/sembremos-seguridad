@@ -13,7 +13,9 @@ const AccionEstrategica = sequelizeFP.define('AccionEstrategica', {
     references: {
       model: 'lineas_accion',
       key: 'id'
-    }
+    },
+    onUpdate: 'CASCADE',
+    onDelete: 'CASCADE'
   },
   nombre: {
     type: DataTypes.STRING(200),

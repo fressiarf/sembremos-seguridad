@@ -15,7 +15,11 @@
     "migrate:msp": "sequelize-cli db:migrate --env msp --migrations-path src/migrations/msp",
     "migrate:muni": "sequelize-cli db:migrate --env muni --migrations-path src/migrations/muni",
     "migrate:undo:msp": "sequelize-cli db:migrate:undo --env msp --migrations-path src/migrations/msp",
-    "migrate:undo:muni": "sequelize-cli db:migrate:undo --env muni --migrations-path src/migrations/muni"
+    "migrate:undo:muni": "sequelize-cli db:migrate:undo --env muni --migrations-path src/migrations/muni",
+    "migrate:undo:all:msp": "sequelize-cli db:migrate:undo:all --env msp --migrations-path src/migrations/msp",
+    "migrate:undo:all:muni": "sequelize-cli db:migrate:undo:all --env muni --migrations-path src/migrations/muni",
+    "seed:msp": "sequelize-cli db:seed:all --env msp --seeders-path src/seeders/msp",
+    "seed:muni": "sequelize-cli db:seed:all --env muni --seeders-path src/seeders/muni"
   },
   "keywords": [],
   "author": "",

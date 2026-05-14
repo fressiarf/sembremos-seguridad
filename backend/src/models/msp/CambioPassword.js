@@ -10,7 +10,9 @@ const CambioPassword = sequelizeFP.define('CambioPassword', {
   usuario_id: {
     type: DataTypes.UUID,
     allowNull: false,
-    references: { model: 'usuarios_fp', key: 'id' }
+    references: { model: 'usuarios_fp', key: 'id' },
+    onUpdate: 'CASCADE',
+    onDelete: 'CASCADE'
   },
   solicitado_en: {
     type: DataTypes.DATE,
@@ -20,7 +22,9 @@ const CambioPassword = sequelizeFP.define('CambioPassword', {
   aprobado_por: {
     type: DataTypes.UUID,
     allowNull: true,
-    references: { model: 'usuarios_fp', key: 'id' }
+    references: { model: 'usuarios_fp', key: 'id' },
+    onUpdate: 'CASCADE',
+    onDelete: 'SET NULL'
   },
   resuelto_en: {
     type: DataTypes.DATE,

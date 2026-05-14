@@ -13,7 +13,9 @@ const KpiNacional = sequelizeFP.define('KpiNacional', {
     references: {
       model: 'acciones_estrategicas',
       key: 'id'
-    }
+    },
+    onUpdate: 'CASCADE',
+    onDelete: 'CASCADE'
   },
   nombre_indicador: {
     type: DataTypes.STRING(200),

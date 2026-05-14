@@ -13,7 +13,9 @@ const LogAuditoriaLocal = sequelizeMUNI.define('LogAuditoriaLocal', {
     references: {
       model: 'usuarios_local',
       key: 'id'
-    }
+    },
+    onUpdate: 'CASCADE',
+    onDelete: 'RESTRICT'
   },
   accion: {
     type: DataTypes.STRING(100),

@@ -13,7 +13,9 @@ const ReporteEvidencia = sequelizeMUNI.define('ReporteEvidencia', {
     references: {
       model: 'actividades_local',
       key: 'id'
-    }
+    },
+    onUpdate: 'CASCADE',
+    onDelete: 'CASCADE'
   },
   autor_id: {
     type: DataTypes.UUID,
@@ -21,7 +23,9 @@ const ReporteEvidencia = sequelizeMUNI.define('ReporteEvidencia', {
     references: {
       model: 'usuarios_local',
       key: 'id'
-    }
+    },
+    onUpdate: 'CASCADE',
+    onDelete: 'RESTRICT'
   },
   descripcion_logro: {
     type: DataTypes.TEXT,
@@ -37,7 +41,9 @@ const ReporteEvidencia = sequelizeMUNI.define('ReporteEvidencia', {
     references: {
       model: 'cat_estado_reporte',
       key: 'id'
-    }
+    },
+    onUpdate: 'CASCADE',
+    onDelete: 'RESTRICT'
   }
 }, {
   tableName: 'reportes_evidencia',

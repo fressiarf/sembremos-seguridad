@@ -13,7 +13,9 @@ const NotificacionFP = sequelizeFP.define('NotificacionFP', {
     references: {
       model: 'usuarios_fp',
       key: 'id'
-    }
+    },
+    onUpdate: 'CASCADE',
+    onDelete: 'CASCADE'
   },
   titulo: {
     type: DataTypes.STRING(200),

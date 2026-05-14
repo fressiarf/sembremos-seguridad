@@ -13,7 +13,9 @@ const HitoActividad = sequelizeMUNI.define('HitoActividad', {
     references: {
       model: 'actividades_local',
       key: 'id'
-    }
+    },
+    onUpdate: 'CASCADE',
+    onDelete: 'CASCADE'
   },
   nombre_paso: {
     type: DataTypes.STRING(200),

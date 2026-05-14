@@ -21,7 +21,9 @@ const ZonaRiesgo = sequelizeFP.define('ZonaRiesgo', {
     references: {
       model: 'cat_nivel_riesgo',
       key: 'id'
-    }
+    },
+    onUpdate: 'CASCADE',
+    onDelete: 'RESTRICT'
   }
 }, {
   tableName: 'zonas_riesgo',

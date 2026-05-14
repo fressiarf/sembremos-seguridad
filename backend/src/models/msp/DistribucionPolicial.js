@@ -13,7 +13,9 @@ const DistribucionPolicial = sequelizeFP.define('DistribucionPolicial', {
     references: {
       model: 'zonas_riesgo',
       key: 'id'
-    }
+    },
+    onUpdate: 'CASCADE',
+    onDelete: 'CASCADE'
   },
   cantidad_oficiales: {
     type: DataTypes.INTEGER,
@@ -26,7 +28,9 @@ const DistribucionPolicial = sequelizeFP.define('DistribucionPolicial', {
     references: {
       model: 'cat_turno',
       key: 'id'
-    }
+    },
+    onUpdate: 'CASCADE',
+    onDelete: 'RESTRICT'
   }
 }, {
   tableName: 'distribucion_policial',

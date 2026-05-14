@@ -18,12 +18,21 @@ const UsuarioLocal = sequelizeMUNI.define('UsuarioLocal', {
   cedula: {
     type: DataTypes.STRING(20),
     allowNull: false,
-    unique: true
+    unique: {
+      msg: 'La cédula ya se encuentra registrada'
+    }
   },
   email: {
     type: DataTypes.STRING(150),
     allowNull: false,
-    unique: true
+    unique: {
+      msg: 'El correo electrónico ya se encuentra registrado'
+    },
+    validate: {
+      isEmail: {
+        msg: 'Debe proporcionar un formato de correo electrónico válido'
+      }
+    }
   },
   password_hash: {
     type: DataTypes.STRING(255),
@@ -35,7 +44,9 @@ const UsuarioLocal = sequelizeMUNI.define('UsuarioLocal', {
     references: {
       model: 'roles_local',
       key: 'id'
-    }
+    },
+    onUpdate: 'CASCADE',
+    onDelete: 'RESTRICT'
   },
   activo: {
     type: DataTypes.BOOLEAN,

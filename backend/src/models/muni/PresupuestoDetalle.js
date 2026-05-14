@@ -13,7 +13,9 @@ const PresupuestoDetalle = sequelizeMUNI.define('PresupuestoDetalle', {
     references: {
       model: 'actividades_local',
       key: 'id'
-    }
+    },
+    onUpdate: 'CASCADE',
+    onDelete: 'CASCADE'
   },
   concepto: {
     type: DataTypes.STRING(200),
@@ -30,7 +32,9 @@ const PresupuestoDetalle = sequelizeMUNI.define('PresupuestoDetalle', {
     references: {
       model: 'cat_fuente_fondos',
       key: 'id'
-    }
+    },
+    onUpdate: 'CASCADE',
+    onDelete: 'RESTRICT'
   }
 }, {
   tableName: 'presupuesto_detalle',

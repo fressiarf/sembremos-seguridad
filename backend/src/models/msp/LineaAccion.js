@@ -25,7 +25,9 @@ const LineaAccion = sequelizeFP.define('LineaAccion', {
     references: {
       model: 'cantones',
       key: 'id'
-    }
+    },
+    onUpdate: 'CASCADE',
+    onDelete: 'CASCADE'
   },
   responsable_id: {
     type: DataTypes.UUID,
@@ -33,7 +35,9 @@ const LineaAccion = sequelizeFP.define('LineaAccion', {
     references: {
       model: 'usuarios_fp',
       key: 'id'
-    }
+    },
+    onUpdate: 'CASCADE',
+    onDelete: 'SET NULL'
   }
 }, {
   tableName: 'lineas_accion',

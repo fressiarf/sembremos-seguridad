@@ -57,6 +57,16 @@ module.exports = {
         defaultValue: Sequelize.literal('CURRENT_TIMESTAMP')
       }
     });
+
+    // Índices únicos nombrados para Hardening
+    await queryInterface.addIndex('usuarios_local', ['cedula'], {
+      unique: true,
+      name: 'idx_usuarios_local_cedula_unique'
+    });
+    await queryInterface.addIndex('usuarios_local', ['email'], {
+      unique: true,
+      name: 'idx_usuarios_local_email_unique'
+    });
   },
 
   async down(queryInterface) {

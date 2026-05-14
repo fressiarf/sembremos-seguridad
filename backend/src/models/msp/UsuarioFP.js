@@ -18,12 +18,21 @@ const UsuarioFP = sequelizeFP.define('UsuarioFP', {
   cedula: {
     type: DataTypes.STRING(20),
     allowNull: false,
-    unique: true
+    unique: {
+      msg: 'La cédula ya se encuentra registrada'
+    }
   },
   email: {
     type: DataTypes.STRING(150),
     allowNull: false,
-    unique: true
+    unique: {
+      msg: 'El correo electrónico ya se encuentra registrado'
+    },
+    validate: {
+      isEmail: {
+        msg: 'Debe proporcionar un formato de correo electrónico válido'
+      }
+    }
   },
   password_hash: {
     type: DataTypes.STRING(255),
@@ -35,7 +44,9 @@ const UsuarioFP = sequelizeFP.define('UsuarioFP', {
     references: {
       model: 'roles_fp',
       key: 'id'
-    }
+    },
+    onUpdate: 'CASCADE',
+    onDelete: 'RESTRICT'
   },
   institucion_id: {
     type: DataTypes.UUID,
@@ -43,7 +54,9 @@ const UsuarioFP = sequelizeFP.define('UsuarioFP', {
     references: {
       model: 'institucion_maestra',
       key: 'id'
-    }
+    },
+    onUpdate: 'CASCADE',
+    onDelete: 'SET NULL'
   },
   activo: {
     type: DataTypes.BOOLEAN,
