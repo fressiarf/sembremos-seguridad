@@ -14,7 +14,12 @@ const CatEstadoInforme = sequelizeMUNI.define('CatEstadoInforme', {
   }
 }, {
   tableName: 'cat_estado_informe',
-  timestamps: false
+  timestamps: true,
+  underscored: true
 });
+
+CatEstadoInforme.associate = (models) => {
+  CatEstadoInforme.hasMany(models.InformeD71, { foreignKey: 'estado_id', as: 'informes' });
+};
 
 module.exports = CatEstadoInforme;

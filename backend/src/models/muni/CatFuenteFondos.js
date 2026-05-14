@@ -18,7 +18,12 @@ const CatFuenteFondos = sequelizeMUNI.define('CatFuenteFondos', {
   }
 }, {
   tableName: 'cat_fuente_fondos',
-  timestamps: false
+  timestamps: true,
+  underscored: true
 });
+
+CatFuenteFondos.associate = (models) => {
+  CatFuenteFondos.hasMany(models.PresupuestoDetalle, { foreignKey: 'fuente_id', as: 'presupuestos' });
+};
 
 module.exports = CatFuenteFondos;

@@ -18,7 +18,12 @@ const CatNivelRiesgo = sequelizeFP.define('CatNivelRiesgo', {
   }
 }, {
   tableName: 'cat_nivel_riesgo',
-  timestamps: false
+  timestamps: true,
+  underscored: true
 });
+
+CatNivelRiesgo.associate = (models) => {
+  CatNivelRiesgo.hasMany(models.ZonaRiesgo, { foreignKey: 'nivel_riesgo_id', as: 'zonas' });
+};
 
 module.exports = CatNivelRiesgo;

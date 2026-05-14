@@ -17,7 +17,8 @@ const CatZonaEjecucion = sequelizeMUNI.define('CatZonaEjecucion', {
   }
 }, {
   tableName: 'cat_zona_ejecucion',
-  timestamps: false
+  timestamps: true,
+  underscored: true
 });
 
 module.exports = CatZonaEjecucion;

@@ -10,7 +10,31 @@ const EventoCalendario = sequelizeMUNI.define('EventoCalendario', {
   institucion_id: { type: DataTypes.UUID, allowNull: true, references: { model: 'instituciones_local', key: 'id' } },
   creado_por: { type: DataTypes.UUID, allowNull: false, references: { model: 'usuarios_local', key: 'id' } },
   es_publico: { type: DataTypes.BOOLEAN, allowNull: false, defaultValue: true }
-}, { tableName: 'eventos_calendario', timestamps: true, underscored: true });
+}, {
+  tableName: 'eventos_calendario',
+  timestamps: true,
+  underscored: true,
+  hooks: {
+    afterCreate: async (instance, options) => {
+      const LogAuditoriaLocal = require('./LogAuditoriaLocal');
+      const { generarHooksAuditoria } = require('../../common/helpers/auditHelper');
+      const hooks = generarHooksAuditoria(LogAuditoriaLocal, 'EventoCalendario');
+      await hooks.afterCreate(instance, options);
+    },
+    afterUpdate: async (instance, options) => {
+      const LogAuditoriaLocal = require('./LogAuditoriaLocal');
+      const { generarHooksAuditoria } = require('../../common/helpers/auditHelper');
+      const hooks = generarHooksAuditoria(LogAuditoriaLocal, 'EventoCalendario');
+      await hooks.afterUpdate(instance, options);
+    },
+    afterDestroy: async (instance, options) => {
+      const LogAuditoriaLocal = require('./LogAuditoriaLocal');
+      const { generarHooksAuditoria } = require('../../common/helpers/auditHelper');
+      const hooks = generarHooksAuditoria(LogAuditoriaLocal, 'EventoCalendario');
+      await hooks.afterDestroy(instance, options);
+    }
+  }
+});
 
 EventoCalendario.associate = (models) => {
   EventoCalendario.belongsTo(models.InstitucionLocal, { foreignKey: 'institucion_id', as: 'institucion' });

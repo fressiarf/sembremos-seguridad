@@ -13,7 +13,9 @@ const LogAuditoriaFP = sequelizeFP.define('LogAuditoriaFP', {
     references: {
       model: 'usuarios_fp',
       key: 'id'
-    }
+    },
+    onUpdate: 'CASCADE',
+    onDelete: 'RESTRICT'
   },
   accion: {
     type: DataTypes.STRING(100),
@@ -25,6 +27,14 @@ const LogAuditoriaFP = sequelizeFP.define('LogAuditoriaFP', {
   },
   datos_nuevos: {
     type: DataTypes.JSON,
+    allowNull: true
+  },
+  entidad: {
+    type: DataTypes.STRING(100),
+    allowNull: true
+  },
+  entidad_id: {
+    type: DataTypes.STRING(36),
     allowNull: true
   }
 }, {

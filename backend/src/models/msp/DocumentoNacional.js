@@ -8,7 +8,31 @@ const DocumentoNacional = sequelizeFP.define('DocumentoNacional', {
   url_archivo: { type: DataTypes.STRING(500), allowNull: false },
   version: { type: DataTypes.STRING(20), allowNull: true },
   publicado_por: { type: DataTypes.UUID, allowNull: false, references: { model: 'usuarios_fp', key: 'id' } }
-}, { tableName: 'documentos_nacionales', timestamps: true, underscored: true });
+}, {
+  tableName: 'documentos_nacionales',
+  timestamps: true,
+  underscored: true,
+  hooks: {
+    afterCreate: async (instance, options) => {
+      const LogAuditoriaFP = require('./LogAuditoriaFP');
+      const { generarHooksAuditoria } = require('../../common/helpers/auditHelper');
+      const hooks = generarHooksAuditoria(LogAuditoriaFP, 'DocumentoNacional');
+      await hooks.afterCreate(instance, options);
+    },
+    afterUpdate: async (instance, options) => {
+      const LogAuditoriaFP = require('./LogAuditoriaFP');
+      const { generarHooksAuditoria } = require('../../common/helpers/auditHelper');
+      const hooks = generarHooksAuditoria(LogAuditoriaFP, 'DocumentoNacional');
+      await hooks.afterUpdate(instance, options);
+    },
+    afterDestroy: async (instance, options) => {
+      const LogAuditoriaFP = require('./LogAuditoriaFP');
+      const { generarHooksAuditoria } = require('../../common/helpers/auditHelper');
+      const hooks = generarHooksAuditoria(LogAuditoriaFP, 'DocumentoNacional');
+      await hooks.afterDestroy(instance, options);
+    }
+  }
+});
 
 DocumentoNacional.associate = (models) => {
   DocumentoNacional.belongsTo(models.CatCategoriaDoc, { foreignKey: 'categoria_id', as: 'categoria' });

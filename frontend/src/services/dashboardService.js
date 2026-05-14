@@ -1,4 +1,4 @@
-const BASE_URL = 'http://localhost:5000';
+import { apiFetch, BASE_URL } from '../utils/apiFetch';
 
 export const dashboardService = {
   /**
@@ -6,7 +6,7 @@ export const dashboardService = {
    */
   getLineasAccion: async () => {
     try {
-      const response = await fetch(`${BASE_URL}/lineasAccion`);
+      const response = await apiFetch('/lineasAccion');
       if (!response.ok) throw new Error('Error fetching líneas');
       return await response.json();
     } catch (error) {
@@ -20,7 +20,7 @@ export const dashboardService = {
    */
   getTareas: async () => {
     try {
-      const response = await fetch(`${BASE_URL}/tareas`);
+      const response = await apiFetch('/tareas');
       if (!response.ok) throw new Error('Error fetching tareas');
       return await response.json();
     } catch (error) {
@@ -35,14 +35,14 @@ export const dashboardService = {
   getFullDashboardData: async () => {
     try {
       const [lineas, tareas, zonas, alertas, notificaciones, presupuestoAsignado, reportes, usuarios] = await Promise.all([
-        fetch(`${BASE_URL}/lineasAccion`).then(r => r.json()),
-        fetch(`${BASE_URL}/tareas`).then(r => r.json()),
-        fetch(`${BASE_URL}/zonas`).then(r => r.json()),
-        fetch(`${BASE_URL}/alertas`).then(r => r.json()),
-        fetch(`${BASE_URL}/notificaciones`).then(r => r.json()),
-        fetch(`${BASE_URL}/presupuestoAsignado`).then(r => r.json()).catch(() => 65000000),
-        fetch(`${BASE_URL}/reportes`).then(r => r.json()).catch(() => []),
-        fetch(`${BASE_URL}/usuarios`).then(r => r.json()).catch(() => [])
+        apiFetch('/lineasAccion').then(r => r.json()),
+        apiFetch('/tareas').then(r => r.json()),
+        apiFetch('/zonas').then(r => r.json()),
+        apiFetch('/alertas').then(r => r.json()),
+        apiFetch('/notificaciones').then(r => r.json()),
+        apiFetch('/presupuestoAsignado').then(r => r.json()).catch(() => 65000000),
+        apiFetch('/reportes').then(r => r.json()).catch(() => []),
+        apiFetch('/usuarios').then(r => r.json()).catch(() => [])
       ]);
 
       // Mapa de ID de usuario/institución a nombre de institución
@@ -144,7 +144,7 @@ export const dashboardService = {
    */
   createLineaAccion: async (lineaData) => {
     try {
-      const response = await fetch(`${BASE_URL}/lineasAccion`, {
+      const response = await apiFetch('/lineasAccion', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(lineaData)
@@ -162,7 +162,7 @@ export const dashboardService = {
    */
   createTarea: async (tareaData) => {
     try {
-      const response = await fetch(`${BASE_URL}/tareas`, {
+      const response = await apiFetch('/tareas', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -187,7 +187,7 @@ export const dashboardService = {
    */
   getZonas: async () => {
     try {
-      const response = await fetch(`${BASE_URL}/zonas`);
+      const response = await apiFetch('/zonas');
       if (!response.ok) throw new Error('Error fetching zonas');
       return await response.json();
     } catch (error) {
@@ -201,7 +201,7 @@ export const dashboardService = {
    */
   postReporte: async (reporteData) => {
     try {
-      const response = await fetch(`${BASE_URL}/reportes`, {
+      const response = await apiFetch('/reportes', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -224,9 +224,9 @@ export const dashboardService = {
   getStats: async () => {
     try {
       const [tareasRes, zonasRes, comentariosRes] = await Promise.all([
-        fetch(`${BASE_URL}/tareas`),
-        fetch(`${BASE_URL}/zonas`),
-        fetch(`${BASE_URL}/comentariosSoporte`).catch(() => null)
+        apiFetch('/tareas'),
+        apiFetch('/zonas'),
+        apiFetch('/comentariosSoporte').catch(() => null)
       ]);
       const tareas = tareasRes?.ok ? await tareasRes.json() : [];
       const zonas = zonasRes?.ok ? await zonasRes.json() : [];
@@ -244,7 +244,7 @@ export const dashboardService = {
 
   getComentariosSoporte: async () => {
     try {
-      const response = await fetch(`${BASE_URL}/comentariosSoporte?_sort=fecha&_order=desc`);
+      const response = await apiFetch('/comentariosSoporte?_sort=fecha&_order=desc');
       if (!response.ok) throw new Error('Error fetching comentarios');
       return await response.json();
     } catch (error) {
@@ -255,7 +255,7 @@ export const dashboardService = {
 
   postComentarioSoporte: async (comentarioData) => {
     try {
-      const response = await fetch(`${BASE_URL}/comentariosSoporte`, {
+      const response = await apiFetch('/comentariosSoporte', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -273,7 +273,7 @@ export const dashboardService = {
 
   updateComentarioSoporte: async (id, updateData) => {
     try {
-      const response = await fetch(`${BASE_URL}/comentariosSoporte/${id}`, {
+      const response = await apiFetch(`/comentariosSoporte/${id}`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(updateData)
@@ -288,7 +288,7 @@ export const dashboardService = {
 
   deleteComentarioSoporte: async (id) => {
     try {
-      const response = await fetch(`${BASE_URL}/comentariosSoporte/${id}`, {
+      const response = await apiFetch(`/comentariosSoporte/${id}`, {
         method: 'DELETE'
       });
       if (!response.ok) throw new Error('Error eliminando comentario');
@@ -304,7 +304,7 @@ export const dashboardService = {
    */
   getEventos: async () => {
     try {
-      const response = await fetch(`${BASE_URL}/eventos`);
+      const response = await apiFetch('/eventos');
       if (!response.ok) throw new Error('Error fetching eventos');
       return await response.json();
     } catch (error) {
@@ -318,7 +318,7 @@ export const dashboardService = {
    */
   createEvento: async (eventoData) => {
     try {
-      const response = await fetch(`${BASE_URL}/eventos`, {
+      const response = await apiFetch('/eventos', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(eventoData)
@@ -336,7 +336,7 @@ export const dashboardService = {
    */
   deleteEvento: async (eventoId) => {
     try {
-      const response = await fetch(`${BASE_URL}/eventos/${eventoId}`, {
+      const response = await apiFetch(`/eventos/${eventoId}`, {
         method: 'DELETE'
       });
       if (!response.ok) throw new Error('Error deleting evento');

@@ -18,7 +18,12 @@ const CatTipoDelito = sequelizeFP.define('CatTipoDelito', {
   }
 }, {
   tableName: 'cat_tipo_delito',
-  timestamps: false
+  timestamps: true,
+  underscored: true
 });
+
+CatTipoDelito.associate = (models) => {
+  CatTipoDelito.hasMany(models.IncidenteDelictivo, { foreignKey: 'tipo_delito_id', as: 'incidentes' });
+};
 
 module.exports = CatTipoDelito;

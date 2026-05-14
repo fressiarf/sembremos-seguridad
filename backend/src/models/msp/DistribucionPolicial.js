@@ -13,7 +13,9 @@ const DistribucionPolicial = sequelizeFP.define('DistribucionPolicial', {
     references: {
       model: 'zonas_riesgo',
       key: 'id'
-    }
+    },
+    onUpdate: 'CASCADE',
+    onDelete: 'CASCADE'
   },
   cantidad_oficiales: {
     type: DataTypes.INTEGER,
@@ -26,12 +28,34 @@ const DistribucionPolicial = sequelizeFP.define('DistribucionPolicial', {
     references: {
       model: 'cat_turno',
       key: 'id'
-    }
+    },
+    onUpdate: 'CASCADE',
+    onDelete: 'RESTRICT'
   }
 }, {
   tableName: 'distribucion_policial',
   timestamps: true,
-  underscored: true
+  underscored: true,
+  hooks: {
+    afterCreate: async (instance, options) => {
+      const LogAuditoriaFP = require('./LogAuditoriaFP');
+      const { generarHooksAuditoria } = require('../../common/helpers/auditHelper');
+      const hooks = generarHooksAuditoria(LogAuditoriaFP, 'DistribucionPolicial');
+      await hooks.afterCreate(instance, options);
+    },
+    afterUpdate: async (instance, options) => {
+      const LogAuditoriaFP = require('./LogAuditoriaFP');
+      const { generarHooksAuditoria } = require('../../common/helpers/auditHelper');
+      const hooks = generarHooksAuditoria(LogAuditoriaFP, 'DistribucionPolicial');
+      await hooks.afterUpdate(instance, options);
+    },
+    afterDestroy: async (instance, options) => {
+      const LogAuditoriaFP = require('./LogAuditoriaFP');
+      const { generarHooksAuditoria } = require('../../common/helpers/auditHelper');
+      const hooks = generarHooksAuditoria(LogAuditoriaFP, 'DistribucionPolicial');
+      await hooks.afterDestroy(instance, options);
+    }
+  }
 });
 
 DistribucionPolicial.associate = (models) => {
