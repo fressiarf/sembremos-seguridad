@@ -12,6 +12,8 @@ module.exports = {
       { id: 4, nombre: 'Operativo', permisos: JSON.stringify(['read', 'report']) }
     ], {});
 
+    const rawPassword = process.env.DEFAULT_ADMIN_PASSWORD || 'Admin1234';
+
     // 2. Insertar Usuario SuperAdmin inicial usando el Modelo
     // Esto asegura que pase por las validaciones de Cédula y Longitud de Password
     await UsuarioFP.create({
@@ -19,8 +21,8 @@ module.exports = {
       nombre: 'Super',
       apellido: 'Admin Sistema',
       cedula: '100000001', // Cédula válida de 9 dígitos
-      email: 'super@sembremoseguridad.go.cr',
-      password: 'Sembremos.2026*', // Texto plano -> El hook del modelo lo hashea
+      email: 'admin@sembremos.cr',
+      password: rawPassword, // Texto plano -> El hook del modelo lo hashea
       rol_id: 1,
       activo: true
     });

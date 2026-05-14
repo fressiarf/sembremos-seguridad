@@ -10,15 +10,29 @@ module.exports = {
       { id: 3, nombre: 'Visualizador', permisos: JSON.stringify(['read']) }
     ], {});
 
-    // 2. Insertar Usuario Admin Municipal inicial usando el Modelo
+    const rawPassword = process.env.DEFAULT_ADMIN_PASSWORD || 'Admin1234';
+
+    // 2. Insertar Usuario Admin Municipal
     await UsuarioLocal.create({
       id: '00000000-0000-0000-0000-000000000002',
-      nombre: 'Admin',
+      nombre: 'Alcaldía',
       apellido: 'Municipal Puntarenas',
-      cedula: '600000001', // Cédula válida (Provincia 6 = Puntarenas)
-      email: 'admin@muni.cr',
-      password: 'admin123', // Texto plano -> El hook lo hashea
+      cedula: '600000001',
+      email: 'muni@sembremos.cr',
+      password: rawPassword,
       rol_id: 1,
+      activo: true
+    });
+
+    // 3. Insertar Usuario Gestor
+    await UsuarioLocal.create({
+      id: '00000000-0000-0000-0000-000000000003',
+      nombre: 'Gestor',
+      apellido: 'IAFA',
+      cedula: '600000002',
+      email: 'gestor@sembremos.cr',
+      password: rawPassword,
+      rol_id: 2,
       activo: true
     });
   },
