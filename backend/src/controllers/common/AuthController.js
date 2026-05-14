@@ -82,7 +82,10 @@ class AuthController {
         message: 'Sesión iniciada correctamente',
         data: {
           user: {
+            id: user.id,
             nombre: `${user.nombre} ${user.apellido}`,
+            cedula: user.cedula,
+            email: user.email,
             rol: user.rol ? user.rol.nombre : 'N/A',
             nivel: nivelUpper
           }
@@ -312,6 +315,7 @@ class AuthController {
           user: {
             id: user.id,
             nombre: `${user.nombre} ${user.apellido}`,
+            cedula: user.cedula,
             email: user.email,
             rol: user.rol ? user.rol.nombre : 'N/A',
             nivel: nivelUpper

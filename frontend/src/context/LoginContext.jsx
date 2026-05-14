@@ -7,9 +7,29 @@ const LoginContext = createContext();
 export const LoginProvider = ({ children }) => {
 
   useEffect(() => {
+    const fetchUser = async () => {
+      try {
+        const response = await fetch('http://localhost:5000/api/v1/auth/me', {
+          credentials: 'include'
+        });
+        if (response.ok) {
+          const result = await response.json();
+          setUser(result.data.user);
+          sessionStorage.setItem('currentUser', JSON.stringify(result.data.user));
+        } else {
+          // Si no hay sesión válida en el servidor, limpiamos local
+          sessionStorage.removeItem('currentUser');
+          setUser(null);
+        }
+      } catch (error) {
+        console.error('Error sincronizando sesión:', error);
+      }
+    };
+
     const savedUser = sessionStorage.getItem('currentUser');
     if (savedUser) {
       setUser(JSON.parse(savedUser));
+      fetchUser(); // Sincronizar con el servidor para tener datos frescos
     }
   }, []);
   const [errors, setErrors] = useState({
