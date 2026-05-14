@@ -1,0 +1,256 @@
+/* ═══════════════════════════════════════════════════ */
+/*  ELEMENTOS UI — Formulario de Actualización        */
+/* ═══════════════════════════════════════════════════ */
+
+/* ─── Selector Línea de Acción ─── */
+.SelectorLineaAccion {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.SelectorLineaAccion label {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--text-dark);
+}
+
+.SelectorLineaAccion select {
+  padding: 0.55rem 0.75rem;
+  border: 1px solid var(--gray-border);
+  border-radius: 5px;
+  font-size: 0.85rem;
+  color: var(--text-dark);
+  background: var(--gray-bg);
+  font-family: inherit;
+  transition: border-color 0.2s ease;
+}
+
+.SelectorLineaAccion select:focus {
+  outline: none;
+  border-color: var(--navy-blue);
+  box-shadow: 0 0 0 3px var(--focus-ring);
+}
+
+/* ─── Slider Progreso ─── */
+.SliderProgreso {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.SliderProgreso label {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--text-dark);
+}
+
+.SliderProgreso input[type="range"] {
+  width: 100%;
+  height: 6px;
+  border-radius: 3px;
+  appearance: none;
+  background: linear-gradient(
+    to right,
+    var(--navy-blue) 0%,
+    var(--navy-blue) var(--value, 50%),
+    var(--gray-border) var(--value, 50%),
+    var(--gray-border) 100%
+  );
+  cursor: pointer;
+  outline: none;
+}
+
+.SliderProgreso input[type="range"]::-webkit-slider-thumb {
+  appearance: none;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: var(--navy-blue);
+  border: 3px solid var(--white);
+  box-shadow: 0 2px 6px rgba(11, 34, 64, 0.3);
+  cursor: grab;
+  transition: transform 0.15s ease;
+}
+
+.SliderProgreso input[type="range"]::-webkit-slider-thumb:hover {
+  transform: scale(1.15);
+}
+
+/* ─── Carga Evidencias ─── */
+.CargaEvidencias {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.CargaEvidencias label {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--text-dark);
+}
+
+.CargaEvidenciasDropzone {
+  padding: 1.5rem;
+  border: 2px dashed var(--gray-border);
+  border-radius: 8px;
+  background: var(--gray-bg);
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.CargaEvidenciasDropzone:hover {
+  border-color: var(--navy-blue-light);
+  background: #f0f4ff;
+}
+
+.CargaEvidencias input[type="file"] {
+  padding: 0.5rem;
+  font-size: 0.82rem;
+  color: var(--gray-text);
+}
+
+.CargaEvidencias p {
+  margin: 0.5rem 0 0;
+  font-size: 0.72rem;
+  color: var(--gray-text);
+}
+
+/* ─── Bitácora Comentario ─── */
+.BitacoraComentario {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.BitacoraComentario label {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--text-dark);
+}
+
+.BitacoraComentario textarea {
+  padding: 0.65rem 0.75rem;
+  border: 1px solid var(--gray-border);
+  border-radius: 5px;
+  font-size: 0.85rem;
+  color: var(--text-dark);
+  background: var(--gray-bg);
+  font-family: inherit;
+  resize: vertical;
+  min-height: 90px;
+  line-height: 1.5;
+  transition: border-color 0.2s ease;
+}
+
+.BitacoraComentario textarea:focus {
+  outline: none;
+  border-color: var(--navy-blue);
+  box-shadow: 0 0 0 3px var(--focus-ring);
+  background: var(--white);
+}
+
+/* ─── Resumen Hito ─── */
+.ResumenHito {
+  background: var(--gray-bg);
+  border: 1px solid var(--gray-border);
+  border-left: 4px solid var(--navy-blue);
+  border-radius: 6px;
+  padding: 1rem;
+}
+
+.ResumenHito h4 {
+  margin: 0 0 0.35rem;
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: var(--navy-blue);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.ResumenHito p {
+  margin: 0 0 0.25rem;
+  font-size: 0.85rem;
+  color: var(--text-dark);
+  font-weight: 500;
+}
+
+.ResumenHito span {
+  font-size: 0.75rem;
+  color: var(--gray-text);
+}
+
+/* ─── Botón Guardar Avance ─── */
+.BtnGuardarAvance {
+  width: 100%;
+  padding: 0.75rem 1.5rem;
+  background: linear-gradient(135deg, var(--navy-blue) 0%, var(--navy-blue-light) 100%);
+  color: var(--white);
+  border: none;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.25s ease;
+  font-family: inherit;
+  letter-spacing: 0.01em;
+  box-shadow: 0 4px 12px rgba(11, 34, 64, 0.25);
+}
+
+.BtnGuardarAvance:hover {
+  box-shadow: 0 6px 20px rgba(11, 34, 64, 0.35);
+  transform: translateY(-1px);
+}
+
+.BtnGuardarAvance:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 6px rgba(11, 34, 64, 0.2);
+}
+
+.BtnGuardarAvance:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+/* ─── Alerta Estado Línea ─── */
+.AlertaEstadoLinea {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.6rem 0.85rem;
+  border-radius: 6px;
+  font-size: 0.78rem;
+  font-weight: 500;
+}
+
+.AlertaEstadoLinea.normal {
+  background: #f0fdf4;
+  color: #15803d;
+  border: 1px solid #bbf7d0;
+}
+
+.AlertaEstadoLinea.advertencia {
+  background: #fffbeb;
+  color: #92400e;
+  border: 1px solid #fde68a;
+}
+
+.AlertaEstadoLinea.critica {
+  background: #fef2f2;
+  color: #991b1b;
+  border: 1px solid #fecaca;
+  animation: alertaPulse 2s infinite;
+}
+
+@keyframes alertaPulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.85; }
+}
+
+.AlertaEstadoLinea p {
+  margin: 0;
+  font-weight: 600;
+}

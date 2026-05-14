@@ -1,0 +1,154 @@
+/* ═══════════════════════════════════════════════════
+   Acceso Restringido — Pantalla de seguridad
+   ═══════════════════════════════════════════════════ */
+
+.acceso-restringido {
+  padding: 3rem 2.5rem;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  font-family: 'Inter', sans-serif;
+}
+
+.acceso-restringido__card {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 18px;
+  padding: 2.5rem;
+  max-width: 600px;
+  width: 100%;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.06);
+  text-align: center;
+}
+
+.acceso-restringido__icon-wrapper {
+  position: relative;
+  display: inline-flex;
+  margin-bottom: 1.5rem;
+}
+
+.acceso-restringido__shield {
+  width: 80px;
+  height: 80px;
+  background: #fef2f2;
+  border: 2px solid #fecaca;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.acceso-restringido__lock {
+  position: absolute;
+  bottom: -2px;
+  right: -2px;
+  width: 28px;
+  height: 28px;
+  background: #dc2626;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 3px solid #ffffff;
+}
+
+.acceso-restringido__title {
+  font-size: 1.25rem;
+  font-weight: 800;
+  color: #0f172a;
+  margin: 0 0 1rem;
+}
+
+.acceso-restringido__message {
+  font-size: 0.88rem;
+  color: #475569;
+  line-height: 1.7;
+  margin: 0;
+}
+
+.acceso-restringido__divider {
+  height: 1px;
+  background: #e2e8f0;
+  margin: 1.5rem 0;
+}
+
+.acceso-restringido__role-box {
+  background: #f0fdf4;
+  border: 1px solid #bbf7d0;
+  border-radius: 12px;
+  padding: 1.2rem;
+  text-align: left;
+}
+
+.acceso-restringido__role-header {
+  margin-bottom: 8px;
+}
+
+.acceso-restringido__role-badge {
+  background: #166534;
+  color: #fff;
+  font-size: 0.65rem;
+  font-weight: 800;
+  padding: 3px 10px;
+  border-radius: 999px;
+  letter-spacing: 0.06em;
+}
+
+.acceso-restringido__role-text {
+  font-size: 0.82rem;
+  color: #334155;
+  line-height: 1.6;
+  margin: 0;
+}
+
+.acceso-restringido__actions {
+  margin-top: 1.5rem;
+  text-align: left;
+}
+
+.acceso-restringido__actions-label {
+  font-size: 0.75rem;
+  color: #64748b;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  margin: 0 0 10px;
+}
+
+.acceso-restringido__chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.acceso-restringido__chip {
+  background: #f1f5f9;
+  border: 1px solid #e2e8f0;
+  color: #334155;
+  font-size: 0.74rem;
+  font-weight: 600;
+  padding: 4px 12px;
+  border-radius: 999px;
+}
+
+.acceso-restringido__btn {
+  margin-top: 1.5rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 24px;
+  background: #0d9488;
+  color: #fff;
+  border: none;
+  border-radius: 10px;
+  font-size: 0.85rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.2s, transform 0.2s;
+  font-family: 'Inter', sans-serif;
+}
+
+.acceso-restringido__btn:hover {
+  background: #0f766e;
+  transform: translateY(-1px);
+}

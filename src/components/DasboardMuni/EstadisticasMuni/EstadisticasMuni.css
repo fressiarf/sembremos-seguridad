@@ -1,0 +1,55 @@
+/* ═══════════════════════════════════════════════════
+   Estadísticas Municipales — Estilos
+   ═══════════════════════════════════════════════════ */
+
+.est-muni-card {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 14px;
+  padding: 1.25rem;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.02);
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.est-muni-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.06);
+}
+
+.est-muni-card-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.est-muni-card-label {
+  display: block;
+  font-size: 0.72rem;
+  color: #64748b;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  margin-bottom: 2px;
+}
+
+.est-muni-card-value {
+  display: block;
+  font-size: 1.6rem;
+  font-weight: 800;
+  color: #0b2240;
+  line-height: 1.1;
+}
+
+.est-muni-card-sub {
+  display: block;
+  font-size: 0.7rem;
+  color: #94a3b8;
+  margin-top: 2px;
+}

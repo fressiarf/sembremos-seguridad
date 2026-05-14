@@ -1,0 +1,96 @@
+/* HeaderInstitucional.css */
+.HeaderContenedor {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 1rem;
+  width: 100%;
+}
+
+.SeccionLogosInstitucionales {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 1.5rem;
+  margin-bottom: 0.75rem;
+  width: 100%;
+}
+
+.ContenedorLogoItem {
+  height: 45px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.ContenedorLogoItem img {
+  max-height: 100%;
+  width: auto;
+  object-fit: contain;
+}
+
+/* Fallback visualization for empty image tags */
+.ImagenLogoMsp[src=""],
+.ImagenLogoInl[src=""],
+.ImagenLogoSembremos[src=""] {
+  display: block;
+  width: 45px;
+  height: 45px;
+  border-radius: 50%;
+  background-color: #f1f5f9;
+  border: 1px dashed #cbd5e1;
+  color: transparent;
+  position: relative;
+}
+
+.SeccionBranding {
+  text-align: center;
+  border-bottom: none;
+  padding-bottom: 0.75rem;
+  width: 100%;
+}
+
+.TituloProyecto {
+  color: var(--navy-blue);
+  font-size: 1.4rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.75px;
+  margin: 0 0 0.4rem 0;
+}
+
+.SubtituloGobierno {
+  color: var(--navy-blue);
+  font-size: 0.85rem;
+  font-weight: 500;
+  margin: 0;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.SeccionAccesoStatus {
+  margin-top: -10px;
+  display: flex;
+  align-items: center;
+  width: 100%;
+}
+
+.SeccionAccesoStatus::before,
+.SeccionAccesoStatus::after {
+  content: "";
+  flex: 1;
+  height: 1px;
+  background-color: var(--gray-border);
+}
+
+.EtiquetaAcceso {
+  background-color: transparent;
+  color: var(--navy-blue);
+  font-size: 0.7rem;
+  font-weight: 700;
+  padding: 0 1rem;
+  border-radius: 3px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  white-space: nowrap;
+}
