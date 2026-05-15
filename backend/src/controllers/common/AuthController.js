@@ -243,15 +243,14 @@ class AuthController {
       //    El hook beforeCreate del modelo se encargará de hashearla automáticamente.
 
       // 7. Mapeo de Roles a IDs (Basado en la estructura del sistema)
-      // Nota: En una implementación ideal esto se consultaría en la tabla de roles,
-      // pero para el registro inicial usamos el mapeo directo.
+      // 5. Mapeo de Roles a IDs
       let rol_id = 1; // Default Admin
       if (roleUpper === 'OFICIAL_MSP' || roleUpper === 'GESTOR_MUNI') {
         rol_id = 2; // Operativo
       }
 
-      // 8. Creación del registro
-      const newUser = await UserModel.create({
+      // 6. Creación del registro vía Repository
+      const newUser = await userRepository.create({
         nombre,
         apellido,
         cedula,
@@ -262,7 +261,7 @@ class AuthController {
         activo: true
       }, nivelUpper);
 
-      // 9. Respuesta exitosa
+      // 7. Respuesta exitosa
       return res.status(201).json({
         status: 'success',
         message: 'Usuario registrado exitosamente',
@@ -295,6 +294,9 @@ class AuthController {
     try {
       // 1. El ID y Nivel vienen del middleware de autenticación
       const { id, nivel } = req.user;
+
+      // 2. Seleccionar nivel
+      const nivelUpper = nivel.toUpperCase();
 
       // 3. Consultar base de datos vía Repository
       const user = await userRepository.findById(id, nivelUpper);
