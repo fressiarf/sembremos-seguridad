@@ -29,7 +29,27 @@ const AsignacionCogestor = sequelizeMUNI.define('AsignacionCogestor', {
 }, {
   tableName: 'asignaciones_cogestor',
   timestamps: true,
-  underscored: true
+  underscored: true,
+  hooks: {
+    afterCreate: async (instance, options) => {
+      const LogAuditoriaLocal = require('./LogAuditoriaLocal');
+      const { generarHooksAuditoria } = require('../../common/helpers/auditHelper');
+      const hooks = generarHooksAuditoria(LogAuditoriaLocal, 'AsignacionCogestor');
+      await hooks.afterCreate(instance, options);
+    },
+    afterUpdate: async (instance, options) => {
+      const LogAuditoriaLocal = require('./LogAuditoriaLocal');
+      const { generarHooksAuditoria } = require('../../common/helpers/auditHelper');
+      const hooks = generarHooksAuditoria(LogAuditoriaLocal, 'AsignacionCogestor');
+      await hooks.afterUpdate(instance, options);
+    },
+    afterDestroy: async (instance, options) => {
+      const LogAuditoriaLocal = require('./LogAuditoriaLocal');
+      const { generarHooksAuditoria } = require('../../common/helpers/auditHelper');
+      const hooks = generarHooksAuditoria(LogAuditoriaLocal, 'AsignacionCogestor');
+      await hooks.afterDestroy(instance, options);
+    }
+  }
 });
 
 AsignacionCogestor.associate = (models) => {

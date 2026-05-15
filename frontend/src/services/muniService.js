@@ -1,4 +1,4 @@
-const BASE_URL = 'http://localhost:5000';
+import { apiFetch } from '../utils/apiFetch';
 
 /**
  * Servicio exclusivo para el Dashboard Municipal.
@@ -9,10 +9,10 @@ export const muniService = {
   getFullMuniDashboard: async () => {
     try {
       const [tareas, reportes, lineas, usuarios] = await Promise.all([
-        fetch(`${BASE_URL}/tareas`).then(r => r.json()),
-        fetch(`${BASE_URL}/reportes`).then(r => r.json()),
-        fetch(`${BASE_URL}/lineasAccion`).then(r => r.json()),
-        fetch(`${BASE_URL}/usuarios`).then(r => r.json()),
+        apiFetch('/tareas').then(r => r.json()),
+        apiFetch('/reportes').then(r => r.json()),
+        apiFetch('/lineasAccion').then(r => r.json()),
+        apiFetch('/usuarios').then(r => r.json()),
       ]);
 
       // ─── FILTRO: Excluir tareas tipo 3 (operativos/seguridad) ───
@@ -86,8 +86,8 @@ export const muniService = {
   getTareasPreventivas: async () => {
     try {
       const [tareas, reportes] = await Promise.all([
-        fetch(`${BASE_URL}/tareas`).then(r => r.json()),
-        fetch(`${BASE_URL}/reportes`).then(r => r.json()),
+        apiFetch('/tareas').then(r => r.json()),
+        apiFetch('/reportes').then(r => r.json()),
       ]);
       return tareas.filter(t => t.tipo !== 3).map(t => {
         const misReportes = reportes.filter(r => r.tareaId === t.id && r.estado === 'aprobado');
@@ -103,8 +103,8 @@ export const muniService = {
   getReportesComunitarios: async () => {
     try {
       const [reportes, tareas] = await Promise.all([
-        fetch(`${BASE_URL}/reportes`).then(r => r.json()),
-        fetch(`${BASE_URL}/tareas`).then(r => r.json()),
+        apiFetch('/reportes').then(r => r.json()),
+        apiFetch('/tareas').then(r => r.json()),
       ]);
       return reportes
         .filter(r => r.tipoActividad !== 'Seguridad')
@@ -121,7 +121,7 @@ export const muniService = {
 
   crearActividad: async (tareaData) => {
     try {
-      const resp = await fetch(`${BASE_URL}/tareas`, {
+      const resp = await apiFetch('/tareas', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
@@ -137,7 +137,7 @@ export const muniService = {
 
   actualizarActividad: async (id, tareaData) => {
     try {
-      const resp = await fetch(`${BASE_URL}/tareas/${id}`, {
+      const resp = await apiFetch(`/tareas/${id}`, {
         method: 'PATCH',
         headers: {
           'Content-Type': 'application/json'

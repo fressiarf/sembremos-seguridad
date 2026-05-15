@@ -18,7 +18,12 @@ const RolFP = sequelizeFP.define('RolFP', {
   }
 }, {
   tableName: 'roles_fp',
-  timestamps: false
+  timestamps: true,
+  underscored: true
 });
+
+RolFP.associate = (models) => {
+  RolFP.hasMany(models.UsuarioFP, { foreignKey: 'rol_id', as: 'usuarios' });
+};
 
 module.exports = RolFP;

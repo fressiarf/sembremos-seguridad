@@ -18,7 +18,8 @@ const CatRangoPolicial = sequelizeFP.define('CatRangoPolicial', {
   }
 }, {
   tableName: 'cat_rango_policial',
-  timestamps: false
+  timestamps: true,
+  underscored: true
 });
 
 module.exports = CatRangoPolicial;

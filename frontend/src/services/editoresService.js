@@ -1,4 +1,4 @@
-const BASE_URL = 'http://localhost:5000';
+import { apiFetch } from '../utils/apiFetch';
 
 export const editoresService = {
   /**
@@ -8,7 +8,7 @@ export const editoresService = {
     try {
       const tareas = await editoresService.getTareasDeInstitucion(userId);
       const lineaIds = [...new Set(tareas.map(t => t.lineaAccionId))];
-      const resLineas = await fetch(`${BASE_URL}/lineasAccion`);
+      const resLineas = await apiFetch('/lineasAccion');
       const allLineas = await resLineas.json();
       return allLineas.filter(l => lineaIds.includes(l.id));
     } catch (error) {
@@ -22,7 +22,7 @@ export const editoresService = {
    */
   getTareasDeInstitucion: async (userId, institucionId) => {
     try {
-      const response = await fetch(`${BASE_URL}/tareas`);
+      const response = await apiFetch('/tareas');
       if (!response.ok) throw new Error('Error fetching tareas');
       const allTareas = await response.json();
       
@@ -43,9 +43,9 @@ export const editoresService = {
    */
   getTareasPorLinea: async (lineaAccionId, institucionId) => {
     try {
-      let url = `${BASE_URL}/tareas?lineaAccionId=${lineaAccionId}`;
-      if (institucionId) url += `&institucionId=${institucionId}`;
-      const response = await fetch(url);
+      let path = `/tareas?lineaAccionId=${lineaAccionId}`;
+      if (institucionId) path += `&institucionId=${institucionId}`;
+      const response = await apiFetch(path);
       if (!response.ok) throw new Error('Error fetching tareas por línea');
       return await response.json();
     } catch (error) {
@@ -59,7 +59,7 @@ export const editoresService = {
    */
   completarTarea: async (tareaId, reporteData) => {
     try {
-      const response = await fetch(`${BASE_URL}/reportes`, {
+      const response = await apiFetch('/reportes', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -106,7 +106,7 @@ export const editoresService = {
    */
   editarReporteRechazado: async (reporteId, reporteData) => {
     try {
-      const response = await fetch(`${BASE_URL}/reportes/${reporteId}`, {
+      const response = await apiFetch(`/reportes/${reporteId}`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -171,7 +171,7 @@ export const editoresService = {
     try {
       const [tareas, reportesRes] = await Promise.all([
         editoresService.getTareasDeInstitucion(userId),
-        fetch(`${BASE_URL}/reportes`)
+        apiFetch('/reportes')
       ]);
       const reportes = await reportesRes.json();
 
@@ -203,7 +203,7 @@ export const editoresService = {
 
       // Obtener las líneas relacionadas
       const lineaIds = [...new Set(tareasConProgreso.map(t => t.lineaAccionId))];
-      const resLineas = await fetch(`${BASE_URL}/lineasAccion`);
+      const resLineas = await apiFetch('/lineasAccion');
       const allLineas = await resLineas.json();
       const lineas = allLineas.filter(l => lineaIds.includes(l.id));
 
@@ -259,7 +259,7 @@ export const editoresService = {
    */
   getHitos: async () => {
     try {
-      const response = await fetch(`${BASE_URL}/alertas`);
+      const response = await apiFetch('/alertas');
       if (!response.ok) return [];
       const alertas = await response.json();
       return alertas.map(al => ({ titulo: al.descripcion, fecha: al.tipo }));

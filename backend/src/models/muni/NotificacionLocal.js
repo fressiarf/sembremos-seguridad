@@ -13,7 +13,9 @@ const NotificacionLocal = sequelizeMUNI.define('NotificacionLocal', {
     references: {
       model: 'usuarios_local',
       key: 'id'
-    }
+    },
+    onUpdate: 'CASCADE',
+    onDelete: 'CASCADE'
   },
   titulo: {
     type: DataTypes.STRING(200),

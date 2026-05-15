@@ -13,7 +13,9 @@ const SesionActivaFP = sequelizeFP.define('SesionActivaFP', {
     references: {
       model: 'usuarios_fp',
       key: 'id'
-    }
+    },
+    onUpdate: 'CASCADE',
+    onDelete: 'CASCADE'
   },
   token: {
     type: DataTypes.TEXT,

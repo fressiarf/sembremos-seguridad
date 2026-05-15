@@ -29,6 +29,7 @@ Canton.associate = (models) => {
   Canton.belongsTo(models.Provincia, { foreignKey: 'provincia_id', as: 'provincia' });
   Canton.hasMany(models.Distrito, { foreignKey: 'canton_id', as: 'distritos' });
   Canton.hasMany(models.InstitucionMaestra, { foreignKey: 'canton_id', as: 'instituciones' });
+  Canton.hasMany(models.LineaAccion, { foreignKey: 'canton_id', as: 'lineasAccion' });
 };
 
 module.exports = Canton;

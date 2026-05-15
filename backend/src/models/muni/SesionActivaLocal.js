@@ -13,7 +13,9 @@ const SesionActivaLocal = sequelizeMUNI.define('SesionActivaLocal', {
     references: {
       model: 'usuarios_local',
       key: 'id'
-    }
+    },
+    onUpdate: 'CASCADE',
+    onDelete: 'CASCADE'
   },
   token: {
     type: DataTypes.TEXT,

@@ -30,4 +30,9 @@ const InstitucionLocal = sequelizeMUNI.define('InstitucionLocal', {
   underscored: true
 });
 
+InstitucionLocal.associate = (models) => {
+  InstitucionLocal.hasMany(models.AsignacionCogestor, { foreignKey: 'institucion_id', as: 'cogestores' });
+  InstitucionLocal.hasMany(models.EventoCalendario, { foreignKey: 'institucion_id', as: 'eventosCalendario' });
+};
+
 module.exports = InstitucionLocal;

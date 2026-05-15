@@ -9,7 +9,31 @@ const SoporteTicket = sequelizeMUNI.define('SoporteTicket', {
   prioridad_id: { type: DataTypes.INTEGER, allowNull: false, references: { model: 'cat_prioridad_ticket', key: 'id' } },
   estado_id: { type: DataTypes.INTEGER, allowNull: false, references: { model: 'cat_estado_ticket', key: 'id' } },
   fecha_cierre: { type: DataTypes.DATE, allowNull: true }
-}, { tableName: 'soporte_tickets', timestamps: true, underscored: true });
+}, {
+  tableName: 'soporte_tickets',
+  timestamps: true,
+  underscored: true,
+  hooks: {
+    afterCreate: async (instance, options) => {
+      const LogAuditoriaLocal = require('./LogAuditoriaLocal');
+      const { generarHooksAuditoria } = require('../../common/helpers/auditHelper');
+      const hooks = generarHooksAuditoria(LogAuditoriaLocal, 'SoporteTicket');
+      await hooks.afterCreate(instance, options);
+    },
+    afterUpdate: async (instance, options) => {
+      const LogAuditoriaLocal = require('./LogAuditoriaLocal');
+      const { generarHooksAuditoria } = require('../../common/helpers/auditHelper');
+      const hooks = generarHooksAuditoria(LogAuditoriaLocal, 'SoporteTicket');
+      await hooks.afterUpdate(instance, options);
+    },
+    afterDestroy: async (instance, options) => {
+      const LogAuditoriaLocal = require('./LogAuditoriaLocal');
+      const { generarHooksAuditoria } = require('../../common/helpers/auditHelper');
+      const hooks = generarHooksAuditoria(LogAuditoriaLocal, 'SoporteTicket');
+      await hooks.afterDestroy(instance, options);
+    }
+  }
+});
 
 SoporteTicket.associate = (models) => {
   SoporteTicket.belongsTo(models.UsuarioLocal, { foreignKey: 'usuario_id', as: 'usuario' });

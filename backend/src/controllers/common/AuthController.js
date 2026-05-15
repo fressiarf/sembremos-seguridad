@@ -239,8 +239,8 @@ class AuthController {
         });
       }
 
-      // 6. Hashing de contraseña
-      const password_hash = await authHelper.hashPassword(password);
+      // 6. La contraseña se enviará al campo VIRTUAL del modelo.
+      //    El hook beforeCreate del modelo se encargará de hashearla automáticamente.
 
       // 7. Mapeo de Roles a IDs (Basado en la estructura del sistema)
       // Nota: En una implementación ideal esto se consultaría en la tabla de roles,
@@ -250,13 +250,13 @@ class AuthController {
         rol_id = 2; // Operativo
       }
 
-      // 8. Creación del registro vía Repository
-      const newUser = await userRepository.create({
+      // 8. Creación del registro
+      const newUser = await UserModel.create({
         nombre,
         apellido,
         cedula,
         email,
-        password_hash,
+        password,
         rol_id,
         institucion_id: institucion_id || null,
         activo: true

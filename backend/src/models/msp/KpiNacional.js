@@ -13,7 +13,9 @@ const KpiNacional = sequelizeFP.define('KpiNacional', {
     references: {
       model: 'acciones_estrategicas',
       key: 'id'
-    }
+    },
+    onUpdate: 'CASCADE',
+    onDelete: 'CASCADE'
   },
   nombre_indicador: {
     type: DataTypes.STRING(200),
@@ -32,7 +34,33 @@ const KpiNacional = sequelizeFP.define('KpiNacional', {
 }, {
   tableName: 'kpis_nacionales',
   timestamps: true,
-  underscored: true
+  underscored: true,
+  hooks: {
+    afterCreate: async (instance, options) => {
+      const LogAuditoriaFP = require('./LogAuditoriaFP');
+      const { generarHooksAuditoria } = require('../../common/helpers/auditHelper');
+      const hooks = generarHooksAuditoria(LogAuditoriaFP, 'KpiNacional');
+      await hooks.afterCreate(instance, options);
+      // Sincronización MSP → MUNI
+      const SyncService = require('../../services/SyncService');
+      await SyncService.syncKpis().catch(err => console.error('[SYNC ERROR] Auto-sync KPI:', err.message));
+    },
+    afterUpdate: async (instance, options) => {
+      const LogAuditoriaFP = require('./LogAuditoriaFP');
+      const { generarHooksAuditoria } = require('../../common/helpers/auditHelper');
+      const hooks = generarHooksAuditoria(LogAuditoriaFP, 'KpiNacional');
+      await hooks.afterUpdate(instance, options);
+      // Sincronización MSP → MUNI
+      const SyncService = require('../../services/SyncService');
+      await SyncService.syncKpis().catch(err => console.error('[SYNC ERROR] Auto-sync KPI:', err.message));
+    },
+    afterDestroy: async (instance, options) => {
+      const LogAuditoriaFP = require('./LogAuditoriaFP');
+      const { generarHooksAuditoria } = require('../../common/helpers/auditHelper');
+      const hooks = generarHooksAuditoria(LogAuditoriaFP, 'KpiNacional');
+      await hooks.afterDestroy(instance, options);
+    }
+  }
 });
 
 KpiNacional.associate = (models) => {

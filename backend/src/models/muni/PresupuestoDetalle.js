@@ -13,7 +13,9 @@ const PresupuestoDetalle = sequelizeMUNI.define('PresupuestoDetalle', {
     references: {
       model: 'actividades_local',
       key: 'id'
-    }
+    },
+    onUpdate: 'CASCADE',
+    onDelete: 'CASCADE'
   },
   concepto: {
     type: DataTypes.STRING(200),
@@ -30,12 +32,34 @@ const PresupuestoDetalle = sequelizeMUNI.define('PresupuestoDetalle', {
     references: {
       model: 'cat_fuente_fondos',
       key: 'id'
-    }
+    },
+    onUpdate: 'CASCADE',
+    onDelete: 'RESTRICT'
   }
 }, {
   tableName: 'presupuesto_detalle',
   timestamps: true,
-  underscored: true
+  underscored: true,
+  hooks: {
+    afterCreate: async (instance, options) => {
+      const LogAuditoriaLocal = require('./LogAuditoriaLocal');
+      const { generarHooksAuditoria } = require('../../common/helpers/auditHelper');
+      const hooks = generarHooksAuditoria(LogAuditoriaLocal, 'PresupuestoDetalle');
+      await hooks.afterCreate(instance, options);
+    },
+    afterUpdate: async (instance, options) => {
+      const LogAuditoriaLocal = require('./LogAuditoriaLocal');
+      const { generarHooksAuditoria } = require('../../common/helpers/auditHelper');
+      const hooks = generarHooksAuditoria(LogAuditoriaLocal, 'PresupuestoDetalle');
+      await hooks.afterUpdate(instance, options);
+    },
+    afterDestroy: async (instance, options) => {
+      const LogAuditoriaLocal = require('./LogAuditoriaLocal');
+      const { generarHooksAuditoria } = require('../../common/helpers/auditHelper');
+      const hooks = generarHooksAuditoria(LogAuditoriaLocal, 'PresupuestoDetalle');
+      await hooks.afterDestroy(instance, options);
+    }
+  }
 });
 
 PresupuestoDetalle.associate = (models) => {

@@ -1,4 +1,4 @@
-const BASE_URL = 'http://localhost:5000';
+import { apiFetch } from '../utils/apiFetch';
 
 /**
  * Servicio de Alertas por Vencimiento
@@ -50,7 +50,7 @@ export const alertasService = {
    */
   generarAlertasVencimiento: async () => {
     try {
-      const res = await fetch(`${BASE_URL}/tareas`);
+      const res = await apiFetch('/tareas');
       if (!res.ok) return [];
       const tareas = await res.json();
 

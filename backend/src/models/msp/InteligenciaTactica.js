@@ -9,7 +9,31 @@ const InteligenciaTactica = sequelizeFP.define('InteligenciaTactica', {
   hallazgo: { type: DataTypes.TEXT, allowNull: false },
   fuente: { type: DataTypes.STRING(200), allowNull: true },
   analista_id: { type: DataTypes.UUID, allowNull: false, references: { model: 'usuarios_fp', key: 'id' } }
-}, { tableName: 'inteligencia_tactica', timestamps: true, underscored: true });
+}, {
+  tableName: 'inteligencia_tactica',
+  timestamps: true,
+  underscored: true,
+  hooks: {
+    afterCreate: async (instance, options) => {
+      const LogAuditoriaFP = require('./LogAuditoriaFP');
+      const { generarHooksAuditoria } = require('../../common/helpers/auditHelper');
+      const hooks = generarHooksAuditoria(LogAuditoriaFP, 'InteligenciaTactica');
+      await hooks.afterCreate(instance, options);
+    },
+    afterUpdate: async (instance, options) => {
+      const LogAuditoriaFP = require('./LogAuditoriaFP');
+      const { generarHooksAuditoria } = require('../../common/helpers/auditHelper');
+      const hooks = generarHooksAuditoria(LogAuditoriaFP, 'InteligenciaTactica');
+      await hooks.afterUpdate(instance, options);
+    },
+    afterDestroy: async (instance, options) => {
+      const LogAuditoriaFP = require('./LogAuditoriaFP');
+      const { generarHooksAuditoria } = require('../../common/helpers/auditHelper');
+      const hooks = generarHooksAuditoria(LogAuditoriaFP, 'InteligenciaTactica');
+      await hooks.afterDestroy(instance, options);
+    }
+  }
+});
 
 InteligenciaTactica.associate = (models) => {
   InteligenciaTactica.belongsTo(models.ZonaRiesgo, { foreignKey: 'zona_id', as: 'zona' });
