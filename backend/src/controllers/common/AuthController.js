@@ -1,5 +1,7 @@
 const authHelper = require('../../common/helpers/authHelper');
+const validationHelper = require('../../common/helpers/validationHelper');
 const tokenService = require('../../common/services/tokenService');
+const userRepository = require('../../common/repositories/userRepository');
 const UsuarioFP = require('../../models/msp/UsuarioFP');
 const UsuarioLocal = require('../../models/muni/UsuarioLocal');
 const RolFP = require('../../models/msp/RolFP');
@@ -27,11 +29,8 @@ class AuthController {
       const UserModel = nivelUpper === 'MSP' ? UsuarioFP : UsuarioLocal;
       const RoleModel = nivelUpper === 'MSP' ? RolFP : RolLocal;
       
-      // 3. Buscar usuario incluyendo su rol
-      const user = await UserModel.findOne({ 
-        where: { email, activo: true },
-        include: [{ model: RoleModel, as: 'rol' }]
-      });
+      // 3. Buscar usuario incluyendo su rol vía Repository
+      const user = await userRepository.findByEmail(email, nivelUpper);
       
       // 4. Verificación de seguridad (Usuario existe)
       if (!user) {
@@ -190,6 +189,14 @@ class AuthController {
         });
       }
 
+      // 1.1 Validación de formato de Cédula (Costa Rica - 9 dígitos)
+      if (!validationHelper.isValidCedula(cedula)) {
+        return res.status(400).json({
+          status: 'fail',
+          message: 'El formato de la cédula es inválido. Debe contener 9 dígitos numéricos (ej: 102340567).'
+        });
+      }
+
       const nivelUpper = nivel.toUpperCase();
       const roleUpper = role.toUpperCase();
 
@@ -215,7 +222,7 @@ class AuthController {
       const UserModel = nivelUpper === 'MSP' ? UsuarioFP : UsuarioLocal;
 
       // 4. Verificar duplicados por Email
-      const existingEmail = await UserModel.findOne({ where: { email } });
+      const existingEmail = await userRepository.findByEmail(email, nivelUpper);
       if (existingEmail) {
         return res.status(400).json({ 
           status: 'fail', 
@@ -223,8 +230,8 @@ class AuthController {
         });
       }
 
-      // 5. Verificar duplicados por Cédula (Buena práctica de Senior)
-      const existingCedula = await UserModel.findOne({ where: { cedula } });
+      // 5. Verificar duplicados por Cédula (Uso de Repository)
+      const existingCedula = await userRepository.findByCedula(cedula, nivelUpper);
       if (existingCedula) {
         return res.status(400).json({ 
           status: 'fail', 
@@ -243,8 +250,8 @@ class AuthController {
         rol_id = 2; // Operativo
       }
 
-      // 8. Creación del registro
-      const newUser = await UserModel.create({
+      // 8. Creación del registro vía Repository
+      const newUser = await userRepository.create({
         nombre,
         apellido,
         cedula,
@@ -253,7 +260,7 @@ class AuthController {
         rol_id,
         institucion_id: institucion_id || null,
         activo: true
-      });
+      }, nivelUpper);
 
       // 9. Respuesta exitosa
       return res.status(201).json({
@@ -289,17 +296,8 @@ class AuthController {
       // 1. El ID y Nivel vienen del middleware de autenticación
       const { id, nivel } = req.user;
 
-      // 2. Seleccionar modelo y rol según el nivel
-      const nivelUpper = nivel.toUpperCase();
-      const UserModel = nivelUpper === 'MSP' ? UsuarioFP : UsuarioLocal;
-      const RoleModel = nivelUpper === 'MSP' ? RolFP : RolLocal;
-
-      // 3. Consultar base de datos para asegurar que el usuario aún existe y está activo
-      const user = await UserModel.findOne({
-        where: { id, activo: true },
-        include: [{ model: RoleModel, as: 'rol' }],
-        attributes: ['id', 'nombre', 'apellido', 'email'] // No traer el hash
-      });
+      // 3. Consultar base de datos vía Repository
+      const user = await userRepository.findById(id, nivelUpper);
 
       if (!user) {
         return res.status(401).json({
