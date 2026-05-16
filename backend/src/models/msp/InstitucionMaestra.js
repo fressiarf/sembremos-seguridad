@@ -32,8 +32,8 @@ const InstitucionMaestra = sequelizeFP.define('InstitucionMaestra', {
     }
   }
 }, {
-    tableName: 'institucion_maestra',
-  timestamps: true,
+  tableName: 'institucion_maestra',
+  timestamps: false,
   underscored: true,
   hooks: {
     afterCreate: async (instance, options) => {

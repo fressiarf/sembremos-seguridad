@@ -11,8 +11,11 @@ import * as XLSX from 'xlsx';
 import SkeletonLoader from '../Shared/SkeletonLoader';
 import PageTransition from '../Shared/PageTransition';
 
+import { ROLES } from '../../constants/roles';
+
 const DashboardInstitucion = () => {
   const { user } = useLogin();
+  const isLector = user?.rol === ROLES.LECTOR;
   const { showToast } = useToast();
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -207,8 +210,12 @@ const DashboardInstitucion = () => {
           ) : (
             filteredData.map(linea => (
               <CardLineaAccion key={linea.id} linea={linea}>
-                <ModuloDelegacion lineaId={linea.id} tareasIniciales={linea.tareas || []} />
-                <CargaEvidencia lineaId={linea.id} />
+                {!isLector && (
+                  <>
+                    <ModuloDelegacion lineaId={linea.id} tareasIniciales={linea.tareas || []} />
+                    <CargaEvidencia lineaId={linea.id} />
+                  </>
+                )}
               </CardLineaAccion>
             ))
           )}

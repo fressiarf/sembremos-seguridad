@@ -11,7 +11,7 @@ module.exports = {
       { id: 5, nombre: 'Narcotráfico / Venta de Drogas', categoria: 'Contra la Salud Pública' },
       { id: 6, nombre: 'Violencia Doméstica', categoria: 'Contra la Familia' },
       { id: 7, nombre: 'Hurto', categoria: 'Contra la Propiedad' }
-    ], {});
+    ], { ignoreDuplicates: true });
 
     // 2. Niveles de Gravedad
     await queryInterface.bulkInsert('cat_gravedad', [
@@ -19,7 +19,7 @@ module.exports = {
       { id: 2, nombre: 'Media', nivel: 2 },
       { id: 3, nombre: 'Alta', nivel: 3 },
       { id: 4, nombre: 'Crítica', nivel: 4 }
-    ], {});
+    ], { ignoreDuplicates: true });
 
     // 3. Estados de Caso
     await queryInterface.bulkInsert('cat_estado_caso', [
@@ -27,21 +27,21 @@ module.exports = {
       { id: 2, nombre: 'En Investigación' },
       { id: 3, nombre: 'Judicializado' },
       { id: 4, nombre: 'Cerrado' }
-    ], {});
+    ], { ignoreDuplicates: true });
 
     // 4. Clasificación de Inteligencia
     await queryInterface.bulkInsert('cat_clasificacion_intel', [
       { id: 1, nombre: 'Táctica', nivel_acceso: 1 },
       { id: 2, nombre: 'Estratégica', nivel_acceso: 3 },
       { id: 3, nombre: 'Operativa', nivel_acceso: 2 }
-    ], {});
+    ], { ignoreDuplicates: true });
 
     // 5. Niveles de Confianza
     await queryInterface.bulkInsert('cat_nivel_confianza', [
       { id: 1, nombre: 'Confirmada' },
       { id: 2, nombre: 'Probable' },
       { id: 3, nombre: 'Dudosa' }
-    ], {});
+    ], { ignoreDuplicates: true });
   },
 
   async down(queryInterface, Sequelize) {

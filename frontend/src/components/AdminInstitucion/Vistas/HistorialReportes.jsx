@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { adminInstitucionService } from '../../../services/adminInstitucionService';
 import { useToast } from '../../../context/ToastContext';
 import { useLogin } from '../../../context/LoginContext';
+import { apiFetch } from '../../../utils/apiFetch';
 import { 
   Clock, Users, Activity, CheckCircle, XCircle, AlertCircle, 
   Image as ImageIcon, Search, Calendar, Filter, ChevronRight,
@@ -33,11 +34,13 @@ const HistorialReportes = ({ isGlobal = false }) => {
       const historial = await adminInstitucionService.getHistorial(queryParams);
       setReportes(historial);
 
-      if (isGlobal && instituciones.length === 0) {
-        // Cargar lista de instituciones para el filtro global
-        const res = await fetch('http://localhost:5000/usuarios?rol=institucion&rol=adminInstitucion');
-        const users = await res.json();
-        setInstituciones(users);
+      if (isGlobal && instituciones.length === 0 && (user?.rol === 'admin' || user?.rol === 'municipalidad')) {
+        // Cargar lista de instituciones para el filtro global usando el proxy seguro
+        const res = await apiFetch('/usuarios?rol=institucion&rol=adminInstitucion');
+        if (res.ok) {
+          const users = await res.json();
+          setInstituciones(Array.isArray(users) ? users : []);
+        }
       }
     } catch (e) {
       showToast('Error al cargar historial', 'error');
@@ -90,7 +93,7 @@ const HistorialReportes = ({ isGlobal = false }) => {
                 <Building size={16} />
                 <select value={filtros.institucionId} onChange={(e) => setFiltros({...filtros, institucionId: e.target.value})}>
                   <option value="Todos">Todas las instituciones</option>
-                  {instituciones.map(inst => (
+                  {Array.isArray(instituciones) && instituciones.map(inst => (
                     <option key={inst.id} value={inst.id}>{inst.institucion || inst.nombre}</option>
                   ))}
                 </select>

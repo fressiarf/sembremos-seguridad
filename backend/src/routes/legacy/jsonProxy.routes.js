@@ -23,6 +23,25 @@ const express = require('express');
 const router = express.Router();
 const authMiddleware = require('../../common/middlewares/authMiddleware');
 
+// Modelos MSP
+const LineaAccion = require('../../models/msp/LineaAccion');
+const AccionEstrategica = require('../../models/msp/AccionEstrategica');
+const KpiNacional = require('../../models/msp/KpiNacional');
+const UsuarioFP = require('../../models/msp/UsuarioFP');
+const ZonaRiesgo = require('../../models/msp/ZonaRiesgo');
+const AlertaCumplimiento = require('../../models/msp/AlertaCumplimiento');
+
+// Modelos MUNI
+const ActividadLocal = require('../../models/muni/ActividadLocal');
+const PresupuestoDetalle = require('../../models/muni/PresupuestoDetalle');
+const UsuarioLocal = require('../../models/muni/UsuarioLocal');
+const ReporteEvidencia = require('../../models/muni/ReporteEvidencia');
+const DesgloseAsistencia = require('../../models/muni/DesgloseAsistencia');
+const EventoCalendario = require('../../models/muni/EventoCalendario');
+const SoporteTicket = require('../../models/muni/SoporteTicket');
+
+const { fn, col, Op } = require('sequelize');
+
 // Aplicar autenticación por cookie JWT a TODAS las rutas del proxy
 router.use(authMiddleware);
 
@@ -32,9 +51,6 @@ router.use(authMiddleware);
 
 router.get('/usuarios', async (req, res) => {
   try {
-    const UsuarioLocal = require('../../models/muni/UsuarioLocal');
-    const UsuarioFP = require('../../models/msp/UsuarioFP');
-
     const [muniUsers, mspUsers] = await Promise.all([
       UsuarioLocal.findAll(),
       UsuarioFP.findAll()
@@ -42,20 +58,22 @@ router.get('/usuarios', async (req, res) => {
 
     const formatted = [
       ...muniUsers.map(u => ({
-        id: u.id,
+        ...u.dataValues,
+        id: `muni_${u.id}`,
+        db_id: u.id,
         usuario: u.email,
-        nombre: u.nombre,
-        rol: 'municipalidad',
-        institucion: 'Municipalidad',
-        tipo: 'MUNI'
+        rol: u.role || 'municipalidad',
+        tipo: 'MUNI',
+        nivel: 'MUNI'
       })),
       ...mspUsers.map(u => ({
-        id: u.id,
+        ...u.dataValues,
+        id: `msp_${u.id}`,
+        db_id: u.id,
         usuario: u.email,
-        nombre: u.nombre,
-        rol: 'admin',
-        institucion: 'Ministerio de Seguridad Pública',
-        tipo: 'MSP'
+        rol: u.role || 'admin',
+        tipo: 'MSP',
+        nivel: 'MSP'
       }))
     ];
 
@@ -66,17 +84,137 @@ router.get('/usuarios', async (req, res) => {
   }
 });
 
+// NUEVO: Soporte para eliminación de usuarios
+router.delete('/usuarios/:id', async (req, res) => {
+  try {
+    const UsuarioLocal = require('../../models/muni/UsuarioLocal');
+    const UsuarioFP = require('../../models/msp/UsuarioFP');
+    const { id } = req.params;
+
+    // Detectar de qué base de datos viene por el prefijo
+    if (id.startsWith('msp_')) {
+      await UsuarioFP.destroy({ where: { id: id.replace('msp_', '') } });
+    } else if (id.startsWith('muni_')) {
+      await UsuarioLocal.destroy({ where: { id: id.replace('muni_', '') } });
+    } else {
+      // Intento a ciegas si no hay prefijo (compatibilidad)
+      await UsuarioFP.destroy({ where: { id } });
+      await UsuarioLocal.destroy({ where: { id } });
+    }
+
+    return res.json({ message: 'Usuario eliminado correctamente' });
+  } catch (error) {
+    console.error('[LEGACY] Error DELETE /usuarios:', error.message);
+    return res.status(500).json({ error: error.message });
+  }
+});
+
+// NUEVO: Soporte para actualización de usuarios (Ajustado para prefijos)
+router.patch('/usuarios/:id', async (req, res) => {
+  try {
+    const UsuarioLocal = require('../../models/muni/UsuarioLocal');
+    const UsuarioFP = require('../../models/msp/UsuarioFP');
+    const { id } = req.params;
+
+    let user;
+    if (id.startsWith('msp_')) {
+      user = await UsuarioFP.findByPk(id.replace('msp_', ''));
+    } else if (id.startsWith('muni_')) {
+      user = await UsuarioLocal.findByPk(id.replace('muni_', ''));
+    } else {
+      user = await UsuarioFP.findByPk(id) || await UsuarioLocal.findByPk(id);
+    }
+
+    if (!user) return res.status(404).json({ error: 'Usuario no encontrado' });
+
+    const { nombre, apellido, email, role, cedula, password, activo } = req.body;
+    const updateData = {};
+    if (nombre) updateData.nombre = nombre;
+    if (apellido) updateData.apellido = apellido;
+    if (email) updateData.email = email;
+    if (role) updateData.role = role;
+    if (cedula) updateData.cedula = cedula;
+    if (activo !== undefined) updateData.activo = activo;
+    if (password) {
+      const bcrypt = require('bcryptjs');
+      updateData.password = await bcrypt.hash(password, 10);
+    }
+
+    await user.update(updateData);
+    return res.json({ message: 'Usuario actualizado correctamente' });
+  } catch (error) {
+    console.error('[LEGACY] Error PATCH /usuarios:', error.message);
+    return res.status(500).json({ error: error.message });
+  }
+});
+
+// NUEVO: Catálogo de instituciones para el formulario de registro
+router.get('/usuarios/catalogos/instituciones', async (req, res) => {
+  try {
+    const InstitucionMaestra = require('../../models/msp/InstitucionMaestra');
+    const instituciones = await InstitucionMaestra.findAll({
+      attributes: ['id', 'nombre', 'siglas'],
+      order: [['nombre', 'ASC']]
+    });
+    return res.json(instituciones);
+  } catch (error) {
+    console.error('[LEGACY] Error en /usuarios/catalogos/instituciones:', error.message);
+    return res.json([]);
+  }
+});
+
+// NUEVO: Soporte para creación de usuarios a través del proxy legacy
+router.post('/usuarios', async (req, res) => {
+  const AuthController = require('../../controllers/common/AuthController');
+  return AuthController.register(req, res);
+});
+
 // ═══════════════════════════════════════════════════════
 //  LÍNEAS DE ACCIÓN — MSP
 // ═══════════════════════════════════════════════════════
 
 router.get('/lineasAccion', async (req, res) => {
   try {
-    const LineaAccion = require('../../models/msp/LineaAccion');
+    // 1. Obtener todas las líneas de acción de MSP
     const lineas = await LineaAccion.findAll({
       order: [['created_at', 'DESC']]
     });
-    return res.json(lineas);
+
+    // 2. Obtener inversiones desde MUNI
+    const desgloses = await PresupuestoDetalle.findAll({
+      include: [{
+        model: ActividadLocal,
+        as: 'actividad',
+        attributes: ['linea_sync_id']
+      }]
+    });
+    
+    // Mapa de inversión por ID de línea
+    const inversionMap = {};
+    desgloses.forEach(d => {
+      const act = d.actividad;
+      const lineaId = act ? (act.linea_sync_id || act.dataValues?.linea_sync_id) : null;
+      if (lineaId) {
+        inversionMap[lineaId] = (inversionMap[lineaId] || 0) + parseFloat(d.monto_ejecutado || 0);
+      }
+    });
+
+    // 3. Fusionar datos
+    const formatted = lineas.map((l, idx) => {
+      const data = l.get({ plain: true });
+      return {
+        ...data,
+        no: idx + 1,
+        lineaAccion: data.titulo,
+        inversionLinea: inversionMap[data.id] || 0,
+        responsables: ['Fuerza Pública', 'Municipalidad'],
+        institucionesLideres: [1, 2],
+        completadas: 0,
+        progreso: 0
+      };
+    });
+
+    return res.json(formatted);
   } catch (error) {
     console.error('[LEGACY] Error en /lineasAccion:', error.message);
     return res.json([]);
@@ -100,24 +238,45 @@ router.post('/lineasAccion', async (req, res) => {
 
 router.get('/tareas', async (req, res) => {
   try {
-    const AccionEstrategica = require('../../models/msp/AccionEstrategica');
-    const KpiNacional = require('../../models/msp/KpiNacional');
-    
     const acciones = await AccionEstrategica.findAll({
       include: [{ model: KpiNacional, as: 'kpis' }],
       order: [['created_at', 'DESC']]
     });
 
+    const actividadesLocal = await ActividadLocal.findAll({
+      include: [{
+        model: PresupuestoDetalle,
+        as: 'presupuestos'
+      }]
+    });
+
+    const budgetMap = {};
+    actividadesLocal.forEach(al => {
+      const spent = (al.presupuestos || []).reduce((sum, p) => sum + parseFloat(p.monto_ejecutado), 0);
+      budgetMap[al.titulo.toLowerCase().trim()] = {
+        total: spent || al.presupuesto_asignado || 0,
+        detalles: al.presupuestos || []
+      };
+    });
+
     // Transformamos al formato que el frontend espera
-    const tareas = acciones.map(a => ({
-      id: a.id,
-      lineaAccionId: a.linea_id,
-      titulo: a.nombre,
-      descripcion: a.objetivo_especifico,
-      completada: false,
-      estado: 'Sin Actividades',
-      ...a.dataValues
-    }));
+    const tareas = acciones.map(a => {
+      const data = a.get({ plain: true });
+      const budgetData = budgetMap[data.nombre.toLowerCase().trim()] || { total: 0, detalles: [] };
+      return {
+        ...data,
+        id: data.id,
+        lineaAccionId: data.linea_id,
+        titulo: data.nombre,
+        descripcion: data.objetivo_especifico,
+        completada: false,
+        estado: 'En ejecución',
+        inversionColones: budgetData.total,
+        presupuestoDetalles: budgetData.detalles, // Información de en qué se gastó
+        meta: 100, // Valor por defecto para cálculos de progreso
+        seguimientoTipo: 'porcentaje'
+      };
+    });
 
     return res.json(tareas);
   } catch (error) {
@@ -128,7 +287,6 @@ router.get('/tareas', async (req, res) => {
 
 router.get('/tareas/:id', async (req, res) => {
   try {
-    const AccionEstrategica = require('../../models/msp/AccionEstrategica');
     const tarea = await AccionEstrategica.findByPk(req.params.id);
     if (!tarea) return res.status(404).json({ error: 'Tarea no encontrada' });
     return res.json(tarea);
@@ -139,7 +297,6 @@ router.get('/tareas/:id', async (req, res) => {
 
 router.post('/tareas', async (req, res) => {
   try {
-    const AccionEstrategica = require('../../models/msp/AccionEstrategica');
     const nueva = await AccionEstrategica.create({
       linea_id: req.body.lineaAccionId || req.body.linea_id,
       nombre: req.body.titulo || req.body.nombre,
@@ -154,7 +311,6 @@ router.post('/tareas', async (req, res) => {
 
 router.patch('/tareas/:id', async (req, res) => {
   try {
-    const AccionEstrategica = require('../../models/msp/AccionEstrategica');
     const tarea = await AccionEstrategica.findByPk(req.params.id);
     if (!tarea) return res.status(404).json({ error: 'Tarea no encontrada' });
     await tarea.update(req.body);
@@ -170,7 +326,6 @@ router.patch('/tareas/:id', async (req, res) => {
 
 router.get('/zonas', async (req, res) => {
   try {
-    const ZonaRiesgo = require('../../models/msp/ZonaRiesgo');
     const zonas = await ZonaRiesgo.findAll();
     return res.json(zonas);
   } catch (error) {
@@ -185,7 +340,6 @@ router.get('/zonas', async (req, res) => {
 
 router.get('/alertas', async (req, res) => {
   try {
-    const AlertaCumplimiento = require('../../models/msp/AlertaCumplimiento');
     const alertas = await AlertaCumplimiento.findAll({
       order: [['created_at', 'DESC']]
     });
@@ -211,13 +365,23 @@ router.get('/alertas', async (req, res) => {
 
 router.get('/reportes', async (req, res) => {
   try {
-    const ReporteEvidencia = require('../../models/muni/ReporteEvidencia');
     const reportes = await ReporteEvidencia.findAll({
+      include: [{ model: DesgloseAsistencia, as: 'asistencia' }],
       order: [['created_at', 'DESC']]
     });
 
     // Aplicar filtros por query string (compatible con json-server)
-    let result = reportes.map(r => r.dataValues);
+    let result = reportes.map(r => {
+      const asist = r.asistencia || {};
+      const totalBeneficiados = (asist.ninos || 0) + (asist.jovenes || 0) + (asist.adultos || 0);
+      
+      return {
+        ...r.dataValues,
+        tareaId: r.actividad_id, // Mapeo para el frontend
+        estado: r.estado_id === 3 ? 'aprobado' : 'pendiente', // Mapeo de IDs de catálogo a nombres
+        beneficiados: totalBeneficiados // Campo esperado por el dashboard para calcular progreso
+      };
+    });
     const queryKeys = Object.keys(req.query).filter(k => !k.startsWith('_'));
     for (const key of queryKeys) {
       result = result.filter(item => String(item[key]) === String(req.query[key]));
@@ -270,7 +434,6 @@ router.patch('/reportes/:id', async (req, res) => {
 
 router.get('/eventos', async (req, res) => {
   try {
-    const EventoCalendario = require('../../models/muni/EventoCalendario');
     const eventos = await EventoCalendario.findAll({
       order: [['fecha_inicio', 'ASC']]
     });

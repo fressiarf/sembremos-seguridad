@@ -1,22 +1,29 @@
 import React from 'react';
 import { useLogin } from '../../../context/LoginContext';
 import './InputValidar.css';
-import { Lock, Eye, EyeOff, Mail, AlertCircle, User } from 'lucide-react';
+import { Lock, Eye, EyeOff, Mail, AlertCircle, IdCard } from 'lucide-react';
 
 const InputValidar = () => {
-  const { formData, setFormData, errors, setErrors } = useLogin();
+  const { formData, setFormData, errors, setErrors, loginMethod, setLoginMethod } = useLogin();
   const [showPassword, setShowPassword] = React.useState(false);
 
   const handleTogglePassword = () => {
     setShowPassword(!showPassword);
   };
 
+  const handleMethodChange = (method) => {
+    if (method === loginMethod) return;
+    setLoginMethod(method);
+    // Limpiar el campo de identificador al cambiar de método
+    setFormData(prev => ({ ...prev, identificador: '' }));
+    setErrors({ identificador: '', password: '' });
+  };
+
   const handleChange = (e) => {
     const { id, value } = e.target;
     let name = '';
     
-    if (id === 'EntradaUsuario') name = 'usuario';
-    else if (id === 'EntradaCedula') name = 'cedula';
+    if (id === 'EntradaIdentificador') name = 'identificador';
     else if (id === 'EntradaPassword') name = 'password';
     
     setFormData(prev => ({ ...prev, [name]: value }));
@@ -26,11 +33,37 @@ const InputValidar = () => {
     }
   };
 
+  const isGenericError = errors.identificador === 'Las credenciales son incorrectas';
+
   return (
     <div className="SeccionEntradasValidar">
       
+      {/* Selector de Método de Autenticación (Tabs) */}
+      <div className="SelectorMetodoAuth">
+        <button
+          type="button"
+          className={`TabMetodo ${loginMethod === 'email' ? 'TabMetodoActivo' : ''}`}
+          onClick={() => handleMethodChange('email')}
+        >
+          <Mail size={15} />
+          <span>Correo</span>
+        </button>
+        <button
+          type="button"
+          className={`TabMetodo ${loginMethod === 'cedula' ? 'TabMetodoActivo' : ''}`}
+          onClick={() => handleMethodChange('cedula')}
+        >
+          <IdCard size={15} />
+          <span>Cédula</span>
+        </button>
+        <div 
+          className="IndicadorTabActivo" 
+          style={{ transform: loginMethod === 'cedula' ? 'translateX(100%)' : 'translateX(0)' }}
+        />
+      </div>
+
       {/* Alerta de Error Global (Solo para errores de seguridad/credenciales) */}
-      {(errors.usuario === 'Las credenciales son incorrectas' || errors.cedula === 'Las credenciales son incorrectas' || errors.password === 'Las credenciales son incorrectas') && (
+      {isGenericError && (
         <div className="AlertaErrorGlobal animacion-entrada-error">
           <div className="ContenedorIconoError">
             <AlertCircle size={18} />
@@ -42,61 +75,34 @@ const InputValidar = () => {
         </div>
       )}
 
-      {/* Entrada de Correo Institucional */}
+      {/* Entrada de Identificador (Email o Cédula según el tab seleccionado) */}
       <div className="ContenedorInputValidar">
-        <label htmlFor="EntradaUsuario" className="LabelValidacion">
-          Correo Institucional
+        <label htmlFor="EntradaIdentificador" className="LabelValidacion">
+          {loginMethod === 'email' ? 'Correo Institucional' : 'Número de Cédula'}
         </label>
-        <div className={`CajaEntradaInteractiva ${errors.usuario ? 'CajaError' : ''}`}>
+        <div className={`CajaEntradaInteractiva ${errors.identificador ? 'CajaError' : ''}`}>
           <span className="IconoEntrada">
-            <Mail size={18} />
+            {loginMethod === 'email' ? <Mail size={18} /> : <IdCard size={18} />}
           </span>
           <input 
-            type="email" 
-            id="EntradaUsuario" 
+            type={loginMethod === 'email' ? 'email' : 'text'}
+            id="EntradaIdentificador" 
             className="InputCampoValidado" 
-            placeholder="Ej: usuario@sembremosseguridad.go.cr"
-            value={formData.usuario}
+            placeholder={loginMethod === 'email' ? 'Ej: usuario@sembremosseguridad.go.cr' : 'Ej: 102340567'}
+            value={formData.identificador}
             onChange={handleChange}
+            inputMode={loginMethod === 'cedula' ? 'numeric' : undefined}
+            autoComplete={loginMethod === 'email' ? 'email' : 'off'}
           />
-          {errors.usuario === 'campo-vacio' && (
+          {errors.identificador === 'campo-vacio' && (
             <div className="BurbujaAlertaNativa">
               <div className="IconoAdvertenciaNaranja">!</div>
               <span className="TextoBurbujaNativa">Rellene este campo.</span>
             </div>
           )}
         </div>
-        {errors.usuario && errors.usuario !== 'Las credenciales son incorrectas' && errors.usuario !== 'campo-vacio' && (
-          <span className="MensajeErrorValidacion">{errors.usuario}</span>
-        )}
-      </div>
-
-      {/* Entrada de Cédula */}
-      <div className="ContenedorInputValidar">
-        <label htmlFor="EntradaCedula" className="LabelValidacion">
-          Cédula
-        </label>
-        <div className={`CajaEntradaInteractiva ${errors.cedula ? 'CajaError' : ''}`}>
-          <span className="IconoEntrada">
-            <User size={18} />
-          </span>
-          <input 
-            type="text" 
-            id="EntradaCedula" 
-            className="InputCampoValidado" 
-            placeholder="Ej: 102340567"
-            value={formData.cedula}
-            onChange={handleChange}
-          />
-          {errors.cedula === 'campo-vacio' && (
-            <div className="BurbujaAlertaNativa">
-              <div className="IconoAdvertenciaNaranja">!</div>
-              <span className="TextoBurbujaNativa">Rellene este campo.</span>
-            </div>
-          )}
-        </div>
-        {errors.cedula && errors.cedula !== 'Las credenciales son incorrectas' && errors.cedula !== 'campo-vacio' && (
-          <span className="MensajeErrorValidacion">{errors.cedula}</span>
+        {errors.identificador && errors.identificador !== 'Las credenciales son incorrectas' && errors.identificador !== 'campo-vacio' && (
+          <span className="MensajeErrorValidacion">{errors.identificador}</span>
         )}
       </div>
 

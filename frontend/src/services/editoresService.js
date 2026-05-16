@@ -242,7 +242,7 @@ export const editoresService = {
         const linea = lineas.find(l => l.id === t.lineaAccionId);
         return {
           ...t,
-          lineaNombre: linea ? linea.lineaAccion : 'Línea Desconocida',
+          lineaNombre: linea ? (linea.titulo || linea.lineaAccion) : 'Línea Desconocida',
           problematica: linea ? linea.problematica : ''
         };
       });

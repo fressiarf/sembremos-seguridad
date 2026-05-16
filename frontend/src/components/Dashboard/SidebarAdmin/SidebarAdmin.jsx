@@ -47,42 +47,44 @@ const SidebarAdmin = ({ collapsed = false, onToggle, activeView, onViewChange })
     return () => clearInterval(interval);
   }, []);
 
-  // ── Secciones de navegación dinámicas ──
+  // ── Secciones de navegación dinámicas con SCopes ──
   const navSections = [
     {
       label: 'DIRECCIÓN ESTRATÉGICA',
       items: [
-        { id: 'estadisticas', label: 'Centro de Análisis', icon: LayoutDashboard },
-        { id: 'mesa-cir', label: 'Mesa CIR Social', icon: Activity },
-        { id: 'matriz-seguimiento', label: 'Matriz Completa', icon: FileText },
+        { id: 'estadisticas', label: 'Centro de Análisis', icon: LayoutDashboard, scope: 'GLOBAL' },
+        { id: 'mesa-cir', label: 'Mesa CIR Social', icon: Activity, scope: 'GLOBAL' },
+        { id: 'matriz-seguimiento', label: 'Matriz Completa', icon: FileText, scope: 'GLOBAL' },
       ],
     },
     {
       label: 'INTELIGENCIA TERRITORIAL',
+      scope: 'MSP',
       items: [
-        { id: 'zonas', label: 'Zonas Críticas y Riesgo', icon: MapPin },
-        { id: 'mapa', label: 'Despliegue Policial', icon: MapPin },
+        { id: 'zonas', label: 'Zonas Críticas y Riesgo', icon: MapPin, scope: 'MSP' },
+        { id: 'mapa', label: 'Despliegue Policial', icon: MapPin, scope: 'MSP' },
       ],
     },
     {
       label: 'GESTIÓN OPERATIVA',
       items: [
-        { id: 'lineas-accion', label: 'Gestión de Tareas', icon: LayoutGrid },
-        { id: 'calendario',  label: 'Calendario Institucional', icon: Calendar },
+        { id: 'lineas-accion', label: 'Gestión de Tareas', icon: LayoutGrid, scope: 'GLOBAL' },
+        { id: 'consolidado', label: 'Consolidado Trimestral', icon: FileBarChart, scope: 'MUNI' },
+        { id: 'calendario',  label: 'Calendario Institucional', icon: Calendar, scope: 'GLOBAL' },
       ],
     },
     {
       label: 'MONITOREO Y EVALUACIÓN',
       items: [
-        { id: 'reportes-resultados', label: 'Revisión de Reportes', icon: FileSearch },
-        { id: 'historial', label: 'Historial de Reportes', icon: Clock },
+        { id: 'reportes-resultados', label: 'Revisión de Reportes', icon: FileSearch, scope: 'GLOBAL' },
+        { id: 'historial', label: 'Historial de Reportes', icon: Clock, scope: 'GLOBAL' },
       ],
     },
     {
       label: 'ADMINISTRACIÓN',
       items: [
-        { id: 'usuarios', label: 'Gestión de Funcionarios', icon: User, badge: stats.solicitudesCount },
-        { id: 'alertas', label: 'Soporte y Comentarios',  icon: MessageCircle, badge: stats.alertsCount },
+        { id: 'usuarios', label: 'Gestión de Funcionarios', icon: User, badge: stats.solicitudesCount, scope: 'GLOBAL' },
+        { id: 'alertas', label: 'Soporte y Comentarios',  icon: MessageCircle, badge: stats.alertsCount, scope: 'GLOBAL' },
       ],
     },
   ];
@@ -133,67 +135,72 @@ const SidebarAdmin = ({ collapsed = false, onToggle, activeView, onViewChange })
         <div className="sidebar-admin__role">
           <span className="sidebar-admin__role-dot" />
           <span className="sidebar-admin__role-label">
-            {user?.rol === 'admin' ? 'Fuerza Pública' : 'Editor'}
+            {user?.nivel === 'MSP' ? 'Fuerza Pública' : 'Municipalidad'}
           </span>
         </div>
       )}
 
       {/* ── Navegación ── */}
       <nav className="sidebar-admin__nav">
-        {navSections.map(section => (
-          <div key={section.label} className="sidebar-admin__section">
+        {navSections
+          .filter(section => !section.scope || section.scope === 'GLOBAL' || section.scope === user?.nivel)
+          .map(section => {
+            // Filtrar items dentro de la sección
+            const visibleItems = section.items.filter(item => 
+              !item.scope || item.scope === 'GLOBAL' || item.scope === user?.nivel
+            );
 
+            if (visibleItems.length === 0) return null;
 
-            {/* Título de sección */}
-            {!collapsed && (
-              <button
-                className="sidebar-admin__section-title"
-                onClick={() => toggleSection(section.label)}
-              >
-                <span>{section.label}</span>
-                <span className="sidebar-admin__section-chevron">
-                  <ChevronDown size={14} style={{ transform: openSections[section.label] ? 'rotate(0deg)' : 'rotate(-90deg)', transition: 'transform 0.25s ease' }} />
-                </span>
-              </button>
-            )}
+            return (
+              <div key={section.label} className="sidebar-admin__section">
+                {/* Título de sección */}
+                {!collapsed && (
+                  <button
+                    className="sidebar-admin__section-title"
+                    onClick={() => toggleSection(section.label)}
+                  >
+                    <span>{section.label}</span>
+                    <span className="sidebar-admin__section-chevron">
+                      <ChevronDown size={14} style={{ transform: openSections[section.label] ? 'rotate(0deg)' : 'rotate(-90deg)', transition: 'transform 0.25s ease' }} />
+                    </span>
+                  </button>
+                )}
 
-            {/* Ítems */}
-            <ul className={`sidebar-admin__list ${!collapsed && !openSections[section.label] ? 'sidebar-admin__list--hidden' : ''}`}>
-              {section.items.map(item => {
-                const IconComp = item.icon;
-                const isActive = activeView === item.id;
-                return (
-                  <li key={item.id}>
-                    <button
-                      id={`nav-${item.id}`}
-                      className={`sidebar-admin__item ${isActive ? 'sidebar-admin__item--active' : ''}`}
-                      onClick={() => onViewChange(item.id)}
-                      title={collapsed ? item.label : undefined}
-                    >
-                      {/* Ícono */}
+                {/* Ítems */}
+                <ul className={`sidebar-admin__list ${!collapsed && !openSections[section.label] ? 'sidebar-admin__list--hidden' : ''}`}>
+                  {visibleItems.map(item => {
+                    const IconComp = item.icon;
+                    const isActive = activeView === item.id;
+                    return (
+                      <li key={item.id}>
+                        <button
+                          id={`nav-${item.id}`}
+                          className={`sidebar-admin__item ${isActive ? 'sidebar-admin__item--active' : ''}`}
+                          onClick={() => onViewChange(item.id)}
+                          title={collapsed ? item.label : undefined}
+                        >
+                          <span className="sidebar-admin__item-icon">
+                            <IconComp />
+                          </span>
 
-                      <span className="sidebar-admin__item-icon">
-                        <IconComp />
-                      </span>
+                          {!collapsed && (
+                            <span className="sidebar-admin__item-label">{item.label}</span>
+                          )}
 
-                      {/* Etiqueta */}
-                      {!collapsed && (
-                        <span className="sidebar-admin__item-label">{item.label}</span>
-                      )}
-
-                      {/* Badge */}
-                      {item.badge && (
-                        <span className={`sidebar-admin__badge ${collapsed ? 'sidebar-admin__badge--dot' : ''}`}>
-                          {!collapsed && item.badge}
-                        </span>
-                      )}
-                    </button>
-                  </li>
-                );
-              })}
-            </ul>
-          </div>
-        ))}
+                          {item.badge && (
+                            <span className={`sidebar-admin__badge ${collapsed ? 'sidebar-admin__badge--dot' : ''}`}>
+                              {!collapsed && item.badge}
+                            </span>
+                          )}
+                        </button>
+                      </li>
+                    );
+                  })}
+                </ul>
+              </div>
+            );
+          })}
       </nav>
 
       {/* ── Footer: perfil + cerrar sesión ── */}

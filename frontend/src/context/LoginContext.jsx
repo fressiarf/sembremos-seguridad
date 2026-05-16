@@ -32,15 +32,17 @@ export const LoginProvider = ({ children }) => {
       fetchUser(); // Sincronizar con el servidor para tener datos frescos
     }
   }, []);
+
+  // Método de autenticación seleccionado: 'email' o 'cedula'
+  const [loginMethod, setLoginMethod] = useState('email');
+
   const [errors, setErrors] = useState({
-    usuario: '',
-    cedula: '',
+    identificador: '',
     password: ''
   });
 
   const [formData, setFormData] = useState({
-    usuario: '',
-    cedula: '',
+    identificador: '',
     password: ''
   });
 
@@ -48,76 +50,88 @@ export const LoginProvider = ({ children }) => {
 
   const validateAll = async () => {
     const newErrors = {
-      usuario: '',
-      cedula: '',
+      identificador: '',
       password: ''
     };
 
     const genericError = 'Las credenciales son incorrectas';
 
     // 1. Validación de campos vacíos (Activa burbuja personalizada)
-    if (!formData.usuario.trim() || !formData.cedula.trim() || !formData.password.trim()) {
-      if (!formData.usuario.trim()) newErrors.usuario = 'campo-vacio';
-      if (!formData.cedula.trim()) newErrors.cedula = 'campo-vacio';
+    if (!formData.identificador.trim() || !formData.password.trim()) {
+      if (!formData.identificador.trim()) newErrors.identificador = 'campo-vacio';
       if (!formData.password.trim()) newErrors.password = 'campo-vacio';
       setErrors(newErrors);
       return false;
     }
 
-    // 2. Validación de signo @ (Muestra error genérico)
-    if (formData.usuario && !formData.usuario.includes('@')) {
-      newErrors.usuario = genericError;
-      newErrors.cedula = genericError;
-      newErrors.password = genericError;
-      setErrors(newErrors);
-      return false;
+    // 2. Validaciones específicas según el método seleccionado
+    if (loginMethod === 'email') {
+      // Validación de signo @
+      if (!formData.identificador.includes('@')) {
+        newErrors.identificador = genericError;
+        newErrors.password = genericError;
+        setErrors(newErrors);
+        return false;
+      }
+
+      // Validación de dominio con excepción para pruebas
+      const usuarioMinuscula = formData.identificador.toLowerCase();
+      const dominiosPermitidos = [
+        'sembremosseguridad.go.cr',
+        'sembremos.cr',
+        'muni.cr',
+        'pani.cr',
+        'inl.cr'
+      ];
+      
+      const esDominioValido = dominiosPermitidos.some(dominio => usuarioMinuscula.endsWith(dominio));
+      const esCorreoExcepcion = usuarioMinuscula === 'friveraffwd@gmail.com';
+
+      if (!esDominioValido && !esCorreoExcepcion) {
+        newErrors.identificador = genericError;
+        newErrors.password = genericError;
+        setErrors(newErrors);
+        return false;
+      }
+
+      // Validación de formato de email y longitud mínima de password
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailRegex.test(formData.identificador) || formData.password.length < 6) {
+        newErrors.identificador = genericError;
+        newErrors.password = genericError;
+        setErrors(newErrors);
+        return false;
+      }
+    } else {
+      // Método: cédula — validar formato numérico (9 a 12 dígitos)
+      const cedulaRegex = /^[0-9]{9,12}$/;
+      if (!cedulaRegex.test(formData.identificador.trim())) {
+        newErrors.identificador = 'Formato inválido. La cédula debe tener entre 9 y 12 dígitos.';
+        setErrors(newErrors);
+        return false;
+      }
+
+      if (formData.password.length < 6) {
+        newErrors.identificador = genericError;
+        newErrors.password = genericError;
+        setErrors(newErrors);
+        return false;
+      }
     }
 
-    // 2. Validación de dominio (Muestra error genérico) con excepción para pruebas
-    const usuarioMinuscula = formData.usuario.toLowerCase();
-    const dominiosPermitidos = [
-      'sembremosseguridad.go.cr',
-      'sembremos.cr',
-      'muni.cr',
-      'pani.cr',
-      'inl.cr'
-    ];
-    
-    const esDominioValido = dominiosPermitidos.some(dominio => usuarioMinuscula.endsWith(dominio));
-    const esCorreoExcepcion = usuarioMinuscula === 'friveraffwd@gmail.com';
-
-    if (formData.usuario && !esDominioValido && !esCorreoExcepcion) {
-      newErrors.usuario = genericError;
-      newErrors.cedula = genericError;
-      newErrors.password = genericError;
-      setErrors(newErrors);
-      return false;
-    }
-
-    // 3. Validación de formato general y presencia (Genérica)
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    const isFormatInvalid = !formData.usuario || !emailRegex.test(formData.usuario) || 
-                            !formData.password || formData.password.length < 6;
-
-    if (isFormatInvalid) {
-      newErrors.usuario = genericError;
-      newErrors.cedula = genericError;
-      newErrors.password = genericError;
-      setErrors(newErrors);
-      return false;
-    }
-
-    // 2. Verificación contra el Backend Real (POST /login)
+    // 3. Verificación contra el Backend Real (POST /login)
     try {
-      // Inferencia de nivel basada en dominio
-      const usuarioMinuscula = formData.usuario.toLowerCase().trim();
+      // Inferencia de nivel basada en dominio (solo para método email)
       let nivel = 'MSP'; // Default
       
-      if (usuarioMinuscula.endsWith('muni.cr')) {
-        nivel = 'MUNI';
-      } else if (usuarioMinuscula.endsWith('sembremosseguridad.go.cr') || usuarioMinuscula.endsWith('sembremos.cr')) {
-        nivel = 'MSP';
+      if (loginMethod === 'email') {
+        const usuarioMinuscula = formData.identificador.toLowerCase().trim();
+        if (usuarioMinuscula.endsWith('muni.cr')) {
+          nivel = 'MUNI';
+        }
       }
+      // Para cédula, el nivel por defecto es MSP.
+      // El backend buscará en la DB correspondiente.
 
       const response = await fetch(`${API_BASE_URL}/login`, {
         method: 'POST',
@@ -125,9 +139,10 @@ export const LoginProvider = ({ children }) => {
           'Content-Type': 'application/json'
         },
         body: JSON.stringify({
-          email: formData.usuario,
+          identificador: formData.identificador.trim(),
           password: formData.password,
-          nivel: nivel
+          nivel: nivel,
+          metodo: loginMethod
         }),
         // Crucial para que el navegador guarde la Cookie HTTP-Only
         credentials: 'include'
@@ -142,10 +157,6 @@ export const LoginProvider = ({ children }) => {
       // Usuario autenticado exitosamente
       const userResult = result.data.user;
       
-      // Validamos que la cédula coincida (Si el backend no la valida en login, lo hacemos aquí por consistencia con el diseño previo)
-      // Nota: En una fase final, la cédula debería ser validada por el backend también.
-      // Por ahora la verificamos contra el input si el backend no la devolvió (o si queremos ser extra estrictos)
-      
       setUser(userResult);
       sessionStorage.setItem('currentUser', JSON.stringify(userResult));
       
@@ -154,8 +165,7 @@ export const LoginProvider = ({ children }) => {
 
     } catch (error) {
       console.error('Error al verificar credenciales:', error);
-      newErrors.usuario = genericError;
-      newErrors.cedula = genericError;
+      newErrors.identificador = genericError;
       newErrors.password = genericError;
       setErrors(newErrors);
       return false;
@@ -163,8 +173,8 @@ export const LoginProvider = ({ children }) => {
   };
 
   const logout = () => {
-    setFormData({ usuario: '', cedula: '', password: '' });
-    setErrors({ usuario: '', cedula: '', password: '' });
+    setFormData({ identificador: '', password: '' });
+    setErrors({ identificador: '', password: '' });
     setUser(null);
     
     // Eliminación agresiva de llaves de sesión
@@ -191,7 +201,9 @@ export const LoginProvider = ({ children }) => {
     validateAll,
     logout,
     user,
-    updateSessionUser
+    updateSessionUser,
+    loginMethod,
+    setLoginMethod
   };
 
   return (

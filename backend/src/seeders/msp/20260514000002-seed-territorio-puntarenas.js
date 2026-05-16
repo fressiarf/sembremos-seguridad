@@ -8,7 +8,7 @@ module.exports = {
       nombre: 'Puntarenas',
       created_at: new Date(),
       updated_at: new Date()
-    }], {});
+    }], { ignoreDuplicates: true });
 
     // 2. Cargar Cantón Puntarenas Central (ID: 601)
     await queryInterface.bulkInsert('cantones', [{
@@ -17,7 +17,7 @@ module.exports = {
       provincia_id: 6,
       created_at: new Date(),
       updated_at: new Date()
-    }], {});
+    }], { ignoreDuplicates: true });
 
     // 3. Cargar Distritos del Núcleo Urbano
     await queryInterface.bulkInsert('distritos', [
@@ -25,7 +25,7 @@ module.exports = {
       { id: 60115, nombre: 'El Roble', canton_id: 601, created_at: new Date(), updated_at: new Date() },
       { id: 60114, nombre: 'Barranca', canton_id: 601, created_at: new Date(), updated_at: new Date() },
       { id: 60113, nombre: 'Chacarita', canton_id: 601, created_at: new Date(), updated_at: new Date() }
-    ], {});
+    ], { ignoreDuplicates: true });
   },
 
   async down(queryInterface, Sequelize) {

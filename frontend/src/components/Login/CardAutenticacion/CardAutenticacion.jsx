@@ -60,7 +60,7 @@ const CardAutenticacion = ({ children }) => {
         {children}
 
         <footer className="PieTarjetaLogin">
-          <Link to={`/soporte-acceso?email=${encodeURIComponent(formData.usuario)}`} className="EnlaceRecuperacion">¿Problemas para ingresar?</Link>
+          <Link to={`/soporte-acceso?email=${encodeURIComponent(formData.identificador)}`} className="EnlaceRecuperacion">¿Problemas para ingresar?</Link>
           
           <div className="ContenedorRecordatorio">
             <div className="IconoTooltipSecurity" data-tooltip="Recuerde: Su acceso está siendo monitoreado por seguridad">
