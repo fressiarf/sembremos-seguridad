@@ -2,7 +2,8 @@ export const ROLES = {
   SUPER_ADMIN: 'admin', // Fuerza Pública: Control total + CRUD
   SUB_ADMIN: 'municipalidad', // Municipalidad: Acceso preventivo, no ve delitos
   ADMIN_INSTITUCION: 'adminInstitucion', // Admin Institucional: Gestiona institución y editores
-  EDITOR: 'institucion' // Funcionario Operativo: Carga evidencia y reportes
+  EDITOR: 'institucion', // Funcionario Operativo: Carga evidencia y reportes
+  LECTOR: 'lector' // Solo Lectura: Ve estadísticas y mapas, no edita
 };
 
 // Arreglos de apoyo para validación de rutas

@@ -5,7 +5,8 @@ import { dashboardService } from '../../../services/dashboardService';
 import { adminInstitucionService } from '../../../services/adminInstitucionService';
 import {
   BarChart3, PieChart, TrendingUp, Users, CheckCircle,
-  Clock, DollarSign, Activity, Target, MapPin, Layers, LayoutDashboard
+  Clock, DollarSign, Activity, Target, MapPin, Layers, LayoutDashboard,
+  ChevronDown
 } from 'lucide-react';
 import DashboardGlobal from '../DashboardGlobal/DashboardGlobal';
 import DiagnosticoMetodologico from '../DiagnosticoMetodologico/DiagnosticoMetodologico';
@@ -16,6 +17,8 @@ const EstadisticasGlobal = ({ collapsed, onViewChange }) => {
   const [tareasMock, setTareasMock] = useState([]);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState('ejecutivo');
+  const [expandedLineaId, setExpandedLineaId] = useState(null);
+  const [expandedTasks, setExpandedTasks] = useState({});
 
   useEffect(() => {
     const fetchData = async () => {
@@ -44,11 +47,13 @@ const EstadisticasGlobal = ({ collapsed, onViewChange }) => {
 
   const tareasporLinea = lineas.length > 0 
     ? lineas.map(l => ({
-        nombre: l.lineaAccion || l.nombre || `Línea ${l.no}`,
+        id: l.id,
+        nombre: l.titulo || l.lineaAccion || l.nombre || `Línea ${l.no || '?'}`,
         total: l.totalTareas || 0,
         completadas: l.tareasCompletadas || 0,
         progreso: l.progreso || 0,
-        inversion: l.inversionLinea || 0
+        inversion: l.inversionLinea || 0,
+        tareas: l.tareas || []
       }))
     : (() => {
         const map = {};
@@ -124,9 +129,7 @@ const EstadisticasGlobal = ({ collapsed, onViewChange }) => {
   const tareasCompletas = estadosTareas.completadas || stats.tareasCompletadas || 0;
   const cumplimiento = totalTareas > 0 ? Math.round((tareasCompletas / totalTareas) * 100) : 0;
   
-  const totalInversion = tareas.length > 0
-    ? tareas.filter(t => t.completada).reduce((s, t) => s + (t.inversionColones || 0), 0)
-    : 0;
+  const totalInversion = stats.inversionTotal || 0;
 
   // ECharts Configurations (Premium Designs)
   const tooltipPremium = {
@@ -268,8 +271,9 @@ const EstadisticasGlobal = ({ collapsed, onViewChange }) => {
   };
 
   const formatColones = (amount) => {
-    if (!amount || amount === 0) return '₡0';
-    return '₡' + amount.toLocaleString('es-CR');
+    const num = parseFloat(amount);
+    if (isNaN(num) || num === 0) return '₡0';
+    return '₡' + num.toLocaleString('es-CR');
   };
 
   const getTabClass = (tabId) => `estadisticas-tab-btn ${activeTab === tabId ? 'active' : ''}`;
@@ -348,6 +352,7 @@ const EstadisticasGlobal = ({ collapsed, onViewChange }) => {
                   <table className="estadisticas-table">
                     <thead>
                       <tr>
+                        <th style={{ width: '40px' }}></th>
                         <th>Línea de Acción</th>
                         <th>Tareas Asignadas</th>
                         <th>Inversión Financiera Ejecutada</th>
@@ -356,19 +361,79 @@ const EstadisticasGlobal = ({ collapsed, onViewChange }) => {
                     </thead>
                     <tbody>
                       {tareasporLinea.map((linea, i) => (
-                        <tr key={i}>
-                          <td style={{ fontWeight: 700 }}>{linea.nombre}</td>
-                          <td>{linea.total}</td>
-                          <td style={{ color: '#7c3aed', fontWeight: 600 }}>{formatColones(linea.inversion || (linea.total * 500000))}</td>
-                          <td>
-                            <div className="estadisticas-progress-mini">
-                              <div className="track">
-                                <div className="fill" style={{ width: `${linea.progreso}%`, backgroundColor: '#7c3aed' }} />
+                        <React.Fragment key={linea.id || i}>
+                          <tr className={expandedLineaId === linea.id ? 'row-expanded' : ''}>
+                            <td>
+                              <button 
+                                onClick={() => setExpandedLineaId(expandedLineaId === linea.id ? null : linea.id)}
+                                style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#64748b' }}
+                              >
+                                <ChevronDown size={18} style={{ transform: expandedLineaId === linea.id ? 'rotate(180deg)' : 'none', transition: 'transform 0.2s' }} />
+                              </button>
+                            </td>
+                            <td style={{ fontWeight: 700 }}>{linea.nombre}</td>
+                            <td>{linea.total}</td>
+                            <td style={{ color: '#7c3aed', fontWeight: 600 }}>{formatColones(linea.inversion)}</td>
+                            <td>
+                              <div className="estadisticas-progress-mini">
+                                <div className="track">
+                                  <div className="fill" style={{ width: `${linea.progreso}%`, backgroundColor: '#7c3aed' }} />
+                                </div>
+                                <span className="pct">{linea.progreso}%</span>
                               </div>
-                              <span className="pct">{linea.progreso}%</span>
-                            </div>
-                          </td>
-                        </tr>
+                            </td>
+                          </tr>
+                          
+                          {/* Sub-tabla de Tareas cuando se expande la línea */}
+                          {expandedLineaId === linea.id && (
+                            <tr>
+                              <td colSpan="5" style={{ padding: '0 0 15px 40px', background: '#f8fafc' }}>
+                                <div className="expanded-task-list" style={{ borderLeft: '3px solid #7c3aed', paddingLeft: '15px', marginTop: '10px' }}>
+                                  <h4 style={{ fontSize: '0.85rem', color: '#475569', marginBottom: '10px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                    <Layers size={14} /> Tareas Estratégicas y su Inversión
+                                  </h4>
+                                  <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                                    {linea.tareas && linea.tareas.map(t => (
+                                      <div key={t.id} style={{ background: 'white', padding: '10px', borderRadius: '8px', boxShadow: '0 1px 3px rgba(0,0,0,0.05)', border: '1px solid #e2e8f0' }}>
+                                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                                          <div>
+                                            <div style={{ fontSize: '0.85rem', fontWeight: 700, color: '#1e293b' }}>{t.titulo}</div>
+                                            <div style={{ fontSize: '0.75rem', color: '#64748b' }}>{t.institucionNombre} · {t.zona}</div>
+                                          </div>
+                                          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                                            <div style={{ textAlign: 'right' }}>
+                                              <div style={{ fontSize: '0.8rem', fontWeight: 800, color: '#7c3aed' }}>{formatColones(t.inversionColones)}</div>
+                                              <div style={{ fontSize: '0.7rem', color: '#94a3b8' }}>{t.progresoReal || 0}% completado</div>
+                                            </div>
+                                            <button 
+                                              onClick={() => setExpandedTasks(prev => ({ ...prev, [t.id]: !prev[t.id] }))}
+                                              style={{ background: '#f1f5f9', border: 'none', borderRadius: '6px', padding: '4px 8px', cursor: 'pointer', color: '#64748b' }}
+                                            >
+                                              <ChevronDown size={14} style={{ transform: expandedTasks[t.id] ? 'rotate(180deg)' : 'none' }} />
+                                            </button>
+                                          </div>
+                                        </div>
+
+                                        {/* Desglose de Presupuesto (Nivel 2) */}
+                                        {expandedTasks[t.id] && t.presupuestoDetalles && (
+                                          <div style={{ marginTop: '8px', padding: '8px', background: '#fdfaff', borderRadius: '6px', border: '1px dashed #7c3aed' }}>
+                                            <div style={{ fontSize: '0.7rem', fontWeight: 700, color: '#7c3aed', marginBottom: '5px' }}>Detalle de ejecución:</div>
+                                            {t.presupuestoDetalles.map((p, idx) => (
+                                              <div key={idx} style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.75rem', padding: '2px 0' }}>
+                                                <span style={{ color: '#475569' }}>• {p.concepto}</span>
+                                                <span style={{ fontWeight: 600 }}>{formatColones(p.monto_ejecutado)}</span>
+                                              </div>
+                                            ))}
+                                          </div>
+                                        )}
+                                      </div>
+                                    ))}
+                                  </div>
+                                </div>
+                              </td>
+                            </tr>
+                          )}
+                        </React.Fragment>
                       ))}
                     </tbody>
                   </table>

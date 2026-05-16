@@ -1,82 +1,82 @@
 const authHelper = require('../../common/helpers/authHelper');
 const tokenService = require('../../common/services/tokenService');
-const UsuarioFP = require('../../models/msp/UsuarioFP');
-const UsuarioLocal = require('../../models/muni/UsuarioLocal');
-const RolFP = require('../../models/msp/RolFP');
-const RolLocal = require('../../models/muni/RolLocal');
+const { UsuarioFP, UsuarioLocal, RolFP, RolLocal } = require('../../models');
+const { Op } = require('sequelize');
 
 class AuthController {
   /**
-   * Procesa el inicio de sesión para MSP o MUNI
+   * Procesa el inicio de sesión para MSP o MUNI.
    */
   async login(req, res) {
     try {
-      const { email, password, nivel } = req.body;
+      const { identificador, email, password, nivel, metodo } = req.body;
+      const username = (identificador || email || '').trim();
 
-      // 1. Validaciones básicas
-      if (!email || !password || !nivel) {
+      if (!username || !password || !nivel) {
         return res.status(400).json({ 
           status: 'fail', 
-          message: 'Email, password y nivel (MSP/MUNI) son obligatorios' 
+          message: 'Identificador, contraseña y nivel son obligatorios' 
         });
       }
 
       const nivelUpper = nivel.toUpperCase();
-
-      // 2. Seleccionar modelo y asociación de rol según el nivel
       const UserModel = nivelUpper === 'MSP' ? UsuarioFP : UsuarioLocal;
       const RoleModel = nivelUpper === 'MSP' ? RolFP : RolLocal;
       
-      // 3. Buscar usuario incluyendo su rol
-      const user = await UserModel.findOne({ 
-        where: { email, activo: true },
+      const isEmail = username.includes('@');
+      const whereCondition = isEmail
+        ? { email: username, activo: true }
+        : { cedula: username, activo: true };
+
+      let user = await UserModel.findOne({ 
+        where: whereCondition,
         include: [{ model: RoleModel, as: 'rol' }]
       });
-      
-      // 4. Verificación de seguridad (Usuario existe)
+
+      let finalNivel = nivelUpper;
+
       if (!user) {
-        return res.status(401).json({ 
-          status: 'fail', 
-          message: 'Credenciales inválidas o acceso denegado' 
+        const fallbackNivel = nivelUpper === 'MSP' ? 'MUNI' : 'MSP';
+        const FallbackUserModel = fallbackNivel === 'MSP' ? UsuarioFP : UsuarioLocal;
+        const FallbackRoleModel = fallbackNivel === 'MSP' ? RolFP : RolLocal;
+
+        user = await FallbackUserModel.findOne({
+          where: whereCondition,
+          include: [{ model: FallbackRoleModel, as: 'rol' }]
         });
+
+        if (user) finalNivel = fallbackNivel;
+      }
+      
+      if (!user) {
+        return res.status(401).json({ status: 'fail', message: 'Credenciales inválidas' });
       }
 
-      // 5. Comparación de contraseña (Bcrypt)
       const isMatch = await authHelper.comparePassword(password, user.password_hash);
       if (!isMatch) {
-        return res.status(401).json({ 
-          status: 'fail', 
-          message: 'Credenciales inválidas o acceso denegado' 
-        });
+        return res.status(401).json({ status: 'fail', message: 'Credenciales inválidas' });
       }
 
-      // 6. Generar JWT (Premium)
-      // Se pasa el nombre del rol para que el token contenga el string (ej: 'ADMIN_MSP')
+      const rolFrontend = mapRole(user.rol?.nombre, finalNivel);
+
       const userPayload = {
         id: user.id,
         email: user.email,
-        rol: user.rol ? user.rol.nombre : (nivelUpper === 'MSP' ? 'admin' : 'municipalidad'), // Nombres compatibles
-        nivel: nivelUpper
+        rol: rolFrontend,
+        nivel: finalNivel
       };
       
-      const token = tokenService.generateToken(userPayload, nivelUpper);
-
-      // 7. Configuración de Cookie HTTP-Only (Seguridad Máxima)
-      // Calculamos maxAge basado en JWT_EXPIRES_IN (asumiendo formato simple como '1h', '2h', etc.)
+      const token = tokenService.generateToken(userPayload, finalNivel);
       const expiresConfig = process.env.JWT_EXPIRES_IN || '2h';
-      const hours = parseInt(expiresConfig);
-      const maxAge = hours * 60 * 60 * 1000;
+      const maxAge = parseInt(expiresConfig) * 60 * 60 * 1000;
 
-      const cookieOptions = {
+      res.cookie('token', token, {
         httpOnly: true,
         secure: process.env.NODE_ENV === 'production', 
-        sameSite: 'Strict', // Prevención estricta de CSRF
+        sameSite: 'Strict',
         maxAge: maxAge
-      };
+      });
 
-      res.cookie('token', token, cookieOptions);
-
-      // 8. Respuesta Final JSON (Sin token en el cuerpo)
       return res.status(200).json({
         status: 'success',
         message: 'Sesión iniciada correctamente',
@@ -86,229 +86,100 @@ class AuthController {
             nombre: `${user.nombre} ${user.apellido}`,
             cedula: user.cedula,
             email: user.email,
-            rol: user.rol ? user.rol.nombre : 'N/A',
-            nivel: nivelUpper
+            rol: rolFrontend,
+            nivel: finalNivel
           }
         }
       });
-
     } catch (error) {
       console.error('Error crítico en Login:', error);
-      return res.status(500).json({ 
-        status: 'error', 
-        message: 'Error interno del servidor al procesar la autenticación' 
-      });
+      return res.status(500).json({ status: 'error', message: error.message });
     }
   }
 
-  /**
-   * Cierra la sesión eliminando la cookie del navegador
-   */
+  async testHash(req, res) {
+    try {
+      const { password } = req.body;
+      const hash = await authHelper.hashPassword(password);
+      return res.status(200).json({ status: 'success', data: { hashed: hash } });
+    } catch (error) {
+      return res.status(500).json({ status: 'error', message: error.message });
+    }
+  }
+
+  async testCompare(req, res) {
+    try {
+      const { password, hash } = req.body;
+      const match = await authHelper.comparePassword(password, hash);
+      return res.status(200).json({ status: 'success', data: { match } });
+    } catch (error) {
+      return res.status(500).json({ status: 'error', message: error.message });
+    }
+  }
+
   async logout(req, res) {
     try {
-      // Limpiar la cookie con las mismas opciones base (excepto maxAge/expires)
       res.clearCookie('token', {
         httpOnly: true,
         secure: process.env.NODE_ENV === 'production',
         sameSite: 'Strict'
       });
-
-      return res.status(200).json({ 
-        status: 'success', 
-        message: 'Sesión cerrada correctamente' 
-      });
+      return res.status(200).json({ status: 'success', message: 'Sesión cerrada' });
     } catch (error) {
       return res.status(500).json({ status: 'error', message: 'Error al cerrar sesión' });
     }
   }
 
-  /**
-   * Endpoint de prueba para hashear una contraseña.
-   */
-  async testHash(req, res) {
-    try {
-      const { password } = req.body;
-      if (!password) {
-        return res.status(400).json({ status: 'fail', message: 'Debe proporcionar una password' });
-      }
-
-      const hash = await authHelper.hashPassword(password);
-      return res.status(200).json({
-        status: 'success',
-        data: {
-          original: password,
-          hashed: hash
-        }
-      });
-    } catch (error) {
-      return res.status(500).json({ status: 'error', message: error.message });
-    }
-  }
-
-  /**
-   * Endpoint de prueba para comparar una contraseña con un hash.
-   */
-  async testCompare(req, res) {
-    try {
-      const { password, hash } = req.body;
-      if (!password || !hash) {
-        return res.status(400).json({ status: 'fail', message: 'Debe proporcionar password y hash' });
-      }
-
-      const match = await authHelper.comparePassword(password, hash);
-      return res.status(200).json({
-        status: 'success',
-        data: {
-          match: match
-        }
-      });
-    } catch (error) {
-      return res.status(500).json({ status: 'error', message: error.message });
-    }
-  }
-  /**
-   * Registra un nuevo usuario en el sistema (MSP o MUNI)
-   */
   async register(req, res) {
     try {
-      const { 
-        nombre, 
-        apellido, 
-        cedula, 
-        email, 
-        password, 
-        nivel, 
-        role, 
-        institucion_id 
-      } = req.body;
-
-      // 1. Validaciones de presencia
+      const { nombre, apellido, cedula, email, password, nivel, role, institucion_id } = req.body;
       if (!nombre || !apellido || !cedula || !email || !password || !nivel || !role) {
-        return res.status(400).json({ 
-          status: 'fail', 
-          message: 'Todos los campos (nombre, apellido, cedula, email, password, nivel, role) son obligatorios' 
-        });
+        return res.status(400).json({ status: 'fail', message: 'Campos incompletos' });
       }
 
       const nivelUpper = nivel.toUpperCase();
-      const roleUpper = role.toUpperCase();
-
-      // 2. Validación de coherencia Rol-Nivel
-      const rolesValidosMSP = ['ADMIN_MSP', 'OFICIAL_MSP'];
-      const rolesValidosMUNI = ['ADMIN_MUNI', 'GESTOR_MUNI'];
-
-      if (nivelUpper === 'MSP' && !rolesValidosMSP.includes(roleUpper)) {
-        return res.status(400).json({ 
-          status: 'fail', 
-          message: `El rol '${role}' no es válido para el nivel MSP` 
-        });
-      }
-
-      if (nivelUpper === 'MUNI' && !rolesValidosMUNI.includes(roleUpper)) {
-        return res.status(400).json({ 
-          status: 'fail', 
-          message: `El rol '${role}' no es válido para el nivel MUNI` 
-        });
-      }
-
-      // 3. Seleccionar modelo según el nivel
       const UserModel = nivelUpper === 'MSP' ? UsuarioFP : UsuarioLocal;
-
-      // 4. Verificar duplicados por Email
-      const existingEmail = await UserModel.findOne({ where: { email } });
-      if (existingEmail) {
-        return res.status(400).json({ 
-          status: 'fail', 
-          message: 'El correo electrónico ya se encuentra vinculado a una cuenta' 
-        });
+      
+      let rol_id = 4;
+      if (nivelUpper === 'MSP') {
+        if (role === 'admin') rol_id = 1;
+        else if (role === 'adminInstitucion') rol_id = 2;
+      } else {
+        if (role === 'municipalidad') rol_id = 1;
+        else if (role === 'institucion') rol_id = 2;
       }
 
-      // 5. Verificar duplicados por Cédula (Buena práctica de Senior)
-      const existingCedula = await UserModel.findOne({ where: { cedula } });
-      if (existingCedula) {
-        return res.status(400).json({ 
-          status: 'fail', 
-          message: 'La cédula ya se encuentra registrada en el sistema' 
-        });
-      }
-
-      // 6. La contraseña se enviará al campo VIRTUAL del modelo.
-      //    El hook beforeCreate del modelo se encargará de hashearla automáticamente.
-
-      // 7. Mapeo de Roles a IDs (Basado en la estructura del sistema)
-      // Nota: En una implementación ideal esto se consultaría en la tabla de roles,
-      // pero para el registro inicial usamos el mapeo directo.
-      let rol_id = 1; // Default Admin
-      if (roleUpper === 'OFICIAL_MSP' || roleUpper === 'GESTOR_MUNI') {
-        rol_id = 2; // Operativo
-      }
-
-      // 8. Creación del registro (password va al campo VIRTUAL, el hook genera password_hash)
       const newUser = await UserModel.create({
-        nombre,
-        apellido,
-        cedula,
-        email,
-        password,
-        rol_id,
+        nombre, apellido, cedula, email, password, rol_id,
         institucion_id: institucion_id || null,
         activo: true
       });
 
-      // 9. Respuesta exitosa
-      return res.status(201).json({
-        status: 'success',
-        message: 'Usuario registrado exitosamente',
-        data: {
-          user: {
-            id: newUser.id,
-            nombre: newUser.nombre,
-            apellido: newUser.apellido,
-            email: newUser.email,
-            cedula: newUser.cedula,
-            nivel: nivelUpper,
-            role: roleUpper
-          }
-        }
-      });
-
+      return res.status(201).json({ status: 'success', data: { user: newUser } });
     } catch (error) {
-      console.error('Error en Register:', error);
-      return res.status(500).json({ 
-        status: 'error', 
-        message: 'Error interno del servidor al procesar el registro' 
-      });
+      return res.status(500).json({ status: 'error', message: error.message });
     }
   }
-  /**
-   * Obtiene el perfil del usuario actual basado en el token JWT.
-   * Utilizado para persistencia de sesión en el frontend.
-   */
+
   async getCurrentUser(req, res) {
     try {
-      // 1. El ID y Nivel vienen del middleware de autenticación
       const { id, nivel } = req.user;
-
-      // 2. Seleccionar modelo y rol según el nivel
       const nivelUpper = nivel.toUpperCase();
       const UserModel = nivelUpper === 'MSP' ? UsuarioFP : UsuarioLocal;
       const RoleModel = nivelUpper === 'MSP' ? RolFP : RolLocal;
 
-      // 3. Consultar base de datos para asegurar que el usuario aún existe y está activo
       const user = await UserModel.findOne({
         where: { id, activo: true },
         include: [{ model: RoleModel, as: 'rol' }],
-        attributes: ['id', 'nombre', 'apellido', 'email'] // No traer el hash
+        attributes: ['id', 'nombre', 'apellido', 'email', 'cedula']
       });
 
       if (!user) {
-        return res.status(401).json({
-          status: 'fail',
-          message: 'El usuario ya no existe o ha sido desactivado'
-        });
+        return res.status(401).json({ status: 'fail', message: 'Usuario no encontrado' });
       }
 
-      // 4. Respuesta exitosa con el perfil verificado
+      const rolFrontend = mapRole(user.rol?.nombre, nivelUpper);
+
       return res.status(200).json({
         status: 'success',
         data: {
@@ -317,20 +188,36 @@ class AuthController {
             nombre: `${user.nombre} ${user.apellido}`,
             cedula: user.cedula,
             email: user.email,
-            rol: user.rol ? user.rol.nombre : 'N/A',
+            rol: rolFrontend,
             nivel: nivelUpper
           }
         }
       });
-
     } catch (error) {
       console.error('Error en getCurrentUser:', error);
-      return res.status(500).json({
-        status: 'error',
-        message: 'Error al recuperar el perfil del usuario'
-      });
+      return res.status(500).json({ status: 'error', message: error.message });
     }
   }
+}
+
+/**
+ * Mapea el nombre del rol en la base de datos al rol esperado por el frontend (RBAC).
+ */
+function mapRole(dbRolNombre, nivel) {
+  let rolFrontend = 'institucion'; // Default seguro
+  const nombre = (dbRolNombre || '').trim();
+
+  if (nivel === 'MSP') {
+    if (nombre === 'SuperAdmin') rolFrontend = 'admin';
+    else if (nombre === 'Admin Institucional') rolFrontend = 'adminInstitucion';
+    else if (nombre === 'Analista') rolFrontend = 'lector';
+    else if (nombre === 'Operativo') rolFrontend = 'institucion';
+  } else {
+    if (nombre === 'Admin Municipal') rolFrontend = 'municipalidad';
+    else if (nombre === 'Gestor Actividades') rolFrontend = 'institucion';
+    else if (nombre === 'Visualizador') rolFrontend = 'lector';
+  }
+  return rolFrontend;
 }
 
 module.exports = new AuthController();

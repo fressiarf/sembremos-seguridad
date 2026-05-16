@@ -10,10 +10,11 @@ const PrivateRoutes = ({ children, allowedRoles = [] }) => {
   // Validar rol si se especifican roles permitidos
   if (allowedRoles.length > 0) {
     const user = JSON.parse(estaAutenticado);
-    const userRol = user?.rol?.toLowerCase()?.trim();
+    const userRol = String(user?.rol || '').toLowerCase().trim();
     const rolesNormalizados = allowedRoles.map(r => String(r).toLowerCase().trim());
     
-    if (!userRol || !rolesNormalizados.includes(userRol)) {
+    // El rol 'admin' siempre es superadmin y tiene acceso a todo
+    if (userRol !== 'admin' && !rolesNormalizados.includes(userRol)) {
       console.warn(`Access Denied: User role [${userRol}] not in allowed roles [${rolesNormalizados.join(', ')}]`);
       return <Navigate to="/" replace />;
     }

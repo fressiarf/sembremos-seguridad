@@ -45,18 +45,12 @@ export const dashboardService = {
         apiFetch('/usuarios').then(r => r.json()).catch(() => [])
       ]);
 
-      // Mapa de ID de usuario/institución a nombre de institución
-      const instMap = {};
-      usuarios.forEach(u => {
-        if (u.id && u.institucion) instMap[String(u.id)] = u.institucion;
-      });
-
       // Enriquecer tareas con su progreso real (suma de reportes aprobados)
       const tareasConProgreso = tareas.map(tarea => {
         const reportesAprobados = reportes.filter(r => String(r.tareaId) === String(tarea.id) && r.estado === 'aprobado');
         
         let avanceAcumulado = 0;
-        if (tarea.seguimientoTipo === 'hitos' || (tarea.tipo === 2 && !tarea.seguimientoTipo)) { // Seguimiento por Hitos
+        if (tarea.seguimientoTipo === 'hitos' || (tarea.tipo === 2 && !tarea.seguimientoTipo)) {
           avanceAcumulado = reportesAprobados.length > 0 ? Math.max(...reportesAprobados.map(r => {
              const hitosCompletados = r.hitos?.filter(h => h.completado).length || 0;
              const totalHitos = r.hitos?.length || 5;
@@ -67,14 +61,10 @@ export const dashboardService = {
         }
 
         const metaNum = parseInt(tarea.meta) || 1;
-        // Normalizamos el porcentaje para que nunca exceda el 100% (según requerimiento de validación de objetivos)
-        const porcentaje = Math.min(
-          Math.max(
-            tarea.tipo === 2 ? avanceAcumulado : Math.round((avanceAcumulado / metaNum) * 100),
-            0
-          ),
-          100
-        );
+        const porcentaje = Math.min(Math.max(
+          tarea.tipo === 2 ? avanceAcumulado : Math.round((avanceAcumulado / metaNum) * 100),
+          0
+        ), 100);
 
         return {
           ...tarea,
@@ -90,33 +80,25 @@ export const dashboardService = {
         const progresoTotal = tareasLinea.reduce((sum, t) => sum + (t.progresoReal || 0), 0);
         const completadas = tareasLinea.filter(t => t.completada);
         
-        // Resolver nombres de responsables si no existen
-        let responsables = linea.responsables || [];
-        if (responsables.length === 0 && linea.institucionesLideres) {
-          responsables = linea.institucionesLideres.map(id => instMap[String(id)]).filter(Boolean);
-        }
-        
         return {
           ...linea,
-          responsables,
+          responsables: linea.responsables || [],
           tareas: tareasLinea,
           totalTareas: tareasLinea.length,
           tareasCompletadas: completadas.length,
-          progreso: tareasLinea.length > 0 ? Math.round(progresoTotal / tareasLinea.length) : 0,
-          inversionLinea: tareasLinea.reduce((sum, t) => sum + (t.inversionColones || 0), 0)
+          progreso: linea.progreso || (tareasLinea.length > 0 ? Math.round(progresoTotal / tareasLinea.length) : 0),
+          inversionLinea: linea.inversionLinea || tareasLinea.reduce((sum, t) => sum + (t.inversionColones || 0), 0)
         };
       });
 
       // Stats globales
       const totalTareas = tareas.length;
       const tareasCompletadas = tareas.filter(t => t.completada).length;
-      const inversionTotal = tareas.filter(t => t.completada).reduce((sum, t) => sum + (t.inversionColones || 0), 0);
+      const inversionTotal = lineasEnriquecidas.reduce((sum, l) => sum + (l.inversionLinea || 0), 0);
 
       return {
         lineas: lineasEnriquecidas,
-        lineasEnriquecidas,
         tareas: tareasConProgreso,
-        tareasConProgreso,
         reportes,
         usuarios,
         activities: tareasConProgreso,
@@ -135,7 +117,25 @@ export const dashboardService = {
       };
     } catch (error) {
       console.error('Error fetching full dashboard data:', error);
-      return null;
+      return {
+        lineas: [],
+        tareas: [],
+        reportes: [],
+        usuarios: [],
+        activities: [],
+        zones: [],
+        alerts: [],
+        notifications: [],
+        stats: {
+          totalLineas: 0,
+          totalTareas: 0,
+          tareasCompletadas: 0,
+          tareasPendientes: 0,
+          inversionTotal: 0,
+          presupuestoAsignado: 0,
+          cumplimiento: 0
+        }
+      };
     }
   },
 

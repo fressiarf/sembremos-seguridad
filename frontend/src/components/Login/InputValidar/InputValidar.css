@@ -1,4 +1,65 @@
 
+/* ═══════════════════════════════════════════════════════
+   SELECTOR DE MÉTODO DE AUTENTICACIÓN (Tabs)
+   ═══════════════════════════════════════════════════════ */
+
+.SelectorMetodoAuth {
+  display: flex;
+  position: relative;
+  background: var(--gray-bg, #f1f5f9);
+  border-radius: 8px;
+  padding: 4px;
+  margin-bottom: 1.25rem;
+  border: 1px solid var(--gray-border, #e2e8f0);
+}
+
+.TabMetodo {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 0.55rem 0.75rem;
+  border: none;
+  background: transparent;
+  color: #64748b;
+  font-size: 0.85rem;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+  border-radius: 6px;
+  position: relative;
+  z-index: 2;
+  transition: color 0.3s ease;
+  user-select: none;
+}
+
+.TabMetodo:hover:not(.TabMetodoActivo) {
+  color: #475569;
+}
+
+.TabMetodoActivo {
+  color: var(--white, #ffffff);
+}
+
+.IndicadorTabActivo {
+  position: absolute;
+  top: 4px;
+  left: 4px;
+  width: calc(50% - 4px);
+  height: calc(100% - 8px);
+  background: linear-gradient(135deg, var(--navy-blue, #0b2240) 0%, #1a3a5c 100%);
+  border-radius: 6px;
+  z-index: 1;
+  transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 2px 8px rgba(11, 34, 64, 0.3);
+}
+
+
+/* ═══════════════════════════════════════════════════════
+   CONTENEDOR DE INPUTS
+   ═══════════════════════════════════════════════════════ */
+
 .ContenedorInputValidar {
   display: flex;
   flex-direction: column;
@@ -96,7 +157,11 @@
   color: var(--text-dark);
 }
 
-/* Nueva Alerta de Error Global Estilizada */
+
+/* ═══════════════════════════════════════════════════════
+   ALERTA DE ERROR GLOBAL
+   ═══════════════════════════════════════════════════════ */
+
 .AlertaErrorGlobal {
   display: flex;
   align-items: center;
@@ -154,7 +219,11 @@
   }
 }
 
-/* Burbuja de Alerta Estilo Nativo para Campos Vacíos */
+
+/* ═══════════════════════════════════════════════════════
+   BURBUJA DE ALERTA NATIVA (Campos Vacíos)
+   ═══════════════════════════════════════════════════════ */
+
 .BurbujaAlertaNativa {
   position: absolute;
   top: 110%;
