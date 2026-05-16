@@ -1,6 +1,6 @@
 const authHelper = require('../../common/helpers/authHelper');
 const tokenService = require('../../common/services/tokenService');
-const { UsuarioFP, UsuarioLocal, RolFP, RolLocal } = require('../../models');
+const { UsuarioFP, UsuarioLocal, RolFP, RolLocal, InstitucionMaestra } = require('../../models');
 const { Op } = require('sequelize');
 
 class AuthController {
@@ -87,7 +87,9 @@ class AuthController {
             cedula: user.cedula,
             email: user.email,
             rol: rolFrontend,
-            nivel: finalNivel
+            nivel: finalNivel,
+            institucion: user.institucion?.nombre || null,
+            institucion_id: user.institucion_id
           }
         }
       });
@@ -170,8 +172,11 @@ class AuthController {
 
       const user = await UserModel.findOne({
         where: { id, activo: true },
-        include: [{ model: RoleModel, as: 'rol' }],
-        attributes: ['id', 'nombre', 'apellido', 'email', 'cedula']
+        include: [
+          { model: RoleModel, as: 'rol' },
+          { model: InstitucionMaestra, as: 'institucion', attributes: ['nombre'] }
+        ],
+        attributes: ['id', 'nombre', 'apellido', 'email', 'cedula', 'institucion_id']
       });
 
       if (!user) {
@@ -189,7 +194,9 @@ class AuthController {
             cedula: user.cedula,
             email: user.email,
             rol: rolFrontend,
-            nivel: nivelUpper
+            nivel: nivelUpper,
+            institucion: user.institucion?.nombre || null,
+            institucion_id: user.institucion_id
           }
         }
       });
