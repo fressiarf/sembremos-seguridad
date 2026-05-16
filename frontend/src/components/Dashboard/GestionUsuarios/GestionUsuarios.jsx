@@ -355,7 +355,7 @@ const GestionUsuarios = () => {
                     </div>
                 </div>
 
-                {newUser.rol === 'institucion' && (
+                {(newUser.rol === 'institucion' || newUser.rol === 'adminInstitucion') && (
                   <div className="form-group" style={{ gridColumn: '1 / -1' }}>
                     <label>Institución Vinculada</label>
                     <select className="modal-select" style={{ paddingLeft: '10px' }} value={newUser.institucion_id} onChange={e => setNewUser({ ...newUser, institucion_id: e.target.value })}>
