@@ -21,7 +21,12 @@ import Swal from 'sweetalert2';
 const SidebarAdmin = ({ collapsed = false, onToggle, activeView, onViewChange }) => {
   const { user, logout } = useLogin();
   const [openSections, setOpenSections] = useState({
-    'GESTIÓN ESTRATÉGICA': true, HERRAMIENTAS: true,
+    'DIRECCIÓN ESTRATÉGICA': true,
+    'LÍNEAS DE ACCIÓN': true,
+    'INTELIGENCIA TERRITORIAL': true,
+    'GESTIÓN OPERATIVA': true,
+    'MONITOREO Y EVALUACIÓN': true,
+    'ADMINISTRACIÓN': true
   });
 
   const [stats, setStats] = useState({
@@ -54,7 +59,13 @@ const SidebarAdmin = ({ collapsed = false, onToggle, activeView, onViewChange })
       items: [
         { id: 'estadisticas', label: 'Centro de Análisis', icon: LayoutDashboard, scope: 'GLOBAL' },
         { id: 'mesa-cir', label: 'Mesa CIR Social', icon: Activity, scope: 'GLOBAL' },
-        { id: 'matriz-seguimiento', label: 'Matriz Completa', icon: FileText, scope: 'GLOBAL' },
+      ],
+    },
+    {
+      label: 'LÍNEAS DE ACCIÓN',
+      items: [
+        { id: 'lineas-accion', label: 'Líneas de Acción', icon: LayoutGrid, scope: 'GLOBAL' },
+        { id: 'matriz-seguimiento', label: 'Matriz de Seguimiento', icon: FileText, scope: 'GLOBAL' },
       ],
     },
     {
@@ -68,7 +79,7 @@ const SidebarAdmin = ({ collapsed = false, onToggle, activeView, onViewChange })
     {
       label: 'GESTIÓN OPERATIVA',
       items: [
-        { id: 'lineas-accion', label: 'Gestión de Tareas', icon: LayoutGrid, scope: 'GLOBAL' },
+        { id: 'actividades', label: 'Gestión de Tareas', icon: LayoutGrid, scope: 'GLOBAL' },
         { id: 'consolidado', label: 'Consolidado Trimestral', icon: FileBarChart, scope: 'MUNI' },
         { id: 'calendario',  label: 'Calendario Institucional', icon: Calendar, scope: 'GLOBAL' },
       ],
