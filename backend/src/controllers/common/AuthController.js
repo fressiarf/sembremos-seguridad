@@ -23,11 +23,12 @@ class AuthController {
       }
 
       const nivelUpper = nivel.toUpperCase();
+      let finalNivel = nivelUpper;
       const UserModel = nivelUpper === 'MSP' ? UsuarioFP : UsuarioLocal;
       const RoleModel = nivelUpper === 'MSP' ? RolFP : RolLocal;
       
       // 3. Buscar usuario incluyendo su rol
-      const user = await UserModel.findOne({ 
+      let user = await UserModel.findOne({ 
         where: { email, activo: true },
         include: [{ model: RoleModel, as: 'rol' }]
       });
@@ -39,7 +40,7 @@ class AuthController {
         const FallbackRoleModel = fallbackNivel === 'MSP' ? RolFP : RolLocal;
 
         user = await FallbackUserModel.findOne({
-          where: whereCondition,
+          where: { email, activo: true },
           include: [{ model: FallbackRoleModel, as: 'rol' }]
         });
 
