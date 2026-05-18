@@ -183,9 +183,8 @@ sembremos-seguridad/
 │   ├── utils/
 │   │   └── exportUtils.js           # Exportación CSV/Excel
 │   ├── App.jsx
-│   └── main.jsx
-├── db.json                          # Base de datos simulada (JSON Server)
-├── vite.config.js
+│   ├── main.jsx
+│   └── db.json                      # Base de datos simulada (JSON Server)
 ├── package.json
 └── README.md
 ```
@@ -239,7 +238,7 @@ npm install
 
 **Terminal 1 — Servidor de Datos (API Mock en puerto 5000)**
 ```bash
-npx json-server --watch db.json --port 5000
+npx json-server --watch frontend/db.json --port 5000
 ```
 
 **Terminal 2 — Aplicación React (puerto 5173)**
