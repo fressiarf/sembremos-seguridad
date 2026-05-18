@@ -1,7 +1,10 @@
 const authHelper = require('../../common/helpers/authHelper');
+const validationHelper = require('../../common/helpers/validationHelper');
 const tokenService = require('../../common/services/tokenService');
-const { UsuarioFP, UsuarioLocal, RolFP, RolLocal, InstitucionMaestra } = require('../../models');
-const { Op } = require('sequelize');
+const UsuarioFP = require('../../models/msp/UsuarioFP');
+const UsuarioLocal = require('../../models/muni/UsuarioLocal');
+const RolFP = require('../../models/msp/RolFP');
+const RolLocal = require('../../models/muni/RolLocal');
 
 class AuthController {
   /**
@@ -23,18 +26,13 @@ class AuthController {
       const UserModel = nivelUpper === 'MSP' ? UsuarioFP : UsuarioLocal;
       const RoleModel = nivelUpper === 'MSP' ? RolFP : RolLocal;
       
-      const isEmail = username.includes('@');
-      const whereCondition = isEmail
-        ? { email: username, activo: true }
-        : { cedula: username, activo: true };
-
-      let user = await UserModel.findOne({ 
-        where: whereCondition,
+      // 3. Buscar usuario incluyendo su rol
+      const user = await UserModel.findOne({ 
+        where: { email, activo: true },
         include: [{ model: RoleModel, as: 'rol' }]
       });
-
-      let finalNivel = nivelUpper;
-
+      
+      // 4. Verificación de seguridad (Usuario existe)
       if (!user) {
         const fallbackNivel = nivelUpper === 'MSP' ? 'MUNI' : 'MSP';
         const FallbackUserModel = fallbackNivel === 'MSP' ? UsuarioFP : UsuarioLocal;
@@ -139,25 +137,75 @@ class AuthController {
         return res.status(400).json({ status: 'fail', message: 'Campos incompletos' });
       }
 
-      const nivelUpper = nivel.toUpperCase();
-      const UserModel = nivelUpper === 'MSP' ? UsuarioFP : UsuarioLocal;
-      
-      let rol_id = 4;
-      if (nivelUpper === 'MSP') {
-        if (role === 'admin') rol_id = 1;
-        else if (role === 'adminInstitucion') rol_id = 2;
-      } else {
-        if (role === 'municipalidad') rol_id = 1;
-        else if (role === 'institucion') rol_id = 2;
+      // 1.1 Validación de formato de Cédula (Costa Rica - 9 dígitos)
+      if (!validationHelper.isValidCedula(cedula)) {
+        return res.status(400).json({
+          status: 'fail',
+          message: 'El formato de la cédula es inválido. Debe contener 9 dígitos numéricos (ej: 102340567).'
+        });
       }
 
+      const nivelUpper = nivel.toUpperCase();
+      const UserModel = nivelUpper === 'MSP' ? UsuarioFP : UsuarioLocal;
+
+      // 4. Verificar duplicados por Email
+      const existingEmail = await UserModel.findOne({ where: { email } });
+      if (existingEmail) {
+        return res.status(400).json({ 
+          status: 'fail', 
+          message: 'El correo electrónico ya se encuentra vinculado a una cuenta' 
+        });
+      }
+
+      // 5. Verificar duplicados por Cédula (Buena práctica de Senior)
+      const existingCedula = await UserModel.findOne({ where: { cedula } });
+      if (existingCedula) {
+        return res.status(400).json({ 
+          status: 'fail', 
+          message: 'La cédula ya se encuentra registrada en el sistema' 
+        });
+      }
+
+      // 6. La contraseña se enviará al campo VIRTUAL del modelo.
+      //    El hook beforeCreate del modelo se encargará de hashearla automáticamente.
+
+      // 7. Mapeo de Roles a IDs (Basado en la estructura del sistema)
+      // Nota: En una implementación ideal esto se consultaría en la tabla de roles,
+      // pero para el registro inicial usamos el mapeo directo.
+      let rol_id = 1; // Default Admin
+      if (roleUpper === 'OFICIAL_MSP' || roleUpper === 'GESTOR_MUNI') {
+        rol_id = 2; // Operativo
+      }
+
+      // 8. Creación del registro (password va al campo VIRTUAL, el hook genera password_hash)
       const newUser = await UserModel.create({
-        nombre, apellido, cedula, email, password, rol_id,
+        nombre,
+        apellido,
+        cedula,
+        email,
+        password,
+        rol_id,
         institucion_id: institucion_id || null,
         activo: true
+      }, nivelUpper);
+
+      // 9. Respuesta exitosa
+      return res.status(201).json({
+        status: 'success',
+        message: 'Usuario registrado exitosamente',
+        data: {
+          user: {
+            id: newUser.id,
+            nombre: newUser.nombre,
+            apellido: newUser.apellido,
+            email: newUser.email,
+            cedula: newUser.cedula,
+            nivel: nivelUpper,
+            role: roleUpper
+          }
+        }
       });
 
-      return res.status(201).json({ status: 'success', data: { user: newUser } });
     } catch (error) {
       return res.status(500).json({ status: 'error', message: error.message });
     }
@@ -166,17 +214,15 @@ class AuthController {
   async getCurrentUser(req, res) {
     try {
       const { id, nivel } = req.user;
-      const nivelUpper = nivel.toUpperCase();
-      const UserModel = nivelUpper === 'MSP' ? UsuarioFP : UsuarioLocal;
-      const RoleModel = nivelUpper === 'MSP' ? RolFP : RolLocal;
 
+      // 2. Seleccionar modelo y rol según el nivel
+      const nivelUpper = nivel.toUpperCase();
+
+      // 3. Consultar base de datos para asegurar que el usuario aún existe y está activo
       const user = await UserModel.findOne({
         where: { id, activo: true },
-        include: [
-          { model: RoleModel, as: 'rol' },
-          { model: InstitucionMaestra, as: 'institucion', attributes: ['nombre'] }
-        ],
-        attributes: ['id', 'nombre', 'apellido', 'email', 'cedula', 'institucion_id']
+        include: [{ model: RoleModel, as: 'rol' }],
+        attributes: ['id', 'nombre', 'apellido', 'email'] // No traer el hash
       });
 
       if (!user) {
