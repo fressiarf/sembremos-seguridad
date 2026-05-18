@@ -1,4 +1,4 @@
-# 🌿 Sembremos Seguridad — Plataforma de Seguimiento Estratégico
+# Sembremos Seguridad — Plataforma de Seguimiento Estratégico
 
 > **Estrategia integral de prevención para la seguridad pública en Costa Rica.**
 > Liderada por el Ministerio de Seguridad Pública (MSP) con el apoyo de la Embajada de Estados Unidos y la Policía Nacional de CR.

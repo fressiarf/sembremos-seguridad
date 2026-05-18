@@ -55,10 +55,6 @@ app.use('/api/v1/system/notificaciones', notificacionRoutes);
 app.use('/api/v1/auth', authRoutes);
 app.use('/api/v1/ai', aiRoutes);
 
-// Rutas Legacy (Compatibilidad con json-server para el frontend existente)
-const legacyRoutes = require('./routes/legacy/jsonProxy.routes');
-app.use('/', legacyRoutes);
-
 // Health Check
 app.get('/health', (req, res) => {
   res.status(200).json({ status: 'UP', timestamp: new Date().toISOString() });
@@ -67,6 +63,11 @@ app.get('/health', (req, res) => {
 app.get('/', (req, res) => {
   res.json({ message: 'Bienvenido a la API del sistema Sembremos Seguridad.' });
 });
+
+// Rutas Legacy (Compatibilidad con json-server para el frontend existente)
+// Se colocan al final como catch-all para evitar colisiones con rutas oficiales o healthchecks
+const legacyRoutes = require('./routes/legacy/jsonProxy.routes');
+app.use('/', legacyRoutes);
 
 // Manejo de errores centralizado
 const errorHandler = require('./middlewares/errors/errorHandler');
