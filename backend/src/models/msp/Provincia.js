@@ -14,7 +14,7 @@ const Provincia = sequelizeFP.define('Provincia', {
   }
 }, {
   tableName: 'provincias',
-  timestamps: true,
+  timestamps: false,
   underscored: true
 });
 

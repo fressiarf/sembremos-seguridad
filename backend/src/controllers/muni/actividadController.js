@@ -46,3 +46,34 @@ exports.addHito = async (req, res) => {
     return res.status(500).json({ status: 'error', message: 'Error interno del servidor' });
   }
 };
+
+exports.updateActividad = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { titulo, descripcion_operativa, tipo_id, estado_id, presupuesto_asignado, progreso } = req.body;
+    const actividad = await ActividadLocal.findByPk(id);
+    if (!actividad) {
+      return res.status(404).json({ status: 'fail', message: 'Actividad no encontrada' });
+    }
+    await actividad.update({ titulo, descripcion_operativa, tipo_id, estado_id, presupuesto_asignado, progreso });
+    return res.status(200).json({ status: 'success', data: actividad });
+  } catch (error) {
+    console.error('Error al actualizar actividad:', error);
+    return res.status(500).json({ status: 'error', message: 'Error interno del servidor' });
+  }
+};
+
+exports.deleteActividad = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const actividad = await ActividadLocal.findByPk(id);
+    if (!actividad) {
+      return res.status(404).json({ status: 'fail', message: 'Actividad no encontrada' });
+    }
+    await actividad.destroy();
+    return res.status(200).json({ status: 'success', message: 'Actividad eliminada correctamente' });
+  } catch (error) {
+    console.error('Error al eliminar actividad:', error);
+    return res.status(500).json({ status: 'error', message: 'Error interno del servidor' });
+  }
+};

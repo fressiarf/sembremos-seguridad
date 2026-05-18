@@ -88,6 +88,41 @@ class SyncController {
       return res.status(500).json({ error: error.message });
     }
   }
+
+  async updateLinea(req, res) {
+    try {
+      const LineaAccion = require('../../models/msp/LineaAccion');
+      const { id } = req.params;
+      const { titulo, problematica, objetivo_general, objetivo } = req.body;
+      const linea = await LineaAccion.findByPk(id);
+      if (!linea) return res.status(404).json({ message: 'Línea no encontrada' });
+
+      await linea.update({
+        titulo,
+        problematica,
+        objetivo_general: objetivo || objetivo_general
+      });
+      return res.status(200).json({ message: 'Línea actualizada', data: linea });
+    } catch (error) {
+      console.error('[SYNC CTRL] Error al actualizar línea:', error);
+      return res.status(500).json({ error: error.message });
+    }
+  }
+
+  async deleteLinea(req, res) {
+    try {
+      const LineaAccion = require('../../models/msp/LineaAccion');
+      const { id } = req.params;
+      const linea = await LineaAccion.findByPk(id);
+      if (!linea) return res.status(404).json({ message: 'Línea no encontrada' });
+
+      await linea.destroy();
+      return res.status(200).json({ message: 'Línea eliminada correctamente' });
+    } catch (error) {
+      console.error('[SYNC CTRL] Error al eliminar línea:', error);
+      return res.status(500).json({ error: error.message });
+    }
+  }
 }
 
 module.exports = new SyncController();

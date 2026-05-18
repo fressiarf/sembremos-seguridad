@@ -21,7 +21,7 @@ const Canton = sequelizeFP.define('Canton', {
   }
 }, {
   tableName: 'cantones',
-  timestamps: true,
+  timestamps: false,
   underscored: true
 });
 

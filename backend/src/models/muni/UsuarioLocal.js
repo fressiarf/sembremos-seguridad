@@ -70,6 +70,10 @@ const UsuarioLocal = sequelizeMUNI.define('UsuarioLocal', {
     type: DataTypes.BOOLEAN,
     allowNull: false,
     defaultValue: true
+  },
+  ultimo_acceso: {
+    type: DataTypes.DATE,
+    allowNull: true
   }
 }, {
   tableName: 'usuarios_local',
@@ -82,23 +86,6 @@ const UsuarioLocal = sequelizeMUNI.define('UsuarioLocal', {
       }
     },
     afterCreate: async (user, options) => {
-      // Sincronización MUNI -> MSP
-      try {
-        const UsuarioFP = require('../../models/msp/UsuarioFP');
-        await UsuarioFP.upsert({
-          id: user.id,
-          nombre: user.nombre,
-          apellido: user.apellido,
-          email: user.email,
-          password_hash: user.password_hash,
-          cedula: user.cedula,
-          rol_id: 1,
-          activo: user.activo
-        });
-        console.log('✅ Usuario sincronizado con MSP exitosamente');
-      } catch (err) {
-        console.error('Error sincronizando usuario con MSP:', err.message);
-      }
       // Auditoría automática
       const LogAuditoriaLocal = require('./LogAuditoriaLocal');
       const { generarHooksAuditoria } = require('../../common/helpers/auditHelper');

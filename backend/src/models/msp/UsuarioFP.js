@@ -80,6 +80,10 @@ const UsuarioFP = sequelizeFP.define('UsuarioFP', {
     type: DataTypes.BOOLEAN,
     allowNull: false,
     defaultValue: true
+  },
+  ultimo_acceso: {
+    type: DataTypes.DATE,
+    allowNull: true
   }
 }, {
   tableName: 'usuarios_fp',

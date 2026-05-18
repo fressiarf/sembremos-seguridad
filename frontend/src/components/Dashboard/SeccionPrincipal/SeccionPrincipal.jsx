@@ -216,10 +216,12 @@ const SeccionPrincipal = ({ collapsed, setCollapsed, activeView, onViewChange })
       )}
 
       {activeView === 'dashboard' && (
-        user?.rol === ROLES.EDITOR ? <DashboardInstitucion /> : <DashboardGlobal collapsed={collapsed} onViewChange={onViewChange} />
+        (user?.rol === ROLES.EDITOR) 
+          ? <DashboardInstitucion /> 
+          : <DashboardGlobal collapsed={collapsed} onViewChange={onViewChange} />
       )}
       {activeView === 'actividades' && <ActividadOficiales />}
-      {activeView === 'usuarios' && <GestionUsuarios />}
+      {activeView === 'usuarios' && (user?.rol === ROLES.SUPER_ADMIN || user?.rol === ROLES.SUB_ADMIN) && <GestionUsuarios />}
       {activeView === 'perfil' && <PerfilUsuario />}
       {activeView === 'matriz-seguimiento' && <MatrizSeguimiento />}
       {activeView === 'reportes-resultados' && <ReportesResultados />}

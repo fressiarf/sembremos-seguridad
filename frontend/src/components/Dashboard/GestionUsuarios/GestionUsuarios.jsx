@@ -2,185 +2,71 @@ import React, { useState, useEffect } from 'react';
 import './GestionUsuarios.css';
 import { userService } from '../../../services/userService';
 import { useToast } from '../../../context/ToastContext';
-import { Search, UserCog, Shield, UserPlus, X, Key, Mail, Fingerprint, User as UserIcon, Building2, Trash2 } from 'lucide-react';
+import { Search, UserCog, Shield, UserPlus, X, Key, Mail, Fingerprint, User as UserIcon, Building2, Trash2, Zap, Info, Eye, EyeOff, Edit3, CheckCircle, Copy, Clock, ShieldCheck, Lock, Power } from 'lucide-react';
 import { useLogin } from '../../../context/LoginContext';
+import { apiFetch } from '../../../utils/apiFetch';
 import Swal from 'sweetalert2';
 
-const INSTITUCIONES = [
-  'PANI', 'IMAS', 'CCSS', 'MEP', 'IAFA',
-  'Ministerio de Salud', 'Bomberos', 'Cruz Roja',
-  'Municipalidad de Puntarenas', 'Fuerza Pública', 'INL'
-];
+const ROLES_POR_NIVEL = {
+  MSP: [
+    { id: 'admin', label: 'SuperAdmin (MSP)' },
+    { id: 'adminInstitucion', label: 'Admin Institucional (MSP)' },
+    { id: 'lector', label: 'Lector / Analista (MSP)' }
+  ],
+  MUNI: [
+    { id: 'municipalidad', label: 'Admin Municipal (MUNI)' },
+    { id: 'lector', label: 'Lector / Alcaldía (MUNI)' }
+  ],
+  GESTOR: [
+    { id: 'institucion', label: 'Gestor Institucional (Externo)' }
+  ]
+};
 
 const GestionUsuarios = () => {
   const { user } = useLogin();
   const { showToast } = useToast();
-  const currentUser = user || { nombre: 'C. Araya', rol: 'admin' };
   
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
   const [showCreateModal, setShowCreateModal] = useState(false);
-  const [updatingId, setUpdatingId] = useState(null);
-  const [solicitudes, setSolicitudes] = useState([]);
-  const [showSolicitudes, setShowSolicitudes] = useState(false);
+  const [showSuccessModal, setShowSuccessModal] = useState(false);
+  const [isEditing, setIsEditing] = useState(false);
+  const [editingUserId, setEditingUserId] = useState(null);
+  
+  const [showPassword, setShowPassword] = useState(false);
+  const [institucionesDB, setInstitucionesDB] = useState([]);
   const [newUser, setNewUser] = useState({
-    nombre: '',
-    cedula: '',
-    usuario: '',
-    password: '',
-    rol: 'adminInstitucion',
-    institucion: ''
+    nombre: '', apellido: '', cedula: '', usuario: '', password: '',
+    nivel: 'MSP', rol: 'admin', institucion_id: '', activo: true
   });
+  const [confirmPassword, setConfirmPassword] = useState('');
+
+  const [lastCreatedUser, setLastCreatedUser] = useState(null);
+
+  useEffect(() => {
+    if (showCreateModal) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = 'auto';
+    }
+    return () => { document.body.style.overflow = 'auto'; };
+  }, [showCreateModal]);
 
   useEffect(() => {
     fetchUsers();
-    fetchSolicitudes();
+    fetchInstituciones();
   }, []);
 
-  const fetchSolicitudes = () => {
-    const saved = JSON.parse(localStorage.getItem('solicitudes_acceso') || '[]');
-    setSolicitudes(saved);
-  };
-
-  const handleDeleteSolicitud = (id) => {
-    const updated = solicitudes.filter(s => s.id !== id);
-    localStorage.setItem('solicitudes_acceso', JSON.stringify(updated));
-    setSolicitudes(updated);
-    showToast('Solicitud removida de la lista', 'info');
-  };
-
-  // Reseteo desde solicitud pendiente (flujo SoporteAcceso)
-  const handleResetPassword = async (sol) => {
-    const foundUser = users.find(u => u.usuario.toLowerCase() === sol.correo.toLowerCase());
-    
-    if (!foundUser) {
-      showToast(`No se encontró ningún usuario con el correo: ${sol.correo}`, 'error');
-      return;
-    }
-
-    const result = await Swal.fire({
-      title: '¿Restablecer contraseña?',
-      html: `Se generará una clave temporal para <strong>${foundUser.nombre}</strong>.<br/>
-             <span style="color:#94a3b8;font-size:0.9rem">${foundUser.usuario}</span>`,
-      icon: 'warning',
-      showCancelButton: true,
-      confirmButtonColor: '#3b82f6',
-      cancelButtonColor: '#64748b',
-      confirmButtonText: 'Sí, restablecer',
-      cancelButtonText: 'Cancelar',
-      background: '#1e293b',
-      color: '#e2e8f0',
-    });
-
-    if (!result.isConfirmed) return;
-
+  const fetchInstituciones = async () => {
     try {
-      const tempPassword = await userService.resetUserPassword(foundUser.id);
-      showToast(`✅ Clave restablecida para ${foundUser.nombre}: ${tempPassword}`, 'success', 8000);
-      handleDeleteSolicitud(sol.id);
-      setUsers(prev => prev.map(u => u.id === foundUser.id ? { ...u, password: tempPassword } : u));
+      const response = await apiFetch('/usuarios/catalogos/instituciones');
+      if (response.ok) {
+        const result = await response.json();
+        setInstitucionesDB(result || []);
+      }
     } catch (error) {
-      showToast('Error técnico al intentar restablecer la contraseña', 'error');
-    }
-  };
-
-  // Reseteo directo desde la tabla (sin solicitud previa)
-  const handleDirectReset = async (targetUser) => {
-    if (targetUser.id === currentUser.id) {
-      showToast('No puedes restablecer tu propia contraseña desde aquí. Usa tu perfil.', 'warning');
-      return;
-    }
-
-    const result = await Swal.fire({
-      title: '¿Resetear contraseña?',
-      html: `Se generará una <strong>clave temporal</strong> para:<br/>
-             <strong style="color:#60a5fa">${targetUser.nombre}</strong><br/>
-             <span style="color:#94a3b8;font-size:0.85rem">${targetUser.usuario}</span>`,
-      icon: 'warning',
-      showCancelButton: true,
-      confirmButtonColor: '#3b82f6',
-      cancelButtonColor: '#64748b',
-      confirmButtonText: 'Generar clave temporal',
-      cancelButtonText: 'Cancelar',
-      background: '#1e293b',
-      color: '#e2e8f0',
-    });
-
-    if (!result.isConfirmed) return;
-
-    setUpdatingId(targetUser.id);
-    try {
-      const tempPassword = await userService.resetUserPassword(targetUser.id);
-      await userService.logSecurityAction({
-        userId: currentUser.id,
-        usuario: currentUser.usuario,
-        accion: 'RESET_PASSWORD_ADMIN',
-        detalles: `Admin [${currentUser.nombre}] reseteó la clave de [${targetUser.nombre}]`
-      });
-
-      await Swal.fire({
-        title: '✅ Contraseña restablecida',
-        html: `Nueva clave temporal para <strong>${targetUser.nombre}</strong>:<br/>
-               <div style="background:#0f172a;padding:12px 20px;border-radius:8px;margin-top:12px;
-               font-family:monospace;font-size:1.3rem;letter-spacing:2px;color:#60a5fa;
-               border:1px solid #1e40af">${tempPassword}</div>
-               <p style="font-size:0.8rem;color:#94a3b8;margin-top:8px">Comunique esta clave al usuario de forma segura.</p>`,
-        icon: 'success',
-        confirmButtonColor: '#3b82f6',
-        confirmButtonText: 'Entendido',
-        background: '#1e293b',
-        color: '#e2e8f0',
-      });
-      setUsers(prev => prev.map(u => u.id === targetUser.id ? { ...u, password: tempPassword } : u));
-    } catch (error) {
-      showToast('Error al restablecer la contraseña', 'error');
-    } finally {
-      setUpdatingId(null);
-    }
-  };
-
-  // Eliminación de usuario con confirmación
-  const handleDeleteUser = async (targetUser) => {
-    if (targetUser.id === currentUser.id) {
-      showToast('No puedes eliminar tu propia cuenta.', 'error');
-      return;
-    }
-
-    const result = await Swal.fire({
-      title: '¿Eliminar usuario?',
-      html: `Esta acción <strong>no se puede deshacer</strong>.<br/>
-             Se eliminará permanentemente a:<br/>
-             <strong style="color:#f87171">${targetUser.nombre}</strong><br/>
-             <span style="color:#94a3b8;font-size:0.85rem">${targetUser.usuario}</span>`,
-      icon: 'warning',
-      showCancelButton: true,
-      confirmButtonColor: '#ef4444',
-      cancelButtonColor: '#64748b',
-      confirmButtonText: 'Sí, eliminar',
-      cancelButtonText: 'Cancelar',
-      background: '#1e293b',
-      color: '#e2e8f0',
-      focusCancel: true,
-    });
-
-    if (!result.isConfirmed) return;
-
-    setUpdatingId(targetUser.id);
-    try {
-      await userService.deleteUser(targetUser.id);
-      await userService.logSecurityAction({
-        userId: currentUser.id,
-        usuario: currentUser.usuario,
-        accion: 'DELETE_USER',
-        detalles: `Admin [${currentUser.nombre}] eliminó al usuario [${targetUser.nombre}] (${targetUser.usuario})`
-      });
-      setUsers(prev => prev.filter(u => u.id !== targetUser.id));
-      showToast(`Usuario ${targetUser.nombre} eliminado exitosamente.`, 'success');
-    } catch (error) {
-      showToast('Error al eliminar el usuario', 'error');
-    } finally {
-      setUpdatingId(null);
+      console.error('Error fetching instituciones:', error);
     }
   };
 
@@ -188,9 +74,7 @@ const GestionUsuarios = () => {
     try {
       setLoading(true);
       const data = await userService.getUsers();
-      // Admin global solo ve admins e instituciones, NO funcionarios
-      const filtered = data.filter(u => u.rol === 'admin' || u.rol === 'adminInstitucion' || u.rol === 'auditor');
-      setUsers(filtered);
+      setUsers(data || []);
     } catch (error) {
       console.error('Error al cargar usuarios');
     } finally {
@@ -198,190 +82,174 @@ const GestionUsuarios = () => {
     }
   };
 
-  const handleToggleRole = async (userId, currentRol) => {
-    if (currentUser.rol !== 'admin') {
-      showToast('Acceso denegado: Solo administradores pueden realizar esta acción', 'error');
-      return;
-    }
-
-    const newRol = currentRol === 'admin' ? 'adminInstitucion' : 'admin';
-    setUpdatingId(userId);
-
-    try {
-      await userService.updateUserRole(userId, newRol);
-      setUsers(prev => prev.map(u => u.id === userId ? { ...u, rol: newRol } : u));
-      showToast(`Rol actualizado: El usuario ahora es ${newRol === 'admin' ? 'Administrador Global' : 'Admin Institución'}`, 'success');
-    } catch (error) {
-      showToast('Error crítico al actualizar el rol en la base de datos', 'error');
-    } finally {
-      setUpdatingId(null);
-    }
+  const generateSecurePassword = () => {
+    const chars = "ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz23456789";
+    let pass = "SS-";
+    for (let i = 0; i < 6; i++) pass += chars.charAt(Math.floor(Math.random() * chars.length));
+    setNewUser({ ...newUser, password: pass });
+    setConfirmPassword(pass);
+    showToast('Clave generada y confirmada', 'info');
   };
 
-  const handleCreateUser = async (e) => {
-    e.preventDefault();
-    
-    // Validación de campos según el rol
-    if (newUser.rol === 'admin') {
-      if (!newUser.nombre || !newUser.usuario || !newUser.password || !newUser.cedula) {
-        showToast('Completa todos los campos del Administrador', 'warning');
-        return;
-      }
-    } else {
-      // Validaciones para adminInstitucion
-      if (!newUser.institucion || !newUser.usuario || !newUser.password) {
-        showToast('Selecciona la Institución y completa los datos de acceso para la misma', 'warning');
-        return;
-      }
-    }
-    
-    if (!newUser.nombre || !newUser.cedula || !newUser.usuario || !newUser.password) {
-      showToast('Por favor completa todos los campos', 'warning');
+  const handleOpenCreate = () => {
+    setIsEditing(false);
+    setEditingUserId(null);
+    setConfirmPassword('');
+    setNewUser({
+      nombre: '', apellido: '', cedula: '', usuario: '', password: '',
+      nivel: 'MSP', rol: 'admin', institucion_id: '', activo: true
+    });
+    setShowCreateModal(true);
+  };
+
+  const [originalUser, setOriginalUser] = useState(null);
+
+  const handleOpenEdit = (u) => {
+    setIsEditing(true);
+    setEditingUserId(u.id);
+    setOriginalUser(u); // Guardamos para comparar cambios de estado
+    setConfirmPassword('');
+    setNewUser({
+      nombre: u.nombre || '',
+      apellido: u.apellido || '',
+      cedula: u.cedula || '',
+      usuario: u.usuario || u.email || '',
+      password: '',
+      nivel: u.nivel || 'MSP',
+      rol: u.rol || 'admin',
+      institucion_id: u.institucion_id || '',
+      activo: u.activo === true || u.activo === 1
+    });
+    setShowCreateModal(true);
+  };
+
+  const handleCreateOrUpdateUser = async (e) => {
+    if (e) e.preventDefault();
+    if (newUser.password !== confirmPassword) {
+      showToast('Las contraseñas no coinciden', 'warning');
       return;
     }
 
-    // Validación General de Cédula (numérica y longitud)
-    if (!/^\d+$/.test(newUser.cedula)) {
-      showToast('La cédula debe contener solo números', 'warning');
-      return;
-    }
-    
-    if (newUser.cedula.length < 9) {
-      showToast('La cédula debe tener al menos 9 dígitos', 'warning');
-      return;
-    }
-
-    // Validación General de Email
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(newUser.usuario)) {
-      showToast('Por favor ingresa un correo electrónico válido', 'warning');
-      return;
-    }
-
-    // Validación General de Contraseña
-    if (newUser.password.length < 6) {
-      showToast('La contraseña debe tener al menos 6 caracteres', 'warning');
-      return;
+    // Validación de seguridad al desactivar desde el formulario
+    if (isEditing && originalUser && (originalUser.activo === true || originalUser.activo === 1) && !newUser.activo) {
+      const result = await Swal.fire({
+        title: '¿Desactivar Funcionario?',
+        text: 'Está a punto de quitarle el acceso al sistema a este usuario. ¿Continuar?',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#ef4444',
+        confirmButtonText: 'Sí, desactivar',
+        cancelButtonText: 'Cancelar'
+      });
+      if (!result.isConfirmed) return;
     }
 
     try {
-      await userService.createUser(newUser);
-      showToast('Usuario creado exitosamente', 'success');
-      setShowCreateModal(false);
-      setNewUser({ nombre: '', cedula: '', usuario: '', password: '', rol: 'adminInstitucion', institucion: '' });
+      if (isEditing) {
+        const payload = { ...newUser, email: newUser.usuario, role: newUser.rol };
+        if (!payload.password) delete payload.password;
+        await userService.updateUser(editingUserId, payload);
+        showToast('Usuario actualizado', 'success');
+        setShowCreateModal(false);
+      } else {
+        await userService.createUser({ ...newUser, email: newUser.usuario, role: newUser.rol });
+        setLastCreatedUser({ ...newUser });
+        setShowCreateModal(false);
+        setShowSuccessModal(true);
+      }
       fetchUsers();
     } catch (error) {
-      showToast('Error al crear el usuario', 'error');
+      showToast(error.message, 'error');
     }
   };
 
-  const getRolLabel = (rol) => {
-    switch (rol) {
-      case 'admin': return 'Administrador Global';
-      case 'adminInstitucion': return 'Admin Institución';
-      case 'auditor': return 'Auditor';
-      default: return rol;
+  const handleToggleStatus = async (targetUser) => {
+    const isActivating = !(targetUser.activo === true || targetUser.activo === 1);
+    const actionText = isActivating ? 'ACTIVAR' : 'DESACTIVAR';
+    const color = isActivating ? '#22c55e' : '#ef4444';
+
+    const result = await Swal.fire({
+      title: `¿${actionText} Usuario?`,
+      text: `¿Está seguro de que desea cambiar el acceso para ${targetUser.nombre}?`,
+      icon: 'question',
+      showCancelButton: true,
+      confirmButtonColor: color,
+      confirmButtonText: `Sí, ${actionText}`,
+      cancelButtonText: 'Cancelar'
+    });
+
+    if (result.isConfirmed) {
+      try {
+        await userService.updateUser(targetUser.id, { activo: isActivating });
+        showToast(`Usuario ${isActivating ? 'activado' : 'desactivado'}`, 'success');
+        fetchUsers();
+      } catch (error) {
+        showToast('Error al cambiar estado', 'error');
+      }
     }
   };
 
-  const getRolBadgeClass = (rol) => {
-    switch (rol) {
-      case 'admin': return 'role-badge role-badge--admin';
-      case 'adminInstitucion': return 'role-badge role-badge--adminInstitucion';
-      case 'auditor': return 'role-badge role-badge--auditor';
-      default: return 'role-badge';
+  const handleDeleteUser = async (targetUser) => {
+    const currentId = user?.id;
+    if (targetUser.db_id === currentId || targetUser.id === currentId || targetUser.usuario === user?.email) {
+      showToast('No puedes eliminar tu propia cuenta.', 'error');
+      return;
+    }
+    const result = await Swal.fire({
+      title: '¿Eliminar Usuario?',
+      text: `Esta acción no se puede deshacer. ¿Eliminar a ${targetUser.nombre}?`,
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#d33',
+      confirmButtonText: 'Sí, eliminar',
+      cancelButtonText: 'Cancelar'
+    });
+    if (!result.isConfirmed) return;
+    try {
+      await userService.deleteUser(targetUser.id);
+      fetchUsers();
+      showToast('Usuario eliminado', 'success');
+    } catch (error) {
+      showToast('Error al eliminar', 'error');
     }
   };
 
-  const filteredUsers = users.filter(u =>
-    u.nombre?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    u.usuario?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    u.cedula?.includes(searchQuery) ||
-    u.institucion?.toLowerCase().includes(searchQuery.toLowerCase())
-  );
-
-  if (loading) return <div style={{ color: '#7a9cc4', padding: '2rem' }}>Cargando usuarios...</div>;
+  const formatLastAccess = (date) => {
+    if (!date) return <span style={{ color: '#94a3b8' }}>Nunca ha entrado</span>;
+    const d = new Date(date);
+    const now = new Date();
+    const diff = Math.floor((now - d) / (1000 * 60));
+    if (diff >= 0 && diff < 5) {
+      return <span style={{ color: '#22c55e', fontWeight: 'bold', display: 'flex', alignItems: 'center', gap: '4px' }}><div className="pulse-dot"></div> En línea</span>;
+    }
+    if (diff < 0) return 'Ahora mismo';
+    if (diff < 60) return `Hace ${diff}m`;
+    if (diff < 1440) return `Hace ${Math.floor(diff / 60)}h`;
+    return d.toLocaleDateString();
+  };
 
   return (
-    <div className="gestion-usuarios" style={{ padding: '2rem 2.5rem', fontFamily: 'Inter, sans-serif' }}>
-
-
-      <section className="gestion-usuarios__filters" style={{ marginTop: '0', borderRadius: '16px', border: 'none', background: 'rgba(255,255,255,0.03)', backdropFilter: 'blur(10px)', border: '1px solid rgba(255,255,255,0.1)' }}>
+    <div className="gestion-usuarios">
+      <div className="gestion-usuarios__filters">
         <div className="search-wrapper">
-          <div className="search-icon">
-            <Search size={18} />
-          </div>
-          <input 
-            type="text" 
-            placeholder="Buscar por nombre, correo, cédula o institución..." 
-            className="search-input"
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            style={{ paddingLeft: '55px', boxSizing: 'border-box' }}
-          />
-          {searchQuery && (
-            <button 
-              className="search-clear" 
-              onClick={() => setSearchQuery('')}
-              title="Limpiar búsqueda"
-            >
-              <X size={14} />
-            </button>
-          )}
+          <Search size={18} className="search-icon" />
+          <input type="text" placeholder="Buscar funcionario..." value={searchQuery} onChange={e => setSearchQuery(e.target.value)} />
         </div>
-        <div className="header-actions">
-          {solicitudes.length > 0 && (
-            <button 
-              className={`btn-solicitudes ${showSolicitudes ? 'active' : ''}`} 
-              onClick={() => setShowSolicitudes(!showSolicitudes)}
-            >
-              <Mail size={18} />
-              <span>Solicitudes ({solicitudes.length})</span>
-              <span className="dot-alert"></span>
-            </button>
-          )}
-          {currentUser.rol === 'admin' && (
-            <button className="btn-create-user" onClick={() => setShowCreateModal(true)}>
-                <UserPlus size={18} />
-                <span>Nueva Institución</span>
-            </button>
-          )}
-        </div>
-      </section>
+        <button className="btn-create-user" onClick={handleOpenCreate}>
+          <UserPlus size={18} /> Nuevo Registro
+        </button>
+      </div>
 
-      {showSolicitudes && solicitudes.length > 0 && (
-        <div className="solicitudes-container animacion-entrada">
-          <div className="solicitudes-grid">
-            {solicitudes.map(sol => (
-              <div key={sol.id} className="solicitud-card">
-                <div className="solicitud-info">
-                  <div className="solicitud-icon">
-                    <Key size={18} />
-                  </div>
-                  <div>
-                    <strong>{sol.correo}</strong>
-                    <p>Solicitó reseteo el {sol.fecha}</p>
-                  </div>
-                </div>
-                <div className="solicitud-actions">
-                  <button 
-                    className="btn-reset-password-mini" 
-                    onClick={() => handleResetPassword(sol)}
-                    title="Generar nueva clave"
-                  >
-                    <Key size={14} />
-                    <span>Restablecer</span>
-                  </button>
-                  <button 
-                    className="btn-resolve-solicitud" 
-                    onClick={() => handleDeleteSolicitud(sol.id)}
-                    title="Ignorar / Remover"
-                  >
-                    <X size={14} />
-                  </button>
-                </div>
-              </div>
-            ))}
+      {showSuccessModal && lastCreatedUser && (
+        <div className="modal-overlay">
+          <div className="user-modal" style={{ maxWidth: '400px', textAlign: 'center', padding: '30px' }}>
+             <CheckCircle size={50} color="#22c55e" style={{ marginBottom: '15px' }} />
+             <h3>¡Registro Exitoso!</h3>
+             <div style={{ background: '#f8fafc', padding: '15px', borderRadius: '10px', margin: '15px 0', textAlign: 'left' }}>
+                <p style={{ margin: '5px 0' }}><strong>Usuario:</strong> {lastCreatedUser.usuario}</p>
+                <p style={{ margin: '5px 0' }}><strong>Clave:</strong> <code style={{ color: '#2563eb', fontWeight: 'bold' }}>{lastCreatedUser.password}</code></p>
+             </div>
+             <button className="btn-submit-modal" style={{ width: '100%' }} onClick={() => setShowSuccessModal(false)}>Aceptar</button>
           </div>
         </div>
       )}
@@ -390,125 +258,128 @@ const GestionUsuarios = () => {
         <div className="modal-overlay">
           <div className="user-modal">
             <div className="user-modal__header">
-              <h3>Registrar Administrador / Institución</h3>
-              <button className="btn-close-modal" onClick={() => setShowCreateModal(false)}>
-                <X size={20} />
-              </button>
+              <h3>{isEditing ? 'Configuración de Funcionario' : 'Registro de Funcionario'}</h3>
+              <button className="btn-close-modal" onClick={() => setShowCreateModal(false)}><X size={20} /></button>
             </div>
-            <form onSubmit={handleCreateUser} className="user-modal__form">
+            <form onSubmit={handleCreateOrUpdateUser} className="user-modal__form">
               <div className="form-grid">
-                
-                {/* 1. Selección de Perfil (Ancho Completo) */}
-                <div className="form-group full-width">
-                  <label>Perfil (Tipo de Cuenta)</label>
-                  <select 
-                    value={newUser.rol}
-                    onChange={e => {
-                      const newRol = e.target.value;
-                      setNewUser({
-                        ...newUser, 
-                        rol: newRol,
-                        nombre: newRol === 'adminInstitucion' ? '' : newUser.nombre,
-                        cedula: newRol === 'adminInstitucion' ? '' : newUser.cedula,
-                        institucion: newRol === 'admin' ? '' : newUser.institucion
-                      });
-                    }}
-                    className="modal-select"
-                  >
-                    <option value="adminInstitucion">Institución</option>
-                    <option value="admin">Administrador Global</option>
+                <div className="type-selector-pills">
+                  {['MSP', 'MUNI', 'GESTOR'].map(t => (
+                    <button 
+                      key={t} type="button" disabled={isEditing}
+                      className={`type-pill ${newUser.nivel === t || (t === 'GESTOR' && newUser.rol === 'institucion') ? 'active' : ''}`}
+                      onClick={() => {
+                        if (t === 'GESTOR') setNewUser({ ...newUser, nivel: 'MUNI', rol: 'institucion', institucion_id: '' });
+                        else setNewUser({ ...newUser, nivel: t, rol: t === 'MSP' ? 'admin' : 'municipalidad', institucion_id: '' });
+                      }}
+                    >
+                      {t === 'GESTOR' ? 'Gestor Externo' : (t === 'MSP' ? 'Nivel Nacional' : 'Nivel Local')}
+                    </button>
+                  ))}
+                </div>
+
+                <div className="form-group">
+                  <label>Nombre</label>
+                  <div className="input-with-icon">
+                    <UserIcon size={16} />
+                    <input type="text" value={newUser.nombre} onChange={e => setNewUser({...newUser, nombre: e.target.value})} required />
+                  </div>
+                </div>
+
+                <div className="form-group">
+                  <label>Apellido</label>
+                  <div className="input-with-icon">
+                    <UserIcon size={16} />
+                    <input type="text" value={newUser.apellido} onChange={e => setNewUser({...newUser, apellido: e.target.value})} required />
+                  </div>
+                </div>
+
+                <div className="form-group">
+                  <label>Cédula</label>
+                  <div className="input-with-icon">
+                    <Fingerprint size={16} />
+                    <input type="text" value={newUser.cedula} onChange={e => setNewUser({...newUser, cedula: e.target.value})} required />
+                  </div>
+                </div>
+
+                <div className="form-group">
+                  <label>Correo Electrónico</label>
+                  <div className="input-with-icon">
+                    <Mail size={16} />
+                    <input type="email" value={newUser.usuario} onChange={e => setNewUser({...newUser, usuario: e.target.value})} required />
+                  </div>
+                </div>
+
+                <div className="form-group">
+                  <label>Rol Asignado</label>
+                  <select className="modal-select" style={{ paddingLeft: '10px' }} value={newUser.rol} onChange={e => setNewUser({ ...newUser, rol: e.target.value })}>
+                    {(newUser.rol === 'institucion' ? ROLES_POR_NIVEL.GESTOR : (newUser.nivel === 'MSP' ? ROLES_POR_NIVEL.MSP : ROLES_POR_NIVEL.MUNI)).map(r => (
+                      <option key={r.id} value={r.id}>{r.label}</option>
+                    ))}
                   </select>
                 </div>
 
-                {/* 2. Datos de Identidad (Nombre y Cédula) */}
-                <div className="form-group">
-                  <label>{newUser.rol === 'admin' ? 'Nombre del Funcionario *' : 'Nombre Completo'}</label>
-                  <div className="input-with-icon">
-                    <UserIcon size={16} />
-                    <input 
-                      type="text" 
-                      placeholder="Ej: Juan Pérez" 
-                      value={newUser.nombre}
-                      onChange={e => {
-                        const val = newUser.rol === 'adminInstitucion' 
-                          ? e.target.value.replace(/[^a-zA-ZáéíóúÁÉÍÓÚñÑ ]/g, '') 
-                          : e.target.value;
-                        setNewUser({...newUser, nombre: val});
-                      }}
-                    />
-                  </div>
-                </div>
-
-                <div className="form-group">
-                  <label>Cédula de Identidad *</label>
-                  <div className="input-with-icon">
-                    <Fingerprint size={16} />
-                    <input 
-                      type="text" 
-                      placeholder="Ej: 102340567" 
-                      maxLength={12}
-                      value={newUser.cedula}
-                      onChange={e => {
-                        const val = e.target.value.replace(/\D/g, '');
-                        setNewUser({...newUser, cedula: val});
-                      }}
-                    />
-                  </div>
-                </div>
-
-                {/* 3. Institución (Solo si aplica, Ancho Completo) */}
-                {newUser.rol === 'adminInstitucion' && (
-                  <div className="form-group full-width">
-                    <label>Institución a Registrar *</label>
-                    <div className="input-with-icon">
-                      <Building2 size={16} />
-                      <select 
-                        value={newUser.institucion}
-                        onChange={e => setNewUser({...newUser, institucion: e.target.value, nombre: e.target.value || newUser.nombre})}
-                        className="modal-select"
-                        style={{ paddingLeft: '40px' }}
-                      >
-                        <option value="">Seleccionar institución...</option>
-                        {INSTITUCIONES.map(inst => (
-                          <option key={inst} value={inst}>{inst}</option>
-                        ))}
-                      </select>
+                <div className="form-group" style={{ gridColumn: '1 / -1' }}>
+                    <div style={{ display: 'flex', gap: '20px' }}>
+                        <div style={{ flex: 1 }}>
+                            <label>{isEditing ? 'Nueva Contraseña' : 'Contraseña'}</label>
+                            <div className="input-with-icon">
+                                <Key size={16} />
+                                <input 
+                                    type={showPassword ? "text" : "password"} 
+                                    value={newUser.password} 
+                                    onChange={e => setNewUser({...newUser, password: e.target.value})} 
+                                    placeholder={isEditing ? "Dejar vacío si no cambia" : "Obligatorio"} 
+                                    required={!isEditing}
+                                />
+                                <div className="input-actions-inner">
+                                    {showPassword ? <EyeOff size={16} onClick={() => setShowPassword(false)} /> : <Eye size={16} onClick={() => setShowPassword(true)} />}
+                                </div>
+                            </div>
+                        </div>
+                        <div style={{ flex: 1 }}>
+                            <label>Confirmar Contraseña</label>
+                            <div className="input-with-icon">
+                                <Lock size={16} />
+                                <input 
+                                    type={showPassword ? "text" : "password"} 
+                                    value={confirmPassword} 
+                                    onChange={e => setConfirmPassword(e.target.value)} 
+                                    required={newUser.password !== '' || !isEditing}
+                                />
+                            </div>
+                        </div>
+                        <button type="button" className="btn-zap" onClick={generateSecurePassword} title="Generar Clave Segura">
+                            <Zap size={18} /> Generar
+                        </button>
                     </div>
+                </div>
+
+                {(newUser.rol === 'institucion' || newUser.rol === 'adminInstitucion') && (
+                  <div className="form-group" style={{ gridColumn: '1 / -1' }}>
+                    <label>Institución Vinculada</label>
+                    <select className="modal-select" style={{ paddingLeft: '10px' }} value={newUser.institucion_id} onChange={e => setNewUser({ ...newUser, institucion_id: e.target.value })}>
+                      <option value="">Seleccione...</option>
+                      {institucionesDB.map(inst => <option key={inst.id} value={inst.id}>{inst.nombre} ({inst.siglas})</option>)}
+                    </select>
                   </div>
                 )}
 
-                {/* 4. Credenciales (Correo y Contraseña) */}
-                <div className="form-group">
-                  <label>Correo Electrónico *</label>
-                  <div className="input-with-icon">
-                    <Mail size={16} />
-                    <input 
-                      type="email" 
-                      placeholder="usuario@sembremos.cr" 
-                      value={newUser.usuario.toLowerCase().trim()}
-                      onKeyDown={(e) => { if (e.key === ' ') e.preventDefault(); }}
-                      onChange={e => setNewUser({...newUser, usuario: e.target.value.replace(/\s/g, '').toLowerCase()})}
-                    />
-                  </div>
+                <div className="form-group" style={{ gridColumn: '1 / -1', marginTop: '10px' }}>
+                    <label style={{ display: 'flex', alignItems: 'center', gap: '10px', cursor: 'pointer' }}>
+                        <input 
+                            type="checkbox" 
+                            checked={newUser.activo} 
+                            onChange={e => setNewUser({...newUser, activo: e.target.checked})} 
+                            style={{ width: '18px', height: '18px', cursor: 'pointer' }}
+                        />
+                        <span>El usuario se encuentra activo (Habilita el acceso al sistema)</span>
+                    </label>
                 </div>
-
-                <div className="form-group">
-                  <label>Contraseña *</label>
-                  <div className="input-with-icon">
-                    <Key size={16} />
-                    <input 
-                      type="password" 
-                      placeholder="********" 
-                      value={newUser.password}
-                      onChange={e => setNewUser({...newUser, password: e.target.value})}
-                    />
-                  </div>
-                </div>
-
               </div>
               <div className="user-modal__footer">
-                <button type="button" className="btn-cancel-modal" onClick={() => setShowCreateModal(false)}>Cancelar</button>
-                <button type="submit" className="btn-submit-modal">Guardar Usuario</button>
+                <button type="button" className="btn-cancel-modal" onClick={() => setShowCreateModal(false)}>Descartar</button>
+                <button type="submit" className="btn-submit-modal">{isEditing ? 'Actualizar Funcionario' : 'Crear Funcionario'}</button>
               </div>
             </form>
           </div>
@@ -519,89 +390,50 @@ const GestionUsuarios = () => {
         <table className="usuarios-table">
           <thead>
             <tr>
-              <th>Usuario</th>
-              <th>Institución</th>
+              <th>Funcionario</th>
               <th>Cédula</th>
-              <th>Rol</th>
-              <th style={{ textAlign: 'right' }}>Acciones</th>
+              <th>Nivel</th>
+              <th>Conexión</th>
+              <th>Estado</th>
+              <th>Acciones</th>
             </tr>
           </thead>
           <tbody>
-            {filteredUsers.map(u => (
+            {users.filter(u => u.nombre?.toLowerCase().includes(searchQuery.toLowerCase()) || u.usuario?.toLowerCase().includes(searchQuery.toLowerCase())).map(u => (
               <tr key={u.id}>
                 <td>
-                  <div className="user-info-cell">
-                    <div className="user-avatar-mini">
-                      {u.nombre?.split(' ').map(n => n[0]).join('').slice(0, 2)}
-                    </div>
-                    <div className="user-details">
-                      <span className="user-name">{u.nombre}</span>
-                      <span className="user-email">{u.usuario}</span>
-                    </div>
+                  <div style={{ display: 'flex', flexDirection: 'column' }}>
+                    <span style={{ fontWeight: '700', color: '#002f6c' }}>{u.nombre} {u.apellido}</span>
+                    <span style={{ fontSize: '0.75rem', color: '#64748b' }}>{u.usuario}</span>
+                    <span style={{ fontSize: '0.65rem', color: '#3b82f6', fontWeight: 'bold' }}>{u.rol}</span>
                   </div>
                 </td>
+                <td>{u.cedula}</td>
+                <td><span className={`nivel-badge nivel--${u.nivel}`}>{u.nivel}</span></td>
+                <td>{formatLastAccess(u.ultimo_acceso)}</td>
                 <td>
-                  <span style={{ fontSize: '0.85rem', color: '#334155', fontWeight: 500 }}>
-                    {u.institucion || '—'}
-                  </span>
+                   <div 
+                     className={`status-toggle ${u.activo === true || u.activo === 1 ? 'active' : 'inactive'}`}
+                     onClick={() => handleToggleStatus(u)}
+                     title={u.activo === true || u.activo === 1 ? 'Click para desactivar' : 'Click para activar'}
+                   >
+                      <div className="status-toggle__dot"></div>
+                      <span className="status-toggle__text">
+                        {u.activo === true || u.activo === 1 ? 'ACTIVO' : 'INACTIVO'}
+                      </span>
+                   </div>
                 </td>
-                <td>{u.cedula || <span style={{ color: '#94a3b8' }}>N/A</span>}</td>
                 <td>
-                  <span className={getRolBadgeClass(u.rol)}>
-                    <Shield size={14} style={{ marginRight: '6px' }} /> 
-                    {getRolLabel(u.rol)}
-                  </span>
-                </td>
-                <td style={{ textAlign: 'right', paddingRight: '24px' }}>
-                  {currentUser.rol === 'admin' && u.id !== currentUser.id ? (
-                    <div className="acciones-cell">
-                      {/* Cambiar rol */}
-                      <button 
-                        className="btn-change-role"
-                        onClick={() => handleToggleRole(u.id, u.rol)}
-                        disabled={updatingId === u.id}
-                        title={`Cambiar a ${u.rol === 'admin' ? 'Admin Institución' : 'Administrador Global'}`}
-                      >
-                        <UserCog size={16} />
-                        {updatingId === u.id ? 'Actualizando...' : (u.rol === 'admin' ? 'A Institución' : 'A Admin Global')}
-                      </button>
-                      {/* Resetear contraseña */}
-                      <button
-                        className="btn-reset-pwd"
-                        onClick={() => handleDirectReset(u)}
-                        disabled={updatingId === u.id}
-                        title="Resetear contraseña"
-                      >
-                        <Key size={16} />
-                      </button>
-                      {/* Eliminar usuario */}
-                      <button
-                        className="btn-delete-user"
-                        onClick={() => handleDeleteUser(u)}
-                        disabled={updatingId === u.id}
-                        title="Eliminar usuario"
-                      >
-                        <Trash2 size={14} />
-                      </button>
-                    </div>
-                  ) : u.id === currentUser.id ? (
-                    <span style={{ fontSize: '0.8rem', color: '#94a3b8', fontStyle: 'italic' }}>Tú</span>
-                  ) : (
-                    <span style={{ fontSize: '0.8rem', color: '#94a3b8' }}>Solo lectura</span>
-                  )}
+                  <div style={{ display: 'flex', gap: '10px' }}>
+                    <Edit3 size={18} style={{ cursor: 'pointer', color: '#002f6c' }} onClick={() => handleOpenEdit(u)} title="Editar" />
+                    <Trash2 size={18} style={{ cursor: 'pointer', color: '#d33' }} onClick={() => handleDeleteUser(u)} title="Eliminar" />
+                  </div>
                 </td>
               </tr>
             ))}
           </tbody>
         </table>
-        
-        {filteredUsers.length === 0 && (
-          <div style={{ padding: '3rem', textAlign: 'center', color: '#7a9cc4' }}>
-            No se encontraron usuarios que coincidan con la búsqueda.
-          </div>
-        )}
       </div>
-
     </div>
   );
 };

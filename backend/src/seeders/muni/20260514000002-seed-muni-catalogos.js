@@ -9,7 +9,7 @@ module.exports = {
       { id: 3, nombre: 'Control y Vigilancia' },
       { id: 4, nombre: 'Infraestructura Urbana' },
       { id: 5, nombre: 'Capacitación y Educación' }
-    ], {});
+    ], { ignoreDuplicates: true });
 
     // 2. Estados de Actividad
     await queryInterface.bulkInsert('cat_estado_actividad', [
@@ -17,7 +17,7 @@ module.exports = {
       { id: 2, nombre: 'En Ejecución' },
       { id: 3, nombre: 'Finalizada' },
       { id: 4, nombre: 'Suspendida' }
-    ], {});
+    ], { ignoreDuplicates: true });
 
     // 3. Fuentes de Fondos
     await queryInterface.bulkInsert('cat_fuente_fondos', [
@@ -25,7 +25,7 @@ module.exports = {
       { id: 2, nombre: 'Transferencia Gobierno Central' },
       { id: 3, nombre: 'Donación Externa' },
       { id: 4, nombre: 'Alianza Público-Privada' }
-    ], {});
+    ], { ignoreDuplicates: true });
 
     // 4. Periodos Trimestrales (2026)
     await queryInterface.bulkInsert('cat_periodo_trimestral', [
@@ -33,7 +33,7 @@ module.exports = {
       { id: 2, nombre: 'Segundo Trimestre 2026', mes_inicio: 4, mes_fin: 6 },
       { id: 3, nombre: 'Tercer Trimestre 2026', mes_inicio: 7, mes_fin: 9 },
       { id: 4, nombre: 'Cuarto Trimestre 2026', mes_inicio: 10, mes_fin: 12 }
-    ], {});
+    ], { ignoreDuplicates: true });
   },
 
   async down(queryInterface, Sequelize) {

@@ -24,6 +24,7 @@ const DashboardAvances = ({ scope = 'global' }) => {
   const [stats, setStats] = useState({});
   const [loading, setLoading] = useState(true);
   const [expandedLinea, setExpandedLinea] = useState(null);
+  const [expandedTasks, setExpandedTasks] = useState({}); // Control de desplegables de tareas
 
   useEffect(() => {
     const fetchData = async () => {
@@ -162,8 +163,9 @@ const DashboardAvances = ({ scope = 'global' }) => {
 
   // ── Helpers ──
   const formatColones = (amount) => {
-    if (!amount || amount === 0) return '₡0';
-    return '₡' + amount.toLocaleString('es-CR');
+    const num = parseFloat(amount);
+    if (isNaN(num) || num === 0) return '₡0';
+    return '₡' + num.toLocaleString('es-CR');
   };
 
   const getProgressColor = (pct) => {
@@ -439,25 +441,76 @@ const DashboardAvances = ({ scope = 'global' }) => {
                           <div className="avances-expand-content">
                             <div className="avances-expand-tasks">
                               {linea.tareas.map(t => (
-                                <div key={t.id} className="avances-task-row">
-                                  <div className="avances-task-info">
-                                    <span className="avances-task-title">{t.titulo}</span>
-                                    <span className="avances-task-inst">
-                                      {t.institucionNombre || 'Sin asignar'} · {t.zona || 'Sin zona'}
-                                    </span>
+                                  <div key={t.id} className="avances-task-row" style={{ flexDirection: 'column', alignItems: 'flex-start', gap: '10px', borderBottom: '1px solid #f1f5f9', paddingBottom: '12px' }}>
+                                    <div style={{ display: 'flex', justifyContent: 'space-between', width: '100%', alignItems: 'center' }}>
+                                      <div className="avances-task-info">
+                                        <span className="avances-task-title">{t.titulo}</span>
+                                        <span className="avances-task-inst">
+                                          {t.institucionNombre || 'Sin asignar'} · {t.zona || 'Sin zona'}
+                                        </span>
+                                      </div>
+                                      <div className="avances-task-meta" style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                                        <div style={{ textAlign: 'right' }}>
+                                          <span
+                                            className="avances-task-pct"
+                                            style={{ color: getProgressColor(t.progresoReal || 0), display: 'block', fontSize: '0.9rem', fontWeight: 700 }}
+                                          >
+                                            {Math.min(100, t.progresoReal || 0)}%
+                                          </span>
+                                          <span style={{ fontSize: '0.7rem', color: '#94a3b8', fontWeight: 600 }}>{formatColones(t.inversionColones)}</span>
+                                        </div>
+                                        <button 
+                                          className={`task-budget-toggle ${expandedTasks[t.id] ? 'active' : ''}`}
+                                          onClick={() => setExpandedTasks(prev => ({ ...prev, [t.id]: !prev[t.id] }))}
+                                          style={{ 
+                                            background: expandedTasks[t.id] ? '#7c3aed' : '#f1f5f9',
+                                            color: expandedTasks[t.id] ? 'white' : '#64748b',
+                                            border: 'none',
+                                            borderRadius: '6px',
+                                            padding: '4px 8px',
+                                            cursor: 'pointer',
+                                            display: 'flex',
+                                            alignItems: 'center',
+                                            gap: '4px',
+                                            fontSize: '0.7rem',
+                                            fontWeight: 600,
+                                            transition: 'all 0.2s'
+                                          }}
+                                        >
+                                          <DollarSign size={12} />
+                                          {expandedTasks[t.id] ? 'Ocultar' : 'Detalle'}
+                                          <ChevronDown size={12} style={{ transform: expandedTasks[t.id] ? 'rotate(180deg)' : 'none', transition: 'transform 0.2s' }} />
+                                        </button>
+                                      </div>
+                                    </div>
+                                    
+                                    {/* Desglose de Presupuesto de la Tarea (Desplegable) */}
+                                    {expandedTasks[t.id] && t.presupuestoDetalles && Array.isArray(t.presupuestoDetalles) && t.presupuestoDetalles.length > 0 && (
+                                      <div className="avances-task-budget-details animate-slide-down" style={{ width: '100%', marginTop: '5px', padding: '12px', background: '#f8fafc', borderRadius: '8px', border: '1px solid #e2e8f0' }}>
+                                        <div className="budget-header" style={{ display: 'flex', alignItems: 'center', gap: '6px', color: '#7c3aed', fontSize: '0.75rem', fontWeight: 700, marginBottom: '8px' }}>
+                                          <Layers size={14} />
+                                          <span>Desglose de Gasto Ejecutado:</span>
+                                        </div>
+                                        <div className="budget-list" style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                                          {t.presupuestoDetalles.map((p, idx) => (
+                                            <div key={idx} className="budget-item" style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.78rem', background: 'white', padding: '8px 10px', borderRadius: '6px', boxShadow: '0 1px 2px rgba(0,0,0,0.05)', borderLeft: '4px solid #7c3aed' }}>
+                                              <span className="budget-concept" style={{ color: '#334155', fontWeight: 500 }}>{p?.concepto || 'Sin concepto'}</span>
+                                              <span className="budget-amount" style={{ color: '#7c3aed', fontWeight: 700 }}>{formatColones(p?.monto_ejecutado)}</span>
+                                            </div>
+                                          ))}
+                                          <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '4px', paddingTop: '8px', borderTop: '2px solid #e2e8f0', fontWeight: 800, fontSize: '0.8rem', color: '#1e293b' }}>
+                                            <span>TOTAL EJECUTADO:</span>
+                                            <span>{formatColones(t.inversionColones)}</span>
+                                          </div>
+                                        </div>
+                                      </div>
+                                    )}
+                                    {expandedTasks[t.id] && (!t.presupuestoDetalles || t.presupuestoDetalles.length === 0) && (
+                                      <div style={{ width: '100%', padding: '10px', textAlign: 'center', fontSize: '0.75rem', color: '#94a3b8', fontStyle: 'italic' }}>
+                                        No hay desgloses registrados para esta tarea.
+                                      </div>
+                                    )}
                                   </div>
-                                  <div className="avances-task-meta">
-                                    <span
-                                      className="avances-task-pct"
-                                      style={{ color: getProgressColor(t.progresoReal || 0) }}
-                                    >
-                                      {Math.min(100, t.progresoReal || 0)}%
-                                    </span>
-                                    <span className={`avances-task-badge ${getTaskBadgeClass(t)}`}>
-                                      {getTaskBadgeLabel(t)}
-                                    </span>
-                                  </div>
-                                </div>
                               ))}
                             </div>
                           </div>

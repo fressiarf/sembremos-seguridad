@@ -24,22 +24,10 @@ const ActividadOficiales = () => {
   const [lineas, setLineas] = useState([]);
   const [tareas, setTareas] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [showLineaForm, setShowLineaForm] = useState(false);
   const [showTareaForm, setShowTareaForm] = useState(false);
   const [expandedLinea, setExpandedLinea] = useState(null);
   const [stats, setStats] = useState({ totalTareas: 0, tareasCompletadas: 0, inversionTotal: 0 });
   const { showToast } = useToast();
-
-  const [newLinea, setNewLinea] = useState({
-    canton: 'Puntarenas', 
-    problematica: '', 
-    titulo: '',
-    objetivo: '',
-    indicador: '',
-    meta: '',
-    plazo: 'Anual',
-    institucionesLideres: [] // Array de IDs
-  });
 
   const [newTarea, setNewTarea] = useState({
     lineaAccionId: '', titulo: '', indicador: '', consideraciones: '', meta: '',
@@ -79,30 +67,7 @@ const ActividadOficiales = () => {
 
   useEffect(() => { loadData(); }, []);
 
-  const handleCreateLinea = async (e) => {
-    e.preventDefault();
-    if (!newLinea.problematica || !newLinea.titulo || !newLinea.indicador || !newLinea.meta || !newLinea.objetivo) {
-      showToast('Completa los campos obligatorios (*)', 'warning');
-      return;
-    }
-    if (newLinea.institucionesLideres.length === 0) {
-      showToast('Selecciona al menos una Institución Promotora', 'warning');
-      return;
-    }
-    try {
-      const lineaId = `LA-${Date.now().toString().slice(-4)}`;
-      await dashboardService.createLineaAccion({ ...newLinea, id: lineaId, no: lineas.length + 1 });
-      showToast('Línea de acción creada ✓', 'success');
-      setShowLineaForm(false);
-      setNewLinea({ 
-        canton: 'Puntarenas', problematica: '', titulo: '', objetivo: '',
-        indicador: '', meta: '', plazo: 'Anual', institucionesLideres: []
-      });
-      loadData();
-    } catch (error) {
-      showToast('Error al crear la línea', 'error');
-    }
-  };
+
 
   // ── Crear Tarea ──
   const handleCreateTarea = async (e) => {
@@ -157,9 +122,6 @@ const ActividadOficiales = () => {
         </div>
         {user?.rol !== 'auditor' && (
           <div style={{ display: 'flex', gap: '10px' }}>
-            <button className="btn-primary-assign" onClick={() => setShowLineaForm(true)}>
-              <Plus size={16} /> Crear Línea
-            </button>
             <button className="btn-primary-assign" onClick={() => {
               if (lineas.length === 0) { showToast('Primero crea una Línea de Acción', 'warning'); return; }
               if (officers.length === 0) { showToast('Primero crea una Institución en Gestión de Usuarios', 'warning'); return; }
@@ -171,90 +133,7 @@ const ActividadOficiales = () => {
         )}
       </header>
 
-      {/* ── Modal Crear Línea ── */}
-      {showLineaForm && (
-        <div className="assign-modal-overlay">
-          <div className="assign-modal">
-            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '1.5rem' }}>
-              <h3 style={{ margin: 0, color: '#0b2240' }}>Nueva Línea de Acción</h3>
-              <button onClick={() => setShowLineaForm(false)} style={{ background: 'none', border: 'none', cursor: 'pointer' }}><X size={20} /></button>
-            </div>
-            <form onSubmit={handleCreateLinea}>
-              <div className="form-row-grid">
-                <div className="form-group">
-                  <label>Nombre de Línea Estratégica *</label>
-                  <input type="text" placeholder="Ej: CONSUMO DE DROGAS Y ALCOHOL" value={newLinea.problematica} onChange={e => setNewLinea({...newLinea, problematica: e.target.value})} required />
-                </div>
-                <div className="form-group">
-                  <label>Cantón / Territorio *</label>
-                  <select value={newLinea.canton} onChange={e => setNewLinea({...newLinea, canton: e.target.value})} required>
-                    <option value="Puntarenas">Puntarenas</option>
-                  </select>
-                </div>
-              </div>
 
-              <div className="form-group">
-                <label>Nombre de la Línea de Acción (Estrategia Macro) *</label>
-                <input type="text" placeholder="Ej: Programa de Intervención en Centros Educativos" value={newLinea.titulo} onChange={e => setNewLinea({...newLinea, titulo: e.target.value})} required />
-              </div>
-
-              <div className="form-group">
-                <label>Objetivo Estratégico *</label>
-                <textarea placeholder="Describe el objetivo principal que se busca alcanzar con esta línea de acción..." value={newLinea.objetivo} onChange={e => setNewLinea({...newLinea, objetivo: e.target.value})} rows="2" required />
-              </div>
-
-              <div className="form-row-grid">
-                <div className="form-group">
-                  <label>Indicador de la Estrategia *</label>
-                  <input type="text" placeholder="Ej: Variación de incidentes delictivos" value={newLinea.indicador} onChange={e => setNewLinea({...newLinea, indicador: e.target.value})} required />
-                </div>
-                <div className="form-group">
-                  <label>Meta Global *</label>
-                  <input type="text" placeholder="Ej: Reducir 15% los incidentes en el cantón" value={newLinea.meta} onChange={e => setNewLinea({...newLinea, meta: e.target.value})} required />
-                </div>
-              </div>
-
-              <div className="form-row-grid">
-                <div className="form-group">
-                  <label>Insitución Promotora / Líder (Múltiple) *</label>
-                  <div className="checkbox-list-container" style={{ maxHeight: '160px', overflowY: 'auto', border: '1px solid #cbd5e1', padding: '12px', borderRadius: '6px', backgroundColor: '#f8fafc', boxShadow: 'inset 0 1px 3px rgba(0,0,0,0.05)' }}>
-                    {officers.map(o => (
-                      <label key={o.id} style={{ display: 'flex', alignItems: 'flex-start', gap: '10px', padding: '6px 0', cursor: 'pointer', fontSize: '13px', color: '#334155', borderBottom: '1px solid #e2e8f0' }}>
-                        <input 
-                          type="checkbox" 
-                          style={{ marginTop: '2px', cursor: 'pointer' }}
-                          checked={newLinea.institucionesLideres.includes(o.id)}
-                          onChange={e => {
-                            if (e.target.checked) {
-                              setNewLinea(prev => ({ ...prev, institucionesLideres: [...prev.institucionesLideres, o.id] }));
-                            } else {
-                              setNewLinea(prev => ({ ...prev, institucionesLideres: prev.institucionesLideres.filter(id => id !== o.id) }));
-                            }
-                          }}
-                        />
-                        {o.institucion} ({o.nombre})
-                      </label>
-                    ))}
-                  </div>
-                </div>
-                <div className="form-group">
-                  <label>Plazo Estratégico</label>
-                  <select value={newLinea.plazo} onChange={e => setNewLinea({...newLinea, plazo: e.target.value})}>
-                    <option value="Anual">Cierre Anual</option>
-                    <option value="Semestral">Cierre Semestral</option>
-                    <option value="Cuatrimestral">Cierre Cuatrimestral</option>
-                    <option value="Bimestral">Cierre Bimestral</option>
-                  </select>
-                </div>
-              </div>
-              <div className="modal-actions">
-                <button type="button" onClick={() => setShowLineaForm(false)} className="btn-cancel">Cancelar</button>
-                <button type="submit" className="btn-assign-submit">Guardar Línea de Acción</button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
 
       {/* ── Modal Crear Tarea ── */}
   {showTareaForm && (
@@ -646,6 +525,18 @@ const ActividadOficiales = () => {
               {/* Tareas expandidas */}
               {expandedLinea === linea.id && (
                 <div style={{ padding: '16px 20px', borderTop: '1px solid #e2e8f0' }}>
+                  <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '12px' }}>
+                    <button 
+                      onClick={() => { 
+                        setNewTarea(prev => ({...prev, lineaAccionId: linea.id})); 
+                        setShowTareaForm(true); 
+                      }} 
+                      className="btn-primary-assign" 
+                      style={{ padding: '6px 12px', fontSize: '0.8rem', background: '#3b82f6', color: 'white', borderRadius: '6px', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '4px' }}
+                    >
+                      <Plus size={14} /> Agregar otra tarea
+                    </button>
+                  </div>
                   {linea.tareas && linea.tareas.length > 0 ? (
                     linea.tareas.map(tarea => (
                       <div key={tarea.id} style={{ padding: '12px 14px', marginBottom: '8px', background: tarea.completada ? '#f0fdf4' : '#fff', borderRadius: '8px', border: `1px solid ${tarea.completada ? '#bbf7d0' : '#e2e8f0'}`, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>

@@ -354,7 +354,7 @@
 
 @keyframes slideDown {
   from { opacity: 0; max-height: 0; padding-top: 0; padding-bottom: 0; }
-  to   { opacity: 1; max-height: 500px; }
+  to   { opacity: 1; max-height: 2000px; }
 }
 
 .avances-expand-tasks {
@@ -525,4 +525,70 @@
   .avances-total-bar {
     width: 100%;
   }
+}
+
+/* ── Budget Details ── */
+.avances-task-row-container {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  background: #ffffff;
+  padding: 12px;
+  border-radius: 12px;
+  border: 1px solid #e2e8f0;
+  transition: all 0.2s ease;
+}
+
+.avances-task-row-container:hover {
+  border-color: #3b82f6;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+
+.avances-task-row-container .avances-task-row {
+  border: none;
+  padding: 0;
+}
+
+.avances-task-budget-details {
+  margin-top: 8px;
+  padding-top: 10px;
+  border-top: 1px dashed #e2e8f0;
+}
+
+.budget-header {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: #7c3aed;
+  font-size: 0.75rem;
+  font-weight: 700;
+  margin-bottom: 8px;
+}
+
+.budget-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding-left: 4px;
+}
+
+.budget-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.78rem;
+  padding: 4px 8px;
+  background: #fdfaff;
+  border-left: 3px solid #7c3aed;
+  border-radius: 0 4px 4px 0;
+}
+
+.budget-concept {
+  color: #4b5563;
+  font-weight: 500;
+}
+
+.budget-amount {
+  font-weight: 700;
+  color: #7c3aed;
 }
