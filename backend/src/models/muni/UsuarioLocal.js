@@ -118,7 +118,7 @@ UsuarioLocal.associate = (models) => {
   UsuarioLocal.hasMany(models.NotificacionLocal, { foreignKey: 'usuario_id', as: 'notificaciones' });
   UsuarioLocal.hasMany(models.AsignacionCogestor, { foreignKey: 'usuario_id', as: 'cogestiones' });
   UsuarioLocal.hasMany(models.ComentarioRevision, { foreignKey: 'autor_id', as: 'comentarios' });
-  UsuarioLocal.hasMany(models.EventoCalendario, { foreignKey: 'organizador_id', as: 'eventos' });
+  UsuarioLocal.hasMany(models.EventoCalendario, { foreignKey: 'creado_por', as: 'eventos' });
   UsuarioLocal.hasMany(models.HistorialEstado, { foreignKey: 'cambiado_por', as: 'cambiosEstado' });
   UsuarioLocal.hasMany(models.HistorialIALocal, { foreignKey: 'usuario_id', as: 'consultasIALocal' });
   UsuarioLocal.hasMany(models.InformeD71, { foreignKey: 'generado_por', as: 'informesGenerados' });

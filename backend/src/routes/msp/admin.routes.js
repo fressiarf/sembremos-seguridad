@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const syncController = require('../../controllers/common/syncController');
+const syncController = require('../../controllers/common/SyncController');
 const authMiddleware = require('../../common/middlewares/authMiddleware');
 const { authorizeRoles, ROLES } = require('../../common/middlewares/roleMiddleware');
 
