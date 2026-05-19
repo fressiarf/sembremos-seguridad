@@ -447,7 +447,14 @@ router.get('/eventos', async (req, res) => {
 router.post('/eventos', async (req, res) => {
   try {
     const EventoCalendario = require('../../models/muni/EventoCalendario');
-    const nuevo = await EventoCalendario.create(req.body);
+    // Mapeo explícito: el frontend manda `participantes` (array de nombres),
+    // el modelo lo persiste como `participantes_instituciones`.
+    const payload = { ...req.body };
+    if (payload.participantes && !payload.participantes_instituciones) {
+      payload.participantes_instituciones = payload.participantes;
+    }
+    delete payload.participantes;
+    const nuevo = await EventoCalendario.create(payload, { userId: req.user?.id });
     return res.status(201).json(nuevo);
   } catch (error) {
     return res.status(500).json({ error: error.message });

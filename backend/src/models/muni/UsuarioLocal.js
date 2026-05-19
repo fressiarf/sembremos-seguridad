@@ -79,6 +79,11 @@ const UsuarioLocal = sequelizeMUNI.define('UsuarioLocal', {
     type: DataTypes.BOOLEAN,
     allowNull: false,
     defaultValue: true
+  },
+  institucion_id: {
+    type: DataTypes.UUID,
+    allowNull: true,
+    references: { model: 'instituciones_local', key: 'id' }
   }
 }, {
   tableName: 'usuarios_local',
@@ -115,6 +120,7 @@ const UsuarioLocal = sequelizeMUNI.define('UsuarioLocal', {
 UsuarioLocal.associate = (models) => {
   // belongsTo
   UsuarioLocal.belongsTo(models.RolLocal, { foreignKey: 'rol_id', as: 'rol' });
+  UsuarioLocal.belongsTo(models.InstitucionLocal, { foreignKey: 'institucion_id', as: 'institucion' });
   // hasMany (relaciones inversas)
   UsuarioLocal.hasMany(models.ActividadLocal, { foreignKey: 'gestor_id', as: 'actividades' });
   UsuarioLocal.hasMany(models.SoporteTicket, { foreignKey: 'usuario_id', as: 'tickets' });
