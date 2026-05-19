@@ -3,6 +3,7 @@ import { useLogin } from '../../../context/LoginContext';
 import { useToast } from '../../../context/ToastContext';
 import { userService } from '../../../services/userService';
 import { securityService } from '../../../services/securityService';
+import { recordatorioService } from '../../../services/recordatorioService';
 import { ROLES } from '../../../constants/roles';
 import { Shield, User, Mail, Smartphone, Lock, Building, IdCard, Save, History, Bell, Key, Timer, Camera, Upload, Trash2 } from 'lucide-react';
 import './ProfileSettings.css';
@@ -19,6 +20,8 @@ const ProfileSettings = () => {
     const [photoPreview, setPhotoPreview] = useState(null);
     const [photoFile, setPhotoFile] = useState(null);
     const photoInputRef = useRef(null);
+    const [recibeRecordatorios, setRecibeRecordatorios] = useState(true);
+    const [savingPref, setSavingPref] = useState(false);
 
     const [formData, setFormData] = useState({
         nombre: '',
@@ -63,6 +66,9 @@ const ProfileSettings = () => {
                         setWindowStatus(win);
                     }
                 }
+                // Cargar preferencia de recordatorios (independiente del rol)
+                const prefs = await recordatorioService.getPreferencias();
+                setRecibeRecordatorios(prefs.recibe_recordatorios !== false);
             } catch (error) {
                 showToast('Error al cargar perfil', 'error');
             } finally {
@@ -71,6 +77,29 @@ const ProfileSettings = () => {
         };
         loadUserData();
     }, [currentUser]);
+
+    const handleToggleRecordatorios = async (e) => {
+        const nuevo = e.target.checked;
+        setRecibeRecordatorios(nuevo);
+        setSavingPref(true);
+        try {
+            const res = await recordatorioService.setRecibirRecordatorios(nuevo);
+            if (res) {
+                showToast(
+                    nuevo ? 'Recibirás avisos por correo' : 'Avisos por correo desactivados',
+                    'success'
+                );
+            } else {
+                throw new Error('respuesta vacía');
+            }
+        } catch (err) {
+            // revertir
+            setRecibeRecordatorios(!nuevo);
+            showToast('No se pudo actualizar la preferencia', 'error');
+        } finally {
+            setSavingPref(false);
+        }
+    };
 
     // Timer para la ventana de aprobación
     useEffect(() => {
@@ -433,6 +462,26 @@ const ProfileSettings = () => {
                                     </div>
                                 </>
                             )}
+                        </section>
+
+                        {/* ── SECCIÓN PREFERENCIAS DE NOTIFICACIÓN ── */}
+                        <section className="form-section">
+                            <h3><Bell size={18} /> Preferencias de Notificación</h3>
+                            <div className="pref-toggle-row">
+                                <div className="pref-toggle-text">
+                                    <strong>Recibir avisos por correo</strong>
+                                    <p>Te llegarán recordatorios automáticos antes de cada evento agendado (14d, 7d, 4d, 2d, 1d, 12h, 1h antes).</p>
+                                </div>
+                                <label className="pref-switch">
+                                    <input
+                                        type="checkbox"
+                                        checked={recibeRecordatorios}
+                                        onChange={handleToggleRecordatorios}
+                                        disabled={savingPref}
+                                    />
+                                    <span className="pref-slider" />
+                                </label>
+                            </div>
                         </section>
                     </div>
 

@@ -16,9 +16,9 @@ class AuthController {
       const username = (identificador || email || '').trim();
 
       if (!username || !password || !nivel) {
-        return res.status(400).json({ 
-          status: 'fail', 
-          message: 'Identificador, contraseña y nivel son obligatorios' 
+        return res.status(400).json({
+          status: 'fail',
+          message: 'Identificador, contraseña y nivel son obligatorios'
         });
       }
 
@@ -26,10 +26,12 @@ class AuthController {
       let finalNivel = nivelUpper;
       const UserModel = nivelUpper === 'MSP' ? UsuarioFP : UsuarioLocal;
       const RoleModel = nivelUpper === 'MSP' ? RolFP : RolLocal;
-      
+
+      const searchField = metodo === 'cedula' ? 'cedula' : 'email';
+
       // 3. Buscar usuario incluyendo su rol
-      let user = await UserModel.findOne({ 
-        where: { email, activo: true },
+      let user = await UserModel.findOne({
+        where: { [searchField]: username, activo: true },
         include: [{ model: RoleModel, as: 'rol' }]
       });
       
@@ -40,7 +42,7 @@ class AuthController {
         const FallbackRoleModel = fallbackNivel === 'MSP' ? RolFP : RolLocal;
 
         user = await FallbackUserModel.findOne({
-          where: { email, activo: true },
+          where: { [searchField]: username, activo: true },
           include: [{ model: FallbackRoleModel, as: 'rol' }]
         });
 
@@ -256,22 +258,22 @@ class AuthController {
 
 /**
  * Mapea el nombre del rol en la base de datos al rol esperado por el frontend (RBAC).
+ * Comparación case-insensitive y tolerante a alias antiguos.
  */
 function mapRole(dbRolNombre, nivel) {
-  let rolFrontend = 'institucion'; // Default seguro
-  const nombre = (dbRolNombre || '').trim();
+  const nombre = (dbRolNombre || '').trim().toLowerCase();
 
   if (nivel === 'MSP') {
-    if (nombre === 'SuperAdmin') rolFrontend = 'admin';
-    else if (nombre === 'Admin Institucional') rolFrontend = 'adminInstitucion';
-    else if (nombre === 'Analista') rolFrontend = 'lector';
-    else if (nombre === 'Operativo') rolFrontend = 'institucion';
+    if (nombre === 'admin' || nombre === 'superadmin') return 'admin';
+    if (nombre === 'institucion' || nombre === 'admin institucional') return 'adminInstitucion';
+    if (nombre === 'analista') return 'lector';
+    if (nombre === 'operativo') return 'institucion';
   } else {
-    if (nombre === 'Admin Municipal') rolFrontend = 'municipalidad';
-    else if (nombre === 'Gestor Actividades') rolFrontend = 'institucion';
-    else if (nombre === 'Visualizador') rolFrontend = 'lector';
+    if (nombre === 'municipalidad' || nombre === 'admin municipal') return 'municipalidad';
+    if (nombre === 'gestor' || nombre === 'gestor actividades') return 'institucion';
+    if (nombre === 'visualizador') return 'lector';
   }
-  return rolFrontend;
+  return 'institucion'; // Default seguro
 }
 
 module.exports = new AuthController();

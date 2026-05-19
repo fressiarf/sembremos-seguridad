@@ -9,7 +9,7 @@ import { editoresService } from '../../services/editoresService';
 import DashboardAvances from '../Dashboard/DashboardAvances/DashboardAvances';
 import { useToast } from '../../context/ToastContext';
 import { useLogin } from '../../context/LoginContext';
-import { CheckCircle, Clock, Activity, DollarSign, MessageCircle, Bot, Bell, X } from 'lucide-react';
+import { CheckCircle, Clock, Activity, DollarSign, MessageCircle, Bot, Bell, X, LayoutDashboard } from 'lucide-react';
 import SoporteInstitucional from '../Dashboard/SoporteInstitucional/SoporteInstitucional';
 import TopbarInstitucion from './Navegacion/TopbarInstitucion';
 import ChatBotWindow from '../Shared/ChatBot/ChatBotWindow';

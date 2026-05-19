@@ -74,6 +74,16 @@ const UsuarioLocal = sequelizeMUNI.define('UsuarioLocal', {
   ultimo_acceso: {
     type: DataTypes.DATE,
     allowNull: true
+  },
+  recibe_recordatorios: {
+    type: DataTypes.BOOLEAN,
+    allowNull: false,
+    defaultValue: true
+  },
+  institucion_id: {
+    type: DataTypes.UUID,
+    allowNull: true,
+    references: { model: 'instituciones_local', key: 'id' }
   }
 }, {
   tableName: 'usuarios_local',
@@ -110,6 +120,7 @@ const UsuarioLocal = sequelizeMUNI.define('UsuarioLocal', {
 UsuarioLocal.associate = (models) => {
   // belongsTo
   UsuarioLocal.belongsTo(models.RolLocal, { foreignKey: 'rol_id', as: 'rol' });
+  UsuarioLocal.belongsTo(models.InstitucionLocal, { foreignKey: 'institucion_id', as: 'institucion' });
   // hasMany (relaciones inversas)
   UsuarioLocal.hasMany(models.ActividadLocal, { foreignKey: 'gestor_id', as: 'actividades' });
   UsuarioLocal.hasMany(models.SoporteTicket, { foreignKey: 'usuario_id', as: 'tickets' });
@@ -118,7 +129,7 @@ UsuarioLocal.associate = (models) => {
   UsuarioLocal.hasMany(models.NotificacionLocal, { foreignKey: 'usuario_id', as: 'notificaciones' });
   UsuarioLocal.hasMany(models.AsignacionCogestor, { foreignKey: 'usuario_id', as: 'cogestiones' });
   UsuarioLocal.hasMany(models.ComentarioRevision, { foreignKey: 'autor_id', as: 'comentarios' });
-  UsuarioLocal.hasMany(models.EventoCalendario, { foreignKey: 'organizador_id', as: 'eventos' });
+  UsuarioLocal.hasMany(models.EventoCalendario, { foreignKey: 'creado_por', as: 'eventos' });
   UsuarioLocal.hasMany(models.HistorialEstado, { foreignKey: 'cambiado_por', as: 'cambiosEstado' });
   UsuarioLocal.hasMany(models.HistorialIALocal, { foreignKey: 'usuario_id', as: 'consultasIALocal' });
   UsuarioLocal.hasMany(models.InformeD71, { foreignKey: 'generado_por', as: 'informesGenerados' });

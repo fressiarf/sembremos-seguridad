@@ -3,7 +3,7 @@ const router = express.Router();
 const UserController = require('../../controllers/common/UserController');
 const DashboardController = require('../../controllers/common/DashboardController');
 const AuthController = require('../../controllers/common/AuthController');
-const syncController = require('../../controllers/common/syncController');
+const syncController = require('../../controllers/common/SyncController');
 const authMiddleware = require('../../common/middlewares/authMiddleware');
 const { authorizeRoles, ROLES } = require('../../common/middlewares/roleMiddleware');
 
