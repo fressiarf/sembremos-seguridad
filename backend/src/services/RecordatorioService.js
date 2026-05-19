@@ -32,19 +32,28 @@ const calcularRecordatoriosAplicables = (fechaInicio, ahora = new Date()) => {
     .filter(r => r.programado_para.getTime() > ahoraMs);
 };
 
-/**
- * Inserta los recordatorios aplicables para el evento.
- * Usa ignoreDuplicates para que sea idempotente frente a la constraint
- * UNIQUE(evento_id, offset_minutos).
- */
-const generarRecordatorios = async (eventoId, fechaInicio, options = {}) => {
+const generarRecordatorios = async (evento, options = {}) => {
   const EventoRecordatorio = require('../models/muni/EventoRecordatorio');
-  const filas = calcularRecordatoriosAplicables(fechaInicio).map(r => ({
-    ...r,
-    evento_id: eventoId,
-    estado: 'pendiente'
-  }));
-  if (filas.length === 0) return [];
+  const { resolverDestinatariosEvento } = require('./DestinatariosService');
+  
+  const destinatarios = await resolverDestinatariosEvento(evento);
+  if (destinatarios.length === 0) return [];
+
+  const offsetsAplicables = calcularRecordatoriosAplicables(evento.fecha_inicio);
+  if (offsetsAplicables.length === 0) return [];
+
+  const filas = [];
+  for (const offset of offsetsAplicables) {
+    for (const d of destinatarios) {
+      filas.push({
+        ...offset,
+        evento_id: evento.id,
+        destinatario_email: d.email,
+        estado: 'pendiente'
+      });
+    }
+  }
+
   return EventoRecordatorio.bulkCreate(filas, {
     transaction: options.transaction,
     ignoreDuplicates: true
@@ -56,16 +65,16 @@ const generarRecordatorios = async (eventoId, fechaInicio, options = {}) => {
  * con la nueva fecha. Los ya 'enviado' o 'enviando' se preservan
  * (los enviados son historia; los enviando podrían estar en vuelo).
  */
-const regenerarRecordatorios = async (eventoId, fechaInicio, options = {}) => {
+const regenerarRecordatorios = async (evento, options = {}) => {
   const EventoRecordatorio = require('../models/muni/EventoRecordatorio');
   await EventoRecordatorio.destroy({
     where: {
-      evento_id: eventoId,
+      evento_id: evento.id,
       estado: { [Op.in]: ['pendiente', 'fallido', 'omitido'] }
     },
     transaction: options.transaction
   });
-  return generarRecordatorios(eventoId, fechaInicio, options);
+  return generarRecordatorios(evento, options);
 };
 
 module.exports = {

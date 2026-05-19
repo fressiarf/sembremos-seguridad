@@ -52,7 +52,7 @@ const procesarUno = async (recordatorio) => {
   const NotificacionLocal = require('../models/muni/NotificacionLocal');
   const UsuarioLocal = require('../models/muni/UsuarioLocal');
   const { enviarRecordatorio } = require('../services/MailService');
-  const { resolverDestinatariosEvento } = require('../services/DestinatariosService');
+    // No usamos resolverDestinatariosEvento, usamos el email guardado en DB
   const { formatearAvisoTiempo } = require('../services/RecordatorioFormatter');
 
   const ctxBase = {
@@ -67,15 +67,7 @@ const procesarUno = async (recordatorio) => {
       throw new Error('evento asociado no encontrado (¿borrado?)');
     }
 
-    const destinatarios = await resolverDestinatariosEvento(recordatorio.evento);
-    if (destinatarios.length === 0) {
-      await EventoRecordatorio.update(
-        { estado: 'omitido', ultimo_error: 'sin destinatarios' },
-        { where: { id: recordatorio.id } }
-      );
-      log('warn', 'omitido sin destinatarios', { ...ctxBase, latencia_ms: Date.now() - tInicio });
-      return;
-    }
+    const destinatarios = [{ email: recordatorio.destinatario_email, nombre: recordatorio.destinatario_email }];
 
     const res = await enviarRecordatorio({
       evento: recordatorio.evento,

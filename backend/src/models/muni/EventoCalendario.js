@@ -5,6 +5,7 @@ const EventoCalendario = sequelizeMUNI.define('EventoCalendario', {
   id: { type: DataTypes.UUID, primaryKey: true, defaultValue: DataTypes.UUIDV4 },
   titulo: { type: DataTypes.STRING(200), allowNull: false },
   descripcion: { type: DataTypes.TEXT, allowNull: true },
+  categoria: { type: DataTypes.STRING(50), allowNull: true },
   fecha_inicio: { type: DataTypes.DATE, allowNull: false },
   fecha_fin: { type: DataTypes.DATE, allowNull: true },
   institucion_id: { type: DataTypes.UUID, allowNull: true, references: { model: 'instituciones_local', key: 'id' } },
@@ -24,7 +25,7 @@ const EventoCalendario = sequelizeMUNI.define('EventoCalendario', {
 
       try {
         const { generarRecordatorios } = require('../../services/RecordatorioService');
-        await generarRecordatorios(instance.id, instance.fecha_inicio, options);
+        await generarRecordatorios(instance, options);
       } catch (e) {
         console.error(`[RECORDATORIOS] Falló generación para evento ${instance.id}:`, e.message);
       }
@@ -59,7 +60,7 @@ const EventoCalendario = sequelizeMUNI.define('EventoCalendario', {
       if (instance.changed('fecha_inicio')) {
         try {
           const { regenerarRecordatorios } = require('../../services/RecordatorioService');
-          await regenerarRecordatorios(instance.id, instance.fecha_inicio, options);
+          await regenerarRecordatorios(instance, options);
         } catch (e) {
           console.error(`[RECORDATORIOS] Falló regeneración para evento ${instance.id}:`, e.message);
         }

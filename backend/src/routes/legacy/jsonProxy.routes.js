@@ -434,10 +434,42 @@ router.patch('/reportes/:id', async (req, res) => {
 
 router.get('/eventos', async (req, res) => {
   try {
+    const InstitucionLocal = require('../../models/muni/InstitucionLocal');
+    const UsuarioLocal = require('../../models/muni/UsuarioLocal');
     const eventos = await EventoCalendario.findAll({
+      include: [
+        { model: UsuarioLocal, as: 'creador' },
+        { model: InstitucionLocal, as: 'institucion' }
+      ],
       order: [['fecha_inicio', 'ASC']]
     });
-    return res.json(eventos);
+
+    const formatLeadingZero = (num) => String(num).padStart(2, '0');
+
+    const mapped = eventos.map(ev => {
+      const fechaInicio = new Date(ev.fecha_inicio);
+      const fechaFin = ev.fecha_fin ? new Date(ev.fecha_fin) : null;
+
+      const fechaStr = `${fechaInicio.getFullYear()}-${formatLeadingZero(fechaInicio.getMonth() + 1)}-${formatLeadingZero(fechaInicio.getDate())}`;
+      const inicioStr = `${formatLeadingZero(fechaInicio.getHours())}:${formatLeadingZero(fechaInicio.getMinutes())}`;
+      const finStr = fechaFin ? `${formatLeadingZero(fechaFin.getHours())}:${formatLeadingZero(fechaFin.getMinutes())}` : '';
+
+      return {
+        id: ev.id,
+        titulo: ev.titulo,
+        descripcion: ev.descripcion || '',
+        categoria: ev.categoria || 'Operativa',
+        fecha: fechaStr,
+        inicio: inicioStr,
+        fin: finStr,
+        creadorId: ev.creado_por,
+        creadorNombre: ev.creador ? `${ev.creador.nombre} ${ev.creador.apellido}` : 'Sistema',
+        institucion: ev.institucion?.nombre || '',
+        participantes: ev.participantes_instituciones || []
+      };
+    });
+
+    return res.json(mapped);
   } catch (error) {
     console.error('[LEGACY] Error en /eventos:', error.message);
     return res.json([]);
@@ -447,16 +479,50 @@ router.get('/eventos', async (req, res) => {
 router.post('/eventos', async (req, res) => {
   try {
     const EventoCalendario = require('../../models/muni/EventoCalendario');
-    // Mapeo explícito: el frontend manda `participantes` (array de nombres),
-    // el modelo lo persiste como `participantes_instituciones`.
     const payload = { ...req.body };
+
+    // 1. Mapear participantes
     if (payload.participantes && !payload.participantes_instituciones) {
       payload.participantes_instituciones = payload.participantes;
     }
     delete payload.participantes;
-    const nuevo = await EventoCalendario.create(payload, { userId: req.user?.id });
+
+    // 2. Mapear fecha, inicio y fin a fecha_inicio y fecha_fin
+    if (payload.fecha && payload.inicio) {
+      payload.fecha_inicio = new Date(`${payload.fecha}T${payload.inicio}:00`);
+    }
+    if (payload.fecha && payload.fin) {
+      payload.fecha_fin = new Date(`${payload.fecha}T${payload.fin}:00`);
+    }
+
+    // 3. Mapear creadorId a creado_por (Bypass para usuarios nacionales/MSP en el calendario local)
+    let creadorId = req.user?.id || payload.creadorId;
+    if (req.user?.nivel === 'MSP') {
+      creadorId = '00000000-0000-0000-0000-000000000000'; // Usuario local de 'Sistema'
+    }
+    payload.creado_por = creadorId;
+
+    // 4. Mapear institucion (nombre o siglas) a institucion_id
+    let institucion_id = req.user?.institucion_id || null;
+    if (!institucion_id && payload.institucion) {
+      const InstitucionLocal = require('../../models/muni/InstitucionLocal');
+      const inst = await InstitucionLocal.findOne({
+        where: {
+          [Op.or]: [
+            { nombre: payload.institucion },
+            { siglas: payload.institucion }
+          ]
+        }
+      });
+      if (inst) institucion_id = inst.id;
+    }
+    payload.institucion_id = institucion_id;
+
+    const auditUserId = req.user?.nivel === 'MSP' ? '00000000-0000-0000-0000-000000000000' : (req.user?.id || payload.creadorId);
+    const nuevo = await EventoCalendario.create(payload, { userId: auditUserId });
     return res.status(201).json(nuevo);
   } catch (error) {
+    console.error('[LEGACY] Error al crear evento:', error);
     return res.status(500).json({ error: error.message });
   }
 });

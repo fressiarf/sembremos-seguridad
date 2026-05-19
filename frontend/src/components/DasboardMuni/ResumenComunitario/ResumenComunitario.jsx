@@ -285,7 +285,7 @@ const ResumenComunitario = () => {
                   </span>
                 </div>
                 <p style={{ margin: '0 0 6px', fontSize: '0.8rem', color: '#64748b', lineHeight: 1.5 }}>
-                  {r.descripcion.length > 100 ? r.descripcion.substring(0, 100) + '...' : r.descripcion}
+                  {(r.descripcion || '').length > 100 ? (r.descripcion || '').substring(0, 100) + '...' : (r.descripcion || '')}
                 </p>
                 <div style={{ display: 'flex', gap: '12px', fontSize: '0.7rem', color: '#94a3b8', fontWeight: 600 }}>
                   <span>👥 {r.beneficiados} beneficiados</span>

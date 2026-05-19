@@ -7,6 +7,7 @@ import { useLogin } from '../../../context/LoginContext';
 import { Users, Edit, Plus, X, ListTodo, MapPin, DollarSign, CheckCircle, Clock, ChevronDown, ChevronUp } from 'lucide-react';
 import SkeletonLoader from '../../Shared/SkeletonLoader';
 import PageTransition from '../../Shared/PageTransition';
+import { useSortableData } from '../../../hooks/useSortableData';
 
 const LOCATION_DATA = {
   "Puntarenas": {
@@ -66,6 +67,8 @@ const ActividadOficiales = () => {
   };
 
   useEffect(() => { loadData(); }, []);
+
+  const { items: sortedLineas, requestSort, getSortIndicator } = useSortableData(lineas);
 
 
 
@@ -493,10 +496,19 @@ const ActividadOficiales = () => {
       <section className="actividad-history">
         <div className="actividad-history__header">
           <h2 className="actividad-history__title">Líneas de Acción y Tareas Asignadas</h2>
+          <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
+            <span style={{ fontSize: '13px', color: '#64748b' }}>Ordenar por:</span>
+            <button onClick={() => requestSort('titulo')} style={{ background: 'none', border: '1px solid #e2e8f0', borderRadius: '4px', cursor: 'pointer', fontSize: '13px', padding: '4px 8px' }}>
+              Título {getSortIndicator('titulo')}
+            </button>
+            <button onClick={() => requestSort('progreso')} style={{ background: 'none', border: '1px solid #e2e8f0', borderRadius: '4px', cursor: 'pointer', fontSize: '13px', padding: '4px 8px' }}>
+              Progreso {getSortIndicator('progreso')}
+            </button>
+          </div>
         </div>
 
-        {lineas.length > 0 ? (
-          lineas.map(linea => (
+        {sortedLineas.length > 0 ? (
+          sortedLineas.map(linea => (
             <div key={linea.id} style={{ marginBottom: '16px', background: '#fff', border: '1px solid #e2e8f0', borderRadius: '12px', overflow: 'hidden' }}>
               {/* Línea Header */}
               <div
