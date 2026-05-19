@@ -11,6 +11,9 @@
  *
  * Si MAIL_PASS no está configurado, el recordatorio se mantiene en 'pendiente'
  * (no consume intentos) — así apenas configurás SMTP, los pendientes acumulados salen solos.
+ *
+ * Logging: emite líneas JSON con campos estables — fácil de grep/jq y compatible
+ * con cualquier colector (Loki, CloudWatch, etc.) sin dependencia extra.
  */
 
 const cron = require('node-cron');
@@ -21,6 +24,24 @@ const LIMITE_POR_BARRIDO = 50;
 
 let task = null;
 let procesando = false;
+
+/**
+ * Logger mínimo en JSON. No requiere pino/winston.
+ * @param {'info'|'warn'|'error'} level
+ * @param {string} msg
+ * @param {object} ctx
+ */
+const log = (level, msg, ctx = {}) => {
+  const linea = JSON.stringify({
+    ts: new Date().toISOString(),
+    level,
+    src: 'recordatoriosWorker',
+    msg,
+    ...ctx
+  });
+  if (level === 'error') console.error(linea);
+  else console.log(linea);
+};
 
 /**
  * Procesa un recordatorio individual.
@@ -34,6 +55,13 @@ const procesarUno = async (recordatorio) => {
   const { resolverDestinatariosEvento } = require('../services/DestinatariosService');
   const { formatearAvisoTiempo } = require('../services/RecordatorioFormatter');
 
+  const ctxBase = {
+    recordatorio_id: recordatorio.id,
+    evento_id: recordatorio.evento_id,
+    offset_minutos: recordatorio.offset_minutos
+  };
+  const tInicio = Date.now();
+
   try {
     if (!recordatorio.evento) {
       throw new Error('evento asociado no encontrado (¿borrado?)');
@@ -45,7 +73,7 @@ const procesarUno = async (recordatorio) => {
         { estado: 'omitido', ultimo_error: 'sin destinatarios' },
         { where: { id: recordatorio.id } }
       );
-      console.log(`[WORKER] ${recordatorio.id} omitido — sin destinatarios`);
+      log('warn', 'omitido sin destinatarios', { ...ctxBase, latencia_ms: Date.now() - tInicio });
       return;
     }
 
@@ -55,13 +83,12 @@ const procesarUno = async (recordatorio) => {
       destinatarios
     });
 
-    // SMTP no configurado: devolver al pool sin gastar intentos
     if (res && res.skipped) {
       await EventoRecordatorio.update(
         { estado: 'pendiente' },
         { where: { id: recordatorio.id } }
       );
-      console.log(`[WORKER] ${recordatorio.id} re-encolado — ${res.reason}`);
+      log('warn', 'reencolado (SMTP no configurado)', { ...ctxBase, reason: res.reason });
       return;
     }
 
@@ -69,9 +96,13 @@ const procesarUno = async (recordatorio) => {
       { estado: 'enviado', enviado_en: new Date(), ultimo_error: null },
       { where: { id: recordatorio.id } }
     );
-    console.log(`[WORKER] ✓ ${recordatorio.id} enviado a ${destinatarios.length} dest`);
+    log('info', 'enviado', {
+      ...ctxBase,
+      n_destinatarios: destinatarios.length,
+      latencia_ms: Date.now() - tInicio
+    });
 
-    // Notificación in-app paralela (no bloquea ni revierte si falla)
+    // Notificación in-app paralela
     try {
       const titulo = `${formatearAvisoTiempo(recordatorio.offset_minutos)}: ${recordatorio.evento.titulo}`;
       const mensaje = `Recordatorio del evento "${recordatorio.evento.titulo}".`;
@@ -82,7 +113,7 @@ const procesarUno = async (recordatorio) => {
         }
       }
     } catch (e) {
-      console.error(`[WORKER] notificación in-app falló para ${recordatorio.id}:`, e.message);
+      log('error', 'in-app falló (no revierte envío)', { ...ctxBase, error: e.message });
     }
   } catch (e) {
     const nuevosIntentos = (recordatorio.intentos || 0) + 1;
@@ -91,7 +122,14 @@ const procesarUno = async (recordatorio) => {
       { estado: nuevoEstado, intentos: nuevosIntentos, ultimo_error: e.message },
       { where: { id: recordatorio.id } }
     );
-    console.error(`[WORKER] ✗ ${recordatorio.id} ${nuevoEstado} (intento ${nuevosIntentos}/${MAX_REINTENTOS}): ${e.message}`);
+    log('error', 'envio fallido', {
+      ...ctxBase,
+      estado_nuevo: nuevoEstado,
+      intentos: nuevosIntentos,
+      max_reintentos: MAX_REINTENTOS,
+      error: e.message,
+      latencia_ms: Date.now() - tInicio
+    });
   }
 };
 
@@ -101,11 +139,12 @@ const procesarUno = async (recordatorio) => {
  */
 const procesarRecordatorios = async () => {
   if (procesando) {
-    console.log('[WORKER] barrido anterior aún en curso, salto');
+    log('warn', 'barrido anterior aún en curso, salto');
     return { procesados: 0, salto: true };
   }
   procesando = true;
   let procesados = 0;
+  const tBarrido = Date.now();
 
   try {
     const EventoRecordatorio = require('../models/muni/EventoRecordatorio');
@@ -126,10 +165,9 @@ const procesarRecordatorios = async () => {
       return { procesados: 0 };
     }
 
-    console.log(`[WORKER] ${pendientes.length} recordatorio(s) pendientes para procesar`);
+    log('info', 'barrido inicia', { pendientes: pendientes.length });
 
     for (const r of pendientes) {
-      // Lock optimista: solo procesa si nadie más lo tomó
       const [filas] = await EventoRecordatorio.update(
         { estado: 'enviando' },
         { where: { id: r.id, estado: 'pendiente' } }
@@ -138,8 +176,10 @@ const procesarRecordatorios = async () => {
       await procesarUno(r);
       procesados++;
     }
+
+    log('info', 'barrido completo', { procesados, latencia_ms: Date.now() - tBarrido });
   } catch (e) {
-    console.error('[WORKER] error en barrido:', e.message);
+    log('error', 'barrido aborto', { error: e.message, latencia_ms: Date.now() - tBarrido });
   } finally {
     procesando = false;
   }
@@ -149,20 +189,20 @@ const procesarRecordatorios = async () => {
 
 const start = () => {
   if (task) {
-    console.log('[WORKER] ya estaba corriendo');
+    log('warn', 'start ignorado: worker ya corriendo');
     return;
   }
   task = cron.schedule('* * * * *', procesarRecordatorios, {
     timezone: process.env.APP_TIMEZONE || 'America/Costa_Rica'
   });
-  console.log('[WORKER] node-cron iniciado (cada minuto)');
+  log('info', 'worker iniciado', { intervalo: '1 min' });
 };
 
 const stop = () => {
   if (task) {
     task.stop();
     task = null;
-    console.log('[WORKER] detenido');
+    log('info', 'worker detenido');
   }
 };
 

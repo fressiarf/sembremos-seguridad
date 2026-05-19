@@ -31,6 +31,7 @@ const actividadRoutes = require('./routes/muni/actividad.routes');
 const reporteRoutes = require('./routes/muni/reporte.routes');
 const presupuestoRoutes = require('./routes/muni/presupuesto.routes');
 const recordatorioRoutes = require('./routes/muni/recordatorio.routes');
+const recordatorioAdminRoutes = require('./routes/admin/admin.routes');
 
 // Rutas COMUNES
 const systemRoutes = require('./routes/common/system.routes');
@@ -51,6 +52,7 @@ app.use('/api/v1/muni/actividades', actividadRoutes);
 app.use('/api/v1/muni/reportes', reporteRoutes);
 app.use('/api/v1/muni/presupuesto', presupuestoRoutes);
 app.use('/api/v1/muni', recordatorioRoutes);
+app.use('/api/v1/admin', recordatorioAdminRoutes);
 
 app.use('/api/v1/system', systemRoutes);
 app.use('/api/v1/system/notificaciones', notificacionRoutes);
