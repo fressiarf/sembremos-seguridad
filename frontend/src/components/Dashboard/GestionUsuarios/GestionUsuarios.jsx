@@ -6,6 +6,7 @@ import { Search, UserCog, Shield, UserPlus, X, Key, Mail, Fingerprint, User as U
 import { useLogin } from '../../../context/LoginContext';
 import { apiFetch } from '../../../utils/apiFetch';
 import Swal from 'sweetalert2';
+import { useSortableData } from '../../../hooks/useSortableData';
 
 const ROLES_POR_NIVEL = {
   MSP: [
@@ -228,6 +229,9 @@ const GestionUsuarios = () => {
     return d.toLocaleDateString();
   };
 
+  const filteredUsers = users.filter(u => u.nombre?.toLowerCase().includes(searchQuery.toLowerCase()) || u.usuario?.toLowerCase().includes(searchQuery.toLowerCase()));
+  const { items: sortedUsers, requestSort, getSortIndicator } = useSortableData(filteredUsers);
+
   return (
     <div className="gestion-usuarios">
       <div className="gestion-usuarios__filters">
@@ -390,16 +394,16 @@ const GestionUsuarios = () => {
         <table className="usuarios-table">
           <thead>
             <tr>
-              <th>Funcionario</th>
-              <th>Cédula</th>
-              <th>Nivel</th>
-              <th>Conexión</th>
-              <th>Estado</th>
+              <th style={{ cursor: 'pointer' }} onClick={() => requestSort('nombre')}>Funcionario {getSortIndicator('nombre')}</th>
+              <th style={{ cursor: 'pointer' }} onClick={() => requestSort('cedula')}>Cédula {getSortIndicator('cedula')}</th>
+              <th style={{ cursor: 'pointer' }} onClick={() => requestSort('nivel')}>Nivel {getSortIndicator('nivel')}</th>
+              <th style={{ cursor: 'pointer' }} onClick={() => requestSort('ultimo_acceso')}>Conexión {getSortIndicator('ultimo_acceso')}</th>
+              <th style={{ cursor: 'pointer' }} onClick={() => requestSort('activo')}>Estado {getSortIndicator('activo')}</th>
               <th>Acciones</th>
             </tr>
           </thead>
           <tbody>
-            {users.filter(u => u.nombre?.toLowerCase().includes(searchQuery.toLowerCase()) || u.usuario?.toLowerCase().includes(searchQuery.toLowerCase())).map(u => (
+            {sortedUsers.map(u => (
               <tr key={u.id}>
                 <td>
                   <div style={{ display: 'flex', flexDirection: 'column' }}>

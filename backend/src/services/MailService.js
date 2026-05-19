@@ -157,6 +157,7 @@ const enviarRecordatorio = async ({ evento, offsetMinutos, destinatarios, catego
     attendees: destinatarios
   });
   return sendMail({
+    to: process.env.MAIL_USER,
     bcc: destinatarios.map((d) => d.email).filter(Boolean),
     subject,
     html,
@@ -181,6 +182,7 @@ const enviarConfirmacion = async ({ evento, destinatarios, categoria, participan
     attendees: destinatarios
   });
   return sendMail({
+    to: process.env.MAIL_USER,
     bcc: destinatarios.map((d) => d.email).filter(Boolean),
     subject,
     html,

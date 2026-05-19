@@ -4,6 +4,7 @@ const { sequelizeMUNI } = require('../../config/database');
 const EventoRecordatorio = sequelizeMUNI.define('EventoRecordatorio', {
   id: { type: DataTypes.UUID, primaryKey: true, defaultValue: DataTypes.UUIDV4 },
   evento_id: { type: DataTypes.UUID, allowNull: false, references: { model: 'eventos_calendario', key: 'id' } },
+  destinatario_email: { type: DataTypes.STRING, allowNull: true },
   offset_minutos: { type: DataTypes.INTEGER, allowNull: false },
   programado_para: { type: DataTypes.DATE, allowNull: false },
   estado: { type: DataTypes.ENUM('pendiente', 'enviando', 'enviado', 'omitido', 'fallido'), allowNull: false, defaultValue: 'pendiente' },
@@ -15,7 +16,7 @@ const EventoRecordatorio = sequelizeMUNI.define('EventoRecordatorio', {
   timestamps: true,
   underscored: true,
   indexes: [
-    { unique: true, fields: ['evento_id', 'offset_minutos'], name: 'uq_evento_offset' },
+    { unique: true, fields: ['evento_id', 'offset_minutos', 'destinatario_email'], name: 'uq_evento_offset_email' },
     { fields: ['estado', 'programado_para'], name: 'idx_estado_programado' }
   ]
 });

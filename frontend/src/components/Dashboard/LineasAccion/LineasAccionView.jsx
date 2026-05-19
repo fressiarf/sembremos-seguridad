@@ -7,6 +7,7 @@ import * as XLSX from 'xlsx';
 import './LineasAccionView.css';
 import { apiFetch } from '../../../utils/apiFetch';
 import Swal from 'sweetalert2';
+import { useSortableData } from '../../../hooks/useSortableData';
 
 const LineasAccionView = ({ onViewChange }) => {
   const [lineas, setLineas] = useState([]);
@@ -117,6 +118,8 @@ const LineasAccionView = ({ onViewChange }) => {
     l.titulo.toLowerCase().includes(searchTerm.toLowerCase()) ||
     l.problematica.toLowerCase().includes(searchTerm.toLowerCase())
   );
+
+  const { items: sortedLineas, requestSort, getSortIndicator } = useSortableData(filteredLineas);
 
   const toggleExpand = (id) => {
     setExpandedId(expandedId === id ? null : id);
@@ -232,16 +235,26 @@ const LineasAccionView = ({ onViewChange }) => {
         <table className="data-table">
           <thead>
             <tr>
-              <th style={{ width: '8%' }}>ID Meta</th>
-              <th style={{ width: '25%' }}>Meta Nacional (Línea de Acción)</th>
-              <th style={{ width: '25%' }}>Problemática Asociada</th>
-              <th style={{ width: '15%' }}>Progreso</th>
-              <th style={{ width: '15%', textAlign: 'center' }}>Tareas Operativas</th>
+              <th style={{ width: '8%', cursor: 'pointer' }} onClick={() => requestSort('no')}>
+                ID Meta {getSortIndicator('no')}
+              </th>
+              <th style={{ width: '25%', cursor: 'pointer' }} onClick={() => requestSort('titulo')}>
+                Meta Nacional (Línea de Acción) {getSortIndicator('titulo')}
+              </th>
+              <th style={{ width: '25%', cursor: 'pointer' }} onClick={() => requestSort('problematica')}>
+                Problemática Asociada {getSortIndicator('problematica')}
+              </th>
+              <th style={{ width: '15%', cursor: 'pointer' }} onClick={() => requestSort('progreso')}>
+                Progreso {getSortIndicator('progreso')}
+              </th>
+              <th style={{ width: '15%', textAlign: 'center', cursor: 'pointer' }} onClick={() => requestSort('totalTareas')}>
+                Tareas Operativas {getSortIndicator('totalTareas')}
+              </th>
               <th style={{ width: '12%', textAlign: 'center' }}>Acciones</th>
             </tr>
           </thead>
           <tbody>
-            {filteredLineas.map((linea) => (
+            {sortedLineas.map((linea) => (
               <tr key={linea.id}>
                 <td>
                   <span className="linea-table-badge">Meta #{linea.no || '?'}</span>
@@ -287,7 +300,7 @@ const LineasAccionView = ({ onViewChange }) => {
                 </td>
               </tr>
             ))}
-            {filteredLineas.length === 0 && (
+            {sortedLineas.length === 0 && (
               <tr>
                 <td colSpan="6" className="linea-empty-state">
                   <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '10px' }}>

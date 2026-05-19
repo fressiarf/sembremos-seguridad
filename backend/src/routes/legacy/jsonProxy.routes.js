@@ -434,36 +434,55 @@ router.patch('/reportes/:id', async (req, res) => {
 
 router.get('/eventos', async (req, res) => {
   try {
+    const InstitucionLocal = require('../../models/muni/InstitucionLocal');
+    const UsuarioLocal = require('../../models/muni/UsuarioLocal');
     const eventos = await EventoCalendario.findAll({
+      include: [
+        { model: UsuarioLocal, as: 'creador' },
+        { model: InstitucionLocal, as: 'institucion' }
+      ],
       order: [['fecha_inicio', 'ASC']]
     });
-    // Adaptar al shape que espera el frontend legacy:
-    // { fecha: 'YYYY-MM-DD', inicio: 'HH:mm', fin: 'HH:mm', categoria, participantes }
-    const adaptados = eventos.map((e) => {
-      const v = e.toJSON();
-      const ini = v.fecha_inicio ? new Date(v.fecha_inicio) : null;
-      const fin = v.fecha_fin ? new Date(v.fecha_fin) : null;
-      const pad = (n) => String(n).padStart(2, '0');
-      const fecha = ini ? `${ini.getFullYear()}-${pad(ini.getMonth() + 1)}-${pad(ini.getDate())}` : null;
-      const inicio = ini ? `${pad(ini.getHours())}:${pad(ini.getMinutes())}` : null;
-      const finStr = fin ? `${pad(fin.getHours())}:${pad(fin.getMinutes())}` : null;
-      // Extraer categoría si quedó como prefijo [Categoría] en descripcion
-      let categoria = null;
-      let descripcion = v.descripcion;
-      const m = descripcion && descripcion.match(/^\[([^\]]+)\]\s?(.*)$/);
-      if (m) { categoria = m[1]; descripcion = m[2] || null; }
+    const formatLeadingZero = (num) => String(num).padStart(2, '0');
+
+    const mapped = eventos.map(ev => {
+      const fechaInicio = new Date(ev.fecha_inicio);
+      const fechaFin = ev.fecha_fin ? new Date(ev.fecha_fin) : null;
+
+      const fechaStr = `${fechaInicio.getFullYear()}-${formatLeadingZero(fechaInicio.getMonth() + 1)}-${formatLeadingZero(fechaInicio.getDate())}`;
+      const inicioStr = `${formatLeadingZero(fechaInicio.getHours())}:${formatLeadingZero(fechaInicio.getMinutes())}`;
+      const finStr = fechaFin ? `${formatLeadingZero(fechaFin.getHours())}:${formatLeadingZero(fechaFin.getMinutes())}` : '';
+
+      // Resolver categoría de forma retrocompatible
+      let categoria = ev.categoria || null;
+      let descripcion = ev.descripcion || '';
+      if (!categoria && ev.descripcion) {
+        const m = ev.descripcion.match(/^\[([^\]]+)\]\s?(.*)$/);
+        if (m) {
+          categoria = m[1];
+          descripcion = m[2] || '';
+        }
+      }
+      if (!categoria) {
+        categoria = 'Operativa';
+      }
+
       return {
-        ...v,
-        fecha,
-        inicio,
+        id: ev.id,
+        titulo: ev.titulo,
+        descripcion: descripcion,
+        categoria: categoria,
+        fecha: fechaStr,
+        inicio: inicioStr,
         fin: finStr,
-        categoria,
-        descripcion,
-        participantes: v.participantes_instituciones || [],
-        creadorId: v.creado_por
+        creadorId: ev.creado_por,
+        creadorNombre: ev.creador ? `${ev.creador.nombre} ${ev.creador.apellido}` : 'Sistema',
+        institucion: ev.institucion?.nombre || '',
+        participantes: ev.participantes_instituciones || []
       };
     });
-    return res.json(adaptados);
+
+    return res.json(mapped);
   } catch (error) {
     console.error('[LEGACY] Error en /eventos:', error.message);
     return res.json([]);
@@ -473,65 +492,60 @@ router.get('/eventos', async (req, res) => {
 router.post('/eventos', async (req, res) => {
   try {
     const EventoCalendario = require('../../models/muni/EventoCalendario');
-    const UsuarioLocal = require('../../models/muni/UsuarioLocal');
-    const b = req.body || {};
+    const { Op } = require('sequelize');
+    const payload = { ...req.body };
 
-    // 1) Combinar fecha + inicio → fecha_inicio (DATETIME)
-    //    Frontend manda { fecha: 'YYYY-MM-DD', inicio: 'HH:mm', fin: 'HH:mm' }
-    let fecha_inicio = b.fecha_inicio;
-    let fecha_fin = b.fecha_fin;
-    if (!fecha_inicio && b.fecha && b.inicio) {
-      fecha_inicio = new Date(`${b.fecha}T${b.inicio}:00`);
+    // 1. Mapear participantes
+    if (payload.participantes && !payload.participantes_instituciones) {
+      payload.participantes_instituciones = payload.participantes;
     }
-    if (!fecha_fin && b.fecha && b.fin) {
-      fecha_fin = new Date(`${b.fecha}T${b.fin}:00`);
+    delete payload.participantes;
+
+    // 2. Mapear fecha, inicio y fin a fecha_inicio y fecha_fin
+    if (payload.fecha && payload.inicio) {
+      payload.fecha_inicio = new Date(`${payload.fecha}T${payload.inicio}:00`);
     }
-    if (!fecha_inicio) {
-      return res.status(400).json({ error: 'fecha_inicio (o fecha + inicio) es requerido' });
+    if (payload.fecha && payload.fin) {
+      payload.fecha_fin = new Date(`${payload.fecha}T${payload.fin}:00`);
     }
 
-    // 2) Resolver creado_por: si el usuario logueado tiene cuenta en MUNI usar
-    //    su id, sino dejar null (admins MSP que crean eventos sin mirror).
-    let creado_por = null;
-    if (req.user?.email) {
-      const local = await UsuarioLocal.findOne({
-        where: { email: req.user.email }, attributes: ['id']
+    // 3. Mapear creadorId a creado_por (Bypass para usuarios nacionales/MSP en el calendario local)
+    let creadorId = req.user?.id || payload.creadorId;
+    if (req.user?.nivel === 'MSP') {
+      creadorId = '00000000-0000-0000-0000-000000000000'; // Usuario local de 'Sistema'
+    }
+    payload.creado_por = creadorId;
+
+    // 4. Mapear institucion (nombre o siglas) a institucion_id
+    let institucion_id = req.user?.institucion_id || null;
+    if (!institucion_id && payload.institucion) {
+      const InstitucionLocal = require('../../models/muni/InstitucionLocal');
+      const inst = await InstitucionLocal.findOne({
+        where: {
+          [Op.or]: [
+            { nombre: payload.institucion },
+            { siglas: payload.institucion }
+          ]
+        }
       });
-      if (local) creado_por = local.id;
+      if (inst) institucion_id = inst.id;
     }
+    payload.institucion_id = institucion_id;
 
-    // 3) Participantes: el frontend manda nombres, persistimos en JSON.
-    const participantes_instituciones = Array.isArray(b.participantes)
-      ? b.participantes
-      : (Array.isArray(b.participantes_instituciones) ? b.participantes_instituciones : null);
+    const auditUserId = req.user?.nivel === 'MSP' ? '00000000-0000-0000-0000-000000000000' : (req.user?.id || payload.creadorId);
+    const nuevo = await EventoCalendario.create(payload, { userId: auditUserId });
 
-    // 4) Descripción enriquecida con categoría (si viene) — preserva info
-    //    que el modelo no tiene como columna.
-    const descripcion = b.categoria
-      ? `[${b.categoria}] ${b.descripcion || ''}`.trim()
-      : (b.descripcion || null);
-
-    const nuevo = await EventoCalendario.create({
-      titulo: b.titulo,
-      descripcion,
-      fecha_inicio,
-      fecha_fin: fecha_fin || null,
-      creado_por,
-      participantes_instituciones,
-      es_publico: typeof b.es_publico === 'boolean' ? b.es_publico : true
-    }, { userId: creado_por });
-
-    // 5) Devolver al frontend en el shape que usa (fecha/inicio/fin/categoria)
+    // Devolver al frontend en el shape que usa (fecha/inicio/fin/categoria) de forma unificada
     return res.status(201).json({
       ...nuevo.toJSON(),
-      fecha: b.fecha,
-      inicio: b.inicio,
-      fin: b.fin,
-      categoria: b.categoria,
-      participantes: participantes_instituciones || [],
-      creadorId: req.user?.id,
-      creadorNombre: b.creadorNombre,
-      institucion: b.institucion
+      fecha: payload.fecha,
+      inicio: payload.inicio,
+      fin: payload.fin,
+      categoria: nuevo.categoria,
+      participantes: nuevo.participantes_instituciones || [],
+      creadorId: req.user?.id || payload.creadorId,
+      creadorNombre: req.user?.nombre || payload.creadorNombre,
+      institucion: payload.institucion
     });
   } catch (error) {
     console.error('[POST /eventos] ', error.message);

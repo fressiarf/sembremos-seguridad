@@ -29,10 +29,14 @@ class AuthController {
 
       const searchField = metodo === 'cedula' ? 'cedula' : 'email';
 
-      // 3. Buscar usuario incluyendo su rol
+      // 3. Buscar usuario incluyendo su rol e institucion
+      const InstitucionModel = nivelUpper === 'MSP' ? require('../../models/msp/InstitucionMaestra') : require('../../models/muni/InstitucionLocal');
       let user = await UserModel.findOne({
         where: { [searchField]: username, activo: true },
-        include: [{ model: RoleModel, as: 'rol' }]
+        include: [
+          { model: RoleModel, as: 'rol' },
+          { model: InstitucionModel, as: 'institucion' }
+        ]
       });
       
       // 4. Verificación de seguridad (Usuario existe)
@@ -40,10 +44,14 @@ class AuthController {
         const fallbackNivel = nivelUpper === 'MSP' ? 'MUNI' : 'MSP';
         const FallbackUserModel = fallbackNivel === 'MSP' ? UsuarioFP : UsuarioLocal;
         const FallbackRoleModel = fallbackNivel === 'MSP' ? RolFP : RolLocal;
+        const FallbackInstitucionModel = fallbackNivel === 'MSP' ? require('../../models/msp/InstitucionMaestra') : require('../../models/muni/InstitucionLocal');
 
         user = await FallbackUserModel.findOne({
           where: { [searchField]: username, activo: true },
-          include: [{ model: FallbackRoleModel, as: 'rol' }]
+          include: [
+            { model: FallbackRoleModel, as: 'rol' },
+            { model: FallbackInstitucionModel, as: 'institucion' }
+          ]
         });
 
         if (user) finalNivel = fallbackNivel;
@@ -175,6 +183,7 @@ class AuthController {
       // 7. Mapeo de Roles a IDs (Basado en la estructura del sistema)
       // Nota: En una implementación ideal esto se consultaría en la tabla de roles,
       // pero para el registro inicial usamos el mapeo directo.
+      const roleUpper = role.toUpperCase();
       let rol_id = 1; // Default Admin
       if (roleUpper === 'OFICIAL_MSP' || roleUpper === 'GESTOR_MUNI') {
         rol_id = 2; // Operativo
@@ -190,7 +199,7 @@ class AuthController {
         rol_id,
         institucion_id: institucion_id || null,
         activo: true
-      }, nivelUpper);
+      });
 
       // 9. Respuesta exitosa
       return res.status(201).json({
@@ -219,13 +228,19 @@ class AuthController {
       const { id, nivel } = req.user;
       const nivelUpper = (nivel || '').toUpperCase();
 
+      // 2. Seleccionar modelo y rol según el nivel
       const UserModel = nivelUpper === 'MSP' ? UsuarioFP : UsuarioLocal;
       const RoleModel = nivelUpper === 'MSP' ? RolFP : RolLocal;
 
+      // 3. Consultar base de datos para asegurar que el usuario aún existe y está activo incluyendo institución
+      const InstitucionModel = nivelUpper === 'MSP' ? require('../../models/msp/InstitucionMaestra') : require('../../models/muni/InstitucionLocal');
       const user = await UserModel.findOne({
         where: { id, activo: true },
-        include: [{ model: RoleModel, as: 'rol' }],
-        attributes: ['id', 'nombre', 'apellido', 'email', 'cedula']
+        include: [
+          { model: RoleModel, as: 'rol' },
+          { model: InstitucionModel, as: 'institucion' }
+        ],
+        attributes: ['id', 'nombre', 'apellido', 'email', 'cedula', 'institucion_id'] // No traer el hash, pero incluir cedula e institucion_id
       });
 
       if (!user) {
