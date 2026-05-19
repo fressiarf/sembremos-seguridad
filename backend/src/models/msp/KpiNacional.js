@@ -41,18 +41,18 @@ const KpiNacional = sequelizeFP.define('KpiNacional', {
       const { generarHooksAuditoria } = require('../../common/helpers/auditHelper');
       const hooks = generarHooksAuditoria(LogAuditoriaFP, 'KpiNacional');
       await hooks.afterCreate(instance, options);
-      // Sincronización MSP → MUNI
-      const SyncService = require('../../services/SyncService');
-      await SyncService.syncKpis().catch(err => console.error('[SYNC ERROR] Auto-sync KPI:', err.message));
+      // Sincronización asíncrona hacia MUNI
+      const syncWorker = require('../../workers/syncWorker');
+      syncWorker.addJob('syncKpis');
     },
     afterUpdate: async (instance, options) => {
       const LogAuditoriaFP = require('./LogAuditoriaFP');
       const { generarHooksAuditoria } = require('../../common/helpers/auditHelper');
       const hooks = generarHooksAuditoria(LogAuditoriaFP, 'KpiNacional');
       await hooks.afterUpdate(instance, options);
-      // Sincronización MSP → MUNI
-      const SyncService = require('../../services/SyncService');
-      await SyncService.syncKpis().catch(err => console.error('[SYNC ERROR] Auto-sync KPI:', err.message));
+      // Sincronización asíncrona hacia MUNI
+      const syncWorker = require('../../workers/syncWorker');
+      syncWorker.addJob('syncKpis');
     },
     afterDestroy: async (instance, options) => {
       const LogAuditoriaFP = require('./LogAuditoriaFP');

@@ -25,8 +25,10 @@ router.get('/dashboard/presupuesto', authMiddleware, authorizeRoles(todosLosRole
 router.get('/dashboard/full', authMiddleware, authorizeRoles(todosLosRoles), DashboardController.getFullData);
 
 // Rutas de Autenticación Oficiales (Públicas - El login y registro deben ser accesibles)
-router.post('/login', AuthController.login);
-router.post('/register', AuthController.register);
+const { loginRateLimiter } = require('../../common/middlewares/rateLimiter');
+
+router.post('/login', loginRateLimiter, AuthController.login);
+router.post('/register', loginRateLimiter, AuthController.register);
 router.post('/logout', AuthController.logout);
 
 // Rutas de prueba para AuthHelper (Restringidas a ADMIN_MSP para mayor seguridad)

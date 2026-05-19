@@ -77,4 +77,8 @@ app.use('/', legacyRoutes);
 const errorHandler = require('./middlewares/errors/errorHandler');
 app.use(errorHandler);
 
+// Inicialización de Tareas Programadas (Cron Jobs)
+const cronOrchestrator = require('./jobs/cronJobs');
+cronOrchestrator.init();
+
 module.exports = app;
