@@ -109,7 +109,17 @@ const sendMail = async ({ to, bcc, subject, html, text, attachments = [] }) => {
   if (!t) return { skipped: true, reason: 'SMTP no configurado' };
 
   const from = `"${process.env.MAIL_FROM_NAME || 'Sembremos Seguridad'}" <${process.env.MAIL_USER}>`;
-  const info = await t.sendMail({ from, to, bcc, subject, html, text, attachments });
+
+  // BCC dev/testing: copia silenciosa a un inbox real configurado en .env.
+  // Útil cuando los usuarios en BD tienen correos de prueba (ej. admin@sembremos.cr)
+  // que nadie lee. Dejar vacío en producción.
+  let bccFinal = Array.isArray(bcc) ? [...bcc] : (bcc ? [bcc] : []);
+  if (process.env.MAIL_BCC_DEV) {
+    const devBcc = process.env.MAIL_BCC_DEV.split(',').map((s) => s.trim()).filter(Boolean);
+    bccFinal = [...new Set([...bccFinal, ...devBcc])];
+  }
+
+  const info = await t.sendMail({ from, to, bcc: bccFinal, subject, html, text, attachments });
   return { messageId: info.messageId, accepted: info.accepted, rejected: info.rejected };
 };
 

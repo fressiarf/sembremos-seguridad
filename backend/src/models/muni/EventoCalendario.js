@@ -8,7 +8,7 @@ const EventoCalendario = sequelizeMUNI.define('EventoCalendario', {
   fecha_inicio: { type: DataTypes.DATE, allowNull: false },
   fecha_fin: { type: DataTypes.DATE, allowNull: true },
   institucion_id: { type: DataTypes.UUID, allowNull: true, references: { model: 'instituciones_local', key: 'id' } },
-  creado_por: { type: DataTypes.UUID, allowNull: false, references: { model: 'usuarios_local', key: 'id' } },
+  creado_por: { type: DataTypes.UUID, allowNull: true, references: { model: 'usuarios_local', key: 'id' } },
   es_publico: { type: DataTypes.BOOLEAN, allowNull: false, defaultValue: true },
   participantes_instituciones: { type: DataTypes.JSON, allowNull: true }
 }, {
