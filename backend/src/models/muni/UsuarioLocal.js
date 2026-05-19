@@ -74,6 +74,11 @@ const UsuarioLocal = sequelizeMUNI.define('UsuarioLocal', {
   ultimo_acceso: {
     type: DataTypes.DATE,
     allowNull: true
+  },
+  recibe_recordatorios: {
+    type: DataTypes.BOOLEAN,
+    allowNull: false,
+    defaultValue: true
   }
 }, {
   tableName: 'usuarios_local',

@@ -15,9 +15,9 @@ const resolverDestinatariosEvento = async (evento) => {
 
   if (evento && evento.creado_por) {
     const creador = await UsuarioLocal.findByPk(evento.creado_por, {
-      attributes: ['id', 'nombre', 'apellido', 'email']
+      attributes: ['id', 'nombre', 'apellido', 'email', 'recibe_recordatorios']
     });
-    if (creador && creador.email) {
+    if (creador && creador.email && creador.recibe_recordatorios !== false) {
       destinatarios.push({
         nombre: `${creador.nombre || ''} ${creador.apellido || ''}`.trim() || creador.email,
         email: creador.email

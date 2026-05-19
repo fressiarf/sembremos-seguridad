@@ -1,10 +1,9 @@
 import React, { useState, useEffect, useRef } from 'react';
 import './Calendario.css';
-import { ChevronLeft, ChevronRight, Clock, Tag, Trash2, Users, Search } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Clock, Tag, Trash2, Users, Search, Bell } from 'lucide-react';
 import { useToast } from '../../../context/ToastContext';
 import { useLogin } from '../../../context/LoginContext';
 import { dashboardService } from '../../../services/dashboardService';
-import emailjs from '@emailjs/browser';
 
 const CATEGORIAS = {
     'Operativa': '#ef4444', // Rojo
@@ -40,12 +39,6 @@ const Calendario = () => {
     const [editandoId, setEditandoId] = useState(null);
     const notificadosRef = useRef(new Set());
     const [alertaInminente, setAlertaInminente] = useState(null);
-
-    // ── EmailJS Init ──
-    useEffect(() => {
-        const publicKey = import.meta.env.VITE_EMAILJS_PUBLIC_KEY;
-        if (publicKey) emailjs.init(publicKey);
-    }, []);
 
     // ── Cargar Eventos desde el Servidor ──
     const loadEventos = async () => {
@@ -93,10 +86,13 @@ const Calendario = () => {
         }
     }, []);
 
-    // ── Motor de notificaciones ──
+    // ── Motor de notificaciones (toasts en pantalla) ──
+    // Cadencia alineada con backend RecordatorioService: 14d, 7d, 4d, 2d, 1d, 12h, 1h.
+    // Los avisos por correo los dispara el worker del backend; estos toasts son un
+    // refuerzo visual cuando el usuario tiene la app abierta.
     useEffect(() => {
-        const ETAPAS_DIAS = [7, 5, 3, 1];
-        const ETAPAS_MINS = [60, 30, 15, 5];
+        const ETAPAS_DIAS = [14, 7, 4, 2, 1];
+        const ETAPAS_MINS = [720, 60]; // 12 horas y 1 hora
 
         const verificarEventosProximos = () => {
             const ahora = new Date();
@@ -135,12 +131,12 @@ const Calendario = () => {
                         const clave = `${ev.id}-m${m}`;
                         if (diffMinTotal <= m && !notificadosRef.current.has(clave)) {
                             notificadosRef.current.add(clave);
-                            const esCritico = m <= 5;
-                            showToast(`${esCritico ? '🚨' : '⏰'} "${ev.titulo}" inicia en ${diffMinTotal} min`, esCritico ? 'error' : 'info');
+                            const label = m >= 60 ? `${Math.round(m / 60)} h` : `${m} min`;
+                            showToast(`⏰ "${ev.titulo}" inicia en ${label}`, 'info');
                         }
                     });
 
-                    if (diffMinTotal <= 15 && diffMinTotal < menorDiffMin) {
+                    if (diffMinTotal <= 60 && diffMinTotal < menorDiffMin) {
                         menorDiffMin = diffMinTotal;
                         eventoMasUrgente = { ...ev, minutosRestantes: diffMinTotal };
                     }
@@ -345,6 +341,11 @@ const Calendario = () => {
                                         </button>
                                     ))}
                                 </div>
+                            </div>
+
+                            <div className="modal-recordatorios-hint">
+                                <Bell size={14} />
+                                <span>Se enviarán avisos por correo: <strong>14d, 7d, 4d, 2d, 1d, 12h y 1h antes</strong> del evento.</span>
                             </div>
 
                             <div className="modal-actions">

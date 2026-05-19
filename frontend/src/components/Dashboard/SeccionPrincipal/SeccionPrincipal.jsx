@@ -25,6 +25,7 @@ import DiagnosticoMetodologico from '../DiagnosticoMetodologico/DiagnosticoMetod
 import LineasAccionView from '../LineasAccion/LineasAccionView';
 import MatrizSeguimiento from '../LineasAccion/MatrizSeguimiento';
 import ReportesResultados from '../LineasAccion/ReportesResultados';
+import MisRecordatorios from '../MisRecordatorios/MisRecordatorios';
 import { ROLES } from '../../../constants/roles';
 
 // Helper inline
@@ -216,9 +217,13 @@ const SeccionPrincipal = ({ collapsed, setCollapsed, activeView, onViewChange })
       )}
 
       {activeView === 'dashboard' && (
-        (user?.rol === ROLES.EDITOR) 
-          ? <DashboardInstitucion /> 
-          : <DashboardGlobal collapsed={collapsed} onViewChange={onViewChange} />
+        <>
+          <MisRecordatorios onAbrirCalendario={() => onViewChange && onViewChange('calendario')} />
+          {(user?.rol === ROLES.EDITOR)
+            ? <DashboardInstitucion />
+            : <DashboardGlobal collapsed={collapsed} onViewChange={onViewChange} />
+          }
+        </>
       )}
       {activeView === 'actividades' && <ActividadOficiales />}
       {activeView === 'usuarios' && (user?.rol === ROLES.SUPER_ADMIN || user?.rol === ROLES.SUB_ADMIN) && <GestionUsuarios />}

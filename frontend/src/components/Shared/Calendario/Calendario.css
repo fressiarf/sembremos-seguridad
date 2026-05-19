@@ -503,3 +503,22 @@
     color: #0b2240;
     font-weight: 900;
 }
+
+/* Hint de recordatorios en modal de creación */
+.modal-recordatorios-hint {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 14px;
+    margin: 14px 0 4px;
+    background: #eff6ff;
+    border: 1px solid #bfdbfe;
+    border-radius: 6px;
+    color: #1e3a8a;
+    font-size: 0.82rem;
+    line-height: 1.4;
+}
+.modal-recordatorios-hint strong {
+    color: #0b2240;
+    font-weight: 700;
+}
