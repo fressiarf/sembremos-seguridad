@@ -18,6 +18,14 @@ const startServer = async () => {
     app.listen(PORT, () => {
       console.log(` Servidor corriendo en http://localhost:${PORT}`);
       console.log(' Usa la terminal para las migraciones.');
+
+      // Worker de recordatorios — opt-in vía flag .env
+      if (process.env.ENABLE_REMINDERS !== 'false') {
+        const recordatoriosWorker = require('./jobs/recordatoriosWorker');
+        recordatoriosWorker.start();
+      } else {
+        console.log(' Worker de recordatorios deshabilitado (ENABLE_REMINDERS=false)');
+      }
     });
   } catch (error) {
     console.error(' Error fatal al iniciar el servidor:', error.message);
