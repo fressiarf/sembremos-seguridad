@@ -1,8 +1,8 @@
 const cron = require('node-cron');
 const mailerService = require('./mailer');
 const cleanupService = require('./cleanup');
-// Aquí importaríamos el dashboardService para obtener el reporte
-const { dashboardService } = require('../services/dashboardService');
+const LineaAccion = require('../models/msp/LineaAccion');
+const IncidenteDelictivo = require('../models/msp/IncidenteDelictivo');
 
 class CronOrchestrator {
   init() {
@@ -12,11 +12,13 @@ class CronOrchestrator {
     cron.schedule('0 8 1 * *', async () => {
       console.log('[CRON] Ejecutando trabajo mensual: Reporte Gerencial');
       try {
-        // En una app real, obtendríamos estadísticas desde la BD
-        const data = await dashboardService.getFullDashboardData();
+        // Consultar estadísticas directamente
+        const totalLineas = await LineaAccion.count().catch(() => 0);
+        const incidentesNuevos = await IncidenteDelictivo.count().catch(() => 0);
+
         const summary = {
-          totalLineas: data.lineasEnriquecidas ? data.lineasEnriquecidas.length : 0,
-          incidentesNuevos: data.reportes ? data.reportes.length : 0
+          totalLineas,
+          incidentesNuevos
         };
 
         // En producción se buscaría a los usuarios con Rol "Director" o "Super Admin"
