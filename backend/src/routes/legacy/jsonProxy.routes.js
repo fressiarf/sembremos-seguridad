@@ -437,7 +437,33 @@ router.get('/eventos', async (req, res) => {
     const eventos = await EventoCalendario.findAll({
       order: [['fecha_inicio', 'ASC']]
     });
-    return res.json(eventos);
+    // Adaptar al shape que espera el frontend legacy:
+    // { fecha: 'YYYY-MM-DD', inicio: 'HH:mm', fin: 'HH:mm', categoria, participantes }
+    const adaptados = eventos.map((e) => {
+      const v = e.toJSON();
+      const ini = v.fecha_inicio ? new Date(v.fecha_inicio) : null;
+      const fin = v.fecha_fin ? new Date(v.fecha_fin) : null;
+      const pad = (n) => String(n).padStart(2, '0');
+      const fecha = ini ? `${ini.getFullYear()}-${pad(ini.getMonth() + 1)}-${pad(ini.getDate())}` : null;
+      const inicio = ini ? `${pad(ini.getHours())}:${pad(ini.getMinutes())}` : null;
+      const finStr = fin ? `${pad(fin.getHours())}:${pad(fin.getMinutes())}` : null;
+      // Extraer categoría si quedó como prefijo [Categoría] en descripcion
+      let categoria = null;
+      let descripcion = v.descripcion;
+      const m = descripcion && descripcion.match(/^\[([^\]]+)\]\s?(.*)$/);
+      if (m) { categoria = m[1]; descripcion = m[2] || null; }
+      return {
+        ...v,
+        fecha,
+        inicio,
+        fin: finStr,
+        categoria,
+        descripcion,
+        participantes: v.participantes_instituciones || [],
+        creadorId: v.creado_por
+      };
+    });
+    return res.json(adaptados);
   } catch (error) {
     console.error('[LEGACY] Error en /eventos:', error.message);
     return res.json([]);
@@ -447,16 +473,69 @@ router.get('/eventos', async (req, res) => {
 router.post('/eventos', async (req, res) => {
   try {
     const EventoCalendario = require('../../models/muni/EventoCalendario');
-    // Mapeo explícito: el frontend manda `participantes` (array de nombres),
-    // el modelo lo persiste como `participantes_instituciones`.
-    const payload = { ...req.body };
-    if (payload.participantes && !payload.participantes_instituciones) {
-      payload.participantes_instituciones = payload.participantes;
+    const UsuarioLocal = require('../../models/muni/UsuarioLocal');
+    const b = req.body || {};
+
+    // 1) Combinar fecha + inicio → fecha_inicio (DATETIME)
+    //    Frontend manda { fecha: 'YYYY-MM-DD', inicio: 'HH:mm', fin: 'HH:mm' }
+    let fecha_inicio = b.fecha_inicio;
+    let fecha_fin = b.fecha_fin;
+    if (!fecha_inicio && b.fecha && b.inicio) {
+      fecha_inicio = new Date(`${b.fecha}T${b.inicio}:00`);
     }
-    delete payload.participantes;
-    const nuevo = await EventoCalendario.create(payload, { userId: req.user?.id });
-    return res.status(201).json(nuevo);
+    if (!fecha_fin && b.fecha && b.fin) {
+      fecha_fin = new Date(`${b.fecha}T${b.fin}:00`);
+    }
+    if (!fecha_inicio) {
+      return res.status(400).json({ error: 'fecha_inicio (o fecha + inicio) es requerido' });
+    }
+
+    // 2) Resolver creado_por: si el usuario logueado tiene cuenta en MUNI usar
+    //    su id, sino dejar null (admins MSP que crean eventos sin mirror).
+    let creado_por = null;
+    if (req.user?.email) {
+      const local = await UsuarioLocal.findOne({
+        where: { email: req.user.email }, attributes: ['id']
+      });
+      if (local) creado_por = local.id;
+    }
+
+    // 3) Participantes: el frontend manda nombres, persistimos en JSON.
+    const participantes_instituciones = Array.isArray(b.participantes)
+      ? b.participantes
+      : (Array.isArray(b.participantes_instituciones) ? b.participantes_instituciones : null);
+
+    // 4) Descripción enriquecida con categoría (si viene) — preserva info
+    //    que el modelo no tiene como columna.
+    const descripcion = b.categoria
+      ? `[${b.categoria}] ${b.descripcion || ''}`.trim()
+      : (b.descripcion || null);
+
+    const nuevo = await EventoCalendario.create({
+      titulo: b.titulo,
+      descripcion,
+      fecha_inicio,
+      fecha_fin: fecha_fin || null,
+      creado_por,
+      participantes_instituciones,
+      es_publico: typeof b.es_publico === 'boolean' ? b.es_publico : true
+    }, { userId: creado_por });
+
+    // 5) Devolver al frontend en el shape que usa (fecha/inicio/fin/categoria)
+    return res.status(201).json({
+      ...nuevo.toJSON(),
+      fecha: b.fecha,
+      inicio: b.inicio,
+      fin: b.fin,
+      categoria: b.categoria,
+      participantes: participantes_instituciones || [],
+      creadorId: req.user?.id,
+      creadorNombre: b.creadorNombre,
+      institucion: b.institucion
+    });
   } catch (error) {
+    console.error('[POST /eventos] ', error.message);
+    if (error.stack) console.error(error.stack.split('\n').slice(0, 5).join('\n'));
     return res.status(500).json({ error: error.message });
   }
 });

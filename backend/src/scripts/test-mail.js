@@ -84,7 +84,7 @@ const categoria = 'Reunión';
   // 2) Generar .ics
   const adjunto = await construirAdjuntoIcs({
     evento: eventoFake,
-    organizadorEmail: process.env.MAIL_USER || 'avisos@sembremos.cr',
+    organizadorEmail: process.env.MAIL_FROM_ADDRESS || process.env.MAIL_USER || 'avisos@sembremos.cr',
     attendees: destinatario ? [{ nombre: 'Destinatario', email: destinatario }] : []
   });
   const icsPath = path.join(outDir, `preview-${modo}.ics`);
