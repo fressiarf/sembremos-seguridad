@@ -226,13 +226,13 @@ class AuthController {
   async getCurrentUser(req, res) {
     try {
       const { id, nivel } = req.user;
+      const nivelUpper = (nivel || '').toUpperCase();
 
       // 2. Seleccionar modelo y rol según el nivel
-      const nivelUpper = nivel.toUpperCase();
       const UserModel = nivelUpper === 'MSP' ? UsuarioFP : UsuarioLocal;
       const RoleModel = nivelUpper === 'MSP' ? RolFP : RolLocal;
 
-      // 3. Consultar base de datos para asegurar que el usuario aún existe y está activo
+      // 3. Consultar base de datos para asegurar que el usuario aún existe y está activo incluyendo institución
       const InstitucionModel = nivelUpper === 'MSP' ? require('../../models/msp/InstitucionMaestra') : require('../../models/muni/InstitucionLocal');
       const user = await UserModel.findOne({
         where: { id, activo: true },

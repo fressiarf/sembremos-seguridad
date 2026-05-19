@@ -443,7 +443,6 @@ router.get('/eventos', async (req, res) => {
       ],
       order: [['fecha_inicio', 'ASC']]
     });
-
     const formatLeadingZero = (num) => String(num).padStart(2, '0');
 
     const mapped = eventos.map(ev => {
@@ -454,11 +453,25 @@ router.get('/eventos', async (req, res) => {
       const inicioStr = `${formatLeadingZero(fechaInicio.getHours())}:${formatLeadingZero(fechaInicio.getMinutes())}`;
       const finStr = fechaFin ? `${formatLeadingZero(fechaFin.getHours())}:${formatLeadingZero(fechaFin.getMinutes())}` : '';
 
+      // Resolver categoría de forma retrocompatible
+      let categoria = ev.categoria || null;
+      let descripcion = ev.descripcion || '';
+      if (!categoria && ev.descripcion) {
+        const m = ev.descripcion.match(/^\[([^\]]+)\]\s?(.*)$/);
+        if (m) {
+          categoria = m[1];
+          descripcion = m[2] || '';
+        }
+      }
+      if (!categoria) {
+        categoria = 'Operativa';
+      }
+
       return {
         id: ev.id,
         titulo: ev.titulo,
-        descripcion: ev.descripcion || '',
-        categoria: ev.categoria || 'Operativa',
+        descripcion: descripcion,
+        categoria: categoria,
         fecha: fechaStr,
         inicio: inicioStr,
         fin: finStr,
@@ -479,6 +492,7 @@ router.get('/eventos', async (req, res) => {
 router.post('/eventos', async (req, res) => {
   try {
     const EventoCalendario = require('../../models/muni/EventoCalendario');
+    const { Op } = require('sequelize');
     const payload = { ...req.body };
 
     // 1. Mapear participantes
@@ -520,9 +534,22 @@ router.post('/eventos', async (req, res) => {
 
     const auditUserId = req.user?.nivel === 'MSP' ? '00000000-0000-0000-0000-000000000000' : (req.user?.id || payload.creadorId);
     const nuevo = await EventoCalendario.create(payload, { userId: auditUserId });
-    return res.status(201).json(nuevo);
+
+    // Devolver al frontend en el shape que usa (fecha/inicio/fin/categoria) de forma unificada
+    return res.status(201).json({
+      ...nuevo.toJSON(),
+      fecha: payload.fecha,
+      inicio: payload.inicio,
+      fin: payload.fin,
+      categoria: nuevo.categoria,
+      participantes: nuevo.participantes_instituciones || [],
+      creadorId: req.user?.id || payload.creadorId,
+      creadorNombre: req.user?.nombre || payload.creadorNombre,
+      institucion: payload.institucion
+    });
   } catch (error) {
-    console.error('[LEGACY] Error al crear evento:', error);
+    console.error('[POST /eventos] ', error.message);
+    if (error.stack) console.error(error.stack.split('\n').slice(0, 5).join('\n'));
     return res.status(500).json({ error: error.message });
   }
 });

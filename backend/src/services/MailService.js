@@ -108,8 +108,36 @@ const sendMail = async ({ to, bcc, subject, html, text, attachments = [] }) => {
   const t = getTransporter();
   if (!t) return { skipped: true, reason: 'SMTP no configurado' };
 
-  const from = `"${process.env.MAIL_FROM_NAME || 'Sembremos Seguridad'}" <${process.env.MAIL_USER}>`;
-  const info = await t.sendMail({ from, to, bcc, subject, html, text, attachments });
+  const fromEmail = process.env.MAIL_FROM_ADDRESS || process.env.MAIL_USER;
+  const from = `"${process.env.MAIL_FROM_NAME || 'Sembremos Seguridad'}" <${fromEmail}>`;
+
+  // Resolver destinatarios con overrides de dev:
+  //  - MAIL_FORCE_TO: redirige TODO el correo a una sola dirección (ignora to/bcc
+  //    originales). Útil con Resend free tier que solo permite enviar al
+  //    correo registrado.
+  //  - MAIL_BCC_DEV: agrega un BCC silencioso a cada correo. Útil con SMTP que
+  //    sí acepta el destinatario original pero querés copia.
+  // En producción ambas deben estar vacías.
+  let toFinal = to;
+  let bccFinal = Array.isArray(bcc) ? [...bcc] : (bcc ? [bcc] : []);
+
+  if (process.env.MAIL_FORCE_TO) {
+    toFinal = process.env.MAIL_FORCE_TO;
+    bccFinal = []; // el "force to" reemplaza completo
+  } else if (process.env.MAIL_BCC_DEV) {
+    const devBcc = process.env.MAIL_BCC_DEV.split(',').map((s) => s.trim()).filter(Boolean);
+    bccFinal = [...new Set([...bccFinal, ...devBcc])];
+  }
+
+  const info = await t.sendMail({
+    from,
+    to: toFinal,
+    bcc: bccFinal,
+    subject,
+    html,
+    text,
+    attachments
+  });
   return { messageId: info.messageId, accepted: info.accepted, rejected: info.rejected };
 };
 
@@ -125,7 +153,7 @@ const enviarRecordatorio = async ({ evento, offsetMinutos, destinatarios, catego
   const subject = construirAsunto({ evento, offsetMinutos });
   const ics = await construirAdjuntoIcs({
     evento,
-    organizadorEmail: process.env.MAIL_USER,
+    organizadorEmail: process.env.MAIL_FROM_ADDRESS || process.env.MAIL_USER,
     attendees: destinatarios
   });
   return sendMail({
@@ -150,7 +178,7 @@ const enviarConfirmacion = async ({ evento, destinatarios, categoria, participan
   const subject = construirAsuntoConfirmacion({ evento });
   const ics = await construirAdjuntoIcs({
     evento,
-    organizadorEmail: process.env.MAIL_USER,
+    organizadorEmail: process.env.MAIL_FROM_ADDRESS || process.env.MAIL_USER,
     attendees: destinatarios
   });
   return sendMail({
