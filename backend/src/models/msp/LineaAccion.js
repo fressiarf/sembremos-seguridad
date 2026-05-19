@@ -45,9 +45,9 @@ const LineaAccion = sequelizeFP.define('LineaAccion', {
   underscored: true,
   hooks: {
     afterCreate: async (linea, options) => {
-      // Sincronización MSP -> MUNI
-      const SyncService = require('../../services/SyncService');
-      await SyncService.syncLineasAccion().catch(err => console.error('Error en sync automático:', err));
+      // Sincronización asíncrona hacia MUNI vía Worker (no bloqueante)
+      const syncWorker = require('../../workers/syncWorker');
+      syncWorker.addJob('syncLineasAccion');
       // Auditoría automática
       const LogAuditoriaFP = require('./LogAuditoriaFP');
       const { generarHooksAuditoria } = require('../../common/helpers/auditHelper');
@@ -55,9 +55,9 @@ const LineaAccion = sequelizeFP.define('LineaAccion', {
       await hooks.afterCreate(linea, options);
     },
     afterUpdate: async (linea, options) => {
-      // Sincronización MSP -> MUNI
-      const SyncService = require('../../services/SyncService');
-      await SyncService.syncLineasAccion().catch(err => console.error('Error en sync automático:', err));
+      // Sincronización asíncrona hacia MUNI vía Worker (no bloqueante)
+      const syncWorker = require('../../workers/syncWorker');
+      syncWorker.addJob('syncLineasAccion');
       // Auditoría automática
       const LogAuditoriaFP = require('./LogAuditoriaFP');
       const { generarHooksAuditoria } = require('../../common/helpers/auditHelper');
@@ -72,8 +72,8 @@ const LineaAccion = sequelizeFP.define('LineaAccion', {
       await hooks.afterDestroy(linea, options);
     },
     afterUpsert: async (linea, options) => {
-      const SyncService = require('../../services/SyncService');
-      await SyncService.syncLineasAccion().catch(err => console.error('Error en sync automático:', err));
+      const syncWorker = require('../../workers/syncWorker');
+      syncWorker.addJob('syncLineasAccion');
     }
   }
 });
